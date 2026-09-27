@@ -1,5 +1,5 @@
 {
-  "revision": "R3",
+  "revision": "R4",
   "parameters": {
     "neck_x": 14,
     "neck_y": 19,
@@ -9,16 +9,19 @@
     "phone_t": 18,
     "button_from_end": 105,
     "button_from_screen": 6,
+    "actuator_side": "far",
     "width_min": 66,
     "width_max": 86,
     "thickness_min": 7.5,
     "thickness_max": 20,
     "button_min": 80,
     "button_max": 125,
-    "groove_x": 14,
+    "groove_x": 24,
     "phone_mid_z": 14,
     "pad_normal": 0.8,
-    "pad_x_allowance": 1.13,
+    "pad_x_allowance": 0.8,
+    "rear_face_z": 25.2,
+    "module_x_offset": 2,
     "neck_cx": -23,
     "neck_cy": 40,
     "neck_clearance": 0.6,
@@ -41,22 +44,22 @@
     {
       "name": "carrier",
       "quantity": 1,
-      "volume_mm3": 52828.36,
+      "volume_mm3": 39008.66,
       "bounds_mm": [
-        132.7,
-        145.0,
-        38.0
+        126.7,
+        101.3,
+        37.0
       ],
       "file": "carrier.stl"
     },
     {
       "name": "sliding_jaw",
       "quantity": 1,
-      "volume_mm3": 21451.99,
+      "volume_mm3": 25232.25,
       "bounds_mm": [
-        71.0,
-        30.0,
-        34.0
+        87.0,
+        92.0,
+        37.0
       ],
       "file": "sliding_jaw.stl"
     },
@@ -96,10 +99,10 @@
     {
       "name": "handle_anchor",
       "quantity": 1,
-      "volume_mm3": 9082.78,
+      "volume_mm3": 8676.69,
       "bounds_mm": [
-        15.7,
-        51.3,
+        20.7,
+        48.6,
         24.0
       ],
       "file": "handle_anchor.stl"
@@ -307,6 +310,46 @@
       "printable": false
     },
     {
+      "name": "soft_side_pad_left",
+      "color": [
+        0.13,
+        0.16,
+        0.19
+      ],
+      "file": "assembly_meshes/soft_side_pad_left.stl",
+      "printable": false
+    },
+    {
+      "name": "soft_rear_pad_left",
+      "color": [
+        0.13,
+        0.16,
+        0.19
+      ],
+      "file": "assembly_meshes/soft_rear_pad_left.stl",
+      "printable": false
+    },
+    {
+      "name": "soft_side_pad_right",
+      "color": [
+        0.13,
+        0.16,
+        0.19
+      ],
+      "file": "assembly_meshes/soft_side_pad_right.stl",
+      "printable": false
+    },
+    {
+      "name": "soft_rear_pad_right",
+      "color": [
+        0.13,
+        0.16,
+        0.19
+      ],
+      "file": "assembly_meshes/soft_rear_pad_right.stl",
+      "printable": false
+    },
+    {
       "name": "pivot_M3",
       "color": [
         0.63,
@@ -337,13 +380,43 @@
       "printable": false
     },
     {
-      "name": "return_spring_moving_leg",
+      "name": "travel_stop_M3",
       "color": [
         0.63,
         0.68,
         0.72
       ],
-      "file": "assembly_meshes/return_spring_moving_leg.stl",
+      "file": "assembly_meshes/travel_stop_M3.stl",
+      "printable": false
+    },
+    {
+      "name": "travel_stop_nut",
+      "color": [
+        0.63,
+        0.68,
+        0.72
+      ],
+      "file": "assembly_meshes/travel_stop_nut.stl",
+      "printable": false
+    },
+    {
+      "name": "carriage_M3_-8",
+      "color": [
+        0.63,
+        0.68,
+        0.72
+      ],
+      "file": "assembly_meshes/carriage_M3_-8.stl",
+      "printable": false
+    },
+    {
+      "name": "carriage_M3_8",
+      "color": [
+        0.63,
+        0.68,
+        0.72
+      ],
+      "file": "assembly_meshes/carriage_M3_8.stl",
       "printable": false
     },
     {
@@ -387,66 +460,6 @@
       "printable": false
     },
     {
-      "name": "soft_jaw_pad_left_False",
-      "color": [
-        0.13,
-        0.16,
-        0.19
-      ],
-      "file": "assembly_meshes/soft_jaw_pad_left_False.stl",
-      "printable": false
-    },
-    {
-      "name": "soft_jaw_pad_right_False",
-      "color": [
-        0.13,
-        0.16,
-        0.19
-      ],
-      "file": "assembly_meshes/soft_jaw_pad_right_False.stl",
-      "printable": false
-    },
-    {
-      "name": "soft_jaw_pad_left_True",
-      "color": [
-        0.13,
-        0.16,
-        0.19
-      ],
-      "file": "assembly_meshes/soft_jaw_pad_left_True.stl",
-      "printable": false
-    },
-    {
-      "name": "soft_jaw_pad_right_True",
-      "color": [
-        0.13,
-        0.16,
-        0.19
-      ],
-      "file": "assembly_meshes/soft_jaw_pad_right_True.stl",
-      "printable": false
-    },
-    {
-      "name": "travel_stop_M3",
-      "color": [
-        0.63,
-        0.68,
-        0.72
-      ],
-      "file": "assembly_meshes/travel_stop_M3.stl",
-      "printable": false
-    },
-    {
-      "name": "travel_stop_nut",
-      "color": [
-        0.63,
-        0.68,
-        0.72
-      ],
-      "file": "assembly_meshes/travel_stop_nut.stl",
-      "printable": false
-    },
-    {
       "name": "cable_pinch_barrel",
       "color": [
         0.63,
@@ -454,6 +467,16 @@
         0.72
       ],
       "file": "assembly_meshes/cable_pinch_barrel.stl",
+      "printable": false
+    },
+    {
+      "name": "return_spring_moving_leg",
+      "color": [
+        0.63,
+        0.68,
+        0.72
+      ],
+      "file": "assembly_meshes/return_spring_moving_leg.stl",
       "printable": false
     },
     {
@@ -497,6 +520,26 @@
       "printable": false
     },
     {
+      "name": "housing_route_3",
+      "color": [
+        0.13,
+        0.16,
+        0.19
+      ],
+      "file": "assembly_meshes/housing_route_3.stl",
+      "printable": false
+    },
+    {
+      "name": "housing_route_4",
+      "color": [
+        0.13,
+        0.16,
+        0.19
+      ],
+      "file": "assembly_meshes/housing_route_4.stl",
+      "printable": false
+    },
+    {
       "name": "handle_inner_wire",
       "color": [
         0.63,
@@ -527,66 +570,52 @@
       "printable": false
     },
     {
-      "name": "collar_M4_0_21.2",
+      "name": "collar_M4_phone_21.2",
       "color": [
         0.63,
         0.68,
         0.72
       ],
-      "file": "assembly_meshes/collar_M4_0_21.2.stl",
+      "file": "assembly_meshes/collar_M4_phone_21.2.stl",
       "printable": false
     },
     {
-      "name": "collar_M4_0_58.8",
+      "name": "collar_M4_handle_21.2",
       "color": [
         0.63,
         0.68,
         0.72
       ],
-      "file": "assembly_meshes/collar_M4_0_58.8.stl",
+      "file": "assembly_meshes/collar_M4_handle_21.2.stl",
       "printable": false
     },
     {
-      "name": "collar_M4_-370_21.2",
+      "name": "collar_M4_phone_58.8",
       "color": [
         0.63,
         0.68,
         0.72
       ],
-      "file": "assembly_meshes/collar_M4_-370_21.2.stl",
+      "file": "assembly_meshes/collar_M4_phone_58.8.stl",
       "printable": false
     },
     {
-      "name": "collar_M4_-370_58.8",
+      "name": "collar_M4_handle_58.8",
       "color": [
         0.63,
         0.68,
         0.72
       ],
-      "file": "assembly_meshes/collar_M4_-370_58.8.stl",
-      "printable": false
-    },
-    {
-      "name": "carriage_M3_-8",
-      "color": [
-        0.63,
-        0.68,
-        0.72
-      ],
-      "file": "assembly_meshes/carriage_M3_-8.stl",
-      "printable": false
-    },
-    {
-      "name": "carriage_M3_8",
-      "color": [
-        0.63,
-        0.68,
-        0.72
-      ],
-      "file": "assembly_meshes/carriage_M3_8.stl",
+      "file": "assembly_meshes/collar_M4_handle_58.8.stl",
       "printable": false
     }
   ],
-  "pressed_angle_radians": 0.055856657359453415,
-  "total_printed_solid_cm3": 103.19
+  "pressed_angle_radians": 0.055673794986509026,
+  "motion_pivot": [
+    -158.6,
+    69.0,
+    1.1999999999999815
+  ],
+  "motion_sign": 1,
+  "total_printed_solid_cm3": 92.75
 }
