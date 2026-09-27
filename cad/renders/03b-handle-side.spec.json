@@ -2,6 +2,7 @@
   "image": "03b-handle-side.png",
   "subject": "Handle cable coupling, b view",
   "reference": "../reference/reacher-grabber.png",
+  "stock_reference_view": "00b-stock-side.png",
   "status": "Technical concept illustration; not dimensioned or mechanically validated",
   "neck_geometry": "The stock silver neck is a rectangular prism with a square cross-section, flat faces, and sharp longitudinal edges; the orange cable-housing anchor grips its square profile, not a cylinder.",
   "color_key": "Only the original stock handle is blue in this crop. Added 3D-printed shaft clamp and any trigger strap are orange. Stock shaft and wire remain silver; the cable housing remains black.",
@@ -14,6 +15,7 @@
   "requirements": [
     "Show the same lower shaft, blue handle, and external cable coupling as 3a after a counterclockwise 90-degree viewpoint change around upright y; no inset or additional view.",
     "The upper blue handle head is in view while the black squeeze trigger and its attached tab are occluded behind the handle, consistent with 1b.",
+    "Keep the stock blue grip centered behind the head in side projection, matching 0b rather than sweeping sideways.",
     "Show the stationary split collar anchoring the bicycle brake cable housing and route the cable toward the hidden trigger tab. Use subtle hidden lines only if needed to explain the concealed attachment.",
     "Use minimal extra metal parts, no drilled holes, no internal handle changes, and no use of existing handle screws.",
     "Show a small x/y/z axis glyph on opaque white technical drawing paper: positive y up, positive z left, and positive x out of the page as a circled dot."

@@ -2,7 +2,7 @@
   "image": "00b-stock-side.png",
   "subject": "Unmodified reference reacher-grabber, b/side view",
   "reference": "../reference/reacher-grabber.png",
-  "status": "Technical reference illustration; not a dimensioned or measured CAD model",
+  "status": "Inferred side-view technical reference illustration from a front-only source photo; not a dimensioned or measured CAD model",
   "neck_geometry": "The stock silver neck is a rectangular prism with a square cross-section, flat faces, and straight longitudinal edges, not a cylinder.",
   "color_key": "Only the original stock center brace and molded handle are blue. Stock metal is silver; the overlapping claw foot is black. No added parts or orange components appear.",
   "axes": {

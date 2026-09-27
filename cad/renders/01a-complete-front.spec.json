@@ -2,6 +2,7 @@
   "image": "01a-complete-front.png",
   "subject": "Full proposed grabber retrofit, a view",
   "reference": "../reference/reacher-grabber.png",
+  "stock_reference_view": "00a-stock-front.png",
   "status": "Technical concept illustration; not dimensioned or mechanically validated",
   "neck_geometry": "The stock silver neck is a rectangular prism with a square cross-section, flat faces, and sharp longitudinal edges; every shaft clamp must fit the square profile, not a cylinder.",
   "color_key": "Only the stock center brace and stock handle are blue. All added 3D-printed retrofit parts are orange. Stock metal remains silver; original claw feet and squeeze trigger remain black.",
@@ -14,6 +15,7 @@
   "requirements": [
     "One complete reacher and its attachments in one view; no inset or additional view.",
     "Preserve the exact reference grabber's silver fluted shaft, curved claws, black claw feet, blue pistol handle, and moving black squeeze trigger.",
+    "Keep the stock V-claw span and the single blue center brace at the same relative shaft position as stock reference 0a; retrofit parts do not change them.",
     "Keep the phone below the claw fork and outside the moving claw sweep, held in a removable GoPro-like corner harness on a split neck clamp.",
     "The phone lies in a plane perpendicular to the neck, with uncovered rear cameras facing up the neck toward the claws.",
     "Rotate the phone about the neck's y-axis until its short bottom edge and charging port face the viewer; its long side recedes into depth.",

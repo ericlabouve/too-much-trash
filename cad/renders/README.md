@@ -17,4 +17,6 @@ The stock neck is a silver rectangular prism with a square cross-section, not a 
 
 These generated drawings communicate mechanical intent. The paired views are illustrative rather than geometrically locked CAD projections. They do not prove fit, lever travel, button force, cable tension, or camera clearance. Confirm those details on the physical grabber and iPhone before manufacturing.
 
+The [stock consistency review](stock-consistency.md) compares each retrofit view to its 0a or 0b reference and records what can and cannot be validated visually.
+
 Each PNG has a neighboring `.spec.json` file recording the requirements for that view. Consult and update it when revising the image.
