@@ -1,5 +1,5 @@
-# R2 adjustable prototype files
+# R3 print set — fit prototypes
 
-Eleven printable `*.stl` files and matching editable `*.step` files come from [`../source/build.py`](../source/build.py). `assembly.step` includes these parts plus simplified phone and full stock-grabber visual proxies. [`full-assembly-cad.png`](full-assembly-cad.png) shows the complete assembly and both attachment details; `assembly-cad.png` remains the near-claw technical view. The same STL set adjusts to phone dimensions and button positions within the limits in [the CAD README](../README.md). These are **fit prototypes**, not approved final manufacturing files. Import STLs separately in Bambu Studio and use the orientations in the CAD README.
+Six unique bed-oriented STL files; print **two neck caps** and one of each other part. STEP parts remain in assembly coordinates. `assembly.step` includes printed parts plus unthreaded hardware and provisional stock/phone envelopes. `assembly_meshes/` is viewer data, **not a print set**. Use only the six top-level STLs for printing.
 
-To inspect all eleven local STLs in Chrome, run `python3 serve_viewer.py` from `cad/` and open `http://localhost:8765/viewer.html`. The viewer uses Three.js from a public CDN; the STL files stay on the local loopback server.
+See [assembly/print instructions](../README.md), [BOM](../bom.md), and [limitations](../design-review.md). `manifest.json` records CAD volumes and bounding boxes; `validation.json` records sample checks and provisional mechanism calculations. Open `../viewer.html` through `../serve_viewer.py` to inspect the actual exports in Chrome. The viewer uses pinned Three.js modules from a public CDN and loads geometry from localhost.
