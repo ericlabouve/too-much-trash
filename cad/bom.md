@@ -23,10 +23,10 @@ Six unique STL files, seven printed pieces. Pads are cut from compliant sheet, n
 | M3×25 bolts, broad washers, locking nuts | 2 sets | Bracket/rail slotted adjustment; washers bridge slots |
 | 3 mm smooth metal pivot, about 26–30 mm usable length, washers and axial retainers | 1 set | Both ears support axle; leave rocker and spring free, no clamping friction. Choose actual retention style before assembly. |
 | M3 threaded contact screw/rod, about 25 mm, two thin locknuts | 1 set | Adjustable contact; cut excess and cover end with soft tip |
-| M3×20 stop screw, 5.5 mm square nut ≤2.4 mm thick, locking nut | 1 set | Adjust positive rocker travel limit; check end position on dummy gauge |
+| M3×20 stop screw, 5.5 mm square nut ≤2.4 mm thick, locking nut | 1 set | Adjust positive rocker travel limit; set conservatively before button contact |
 | Bicycle brake housing, 5 mm nominal OD, ferrules | ~1 m, 2 ferrules | Bore is provisionally 5.6 mm; measure ferrule OD and seating length |
 | Stainless brake inner wire, about 1.6 mm | ~1 m | Cut after routing; terminate ends safely |
-| Screw-on cable stop/barrel ≤5 mm OD at rocker; rated loop clamp at handle; end caps | 1 each / as needed | Barrel sits above input arm; inner-wire path is 2.2 mm. No dependence on a factory brake nipple shape. |
+| Screw-on cable stop/barrel ≤5 mm OD at rocker; rated loop clamp at handle; end caps | 1 each / as needed | Stop bears on the input-arm face away from the housing; inner-wire path is 2.2 mm. No dependence on a factory brake nipple shape. |
 | Torsion return spring, fits 3 mm pivot; ≤6 mm OD, ≤2.7 mm coil length, ~0.4 mm wire | 1 | Target initial torque 5 N·mm, rate ~30 N·mm/rad. Spring legs must match seats; test supplied spring, these are design targets. |
 | Closed-eye extension spring, ~35 mm eye-to-eye relaxed, ≤8 mm OD | 1 | Target initial tension 1.5 N, rate 0.055 N/mm, **rated working extension ≥45 mm**. This is a sourcing requirement, not a validated stock SKU. See design review. |
 | Hook-and-loop trigger strap, about 10–15 mm wide; cable route ties | 1 / several | Strap passes through spring eye or securely linked cable loop; inspect creep/slip |

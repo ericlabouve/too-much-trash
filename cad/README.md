@@ -10,7 +10,7 @@ Editable **fit prototype**, based on the [confirmed measurements](reference/meas
 
 The same print set covers a provisional **66–86 mm outside width, 7.5–20 mm thickness**, and volume-button location **80–125 mm from the charging edge**, subject to its center also being **25–65 mm toward the camera end from the phone midpoint**. Both the bare 15 Pro sample (70.6 × 146.6 × 8.25 mm) and wallet-case sample (76 × 152 × 18 mm) are modeled. This is an envelope, **not a verified iPhone 14–18 compatibility list**. Camera bumps, rounded sides, cases and button force must be checked individually.
 
-Two flat opposing jaws clamp replaceable 0.8 mm side pads. Rear ledges with pads locate the camera-side face; the bridge and sliding tongue sit behind that face, leaving the screen open. A metal M4 draw screw adjusts width. Narrow front lips act as escape catches, but have substantial clearance on thin phones: **out-of-plane and lengthwise retention depend on pad friction**, not a close-fitting cage. Use an independent tether and validate retention with a dummy phone before use. Pads must bear on the case/frame, not display glass.
+Two flat opposing jaws clamp replaceable 0.8 mm side pads. Rear ledges with pads locate the camera-side face; the bridge and sliding tongue sit behind that face, leaving the screen open. A metal M4 draw screw adjusts width. Narrow front lips act as escape catches, but have substantial clearance on thin phones: **out-of-plane and lengthwise retention depend on pad friction**, not a close-fitting cage. Use an independent tether. Dummy-phone testing was declined by the user; retention remains physically unverified. Pads must bear on the case/frame, not display glass.
 
 **Option B is the selected layout:** the phone remains beside the shaft, with no shaft/phone intersection. The 24 mm gripping band is centered along phone length, so equal lengths extend beyond it. This balances length about the band; it does not eliminate the lateral moment caused by a phone beside the shaft. The default actuator is on the edge nearest the shaft, with the camera envelope on the opposite edge. The same bracket and rocker can be installed on the far-side rail without mirrored prints; see [both configurations](print/actuator-sides-cad.png) and `assembly-far-side.step`. Confirm the centered band misses the other phone buttons.
 
@@ -20,7 +20,7 @@ The phone rear faces the claws, with its charging edge toward project +Z; the ph
 
 ![Released and pressed CAD mechanism](print/actuator-cad.png)
 
-The outer housing seats in a stepped ferrule bore on the adjustable bracket. The inner wire passes through the rocker input arm and terminates in a purchased screw-on cable barrel above it. Cable pull rotates the rocker on a metal pivot. A padded M3 contact screw presses volume up; two opposed nuts lock the contact setting. A torsion spring returns the rocker to its released ledge. An adjustable M3 stop limits rotation and transfers excess load into the bracket.
+The outer housing seats in a stepped ferrule bore on the adjustable bracket. The inner wire passes through the rocker input arm and terminates in a purchased screw-on cable stop on the side away from the housing. Cable pull rotates the rocker on a metal pivot. A padded M3 contact screw presses volume up; two opposed nuts lock the contact setting. A torsion spring returns the rocker to its released ledge. An adjustable M3 stop limits rotation and transfers excess load into the bracket.
 
 A **purchased extension spring in series between the handle-end cable loop and trigger strap** absorbs the rest of the squeeze stroke after the rocker reaches its stop. It is necessary: a brake cable directly linking 20–40 mm trigger travel to a sub-millimetre phone button would otherwise bind or overload something. The button remains pressed until the trigger is released.
 
@@ -33,9 +33,9 @@ The [generated calculation](print/validation.json) uses provisional 0.35 mm rest
 3. Bolt the integrated saddle and one `neck_cap` around the rectangular neck. Fit the second cap to `handle_anchor` above the handle. Each collar uses two M4 through-bolts and washers. Do not crush the fluted tube; physical shim fit controls friction.
 4. Choose the carrier rail or matching sliding-jaw rail and attach the same bracket to its slot using two M3 bolts and washers. Slide it along the phone and adjust its height through the paired vertical slots, then lock both bolts. Wallet-case button center is 6 mm from the screen side; the rear ledges locate the 18 mm case at a fixed rear datum. Leave the camera keep-out area unobstructed.
 5. Install the pivot, torsion spring and rocker with axial washers. Set spring legs in their provided holes, with preload toward the released stop; ensure no coil/leg rubbing. Install the contact screw with a soft tip and opposed locknuts, and the stop screw with its square nut plus locking nut.
-6. Seat housing/ferrules at both reaction stops. Route the housing down the center of the neck face facing the black trigger; the handle anchor outlet and upper-trigger Velcro tie are in the same plane. Use smooth bends (provisional minimum 50 mm radius; follow housing supplier limits), away from claws and fingers. Secure with removable ties. The CAD route is a diagram with straight segments, not a cut/bend template.
+6. Seat housing/ferrules at both reaction stops. Route the housing down the center of the neck face facing the black trigger; the handle anchor outlet and upper-trigger Velcro tie are in the same plane. Use smooth bends (follow the selected housing supplier’s bend-radius limits; the schematic two-turn loop may need more space), away from claws and fingers. Secure with removable ties. The CAD route is a diagram with straight segments, not a cut/bend template.
 7. Secure the handle inner wire to the series spring with a rated clamp/loop termination. Connect the spring's closed eye to a hook-and-loop strap on the **moving trigger**. Keep all metal ends covered and clear of the hand. Do not attach it to the stationary grip. Verify strap security through the full squeeze.
-8. Calibrate first on a dummy block: eliminate unintended preload, set a small release gap, then limit the rocker stroke with its stop. Adjust cable slack so it releases reliably after every squeeze. Confirm full claw closure still occurs as the series spring extends. Only then approach the actual phone button with a conservative stop setting. Do not assume 0.30 mm is safe for a particular phone/case.
+8. Calibrate the adjustable mechanism: eliminate unintended preload, set a small release gap, then limit the rocker stroke with its stop. Adjust cable slack so it releases reliably after every squeeze. Confirm full claw closure still occurs as the series spring extends. Approach the phone button with a conservative stop setting. Do not assume 0.30 mm is safe for a particular phone/case.
 
 ## Print and materials
 
@@ -73,3 +73,20 @@ uv run --frozen python serve_viewer.py
 ```
 
 Only `cad/.venv` is used; no global Python packages are required. Export behavior follows [CadQuery's export documentation](https://cadquery.readthedocs.io/en/latest/importexport.html). Edit the sample settings to visualize another phone; the same printable geometry remains unchanged inside the stated envelope. Revising the mechanism/fit envelope itself requires reviewing the associated geometry and repeating validation.
+
+## Hardware shown in gray/white
+
+See [the purchased BOM](bom.md) for quantities and provisional sizes. White rods are simplified metal hardware, with threads and some washers/heads omitted:
+
+- Four collar bolts close the phone and handle clamps around the shaft.
+- The long M4 draw screw and its thumb wheel pull the sliding jaw inward; a captive square nut reacts it.
+- Two M3 carriage bolts lock the actuator's position in its adjustment slots.
+- One smooth metal pivot axle supports the rocking lever.
+- One M3 contact screw with two locknuts carries the soft button tip.
+- One M3 stop screw and its nuts limit lever travel.
+- The short cylinder on the lever is a **removable screw-on cable stop**, not a modeled factory cable nipple. The bare inner wire passes through the 2.2 mm lever hole; the stop clamps to the wire on the far side and bears against the lever when pulled. The fixed bracket separately anchors the housing/ferrule and reacts its compression.
+- The pivot spring returns the lever. The inline extension spring near the trigger takes up excess squeeze travel.
+
+Other purchased items are inner cable, outer housing, two ferrules, cable end/loop terminations, hook-and-loop trigger strap, removable route ties, jaw pads, shaft shims, soft contact cap and phone tether. Their dimensions and spring shapes are envelopes pending hardware selection; they are not printable components. A factory cable nipple like the supplied photo could replace the screw-on stop only after checking its shape, bearing area and clearance.
+
+The housing now follows three straight segments with two right-angle turns in CAD. Actual brake housing must make rounded bends at those locations; the drawing is not a specification to kink the housing. Cable length and loop clearance depend on the chosen housing.

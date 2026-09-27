@@ -540,26 +540,6 @@
       "printable": false
     },
     {
-      "name": "housing_route_3",
-      "color": [
-        0.13,
-        0.16,
-        0.19
-      ],
-      "file": "assembly_meshes/housing_route_3.stl",
-      "printable": false
-    },
-    {
-      "name": "housing_route_4",
-      "color": [
-        0.13,
-        0.16,
-        0.19
-      ],
-      "file": "assembly_meshes/housing_route_4.stl",
-      "printable": false
-    },
-    {
       "name": "handle_inner_wire",
       "color": [
         0.63,

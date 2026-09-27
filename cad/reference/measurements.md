@@ -170,3 +170,7 @@ Original stock photo and concept renders remain unchanged.
 The user's rear landscape reference places the camera block at lower left and volume up on the upper long edge. The default demo therefore uses the near-shaft actuator rail, with the camera block on the far edge. This supersedes R4's initial far-side demo placement; either-side printable capability is unchanged. Volume-up center/depth use the supplied measurements. Added button-marker size (7 ×2.6 mm), 14 mm down-button spacing and camera block dimensions are illustrative, not new measurements.
 
 “Dummy phone test” means a physical size/weight surrogate and dummy button gauge to check clamp slip, stiffness, cable friction, return and stop behavior before risking the phone. CAD swept-motion checks and the browser lever slider visualize rigid motion only; they do not validate those physical effects.
+
+### Housing route and hardware clarification — 2026-09-27
+
+User declined dummy-phone testing and requested the housing illustration use a simple loop with two right-angle turns. The CAD now shows three straight segments, with the long run centered on the trigger-facing neck surface. These corners are a routing schematic; actual housing requires rounded bends and selected-hardware clearance. No hardware dimensions or physical tests were supplied. The lever's existing short cylinder represents a purchased screw-on cable stop; it does not assume a particular factory nipple. The README now identifies all non-printed hardware and the housing/inner-wire load paths.

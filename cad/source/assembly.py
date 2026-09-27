@@ -105,15 +105,11 @@ def hardware(p,angle=0):
              'return_spring_moving_leg':rod((9,4,19),(7,1,19),.7)}
     h.update({n:moving(s,p,angle) for n,s in movable.items()})
     h['phone_inner_wire']=module(rod((-7,0,0),(11-18*math.cos(angle),0,22-18*math.sin(angle)),1.6),p)
-    # Routing envelope: leave ferrule axially, pass beyond the phone end, then
-    # descend on the trigger-facing shaft surface. Actual housing uses smooth bends.
-    route_raw=[(-7,0,-6),(-7,0,-42),(-7,75,-42)]
-    points=[]
-    for point in route_raw:
-        marker=module(cq.Workplane('XY').sphere(.1).translate(point),p).val().Center()
-        points.append(marker.toTuple())
-    points += [(p.cable_face_x,p.phone_y0+p.phone_l+30,70),(p.cable_face_x,p.neck_cy,70),
-               (p.cable_face_x,p.neck_cy,p.handle_z+12)]
+    # Schematic U route: axial rise, transverse leg, axial run down shaft.
+    # Two 90-degree corners communicate routing, not physical bend radii.
+    start=module(cq.Workplane('XY').sphere(.1).translate((-7,0,-6)),p).val().Center().toTuple()
+    points=[start,(start[0],start[1],70),(p.cable_face_x,p.neck_cy,70),
+            (p.cable_face_x,p.neck_cy,p.handle_z+12)]
     for i,(a,b) in enumerate(zip(points,points[1:])):h[f'housing_route_{i}']=rod(a,b,5)
     anchor=(p.cable_face_x,p.neck_cy,p.handle_z-12)
     attach=(p.cable_face_x,p.neck_cy,p.handle_z-100)
