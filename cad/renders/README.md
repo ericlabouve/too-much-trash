@@ -1,6 +1,6 @@
 # Reacher retrofit concept drawings
 
-These six views are based on the [specific reacher-grabber photo](../reference/reacher-grabber.png). In every drawing the long shaft is parallel to positive y, positive x points right, and positive z comes out of the page toward the viewer. Each **b** view illustrates an intended 90° change of viewpoint around y; the object is not laid on its side. The latest phone translation applies only to 1a and 2a; 1b and 2b retain their earlier centered placement, so these sketches are not yet geometrically consistent CAD projections.
+These six views are based on the [specific reacher-grabber photo](../reference/reacher-grabber.png). In every drawing the long shaft is parallel to positive y. In the **a** views, positive x points right and positive z comes out of the page toward the viewer. In the **b** views, the axis key rotates with the intended 90° viewpoint change about y: positive z points left and positive x comes out of the page. The object is not laid on its side. The latest phone translation applies only to 1a and 2a; 1b and 2b retain their earlier centered placement, so these sketches are not yet geometrically consistent CAD projections.
 
 | View | Focus |
 | --- | --- |

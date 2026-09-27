@@ -4,9 +4,9 @@
   "reference": "../reference/reacher-grabber.png",
   "status": "Technical concept illustration; not dimensioned or mechanically validated",
   "axes": {
-    "x": "right",
+    "x": "out of the page toward the viewer, shown as a circled dot",
     "y": "up, parallel to the long reacher neck",
-    "z": "out of the page toward the viewer; negative z goes into the page",
+    "z": "left across the page",
     "viewpoint_rotation_about_y_degrees": 90
   },
   "requirements": [
@@ -17,6 +17,6 @@
     "The phone remains below the claw fork with its plane perpendicular to the neck and its cameras facing the claws. This view shows its long side, not the charging-port edge.",
     "Keep the phone centered across the neck as in the earlier b-view concept; do not apply the positive-x and negative-z phone translation requested for 1a.",
     "Keep the external bicycle brake cable on the shaft and route it into the hidden trigger coupling consistently with 3b.",
-    "Show a small x/y/z axis glyph on opaque white paper, with positive z represented as coming out of the page, in a technical engineering drawing style."
+    "Show a small x/y/z axis glyph on opaque white paper: positive y up, positive z left, and positive x out of the page as a circled dot, in a technical engineering drawing style."
   ]
 }

@@ -4,9 +4,9 @@
   "reference": "../reference/reacher-grabber.png",
   "status": "Technical concept illustration; not dimensioned or mechanically validated",
   "axes": {
-    "x": "right",
+    "x": "out of the page toward the viewer, shown as a circled dot",
     "y": "up, parallel to the long reacher neck",
-    "z": "out of the page toward the viewer; negative z goes into the page",
+    "z": "left across the page",
     "viewpoint_rotation_about_y_degrees": 90
   },
   "requirements": [
@@ -14,6 +14,6 @@
     "The upper blue handle head is in view while the black squeeze trigger and its attached tab are occluded behind the handle, consistent with 1b.",
     "Show the stationary split collar anchoring the bicycle brake cable housing and route the cable toward the hidden trigger tab. Use subtle hidden lines only if needed to explain the concealed attachment.",
     "Use minimal extra metal parts, no drilled holes, no internal handle changes, and no use of existing handle screws.",
-    "Show a small x/y/z axis glyph on opaque white technical drawing paper, with positive z toward the viewer."
+    "Show a small x/y/z axis glyph on opaque white technical drawing paper: positive y up, positive z left, and positive x out of the page as a circled dot."
   ]
 }
