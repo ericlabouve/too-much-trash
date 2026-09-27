@@ -1,11 +1,13 @@
 # Reacher retrofit concept drawings
 
-These six views are based on the [specific reacher-grabber photo](../reference/reacher-grabber.png). In every drawing the long shaft is parallel to positive y. In the **a** views, positive x points right and positive z comes out of the page toward the viewer. In the **b** views, the axis key rotates with the intended 90° viewpoint change about y: positive z points left and positive x comes out of the page. The object is not laid on its side. The latest phone translation applies only to 1a and 2a; 1b and 2b retain their earlier centered placement, so these sketches are not yet geometrically consistent CAD projections.
+These eight views are based on the [specific reacher-grabber photo](../reference/reacher-grabber.png). Views **0a** and **0b** show the unmodified stock tool for comparison; views **1–3** show proposed retrofit concepts. In every drawing the long shaft is parallel to positive y. In the **a** views, positive x points right and positive z comes out of the page toward the viewer. In the **b** views, the axis key rotates with the intended 90° viewpoint change about y: positive z points left and positive x comes out of the page. The object is not laid on its side. The latest phone translation applies only to 1a and 2a; 1b and 2b retain their earlier centered placement, so these sketches are not yet geometrically consistent CAD projections.
 
 The stock neck is a silver rectangular prism with a square cross-section, not a round tube. The stock center brace and handle are blue; added 3D-printed clamps, guides, harness pieces, and trigger attachments are orange. Printed shaft clamps are shaped to grip the square neck. Original claw feet and squeeze trigger remain black.
 
 | View | Focus |
 | --- | --- |
+| [0a — stock grabber, front](00a-stock-front.png) | Unmodified reference grabber viewed from the front, with no retrofit parts. |
+| [0b — stock grabber, side](00b-stock-side.png) | The same stock grabber viewed 90° around the upright shaft. |
 | [1a — complete assembly, front](01a-complete-front.png) | One full-length view showing the neck-mounted phone, external bicycle brake cable, and trigger connection. |
 | [1b — complete assembly, side](01b-complete-side.png) | The same assembly viewed 90° around the shaft. |
 | [2a — phone mount, front](02a-phone-mount-front.png) | Close view of the split neck clamp, open-corner phone harness, exposed cameras, and cable-actuated lever at the side volume rocker. |
