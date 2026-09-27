@@ -27,8 +27,9 @@ class Parameters:
     neck_clamp_length: float = 44.0
     neck_center_y: float = -10.0
     claw_clearance: float = 25.0  # Minimum verified gap at full claw sweep.
-    handle_station_z: float = -310.0  # MEASURE axial distance from phone mount.
-    shaft_visible_low_z: float = -380.0   # Assembly envelope only.
+    handle_station_z: float = -380.0  # MEASURE axial distance from phone mount.
+    trigger_tab_z: float = -435.0     # MEASURE on moving black paddle.
+    shaft_visible_low_z: float = -405.0   # Display envelope only.
     shaft_visible_high_z: float = 75.0
     handle_anchor_reach: float = 72.0  # MEASURE to fixed stop beyond trigger.
     trigger_tab_x: float = -42.0       # MEASURE moving trigger attachment.

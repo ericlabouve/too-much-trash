@@ -1,6 +1,6 @@
 # Reacher retrofit CAD — prototype R1
 
-This is an editable, dimensioned **prototype** for the blue-handled grabber in [the stock photo](reference/reacher-grabber.png). The [earlier renders](renders/README.md) remain concept references. R1 uses a narrow open phone frame, a separate adjustable rail, a split square-neck clamp, and a pinned bell crank. Those structures intentionally replace the illustrated corner harness and unconstrained button linkage. The [CAD assembly drawing](print/assembly-cad.png) and [STEP assembly](print/assembly.step) are derived from one common model. Silver neck and dark phone in the assembly are **envelopes**, not reverse-engineered factory solids. The concept sheets' front and side phone positions differ; this CAD uses one consistent offset to positive X and negative project Z.
+This is an editable, dimensioned **prototype** for the blue-handled grabber in [the stock photo](reference/reacher-grabber.png). The [earlier renders](renders/README.md) remain concept references. R1 uses a narrow open phone frame, a separate adjustable rail, a split square-neck clamp, and a pinned bell crank. Those structures intentionally replace the illustrated corner harness and unconstrained button linkage. The [full product rendering](print/full-assembly-cad.png), [phone-end drawing](print/assembly-cad.png), and [STEP assembly](print/assembly.step) are derived from one common model. Every orange part is the actual printable CAD geometry. The silver/blue/black stock tool and gray phone are **unmeasured visual envelopes** inferred from the single front photo, not reverse-engineered factory solids. The concept sheets' front and side phone positions differ; this CAD uses one consistent offset to positive X and negative project Z.
 
 ## What to measure before final printing
 
@@ -13,7 +13,7 @@ Edit [`source/parameters.py`](source/parameters.py). All current values in this 
 | `button_y`, `button_z`, `button_travel` | −81, 5, 0.45 | Volume-up center relative to charging edge and supported underside; force and safe stroke through a compliant tip. |
 | `neck_width`, `neck_clearance` | 16, 0.5 | Maximum width across all four flats/ribs at the chosen mounting site, plus shim thickness. Do not infer this from photo pixels. |
 | `neck_center_y`, `claw_clearance` | −10, 25 | Lateral/depth offset of the neck clamp and minimum verified claw gap. Choose the *axial* mounting station below the fork on the physical tool; the sketch cannot establish that station. |
-| `handle_station_z`, `handle_anchor_reach`, `trigger_tab_x` | −310, 72, −42 | Handle clamp station relative to phone mount, fixed-stop reach, and moving tab location. Check actual trigger motion before selecting reach. |
+| `handle_station_z`, `trigger_tab_z`, `handle_anchor_reach`, `trigger_tab_x` | −380, −435, 72, −42 | Handle clamp and tab stations relative to phone mount, fixed-stop reach, and moving tab location. Check actual trigger motion before selecting reach. |
 | `cable_housing_od`, `cable_wire_od` | 5, 1.6 | Actual ferrule, housing, and stainless inner wire. |
 | Trigger paddle and motion | model only | Paddle section, available attachment area, direction and travel of a point on it relative to the stationary shaft. Verify it moves **away** from the outboard housing stop on squeeze. |
 
@@ -57,4 +57,4 @@ uv sync --frozen
 uv run --frozen python source/build.py
 ```
 
-`source/parts.py` defines every printable solid. `source/build.py` exports all eight STL and STEP parts, `print/assembly.step`, and `print/assembly-cad.png`. This was generated on Python 3.12 / CadQuery 2.6.1. Open an STL in Bambu Studio; orient as above and inspect bridges, holes, and support preview. Do a low-cost fit print of the collars, a rail corner, and actuator first. The [design review](design-review.md) records unresolved risks and validation steps.
+`source/parts.py` defines every printable solid; `source/stock_proxy.py` defines the non-printable grabber and phone visual envelopes. `source/build.py` exports all eight STL and STEP parts, `print/assembly.step`, `print/assembly-cad.png`, and `print/full-assembly-cad.png`. This was generated on Python 3.12 / CadQuery 2.6.1. Open an STL in Bambu Studio; orient as above and inspect bridges, holes, and support preview. Do a low-cost fit print of the collars, a rail corner, and actuator first. The [design review](design-review.md) records unresolved risks and validation steps.
