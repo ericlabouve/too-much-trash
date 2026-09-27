@@ -3,6 +3,8 @@
   "subject": "Phone harness and neck clamp, b view",
   "reference": "../reference/reacher-grabber.png",
   "status": "Technical concept illustration; not dimensioned or mechanically validated",
+  "neck_geometry": "The stock silver neck is a rectangular prism with a square cross-section, flat faces, and sharp longitudinal edges; the orange split phone clamp grips its square profile, not a cylinder.",
+  "color_key": "All added 3D-printed clamp, harness, cable-guide, and lever parts are orange. The stock blue center brace and blue handle are outside this crop. Stock metal remains silver and claw feet black.",
   "axes": {
     "x": "out of the page toward the viewer, shown as a circled dot",
     "y": "up, parallel to the long reacher neck",

@@ -3,6 +3,8 @@
   "subject": "Full proposed grabber retrofit, a view",
   "reference": "../reference/reacher-grabber.png",
   "status": "Technical concept illustration; not dimensioned or mechanically validated",
+  "neck_geometry": "The stock silver neck is a rectangular prism with a square cross-section, flat faces, and sharp longitudinal edges; every shaft clamp must fit the square profile, not a cylinder.",
+  "color_key": "Only the stock center brace and stock handle are blue. All added 3D-printed retrofit parts are orange. Stock metal remains silver; original claw feet and squeeze trigger remain black.",
   "axes": {
     "x": "right",
     "y": "up, parallel to the long reacher neck",

@@ -3,6 +3,8 @@
   "subject": "Handle cable coupling, a view",
   "reference": "../reference/reacher-grabber.png",
   "status": "Technical concept illustration; not dimensioned or mechanically validated",
+  "neck_geometry": "The stock silver neck is a rectangular prism with a square cross-section, flat faces, and sharp longitudinal edges; the orange cable-housing anchor grips its square profile, not a cylinder.",
+  "color_key": "Only the original stock handle is blue in this crop. Added 3D-printed shaft clamp and trigger strap are orange. Stock shaft and wire remain silver; the moving trigger and cable housing remain black.",
   "axes": {
     "x": "right",
     "y": "up, parallel to the long reacher neck",
