@@ -122,8 +122,9 @@ These are engineering choices, not additional measured facts:
   strap slip, and print tolerances require prototypes. No physical fit or
   durability validation has been completed. No blocking measurement
   questions remain for the initial CAD redesign.
-- Existing R2 source/STLs still represent the prior design; this record
-  does not make them compliant with the new measurements or requirements.
+- R2 source/STLs are preserved in `../archive/r2/`. The current R3 source
+  and exports implement the revised measurements and design decisions;
+  they remain unvalidated physical prototypes.
 
 ## Supplied image references
 

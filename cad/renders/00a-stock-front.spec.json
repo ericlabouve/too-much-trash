@@ -16,5 +16,13 @@
     "Show both curved silver claw arms and black plastic feet, the square-profile silver shaft, one blue stock center brace, the blue stock pistol handle, and the black squeeze trigger.",
     "Do not include a phone, harness, cable, lever, printed clamp, orange retrofit part, inset, or additional view.",
     "Use the shaded technical engineering drawing style on white paper with an a-view axis key: positive y up, positive x right, positive z out of the page."
-  ]
+  ],
+  "subsequent_measured_cad_constraints": {
+    "record": "../reference/measurements.md",
+    "date": "2026-09-27",
+    "neck": "Measured rectangular section: 14 mm project X, 19 mm project Z. Supersedes square assumption; original image preserved.",
+    "carrier": "One adjustable opposing padded-jaw carrier for bare/cased phones, including 18 mm wallet case; no GoPro interface.",
+    "actuation": "Adjustable volume-up contact held during squeeze; spring accommodation for excess travel; compact 3a housing anchor and flexible trigger strap.",
+    "status": "Historical illustration unchanged; consult source/ and print/ for R3 CAD geometry."
+  }
 }

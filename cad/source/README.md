@@ -1,3 +1,3 @@
-# Editable source
+# Editable R3 CAD
 
-`parameters.py` holds the provisional tool inputs, the same-harness adjustment limits, and the target phone settings; `parts.py` creates eleven independent CadQuery solids; `stock_proxy.py` creates the non-printable reference-tool silhouette; `build.py` places them in a common assembly and exports the print set and drawings. `check_variants.py` tests several target settings against the same STL geometry. All lengths are millimetres. See [CAD setup and assembly instructions](../README.md).
+`parameters.py` separates measured phone/shaft inputs from provisional design settings. `parts.py` creates six independent printable designs. `assembly.py` supplies shared placements, hardware/stock envelopes and rocker kinematics. `check_design.py` verifies fit and movement; `build.py` exports bed-oriented STLs, STEP and manifests; `render.py` draws actual CAD triangles. All lengths are mm. Run from `cad/` using the [locked workflow](../README.md). R2 source is preserved in `../archive/r2/source/`.
