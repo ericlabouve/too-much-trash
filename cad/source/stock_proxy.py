@@ -57,11 +57,11 @@ def stock_shapes(p: Parameters):
                           (-33, -451), (-15, -445)])
                .close().extrude(6, both=True).translate((0, y, 0)))
     phone = box(p.phone_left, p.phone_left+p.phone_width,
-                -p.phone_length, 0, p.pad_height,
-                p.pad_height+p.phone_thickness)
+                -p.phone_length, 0, p.phone_bottom_z,
+                p.phone_bottom_z+p.phone_thickness)
     lenses = compound([round_post(x, yy,
-                                  p.pad_height+p.phone_thickness,
-                                  p.pad_height+p.phone_thickness+2.2, 4.2).val()
+                                  p.phone_bottom_z+p.phone_thickness,
+                                  p.phone_bottom_z+p.phone_thickness+2.2, 4.2).val()
                        for x, yy in ((p.phone_left+14, -p.phone_length+15),
                                      (p.phone_left+27, -p.phone_length+15),
                                      (p.phone_left+14, -p.phone_length+28))])

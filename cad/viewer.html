@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Too Much Trash — R1 printable STLs</title>
+  <title>Too Much Trash — R2 printable STLs</title>
   <style>
     body { margin: 0; font: 15px system-ui, sans-serif; color: #263340; background: #f7f8fa; }
     header { padding: 16px 24px 10px; }
@@ -20,7 +20,7 @@
 </head>
 <body>
   <header>
-    <h1>Reacher retrofit — eight printable R1 STLs</h1>
+    <h1>Reacher retrofit — eleven printable R2 STLs</h1>
     <p>Drag to rotate, scroll to zoom. Each orange mesh is loaded from its committed STL file. Fit values remain provisional.</p>
   </header>
   <div id="status">Loading…</div>
@@ -30,8 +30,9 @@
     import { STLLoader } from 'three/addons/loaders/STLLoader.js';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    const names = ['carrier_frame', 'movable_rail', 'neck_saddle', 'neck_cap',
-                   'button_lever', 'handle_anchor_saddle', 'handle_anchor_cap', 'trigger_tab'];
+    const names = ['carrier_frame', 'movable_rail', 'camera_end_left', 'camera_end_right',
+                   'actuator_carriage', 'button_lever', 'neck_saddle', 'neck_cap',
+                   'handle_anchor_saddle', 'handle_anchor_cap', 'trigger_tab'];
     const canvas = document.getElementById('view');
     const status = document.getElementById('status');
     const renderer = new THREE.WebGLRenderer({canvas, antialias: true});
@@ -63,7 +64,7 @@
       ctx.textAlign = 'center'; ctx.fillText(name.replaceAll('_', ' '), 256, 42);
       const texture = new THREE.CanvasTexture(c);
       const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map: texture, transparent: true}));
-      sprite.position.set(x, y-40, 0);
+      sprite.position.set(x, y-35, 0);
       sprite.scale.set(72, 9, 1);
       scene.add(sprite);
     }
@@ -71,7 +72,7 @@
     let loaded = 0;
     names.forEach((name, index) => {
       const x = (index % 4 - 1.5) * 88;
-      const y = (0.5 - Math.floor(index / 4)) * 100;
+      const y = (1 - Math.floor(index / 4)) * 70;
       label(name, x, y);
       loader.load(`print/${name}.stl`, geometry => {
         geometry.computeVertexNormals();

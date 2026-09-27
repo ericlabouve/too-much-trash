@@ -35,6 +35,14 @@ def location(x=0, y=0, z=0):
 
 
 def part_location(name):
+    if name == "movable_rail":
+        return location(x=P.right_rail_x)
+    if name == "camera_end_left":
+        return location(y=-P.phone_length)
+    if name == "camera_end_right":
+        return location(x=P.right_rail_x, y=-P.phone_length)
+    if name in ("actuator_carriage", "button_lever"):
+        return location(y=P.button_y)
     if name.startswith("neck_"):
         return location(y=P.neck_center_y)
     if name.startswith("handle_"):
@@ -45,6 +53,14 @@ def part_location(name):
 
 
 def placed_part(name, part):
+    if name == "movable_rail":
+        return part.translate((P.right_rail_x, 0, 0))
+    if name == "camera_end_left":
+        return part.translate((0, -P.phone_length, 0))
+    if name == "camera_end_right":
+        return part.translate((P.right_rail_x, -P.phone_length, 0))
+    if name in ("actuator_carriage", "button_lever"):
+        return part.translate((0, P.button_y, 0))
     if name.startswith("neck_"):
         return part.translate((0, P.neck_center_y, 0))
     if name.startswith("handle_"):
@@ -56,7 +72,7 @@ def placed_part(name, part):
 
 def make_assembly(parts):
     assembly = cq.Assembly(name="reacher_retrofit_prototype")
-    # All eight printable pieces remain individually editable in the STEP tree.
+    # All eleven printable pieces remain individually editable in the STEP tree.
     for name, shape in parts.items():
         assembly.add(shape, name=name, loc=part_location(name), color=cq.Color(*ORANGE))
     proxies = stock_shapes(P)
@@ -92,30 +108,32 @@ def plot_shape(ax, shape, color, alpha=1, stride=1):
 def drawing(parts, neck, phone):
     fig = plt.figure(figsize=(15, 8), facecolor="white")
     ax = fig.add_subplot(121, projection="3d", proj_type="ortho")
-    for name in ("carrier_frame", "movable_rail", "button_lever"):
-        plot_shape(ax, parts[name], ORANGE)
+    for name in ("carrier_frame", "movable_rail", "camera_end_left",
+                 "camera_end_right", "actuator_carriage", "button_lever"):
+        plot_shape(ax, placed_part(name, parts[name]), ORANGE)
     for name in ("neck_saddle", "neck_cap"):
         plot_shape(ax, parts[name].translate((0, P.neck_center_y, 0)), ORANGE)
     plot_shape(ax, neck, (.72, .75, .78), .32, 3)
     plot_shape(ax, phone, (.18, .23, .29), .25, 2)
     # Cable path is a diagrammatic line; geometry of the ferrule and lever is CAD.
-    ax.plot([-55, -13, -2, 10], [-75, -75, -44, -44],
-            [-105, -20, 7, 12], color="#202a32", linewidth=2.5)
-    ax.set(xlim=(-35, 115), ylim=(-165, 20), zlim=(-65, 85))
-    ax.set_box_aspect((150, 185, 150))
+    ax.plot([-48, -25, -17, 6], [P.button_y-37]*4,
+            [-80, -15, 8.2, 8.2], color="#202a32", linewidth=2.5)
+    ax.set(xlim=(-45, 125), ylim=(-180, 20), zlim=(-65, 85))
+    ax.set_box_aspect((170, 200, 150))
     ax.view_init(elev=24, azim=-63)
     ax.set_xlabel("+X → phone")
     ax.set_ylabel("+local Y → charging edge")
     ax.set_zlabel("+local Z → cameras / stock shaft")
     ax.set_title("Carrier and square-neck clamp", fontsize=13, pad=16)
     ax.grid(False)
-    detail = box(-16, 36, -98, -30, -8, 20)
+    detail = box(-20, 36, P.button_y-54, P.button_y+11, -11, 22)
     bx = fig.add_subplot(122, projection="3d", proj_type="ortho")
     plot_shape(bx, parts["carrier_frame"].intersect(detail), ORANGE)
-    plot_shape(bx, parts["button_lever"], ORANGE)
+    plot_shape(bx, placed_part("actuator_carriage", parts["actuator_carriage"]), ORANGE)
+    plot_shape(bx, placed_part("button_lever", parts["button_lever"]), ORANGE)
     plot_shape(bx, phone.intersect(detail), (.18, .23, .29), .18)
-    bx.set(xlim=(-16, 36), ylim=(-98, -30), zlim=(-8, 20))
-    bx.set_box_aspect((52, 68, 28))
+    bx.set(xlim=(-20, 36), ylim=(P.button_y-54, P.button_y+11), zlim=(-11, 22))
+    bx.set_box_aspect((56, 65, 33))
     bx.view_init(elev=70, azim=-85)
     bx.set_title("Ferrule stop → nipple → pinned lever → rocker", fontsize=13, pad=16)
     bx.set_xlabel("+X → button")
@@ -159,7 +177,7 @@ def full_drawing(parts, proxies):
     panel(ax, all_names, all_proxies,
           ((-115, 120), (-165, 35), (-585, 205)),
           (235, 200, 790), 9, -79)
-    cable = [(-13, -44, 7), (-24, -34, -20), (-24, -10, -100),
+    cable = [(-17, P.button_y-37, 8.2), (-24, -34, -20), (-24, -10, -100),
              (-24, -10, -290), (-58, -10, -344), (-77, -10, P.handle_station_z)]
     ax.plot(*zip(*cable), color="#17222a", linewidth=2.2)
     ax.plot([-65, P.trigger_tab_x], [P.neck_center_y]*2,
@@ -167,7 +185,8 @@ def full_drawing(parts, proxies):
 
     phone_ax = fig.add_axes([.58, .51, .39, .35], projection="3d", proj_type="ortho")
     panel(phone_ax,
-          ["carrier_frame", "movable_rail", "neck_saddle", "neck_cap", "button_lever"],
+          ["carrier_frame", "movable_rail", "camera_end_left", "camera_end_right",
+           "actuator_carriage", "neck_saddle", "neck_cap", "button_lever"],
           ["stock_square_neck_envelope", "phone_envelope_only", "phone_camera_markers_proxy"],
           ((-35, 116), (-162, 20), (-47, 82)), (151, 182, 129), 26, -64)
     phone_ax.set_title("Phone / claw-end mount", fontsize=13)
@@ -181,9 +200,9 @@ def full_drawing(parts, proxies):
                    [P.handle_station_z, P.trigger_tab_z], color="#71808c", linewidth=1.5)
     handle_ax.set_title("Fixed stop / moving trigger tab", fontsize=13)
 
-    fig.text(.05, .95, "Too Much Trash — R1 full retrofit assembly", fontsize=19,
+    fig.text(.05, .95, "Too Much Trash — R2 adjustable retrofit assembly", fontsize=19,
              weight="bold", color="#263340")
-    fig.text(.05, .925, "All eight orange printable parts are placed in one CAD coordinate system.",
+    fig.text(.05, .925, "All eleven orange printable parts are placed in one CAD coordinate system.",
              fontsize=11, color="#465563")
     fig.text(.05, .035,
              "Blue/black/silver stock shapes and phone are unmeasured visual proxies from the front photo.\n"
@@ -195,6 +214,7 @@ def full_drawing(parts, proxies):
 
 def main():
     OUT.mkdir(exist_ok=True)
+    P.validate()
     parts = all_parts(P)
     for name, part in parts.items():
         if part.val().Volume() <= 0 or not part.val().isValid() or len(part.val().Solids()) != 1:
@@ -210,12 +230,15 @@ def main():
     # These CAD envelope checks catch gross parameter or placement mistakes.
     checked = [
         ("carrier vs phone", parts["carrier_frame"], phone),
-        ("right rail vs phone", parts["movable_rail"], phone),
-        ("lever vs phone", parts["button_lever"], phone),
-        ("lever vs frame", parts["button_lever"], parts["carrier_frame"]),
-        ("lever vs neck saddle", parts["button_lever"],
+        ("right rail vs phone", placed_part("movable_rail", parts["movable_rail"]), phone),
+        ("camera left vs phone", placed_part("camera_end_left", parts["camera_end_left"]), phone),
+        ("camera right vs phone", placed_part("camera_end_right", parts["camera_end_right"]), phone),
+        ("lever vs phone", placed_part("button_lever", parts["button_lever"]), phone),
+        ("carriage vs phone", placed_part("actuator_carriage", parts["actuator_carriage"]), phone),
+        ("lever vs frame", placed_part("button_lever", parts["button_lever"]), parts["carrier_frame"]),
+        ("lever vs neck saddle", placed_part("button_lever", parts["button_lever"]),
          parts["neck_saddle"].translate((0, P.neck_center_y, 0))),
-        ("lever vs neck cap", parts["button_lever"],
+        ("lever vs neck cap", placed_part("button_lever", parts["button_lever"]),
          parts["neck_cap"].translate((0, P.neck_center_y, 0))),
     ]
     for label, a, b in checked:
