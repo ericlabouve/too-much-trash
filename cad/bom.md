@@ -1,11 +1,11 @@
-# R3 bill of materials
+# R4 bill of materials
 
 ## Printed
 
 | File | Quantity | Purpose |
 | --- | ---: | --- |
-| `print/carrier.stl` | 1 | Fixed jaw, guide, actuator rail, end stop, integral shaft saddle |
-| `print/sliding_jaw.stl` | 1 | Opposing V jaw with captive draw-screw nut |
+| `print/carrier.stl` | 1 | Fixed jaw, guide, near-side actuator rail, integral shaft saddle |
+| `print/sliding_jaw.stl` | 1 | Opposing padded jaw, far-side actuator rail, captive draw-screw nut |
 | `print/neck_cap.stl` | 2 | Identical caps for phone and handle collars |
 | `print/actuator_bracket.stl` | 1 | Housing reaction, metal pivot support, stroke stop and adjustment slots |
 | `print/rocker.stl` | 1 | Cable input arm and padded button contact |
@@ -30,7 +30,7 @@ Six unique STL files, seven printed pieces. Pads are cut from compliant sheet, n
 | Torsion return spring, fits 3 mm pivot; ≤6 mm OD, ≤2.7 mm coil length, ~0.4 mm wire | 1 | Target initial torque 5 N·mm, rate ~30 N·mm/rad. Spring legs must match seats; test supplied spring, these are design targets. |
 | Closed-eye extension spring, ~35 mm eye-to-eye relaxed, ≤8 mm OD | 1 | Target initial tension 1.5 N, rate 0.055 N/mm, **rated working extension ≥45 mm**. This is a sourcing requirement, not a validated stock SKU. See design review. |
 | Hook-and-loop trigger strap, about 10–15 mm wide; cable route ties | 1 / several | Strap passes through spring eye or securely linked cable loop; inspect creep/slip |
-| 0.8 mm compliant TPU/rubber jaw pad sheet | Four ~17 ×24 mm strips | 45° V contact surfaces; thickness should be measured compressed |
+| 0.8 mm compliant TPU/rubber jaw pad sheet | Two side strips trimmed to phone thickness ×24 mm; two rear strips 9 ×24 mm | Flat side and rear contact surfaces; thickness should be measured compressed |
 | Thin removable shaft shim strips; soft button cap; independent phone tether | As needed / 1 / 1 | Grip shaft without crushing ribs, protect button, retain phone if clamp slips |
 
 Fastener envelopes in the STEP/Chrome assembly omit threads; spring coil and strap shapes are indicative. The hardware drawing is not a supplier specification. Measure selected spring and ferrule before final printing; parameters and pockets can then be adjusted.

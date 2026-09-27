@@ -43,47 +43,55 @@ def collar(p,cap=False):
 
 def carrier(p):
     # Light ladder bridge supports the jaw slide; open middle saves material.
-    s=box(8,110,20,60,-12,-8.4).edges('|Z').fillet(2)
-    for xx in (39,66,87):
-        s=s.cut(box(xx,min(xx+19,106),31,49,-13,-8))
+    s=box(8,94,20,60,-12,-8.4).edges('|Z').fillet(2)
+    for xx in (39,66):
+        s=s.cut(box(xx,xx+19,31,49,-13,-8))
     # Two open-ended guides, .4 mm vertical/.3 mm lateral running clearance.
     for ya,yb in ((20,24.7),(55.3,60)):
-        s=s.union(box(8,110,ya,yb,-8.4,0.4))
+        s=s.union(box(8,94,ya,yb,-8.4,0.4))
     for ya,yb in ((20,27),(53,60)):
-        s=s.union(box(8,110,ya,yb,0.4,3.4))
-    # Fixed V jaw: 45 degree bearing faces, pad recess-free for replaceable strips.
-    profile=[(8,0),(26,0),(26,2),(14,14),(26,26),(8,26)]
+        s=s.union(box(8,94,ya,yb,0.4,2.0))
+    # Flat padded side face, rear ledge, and narrow front escape-catch lip.
+    # Assembly rotates this source: low source Z is the phone camera/back face.
+    profile=[(8,0),(24,0),(24,2),(14,2),(14,24),(16,24),(16,25),(8,25)]
     s=s.union(xz_profile(profile,28,52))
     # Draw screw reacts on fixed boss; head/washer remain accessible on left.
-    s=s.union(box(8,15,28,52,-8.4,3))
+    s=s.union(box(8,15,28,52,-8.4,2))
     s=s.cut(bore((7,40,-4),(1,0,0),10,p.m4))
-    # Long, narrow actuator rail; nothing covers camera face.
-    s=s.union(box(0,8,22,141,-12,-2))
-    # horizontal slot through rail takes two M3 bolts from actuator bracket.
-    rail_slot=box(-1,9,68,137,-7.7,-4.3)
-    for yy in (68,137):
-        rail_slot=rail_slot.union(bore((-1,yy,-6),(1,0,0),10,p.m3))
+    # Near-side module rail, behind phone in assembled orientation.
+    s=s.union(box(-8,0,22,117,-12,-2))
+    s=s.union(box(-8,10,27,53,-12,-2))
+    rail_slot=box(-9,1,57,113,-7.7,-4.3)
+    for yy in (57,113):
+        rail_slot=rail_slot.union(bore((-9,yy,-6),(1,0,0),10,p.m3))
     s=s.cut(rail_slot)
-    # Integrated short charging-end stop catches one corner; central ports open.
-    s=s.union(box(8,14,-4,29,-12,0))
-    s=s.union(box(8,29,-4,0,-12,25))
-    s=s.cut(bore((10,-5,16),(0,1,0),6,3))  # tether eye
-    # Integrate measured rectangular saddle and ribs into the carrier.
-    s=s.union(collar(p))
-    s=s.union(box(-16,10,27,53,-12,0))
-    for yy in (27,49):
-        s=s.union(xz_profile([(-13,8),(8,0),(-13,-8)],yy,yy+4))
-    # Finger clearance for purchased thumb wheel at draw-screw head.
+    # Tether eye stays outside screen/phone outline; no length-specific end stop.
+    s=s.cut(bore((-4,24,-13),(0,0,1),12,3))
+    # Thumb-wheel recess before translating the grip clear of collar lugs.
     s=s.cut(box(-5,8,31.5,48.5,-12.5,4.5))
     s=s.cut(bore((7,40,-4),(1,0,0),10,p.m4))
+    s=s.translate((10,0,0))
+    # Integral neck saddle and short bridge; both actuator sides clear its lugs.
+    s=s.union(collar(p))
+    s=s.union(box(-16,20,27,53,-12,-8.4))
+    for yy in (27,49):
+        s=s.union(xz_profile([(-13,8),(19,0),(-13,-8)],yy,yy+4))
+    s=s.cut(box(5,18,31.5,48.5,-12.5,4.5))
     return s
 
 
 def sliding_jaw(p):
     # Valley at X=0; translate to jaw_x during assembly.
     s=box(-65,6,25,55,-8,0).edges('|Z').fillet(1)
-    profile=[(6,0),(-12,0),(-12,2),(0,14),(-12,26),(6,26)]
+    profile=[(6,0),(-10,0),(-10,2),(0,2),(0,24),(-2,24),(-2,25),(6,25)]
     s=s.union(xz_profile(profile,28,52))
+    # Matching far-side interface lets the same actuator move to this jaw.
+    s=s.union(box(0,22,28,52,-8,0))
+    s=s.union(box(14,22,28,117,-12,-2))
+    rail_slot=box(13,23,57,113,-7.7,-4.3)
+    for yy in (57,113):
+        rail_slot=rail_slot.union(bore((13,yy,-6),(1,0,0),10,p.m3))
+    s=s.cut(rail_slot)
     # Continuous axial clearance for M4 draw screw, plus top-loading nut pocket.
     s=s.cut(bore((-66,40,-4),(1,0,0),73,p.m4))
     s=s.cut(box(-60.3,-56,36.25,43.75,-7.7,0.5))
@@ -134,11 +142,12 @@ def rocker(p):
 
 
 def handle_anchor(p):
-    s=collar(p)
-    # Short side ferrule stop, outside shaft and blue-handle plane; no outrigger.
-    s=s.union(box(-19,-7,13,30,-12,12))
-    s=s.cut(bore((-13,19,3),(0,0,1),10,p.ferrule))
-    s=s.cut(bore((-13,19,-13),(0,0,1),17,p.wire))
+    # Trigger-facing -X neck face; housing centered across its Y width.
+    s=collar(p,True)
+    x,y=p.cable_face_x,p.neck_cy
+    s=s.union(box(x-6,x+6,y-7,y+7,-12,12))
+    s=s.cut(bore((x,y,3),(0,0,1),10,p.ferrule))
+    s=s.cut(bore((x,y,-13),(0,0,1),17,p.wire))
     return s
 
 

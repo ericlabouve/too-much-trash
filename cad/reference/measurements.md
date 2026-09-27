@@ -122,7 +122,7 @@ These are engineering choices, not additional measured facts:
   strap slip, and print tolerances require prototypes. No physical fit or
   durability validation has been completed. No blocking measurement
   questions remain for the initial CAD redesign.
-- R2 source/STLs are preserved in `../archive/r2/`. The current R3 source
+- R2 source/STLs are preserved in `../archive/r2/`. The current R4 source
   and exports implement the revised measurements and design decisions;
   they remain unvalidated physical prototypes.
 
@@ -155,3 +155,12 @@ Original stock photo and concept renders remain unchanged.
 4. Commit logical increments on the existing PR branch and open the final
    STL set in Chrome. Physically validate small fit/mechanism prototypes
    before treating the resulting design as ready for final field printing.
+
+## R4 review decisions — 2026-09-27
+
+- User explicitly selected **Option B**: phone beside the shaft; shaft must not intersect the phone. “Centered” means equal phone length on either side of the gripping band, not a shaft passing through the phone center.
+- Carrier and sliding jaw support the rear/camera face, leaving screen viewing unobstructed.
+- Camera envelope belongs on the opposite edge from volume actuation in the reviewed layout. Default actuator is far from shaft; provide mounting interfaces on both sides using the same printed mechanism.
+- Route housing centrally on the neck face facing the moving black trigger, with the outlet aligned to a Velcro attachment on the upper trigger. No rigid printed trigger attachment.
+- Preserve previous draft before changes: pushed annotated Git tag `cad-r3-first-draft` at `c7c0030`.
+- No additional dimensions were measured in this review. R4 pad friction, camera envelope, spring selection, housing bends and stock handle proxy remain provisional.

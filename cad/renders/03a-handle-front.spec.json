@@ -28,5 +28,12 @@
     "carrier": "One adjustable opposing padded-jaw carrier for bare/cased phones, including 18 mm wallet case; no GoPro interface.",
     "actuation": "Adjustable volume-up contact held during squeeze; spring accommodation for excess travel; compact 3a housing anchor and flexible trigger strap.",
     "status": "Historical illustration unchanged; consult source/ and print/ for R3 CAD geometry."
+  },
+  "r4_review_constraints": {
+    "layout": "Option B: phone beside shaft; no intersection",
+    "grip": "centered along phone length; bridge behind camera face",
+    "actuator": "same module mounts near or far from shaft",
+    "cable": "centered on trigger-facing shaft face; upper moving-trigger Velcro tie",
+    "supersedes": "earlier positive-X phone placement; original image retained"
   }
 }

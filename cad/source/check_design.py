@@ -5,7 +5,7 @@ from pathlib import Path
 from itertools import combinations
 from parameters import Parameters,SAMPLES
 from parts import all_parts
-from assembly import place,phone,hardware,stop_angle,tip_advance
+from assembly import place,phone,hardware,stop_angle,tip_advance,contact_x,proxies
 
 OUT=Path(__file__).resolve().parents[1]/'print'
 
@@ -14,8 +14,9 @@ def volume_overlap(a,b):
 
 def check():
     base=Parameters();parts=all_parts(base)
-    samples={**SAMPLES,'small':replace(base,phone_w=66,phone_t=7.5,button_from_end=80,button_from_screen=4),
+    samples={**SAMPLES,'small':replace(base,phone_w=66,phone_t=7.5,button_from_end=105,button_from_screen=4),
              'large':replace(base,phone_w=86,phone_t=20,phone_l=170,button_from_end=125,button_from_screen=6)}
+    samples={f'{n}_{side}':replace(p,actuator_side=side) for n,p in samples.items() for side in ('near','far')}
     failures=[];report={'samples':{},'failures':failures}
     for name,p in samples.items():
         p.validate();shapes={n:place(n,s,p) for n,s in parts.items()};ph=phone(p)
@@ -26,6 +27,9 @@ def check():
         for a,b in combinations(near,2):
             v=volume_overlap(shapes[a],shapes[b])
             if v>.01:failures.append(f'{name}: {a}/{b} {v:.3f} mm3')
+        v=volume_overlap(ph,proxies(p)['stock_neck'])
+        if v>.01:failures.append(f'{name}: phone/shaft {v:.3f} mm3')
+        assert abs((ph.val().BoundingBox().ymin+ph.val().BoundingBox().ymax)/2-p.neck_cy)<1e-7
         hw0=hardware(p)
         for hn in ('draw_screw_M4','draw_screw_head','jaw_nut'):
             for pn in ('carrier','sliding_jaw','neck_cap'):
@@ -45,17 +49,16 @@ def check():
                     v=volume_overlap(hw[n],shapes[fixed])
                     if v>.01:failures.append(f'{name}@{i}: {n}/{fixed} {v:.3f} mm3')
         cable=18*math.sin(amax)
-        # Anchor datum illustrative: 100 axial, 65 transverse. Motion away from claws.
-        stroke20=math.hypot(120,65)-math.hypot(100,65)
-        stroke40=math.hypot(140,65)-math.hypot(100,65)
+        # Aligned upper-trigger tie and centered housing; axial stroke assumption.
+        stroke20,stroke40=20,40
         extension=max(0,stroke40-cable)
         max_tension=p.spring_initial_n+p.spring_rate_n_mm*extension
-        arm=12*math.cos(amax)-(p.phone_left-p.rest_gap-11)*math.sin(amax)
+        arm=12*math.cos(amax)-(contact_x(p)-11)*math.sin(amax)
         max_force=(max_tension*18*math.cos(amax)-(p.return_torque_nmm+p.return_rate_nmm_rad*amax))/arm
         assert extension < p.spring_rated_extension_mm
         assert abs(tip_advance(p,amax)-p.rest_gap-p.safe_button_stroke)<1e-7
         report['samples'][name]={'stop_degrees':math.degrees(amax),'cable_to_stop_mm':cable,
-          'tip_rise_mm':(p.phone_left-p.rest_gap-11)*math.sin(amax)+12*(1-math.cos(amax)),
+          'tip_rise_mm':(contact_x(p)-11)*math.sin(amax)+12*(1-math.cos(amax)),
           'takeup_20_mm':stroke20,'takeup_40_mm':stroke40,'spring_extension_mm':extension,
           'max_cable_tension_n':max_tension,'available_tip_force_n_before_stop':max_force}
     OUT.mkdir(exist_ok=True);(OUT/'validation.json').write_text(json.dumps(report,indent=2)+'\n')

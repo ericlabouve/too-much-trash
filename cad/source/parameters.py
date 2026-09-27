@@ -1,4 +1,4 @@
-"""R3 dimensions in mm. Local XYZ maps to project (X, Z, -Y).
+"""R4 dimensions in mm. Local XYZ maps to project (X, Z, -Y).
 
 Local Z runs toward claws; local Y runs away from charging edge.
 Measured inputs are separated from provisional engineering settings.
@@ -16,6 +16,7 @@ class Parameters:
     phone_t: float = 18
     button_from_end: float = 105
     button_from_screen: float = 6
+    actuator_side: str = "far"  # near or far relative to shaft; same printed module
     # PROVISIONAL same-print adjustment envelope, not model compatibility.
     width_min: float = 66
     width_max: float = 86
@@ -24,10 +25,12 @@ class Parameters:
     button_min: float = 80
     button_max: float = 125
     # Geometry shared by every phone setting.
-    groove_x: float = 14
+    groove_x: float = 24
     phone_mid_z: float = 14
     pad_normal: float = 0.8
-    pad_x_allowance: float = 1.13  # .8 / cos(45deg), compressed fit must be tested
+    pad_x_allowance: float = 0.8  # flat side-pad thickness; verify compressed fit
+    rear_face_z: float = 25.2  # shared rear datum on .8 mm pads
+    module_x_offset: float = 2
     neck_cx: float = -23
     neck_cy: float = 40
     neck_clearance: float = 0.6  # total per axis, includes thin compliant shim
@@ -49,15 +52,15 @@ class Parameters:
 
     @property
     def phone_left(self):
-        return self.groove_x + self.phone_t/2 + self.pad_x_allowance
+        return self.groove_x + self.pad_x_allowance
 
     @property
     def jaw_x(self):
-        return self.groove_x + self.phone_w + self.phone_t + 2*self.pad_x_allowance
+        return self.groove_x + self.phone_w + 2*self.pad_x_allowance
 
     @property
     def phone_bottom(self):
-        return self.phone_mid_z-self.phone_t/2
+        return self.rear_face_z-self.phone_t
 
     @property
     def button_z(self):
@@ -65,7 +68,23 @@ class Parameters:
 
     @property
     def actuator_shift(self):
-        return self.button_z-7
+        return 2*self.phone_mid_z-self.button_z-7
+
+    @property
+    def phone_y0(self):
+        return self.neck_cy-self.phone_l/2
+
+    @property
+    def button_y(self):
+        return self.phone_y0+self.button_from_end
+
+    @property
+    def phone_x_sum(self):
+        return 2*self.phone_left+self.phone_w
+
+    @property
+    def cable_face_x(self):
+        return self.neck_cx-self.neck_x/2-8
 
     def validate(self):
         for v, lo, hi, label in ((self.phone_w,self.width_min,self.width_max,'width'),
@@ -75,10 +94,14 @@ class Parameters:
                 raise ValueError(f'{label} {v} outside same-print range {lo}..{hi}')
         if not 0 < self.button_from_screen < self.phone_t:
             raise ValueError('Button must lie within phone thickness')
-        if not 4 <= self.button_z <= 19:
+        if not 9 <= self.button_z <= 26:
             raise ValueError('Button center exceeds actuator height adjustment')
         if self.phone_l < self.button_from_end+12:
             raise ValueError('Button/module too close to far end')
+        if self.actuator_side not in ('near','far'):
+            raise ValueError('Actuator side must be near or far')
+        if not 65 <= self.button_y <= 105:
+            raise ValueError('Centered grip needs button center 25–65 mm toward camera end from midpoint')
         if self.neck_x <= 0 or self.neck_y <= 0:
             raise ValueError('Invalid measured shaft')
 

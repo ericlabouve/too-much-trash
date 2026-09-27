@@ -1,16 +1,18 @@
-# R3 — adjustable reacher phone retrofit
+# R4 — adjustable reacher phone retrofit
 
-Editable **fit prototype**, based on the [confirmed measurements](reference/measurements.md). Six unique printed designs make seven pieces, down from eleven in R2. One carrier integrates the fixed jaw, rectangular shaft saddle, charging-end stop, and actuator rail. One sliding jaw accommodates different phone widths and thicknesses; a separate compact rocker module adjusts to the volume-up button. The source and exports are real CadQuery solids. Physical reliability remains to be established.
+Editable **fit prototype**, based on the [confirmed measurements](reference/measurements.md). Six unique printed designs make seven pieces, down from eleven in R2. One carrier integrates the fixed jaw, rectangular shaft saddle and near-side actuator rail. One sliding jaw accommodates different phone widths and thicknesses; a separate compact rocker module adjusts to the volume-up button on either side. The source and exports are real CadQuery solids. Physical reliability remains to be established.
 
-![R3 CAD assembly](print/assembly-cad.png)
+![R4 CAD assembly](print/assembly-cad.png)
 
 ## Fit and operation
 
-The same print set covers a provisional **66–86 mm outside width, 7.5–20 mm thickness**, and volume-button location **80–125 mm from the charging edge**. Both the bare 15 Pro sample (70.6 × 146.6 × 8.25 mm) and wallet-case sample (76 × 152 × 18 mm) are modeled. This is an envelope, **not a verified iPhone 14–18 compatibility list**. Camera bumps, rounded sides, cases and button force must be checked individually.
+The same print set covers a provisional **66–86 mm outside width, 7.5–20 mm thickness**, and volume-button location **80–125 mm from the charging edge**, subject to its center also being **25–65 mm toward the camera end from the phone midpoint**. Both the bare 15 Pro sample (70.6 × 146.6 × 8.25 mm) and wallet-case sample (76 × 152 × 18 mm) are modeled. This is an envelope, **not a verified iPhone 14–18 compatibility list**. Camera bumps, rounded sides, cases and button force must be checked individually.
 
-Opposing 45° V jaws use four replaceable 0.8 mm compliant strips. Tightening a metal M4 draw screw pulls the sliding jaw inward; upper/lower faces capture the side edges without a full back plate. The phone centers through its thickness, so no thick filler pads are needed for the wallet case. A small charging-end corner stop blocks sliding in one direction; clamping friction resists sliding toward the camera end. Use a separate phone safety tether and validate axial retention. Place pads on case/bezel edges, never on exposed display glass. The jaw band occupies 28–52 mm from the charging end; confirm it misses every control on the actual phone.
+Two flat opposing jaws clamp replaceable 0.8 mm side pads. Rear ledges with pads locate the camera-side face; the bridge and sliding tongue sit behind that face, leaving the screen open. A metal M4 draw screw adjusts width. Narrow front lips act as escape catches, but have substantial clearance on thin phones: **out-of-plane and lengthwise retention depend on pad friction**, not a close-fitting cage. Use an independent tether and validate retention with a dummy phone before use. Pads must bear on the case/frame, not display glass.
 
-The phone rear faces the claws, with its charging edge facing project +Z and its body extending into −Z. Local CAD axes map **(X, Y, Z) → project (X, Z, −Y)**. The measured shaft is **14 mm project X × 19 mm project Z**. Mount within the measured 200 mm straight region above the blue brace, with clearance from the complete claw sweep.
+**Option B is the selected layout:** the phone remains beside the shaft, with no shaft/phone intersection. The 24 mm gripping band is centered along phone length, so equal lengths extend beyond it. This balances length about the band; it does not eliminate the lateral moment caused by a phone beside the shaft. The default actuator is on the edge farthest from the shaft, with the camera envelope on the opposite edge. The same bracket and rocker can be installed on the near-side rail without mirrored prints; see [both configurations](print/actuator-sides-cad.png) and `assembly-near-side.step`. Confirm the centered band misses the other phone buttons.
+
+The phone rear faces the claws, with its charging edge toward project +Z; the phone protrudes to the negative-X side of the shaft. Local CAD axes map **(X, Y, Z) → project (X, Z, −Y)**. The measured shaft is **14 mm project X × 19 mm project Z**. Mount within the measured 200 mm straight region above the blue brace, with clearance from the complete claw sweep.
 
 ## Button mechanism
 
@@ -20,27 +22,27 @@ The outer housing seats in a stepped ferrule bore on the adjustable bracket. The
 
 A **purchased extension spring in series between the handle-end cable loop and trigger strap** absorbs the rest of the squeeze stroke after the rocker reaches its stop. It is necessary: a brake cable directly linking 20–40 mm trigger travel to a sub-millimetre phone button would otherwise bind or overload something. The button remains pressed until the trigger is released.
 
-The [generated calculation](print/validation.json) uses provisional 0.35 mm rest gap and 0.30 mm button stroke: about **3.2° rotation and 1.0 mm cable travel**. An illustrative 100 mm axial / 65 mm transverse cable span produces about 17–35 mm take-up for 20–40 mm trigger movement. The proposed series spring extends approximately 34 mm at full stroke. These anchor coordinates and button travel are **not measured specifications**. See [design review](design-review.md) for force assumptions and calibration.
+The [generated calculation](print/validation.json) uses provisional 0.35 mm rest gap and 0.30 mm button stroke: about **3.2° rotation and 1.0 mm cable travel**. With the upper-trigger tie aligned to the centered housing outlet, the calculation assumes 20–40 mm axial take-up, requiring approximately **39 mm spring extension** at full stroke. Actual take-up depends on the measured moving tie point and must be checked physically. See [design review](design-review.md) for force assumptions and calibration.
 
 ## Assembly
 
 1. Deburr prints, check slider movement and ream metal-pivot/fastener holes as needed. Apply thin removable shaft shims and jaw pads. Install the M4 square nut in the jaw's top-loading pocket; insert the jaw from the open right end of the guide.
-2. Insert the M4×80 draw screw from the fixed-jaw side into the jaw nut. Use a purchased thumb head no larger than 16 mm diameter / 5 mm thick; the carrier has a finger recess. Backing off permits manually spreading the jaws. Install the phone against the small charging-end stop and tighten only enough to resist slipping.
+2. Insert the M4×80 draw screw from the fixed-jaw side into the jaw nut. Use a purchased thumb head no larger than 16 mm diameter / 5 mm thick; the carrier has a finger recess. Backing off permits manually spreading the jaws. Center the phone length on the jaw band, seat its rear against the padded ledges, and tighten only enough to resist slipping. Attach the independent tether.
 3. Bolt the integrated saddle and one `neck_cap` around the rectangular neck. Fit the second cap to `handle_anchor` above the handle. Each collar uses two M4 through-bolts and washers. Do not crush the fluted tube; physical shim fit controls friction.
-4. Attach the bracket to the long carrier slot using two M3 bolts and washers. Slide it along the phone and adjust its height through the paired vertical slots, then lock both bolts. Wallet-case button center is 6 mm from the screen side; the V jaws center the 18 mm case. Leave the camera keep-out area unobstructed.
+4. Choose the carrier rail or matching sliding-jaw rail and attach the same bracket to its slot using two M3 bolts and washers. Slide it along the phone and adjust its height through the paired vertical slots, then lock both bolts. Wallet-case button center is 6 mm from the screen side; the rear ledges locate the 18 mm case at a fixed rear datum. Leave the camera keep-out area unobstructed.
 5. Install the pivot, torsion spring and rocker with axial washers. Set spring legs in their provided holes, with preload toward the released stop; ensure no coil/leg rubbing. Install the contact screw with a soft tip and opposed locknuts, and the stop screw with its square nut plus locking nut.
-6. Seat housing/ferrules at both reaction stops. Route along the shaft with smooth bends (provisional minimum 50 mm radius; follow housing supplier limits), away from claws and fingers. Secure with removable ties. The CAD route is a diagram with straight segments, not a cut/bend template.
+6. Seat housing/ferrules at both reaction stops. Route the housing down the center of the neck face facing the black trigger; the handle anchor outlet and upper-trigger Velcro tie are in the same plane. Use smooth bends (provisional minimum 50 mm radius; follow housing supplier limits), away from claws and fingers. Secure with removable ties. The CAD route is a diagram with straight segments, not a cut/bend template.
 7. Secure the handle inner wire to the series spring with a rated clamp/loop termination. Connect the spring's closed eye to a hook-and-loop strap on the **moving trigger**. Keep all metal ends covered and clear of the hand. Do not attach it to the stationary grip. Verify strap security through the full squeeze.
 8. Calibrate first on a dummy block: eliminate unintended preload, set a small release gap, then limit the rocker stroke with its stop. Adjust cable slack so it releases reliably after every squeeze. Confirm full claw closure still occurs as the series spring extends. Only then approach the actual phone button with a conservative stop setting. Do not assume 0.30 mm is safe for a particular phone/case.
 
 ## Print and materials
 
-STLs in `print/` are **already oriented and translated onto the bed**, in mm. Import the six files into Bambu Studio as separate objects and make two copies of `neck_cap`. The largest bounding box fits a 180 mm consumer bed. STEP parts retain assembly coordinates.
+STLs in `print/` are **already oriented and translated onto the bed**, in mm. Import the six files into Bambu Studio as separate objects and make two copies of `neck_cap`. The largest bounding box fits a 180 mm consumer bed. Individual STEP parts retain source coordinates; the STEP assembly applies installation transforms.
 
 | Part | Qty | Material / orientation / support |
 | --- | ---: | --- |
-| `carrier` | 1 | PETG; broad bridge/rail underside down. Four walls, 25–35% infill. Local support below collar bolt ears; 2.3 mm guide lips and 45° jaw faces need inspection in preview. |
-| `sliding_jaw` | 1 | PETG; tongue underside down. Four walls, 30% infill; six walls around nut and draw-screw web. V faces are 45°. |
+| `carrier` | 1 | PETG; broad bridge/rail underside down. Four walls, 25–35% infill. Local support below collar bolt ears and front catch lips; 2.3 mm guide overhangs need inspection in preview. |
+| `sliding_jaw` | 1 | PETG; tongue underside down. Four walls, 30% infill; six walls around nut and draw-screw web. Support the small front catch lip; keep guide faces clean. |
 | `neck_cap` | 2 | PETG; shaft axis vertical. Four/five walls; support beneath bolt ears. |
 | `actuator_bracket` | 1 | PETG; exported on cable-stop outer face. Paint support beneath raised back plate/pivot ears, keep slots and ferrule bore clear. Five walls. |
 | `rocker` | 1 | PETG or tough nylon; exported flat on its broad face, pivot axis vertical. Five walls / solid small part; no support. |
@@ -56,7 +58,7 @@ Start with 0.4 mm nozzle, 0.2 mm layers. ASA is an alternative for outdoor heat/
 - `source/check_design.py`: static/swept collision and analytic travel checks.
 - `print/`: current STL/STEP files, assembly meshes, drawings, manifest and validation report.
 - [BOM](bom.md), [design review](design-review.md), [measurement record](reference/measurements.md).
-- `archive/r2/`: superseded prior CAD and exports. `renders/`: original concept art, unchanged.
+- `archive/r2/`: superseded prior CAD and exports. Tag `cad-r3-first-draft` preserves the full R3 draft before this review. `renders/`: original concept art, unchanged.
 
 The project-local workflow uses Python 3.12, [CadQuery 2.6.1](https://github.com/CadQuery/cadquery/tree/v2.6.1), and exact dependencies in `uv.lock`. CadQuery's Git commit is pinned in the lockfile. With `uv` installed, from `cad/`:
 
