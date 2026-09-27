@@ -8,8 +8,9 @@ missing measurements.
 
 The selected button is **volume up**. D is measured along the phone from
 the charging-end outer edge to the button center. H is measured through
-thickness to button center; the datum for supplied H values needs confirmation
-after the user corrected the orientation of the assistant's side-view diagram.
+thickness to button center. The confirmed datum is the rear outside surface
+(wallet back when cased). Use the derived screen-side distance for actuator
+placement; do not confuse it with D.
 T is the outside thickness at the jaw contact region, excluding camera bump.
 
 | Configuration | L | W | D | T | H | Source |
@@ -17,13 +18,27 @@ T is the outside thickness at the jaw contact region, excluding camera bump.
 | iPhone 15 Pro, bare | 146.6 | 70.6 | 102 | 8.25 | 4 | L/W/D reported from online; T/H supplied by user |
 | User's phone in wallet case | 152 | 76 | 105 | 18 | 12 | User measurements; case has rear credit-card storage |
 
-H=12 may be measured from the rear wallet surface; if so, button center
-is 18-12=6 mm from the front outside plane. Do not encode that inference
-as a confirmed measurement. With screen facing the observer, volume buttons
-are on the left and the power button on the right.
+The user confirmed the cased button center is **12 mm from the wallet back
+and 6 mm from the screen-side outside surface**, with this orientation:
 
-User called the cased device “iphone 15”; confirm that it is the same
-iPhone 15 Pro before assigning this envelope to a device profile.
+```text
+WALLET BACK                              SCREEN / FRONT
+     |                                         |
+     |------ 12 mm ------o------- 6 mm ---------|
+                    button center
+     |<---------------- 18 mm ---------------->|
+```
+
+The extra case depth houses credit cards; do not assume its button is
+centered through thickness. For the bare sample, the supplied H=4 gives
+a nominal screen-side distance of 8.25-4=4.25 mm using the same rear datum;
+this bare-phone datum interpretation should be checked during fit testing.
+With screen facing the observer, volume buttons are on the left and the
+power button on the right.
+
+The user initially identified the sample as iPhone 15 Pro and later used
+“iphone 15” as shorthand. Working assumption, stated in conversation: both
+samples are that 15 Pro. The exact wallet-case brand/model is unknown.
 
 ## Reacher
 
@@ -73,6 +88,69 @@ measurement is currently requested.
   intended family is iPhone 14–18, with compatibility still to be checked
   against actual envelopes and button/camera positions.
 - Slim padded opposing jaws, one fixed and one sliding; no GoPro interface.
+- Use the supplied universal-holder images as the jaw mechanism reference:
+  the phone is gripped between padded opposing side faces. The desired
+  carrier is slim and rigid with open access and retaining lips/closure.
 - Adjustable volume-up actuator holds the button while the trigger is held.
+- Adjust actuator position along the phone and through its thickness to
+  accommodate bare buttons and raised case button covers. Case actuation
+  must be checked physically; equal force/travel is not established.
 - Compact housing anchor and removable trigger attachment as in concept 3a.
+- Avoid the prior 72 mm handle outrigger. Use a flexible trigger strap
+  instead of a rigid printed trigger tab where prototype retention permits.
+- Minimize printed part count, bulk, and mass without sacrificing durability.
+- Keep cameras aimed along the shaft toward the claws and all phone/mount
+  geometry clear of claw motion. Preserve port, microphone, camera, and
+  control access; no permanent tool changes or reliance on factory screws.
+- Preserve project axes: +Y toward claws, X/Z as concept 00a. Added printed
+  parts orange; stock handle/brace blue, metal silver, trigger/feet black.
 - Keep measured samples separate from provisional design ranges.
+
+## Implementation choices and validation still required
+
+These are engineering choices, not additional measured facts:
+
+- Thumb-screw jaw adjustment is the stated working default; the user did
+  not separately answer the earlier thumb-screw preference question.
+- Use a defined housing reaction point, constrained actuator, positive
+  return, adjustable contact/rest gap, and controlled button travel.
+- Accommodate remaining trigger travel after button contact with a spring
+  or other compliant transmission. A hard stop alone is insufficient.
+- Calculate cable take-up from actual anchor geometry rather than assuming
+  the full 20–40 mm trigger stroke is transmitted along the cable.
+- Button force/safe travel, spring rates, jaw retention, camera keep-outs,
+  strap slip, and print tolerances require prototypes. No physical fit or
+  durability validation has been completed. No blocking measurement
+  questions remain for the initial CAD redesign.
+- Existing R2 source/STLs still represent the prior design; this record
+  does not make them compliant with the new measurements or requirements.
+
+## Supplied image references
+
+The conversation includes these user-supplied images:
+
+- `full-length.png`: complete reacher alongside tape.
+- `uncompressed.png`: open trigger alongside tape.
+- `compressed.png`: squeezed trigger alongside tape.
+- `universal-phone-holder.png`: adjustable opposing-jaw holder example.
+- [Holder with phone](holder-with-phone-reference.png): second holder example,
+  copied unchanged from the supplied screenshot.
+
+Tape has inch and metric (cm/mm) scales. No numerical dimensions were
+extracted from the images for this record. The first four attachment paths
+were unavailable on disk when this record was consolidated; images remain
+in the conversation, and are not claimed to be archived in this repository.
+Original stock photo and concept renders remain unchanged.
+
+## Next phase
+
+1. Redesign the adjustable carrier, 14 × 19 mm clamps, compact cable anchor,
+   and actuator around these measurements and decisions.
+2. Check the entire mechanism stroke, overtravel accommodation, return,
+   collisions, assembly access, and FDM print orientations.
+3. Regenerate individual STL/STEP parts and an assembly drawing from real
+   CadQuery solids; document parameters, setup, BOM, assembly, materials,
+   prototype limitations, and intentional differences from concept art.
+4. Commit logical increments on the existing PR branch and open the final
+   STL set in Chrome. Physically validate small fit/mechanism prototypes
+   before treating the resulting design as ready for final field printing.

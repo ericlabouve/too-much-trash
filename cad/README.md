@@ -1,5 +1,7 @@
 # Reacher retrofit CAD — adjustable prototype R2
 
+> **Redesign inputs:** The confirmed [measurement and decision record](reference/measurements.md) supersedes R2 assumptions, including the square neck and phone thickness range. The source and exports below are still the prior R2 prototype pending redesign.
+
 This is an editable, dimensioned **prototype** for the blue-handled grabber in [the stock photo](reference/reacher-grabber.png). The [earlier renders](renders/README.md) remain concept references. R2 uses one open carrier for multiple phone envelopes: a sliding side rail sets width, two corner shoes set length, and a sliding cable-stop/lever carriage aligns with the volume button. Replaceable soft pads set thickness. The split square-neck clamps remain removable. The [full product rendering](print/full-assembly-cad.png), [phone-end drawing](print/assembly-cad.png), and [STEP assembly](print/assembly.step) are derived from one common model. Every orange part is printable CAD geometry. The silver/blue/black stock tool and gray phone are **unmeasured visual envelopes** inferred from the single front photo, not reverse-engineered factory solids. The concept sheets' front and side phone positions differ; this CAD uses one consistent offset to positive X and negative project Z.
 
 ## What to measure before final printing
