@@ -1,0 +1,16 @@
+name: TooMuchTrash
+options:
+  bundleIdPrefix: org.toomuchtrash
+  deploymentTarget:
+    iOS: "17.0"
+targets:
+  TooMuchTrash:
+    type: application
+    platform: iOS
+    sources:
+      - TooMuchTrash
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.toomuchtrash.app
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: 5.9

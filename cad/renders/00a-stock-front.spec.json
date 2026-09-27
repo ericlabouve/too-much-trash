@@ -1,0 +1,20 @@
+{
+  "image": "00a-stock-front.png",
+  "subject": "Unmodified reference reacher-grabber, a/front view",
+  "reference": "../reference/reacher-grabber.png",
+  "status": "Technical reference illustration; not a dimensioned or measured CAD model",
+  "neck_geometry": "The stock silver neck is a rectangular prism with a square cross-section, flat faces, and straight longitudinal edges, not a cylinder.",
+  "color_key": "Only the original stock center brace and molded handle are blue. Stock metal is silver; claw feet and squeeze trigger are black. No added parts or orange components appear.",
+  "axes": {
+    "x": "right",
+    "y": "up, parallel to the long reacher neck",
+    "z": "out of the page toward the viewer, shown as a circled dot",
+    "viewpoint_rotation_about_y_degrees": 0
+  },
+  "requirements": [
+    "Depict only the unmodified stock grabber in the same front orientation and general proportions as the reference photo.",
+    "Show both curved silver claw arms and black plastic feet, the square-profile silver shaft, one blue stock center brace, the blue stock pistol handle, and the black squeeze trigger.",
+    "Do not include a phone, harness, cable, lever, printed clamp, orange retrofit part, inset, or additional view.",
+    "Use the shaded technical engineering drawing style on white paper with an a-view axis key: positive y up, positive x right, positive z out of the page."
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "image": "02b-phone-mount-side.png",
+  "subject": "Phone harness and neck clamp, b view",
+  "reference": "../reference/reacher-grabber.png",
+  "stock_reference_view": "00b-stock-side.png",
+  "status": "Technical concept illustration; not dimensioned or mechanically validated",
+  "neck_geometry": "The stock silver neck is a rectangular prism with a square cross-section, flat faces, and sharp longitudinal edges; the orange split phone clamp grips its square profile, not a cylinder.",
+  "color_key": "All added 3D-printed clamp, harness, cable-guide, and lever parts are orange. The stock blue center brace and blue handle are outside this crop. Stock metal remains silver and claw feet black.",
+  "axes": {
+    "x": "out of the page toward the viewer, shown as a circled dot",
+    "y": "up, parallel to the long reacher neck",
+    "z": "left across the page",
+    "viewpoint_rotation_about_y_degrees": 90
+  },
+  "requirements": [
+    "Show the phone, harness, clamp, and cable lever from an intended 90-degree viewpoint rotation about the upright neck; no inset or extra view. Retain the earlier centered phone layout rather than copying the latest 2a phone translation.",
+    "The claw arms and black feet overlap in projection instead of forming a broad V.",
+    "Retain the stock 0b single black claw-foot silhouette, visible round pivot, and square neck profile in this close crop.",
+    "The phone remains perpendicular to the neck and below the claw fork, but its long side is visible across the image rather than the charging-port edge.",
+    "Keep the phone centered across the neck as in the earlier b-view concept; do not apply the positive-x and negative-z phone translation requested for 2a.",
+    "The rear cameras face the claws and stay uncovered by the GoPro-like retaining harness.",
+    "Preserve the split clamp's grip on the neck and show the bicycle brake housing stop, inner wire, pivoting lever, and contact with the side volume rocker from this rotated side.",
+    "Show a small x/y/z axis glyph on opaque white technical drawing paper: positive y up, positive z left, and positive x out of the page as a circled dot."
+  ]
+}

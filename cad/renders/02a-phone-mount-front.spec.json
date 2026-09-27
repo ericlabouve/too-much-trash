@@ -1,0 +1,25 @@
+{
+  "image": "02a-phone-mount-front.png",
+  "subject": "Phone harness and neck clamp, a view",
+  "reference": "../reference/reacher-grabber.png",
+  "stock_reference_view": "00a-stock-front.png",
+  "status": "Technical concept illustration; not dimensioned or mechanically validated",
+  "neck_geometry": "The stock silver neck is a rectangular prism with a square cross-section, flat faces, and sharp longitudinal edges; the orange split phone clamp grips its square profile, not a cylinder.",
+  "color_key": "All added 3D-printed clamp, harness, cable-guide, and lever parts are orange. The stock blue center brace and blue handle are outside this crop. Stock metal remains silver and claw feet black.",
+  "axes": {
+    "x": "right",
+    "y": "up, parallel to the long reacher neck",
+    "z": "out of the page toward the viewer; negative z goes into the page",
+    "viewpoint_rotation_about_y_degrees": 0
+  },
+  "requirements": [
+    "One close view of the phone, its harness, and the neck below the claw fork; no inset or additional view.",
+    "A removable split 3D-printed clamp grips the fluted reacher neck without drilling or using the claw mechanism.",
+    "A GoPro-like open-corner harness secures the phone against sliding out, while leaving all rear camera lenses uncovered.",
+    "The phone lies in a plane perpendicular to the neck with rear cameras facing the claws; this a view looks toward its short bottom edge and charging port.",
+    "Move the phone to positive x and negative z relative to the neck so its near thin long side face, perpendicular to the broad camera face, rests against the neck-mounted support. Maintain the same orientation and visible charging-port edge.",
+    "The charging port is visible but unused by the actuation mechanism.",
+    "A bicycle brake cable outer housing stops at the mount, and its pulled inner wire pivots a compact lever against one side volume rocker. Show the housing stop, wire attachment, pivot, and contact point as a continuous physical path.",
+    "Keep phone and mechanism outside the moving claw sweep and show a small x/y/z axis glyph on opaque white technical drawing paper, with positive z toward the viewer."
+  ]
+}

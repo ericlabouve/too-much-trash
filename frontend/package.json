@@ -1,0 +1,17 @@
+{
+  "name": "too-much-trash-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "desktop": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "typescript": "^5.8.0",
+    "vite": "^6.2.0"
+  },
+  "main": "electron/main.cjs"
+}
