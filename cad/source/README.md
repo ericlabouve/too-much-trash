@@ -1,3 +1,3 @@
-# CAD source
+# Editable source
 
-Keep editable source models and assembly files here. Start with separate components for the neck clamp, phone cradle, cable guides, button actuator, and trigger coupling so each part can be measured and revised independently.
+`parameters.py` holds the provisional measured inputs; `parts.py` creates eight independent CadQuery solids; `build.py` places them in an assembly and exports the print set. All lengths are millimetres. See [CAD setup and assembly instructions](../README.md).
