@@ -80,3 +80,16 @@ def render_all(parts,p,out):
     fig.suptitle('Reversible actuator placement: identical bracket and rocker, no mirrored print',fontsize=16)
     fig.text(.08,.04,'Phone/camera envelope is reversed for the alternative control layout. Compatibility still requires measured button/camera clearance.',fontsize=10)
     fig.savefig(out/'actuator-sides-cad.png',dpi=160);plt.close(fig)
+
+    fig=plt.figure(figsize=(15,9),facecolor='white')
+    ax=fig.add_subplot(121)
+    draw(ax,[r for r in near if r[0] in ('phone_envelope','camera_keepout','phone_volume_up','phone_volume_down')],elev=90,azim=180)
+    ax.set_title('Rear landscape: cameras lower left; volume up on upper edge',fontsize=11)
+    bxpos=450-(p.button_y-p.neck_cy)*870/p.phone_l
+    bypos=450-p.phone_w/2*870/p.phone_l
+    ax.annotate('Volume up',xy=(bxpos,bypos),xytext=(bxpos+35,bypos-75),fontsize=12,color='#145c9c',arrowprops={'arrowstyle':'->','color':'#145c9c'})
+    bx=fig.add_subplot(122);draw(bx,near,elev=90,azim=180)
+    bx.set_title('Demo actuator moved to upper edge, nearest shaft',fontsize=11)
+    fig.suptitle('Corrected iPhone demo orientation — same printable parts',fontsize=17)
+    fig.text(.07,.08,'Button centers use the supplied sample. Button sizes, spacing and camera block are illustrative envelopes.\nThis is a CAD placement view, not a dimensioned Apple device drawing.',fontsize=10)
+    fig.savefig(out/'rear-landscape-cad.png',dpi=170);plt.close(fig)

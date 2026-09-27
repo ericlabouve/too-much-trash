@@ -16,7 +16,7 @@ class Parameters:
     phone_t: float = 18
     button_from_end: float = 105
     button_from_screen: float = 6
-    actuator_side: str = "far"  # near or far relative to shaft; same printed module
+    actuator_side: str = "near"  # near or far relative to shaft; same printed module
     # PROVISIONAL same-print adjustment envelope, not model compatibility.
     width_min: float = 66
     width_max: float = 86

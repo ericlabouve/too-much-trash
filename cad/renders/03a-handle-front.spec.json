@@ -34,6 +34,7 @@
     "grip": "centered along phone length; bridge behind camera face",
     "actuator": "same module mounts near or far from shaft",
     "cable": "centered on trigger-facing shaft face; upper moving-trigger Velcro tie",
-    "supersedes": "earlier positive-X phone placement; original image retained"
+    "supersedes": "earlier positive-X phone placement; original image retained",
+    "demo_orientation": "Rear landscape: camera lower left, volume up on upper long edge; default actuator near shaft"
   }
 }

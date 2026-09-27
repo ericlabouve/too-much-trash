@@ -4,13 +4,15 @@ Editable **fit prototype**, based on the [confirmed measurements](reference/meas
 
 ![R4 CAD assembly](print/assembly-cad.png)
 
+[Corrected rear landscape placement: camera lower left, volume up and demo actuator on upper edge](print/rear-landscape-cad.png).
+
 ## Fit and operation
 
 The same print set covers a provisional **66–86 mm outside width, 7.5–20 mm thickness**, and volume-button location **80–125 mm from the charging edge**, subject to its center also being **25–65 mm toward the camera end from the phone midpoint**. Both the bare 15 Pro sample (70.6 × 146.6 × 8.25 mm) and wallet-case sample (76 × 152 × 18 mm) are modeled. This is an envelope, **not a verified iPhone 14–18 compatibility list**. Camera bumps, rounded sides, cases and button force must be checked individually.
 
 Two flat opposing jaws clamp replaceable 0.8 mm side pads. Rear ledges with pads locate the camera-side face; the bridge and sliding tongue sit behind that face, leaving the screen open. A metal M4 draw screw adjusts width. Narrow front lips act as escape catches, but have substantial clearance on thin phones: **out-of-plane and lengthwise retention depend on pad friction**, not a close-fitting cage. Use an independent tether and validate retention with a dummy phone before use. Pads must bear on the case/frame, not display glass.
 
-**Option B is the selected layout:** the phone remains beside the shaft, with no shaft/phone intersection. The 24 mm gripping band is centered along phone length, so equal lengths extend beyond it. This balances length about the band; it does not eliminate the lateral moment caused by a phone beside the shaft. The default actuator is on the edge farthest from the shaft, with the camera envelope on the opposite edge. The same bracket and rocker can be installed on the near-side rail without mirrored prints; see [both configurations](print/actuator-sides-cad.png) and `assembly-near-side.step`. Confirm the centered band misses the other phone buttons.
+**Option B is the selected layout:** the phone remains beside the shaft, with no shaft/phone intersection. The 24 mm gripping band is centered along phone length, so equal lengths extend beyond it. This balances length about the band; it does not eliminate the lateral moment caused by a phone beside the shaft. The default actuator is on the edge nearest the shaft, with the camera envelope on the opposite edge. The same bracket and rocker can be installed on the far-side rail without mirrored prints; see [both configurations](print/actuator-sides-cad.png) and `assembly-far-side.step`. Confirm the centered band misses the other phone buttons.
 
 The phone rear faces the claws, with its charging edge toward project +Z; the phone protrudes to the negative-X side of the shaft. Local CAD axes map **(X, Y, Z) → project (X, Z, −Y)**. The measured shaft is **14 mm project X × 19 mm project Z**. Mount within the measured 200 mm straight region above the blue brace, with clearance from the complete claw sweep.
 

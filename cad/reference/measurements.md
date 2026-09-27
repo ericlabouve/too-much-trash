@@ -164,3 +164,9 @@ Original stock photo and concept renders remain unchanged.
 - Route housing centrally on the neck face facing the moving black trigger, with the outlet aligned to a Velcro attachment on the upper trigger. No rigid printed trigger attachment.
 - Preserve previous draft before changes: pushed annotated Git tag `cad-r3-first-draft` at `c7c0030`.
 - No additional dimensions were measured in this review. R4 pad friction, camera envelope, spring selection, housing bends and stock handle proxy remain provisional.
+
+### Demo orientation correction — 2026-09-27
+
+The user's rear landscape reference places the camera block at lower left and volume up on the upper long edge. The default demo therefore uses the near-shaft actuator rail, with the camera block on the far edge. This supersedes R4's initial far-side demo placement; either-side printable capability is unchanged. Volume-up center/depth use the supplied measurements. Added button-marker size (7 ×2.6 mm), 14 mm down-button spacing and camera block dimensions are illustrative, not new measurements.
+
+“Dummy phone test” means a physical size/weight surrogate and dummy button gauge to check clamp slip, stiffness, cable friction, return and stop behavior before risking the phone. CAD swept-motion checks and the browser lever slider visualize rigid motion only; they do not validate those physical effects.

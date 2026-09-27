@@ -9,7 +9,7 @@
     "phone_t": 18,
     "button_from_end": 105,
     "button_from_screen": 6,
-    "actuator_side": "far",
+    "actuator_side": "near",
     "width_min": 66,
     "width_max": 86,
     "thickness_min": 7.5,
@@ -247,6 +247,26 @@
         0.19
       ],
       "file": "assembly_meshes/stock_black_trigger.stl",
+      "printable": false
+    },
+    {
+      "name": "phone_volume_up",
+      "color": [
+        0.13,
+        0.16,
+        0.19
+      ],
+      "file": "assembly_meshes/phone_volume_up.stl",
+      "printable": false
+    },
+    {
+      "name": "phone_volume_down",
+      "color": [
+        0.13,
+        0.16,
+        0.19
+      ],
+      "file": "assembly_meshes/phone_volume_down.stl",
       "printable": false
     },
     {
@@ -612,10 +632,10 @@
   ],
   "pressed_angle_radians": 0.055673794986509026,
   "motion_pivot": [
-    -158.6,
+    -59.0,
     69.0,
-    1.1999999999999815
+    1.1999999999999957
   ],
-  "motion_sign": 1,
+  "motion_sign": -1,
   "total_printed_solid_cm3": 92.75
 }

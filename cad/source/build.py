@@ -45,10 +45,10 @@ def main():
     for stale in view.glob('*.stl'):
         if stale.name not in current:stale.unlink()
     assy.export(str(OUT/'assembly.step'))
-    alternate=cq.Assembly(name='R4_near_side_actuator')
-    for name,s,c in scene(parts,replace(p,actuator_side='near')):
+    alternate=cq.Assembly(name='R4_far_side_actuator')
+    for name,s,c in scene(parts,replace(p,actuator_side='far')):
         alternate.add(s,name=name,color=cq.Color(*c))
-    alternate.export(str(OUT/'assembly-near-side.step'))
+    alternate.export(str(OUT/'assembly-far-side.step'))
     manifest['total_printed_solid_cm3']=round(sum(x['volume_mm3']*x['quantity'] for x in manifest['parts'])/1000,2)
     (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     from render import render_all

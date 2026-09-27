@@ -59,6 +59,13 @@ def proxies(p):
        'stock_blue_handle':box(-30,-8,28,52,p.handle_z-96,p.handle_z-30),
        'stock_blue_grip':rod((-23,40,p.handle_z-88),(-65,40,p.handle_z-153),23),
        'stock_black_trigger':rod((p.cable_face_x,40,p.handle_z-100),(-43,40,p.handle_z-145),10)}
+    # Illustrative button markers; measured center and depth, provisional size.
+    # Outer dimensions remain the fit datum, including the selected case.
+    edge=p.phone_left if p.actuator_side=='near' else p.phone_left+p.phone_w
+    x0,x1=(edge-.15,edge+.15)
+    bz=2*p.phone_mid_z-p.button_z
+    for name,yy in (('phone_volume_up',p.button_y),('phone_volume_down',p.button_y-14)):
+        s[name]=phone_transform(box(x0,x1,yy-3.5,yy+3.5,bz-1.3,bz+1.3),p)
     arms=[]
     for sign in (-1,1):
         pts=[(-23+sign*x,40,z) for x,z in ((0,110),(25,138),(52,188),(65,230))]
@@ -125,7 +132,7 @@ def scene(parts,p,angle=0,stock=True,metal=True):
     rows.append(('handle_cap',place('handle_cap',parts['neck_cap'],p),ORANGE))
     if stock:
         for n,s in proxies(p).items():
-            c=BLUE if 'blue' in n else DARK if 'black' in n or 'camera' in n else (.43,.48,.53) if 'phone' in n else METAL
+            c=BLUE if 'blue' in n else DARK if 'black' in n or 'camera' in n or 'volume' in n else (.43,.48,.53) if 'phone' in n else METAL
             rows.append((n,s,c))
     if metal:
         for n,s in hardware(p,angle).items():rows.append((n,s,DARK if any(t in n for t in ('housing','soft','strap')) else METAL))
