@@ -1,0 +1,21 @@
+{
+  "image": "02b-phone-mount-side.png",
+  "subject": "Phone harness and neck clamp, b view",
+  "reference": "../reference/reacher-grabber.png",
+  "status": "Technical concept illustration; not dimensioned or mechanically validated",
+  "axes": {
+    "x": "right",
+    "y": "up, parallel to the long reacher neck",
+    "z": "out of the page toward the viewer; negative z goes into the page",
+    "viewpoint_rotation_about_y_degrees": 90
+  },
+  "requirements": [
+    "Show the phone, harness, clamp, and cable lever from an intended 90-degree viewpoint rotation about the upright neck; no inset or extra view. Retain the earlier centered phone layout rather than copying the latest 2a phone translation.",
+    "The claw arms and black feet overlap in projection instead of forming a broad V.",
+    "The phone remains perpendicular to the neck and below the claw fork, but its long side is visible across the image rather than the charging-port edge.",
+    "Keep the phone centered across the neck as in the earlier b-view concept; do not apply the positive-x and negative-z phone translation requested for 2a.",
+    "The rear cameras face the claws and stay uncovered by the GoPro-like retaining harness.",
+    "Preserve the split clamp's grip on the neck and show the bicycle brake housing stop, inner wire, pivoting lever, and contact with the side volume rocker from this rotated side.",
+    "Show a small x/y/z axis glyph on opaque white technical drawing paper, with positive z toward the viewer."
+  ]
+}

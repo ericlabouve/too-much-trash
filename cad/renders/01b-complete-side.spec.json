@@ -1,0 +1,22 @@
+{
+  "image": "01b-complete-side.png",
+  "subject": "Full proposed grabber retrofit, b view",
+  "reference": "../reference/reacher-grabber.png",
+  "status": "Technical concept illustration; not dimensioned or mechanically validated",
+  "axes": {
+    "x": "right",
+    "y": "up, parallel to the long reacher neck",
+    "z": "out of the page toward the viewer; negative z goes into the page",
+    "viewpoint_rotation_about_y_degrees": 90
+  },
+  "requirements": [
+    "Show the complete assembly from an intended viewpoint rotated 90 degrees around the upright y-axis; do not rotate the paper or tilt the neck. Retain the earlier centered phone layout rather than copying the latest 1a phone translation.",
+    "One complete reacher and its attachments in one view; no inset or additional view.",
+    "The claw arms and plastic feet overlap in projection; only the back of one plastic claw foot is visible.",
+    "Rotate the handle counterclockwise with the assembly so the upper blue handle head is visible and the black squeeze trigger is hidden behind it.",
+    "The phone remains below the claw fork with its plane perpendicular to the neck and its cameras facing the claws. This view shows its long side, not the charging-port edge.",
+    "Keep the phone centered across the neck as in the earlier b-view concept; do not apply the positive-x and negative-z phone translation requested for 1a.",
+    "Keep the external bicycle brake cable on the shaft and route it into the hidden trigger coupling consistently with 3b.",
+    "Show a small x/y/z axis glyph on opaque white paper, with positive z represented as coming out of the page, in a technical engineering drawing style."
+  ]
+}

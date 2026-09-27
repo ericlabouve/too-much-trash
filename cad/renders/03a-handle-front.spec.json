@@ -1,0 +1,21 @@
+{
+  "image": "03a-handle-front.png",
+  "subject": "Handle cable coupling, a view",
+  "reference": "../reference/reacher-grabber.png",
+  "status": "Technical concept illustration; not dimensioned or mechanically validated",
+  "axes": {
+    "x": "right",
+    "y": "up, parallel to the long reacher neck",
+    "z": "out of the page toward the viewer; negative z goes into the page",
+    "viewpoint_rotation_about_y_degrees": 0
+  },
+  "requirements": [
+    "One close view of the specific blue handle, black moving squeeze trigger, and lower silver shaft; no phone, inset, or extra view.",
+    "A removable split clamp on the stationary lower shaft anchors the bicycle brake cable outer housing.",
+    "The exposed inner steel wire follows a continuous, visible path from the housing stop to a small removable tab strapped around the moving black trigger.",
+    "Squeezing the trigger pulls the inner wire relative to the fixed housing; keep the trigger and usable hand grip visible.",
+    "Use minimal extra metal parts, no drilled holes, no internal handle changes, and no attachment to the handle's existing screw holes.",
+    "This visible coupling is the one represented in full assembly image 1a.",
+    "Show a small x/y/z axis glyph on opaque white technical drawing paper, with positive z toward the viewer."
+  ]
+}

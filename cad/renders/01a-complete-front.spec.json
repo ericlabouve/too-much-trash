@@ -1,0 +1,23 @@
+{
+  "image": "01a-complete-front.png",
+  "subject": "Full proposed grabber retrofit, a view",
+  "reference": "../reference/reacher-grabber.png",
+  "status": "Technical concept illustration; not dimensioned or mechanically validated",
+  "axes": {
+    "x": "right",
+    "y": "up, parallel to the long reacher neck",
+    "z": "out of the page toward the viewer; negative z goes into the page",
+    "viewpoint_rotation_about_y_degrees": 0
+  },
+  "requirements": [
+    "One complete reacher and its attachments in one view; no inset or additional view.",
+    "Preserve the exact reference grabber's silver fluted shaft, curved claws, black claw feet, blue pistol handle, and moving black squeeze trigger.",
+    "Keep the phone below the claw fork and outside the moving claw sweep, held in a removable GoPro-like corner harness on a split neck clamp.",
+    "The phone lies in a plane perpendicular to the neck, with uncovered rear cameras facing up the neck toward the claws.",
+    "Rotate the phone about the neck's y-axis until its short bottom edge and charging port face the viewer; its long side recedes into depth.",
+    "Translate the phone toward positive x and negative z until its near thin long side face, perpendicular to the broad camera face, rests against the neck-mounted support. Keep the charging-port edge visible and the camera face pointed toward the claws.",
+    "Route one external bicycle brake Bowden cable from the phone lever down the shaft to a stationary housing anchor and a visible removable tab on the moving black handle trigger, consistent with 3a.",
+    "The cable-driven lever contacts a side volume rocker; it does not press the charging port.",
+    "Show a small x/y/z axis glyph on opaque white paper, with positive z represented as coming out of the page, in a technical engineering drawing style."
+  ]
+}
