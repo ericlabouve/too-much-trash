@@ -47,10 +47,10 @@ STLs in `print/` are **already oriented and translated onto the bed**, in mm. Im
 | `sliding_jaw` | 1 | PETG; tongue underside down. Four walls, 30% infill; six walls around nut and draw-screw web. Support the small front catch lip; keep guide faces clean. |
 | `neck_cap` | 2 | PETG; shaft axis vertical. Four/five walls; support beneath bolt ears. |
 | `actuator_bracket` | 1 | PETG; exported on cable-stop outer face. Paint support beneath raised back plate/pivot ears, keep slots and ferrule bore clear. Five walls. |
-| `rocker` | 1 | PETG or tough nylon; exported flat on its broad face, pivot axis vertical. Five walls / solid small part; no support. |
+| `rocker` | 1 | PETG; exported flat on its broad face, pivot axis vertical. Five walls / solid small part; no support. |
 | `handle_anchor` | 1 | PETG; shaft axis vertical. Five walls; local ear support. |
 
-Start with 0.4 mm nozzle, 0.2 mm layers. ASA is an alternative for outdoor heat/UV if the printer can control warping. TPU/rubber is for pads and the contact cap; metal carries pivot wear, cable tension and threads. Avoid brittle or heat-softened structural prints. Slide clearances are 0.3 mm per side / 0.4 mm vertically; collar adds 0.6 mm total per axis before shims. Fit depends on printer and material. Slice previews and actual print times/mass have **not** been validated in Bambu Studio. Manifest volumes are solid CAD volumes, not slicer material estimates.
+Start with 0.4 mm nozzle, 0.2 mm layers. Use PETG for all seven rigid printed pieces: the user owns PETG, PLA and PLA+ and prefers one material. PLA/PLA+ may use the same STL geometry for fit previews, but are not qualified interchangeable structural substitutes; inspect the specific filament datasheet and recheck fit when changing material. No TPU filament is required: cut compliant pads/shims from rubber sheet and use a purchased soft contact cap; metal carries pivot wear, cable tension and threads. Avoid brittle or heat-softened structural prints. Slide clearances are 0.3 mm per side / 0.4 mm vertically; collar adds 0.6 mm total per axis before shims. Fit depends on printer and material. Slice previews and actual print times/mass have **not** been validated in Bambu Studio. Manifest volumes are solid CAD volumes, not slicer material estimates.
 
 ## Files and regeneration
 
@@ -90,3 +90,5 @@ See [the purchased BOM](bom.md) for quantities and provisional sizes. White rods
 Other purchased items are inner cable, outer housing, two ferrules, cable end/loop terminations, hook-and-loop trigger strap, removable route ties, jaw pads, shaft shims, soft contact cap and phone tether. Their dimensions and spring shapes are envelopes pending hardware selection; they are not printable components. A factory cable nipple like the supplied photo could replace the screw-on stop only after checking its shape, bearing area and clearance.
 
 The housing now follows three straight segments with two right-angle turns in CAD. Actual brake housing must make rounded bends at those locations; the drawing is not a specification to kink the housing. Cable length and loop clearance depend on the chosen housing.
+
+Material basis: [Prusa’s PETG guide](https://help.prusa3d.com/article/petg_2059) recommends PETG for mechanical holders and clamps; its [PLA guide](https://help.prusa3d.com/article/pla_2062) notes lower heat resistance and brittleness. PETG is the design baseline, not a certification of strength. PLA+ brand/grade has not been supplied. Proposed rigid knobs and housing guides can also use PETG; flexible pads must remain compliant purchased components with the currently owned filaments.

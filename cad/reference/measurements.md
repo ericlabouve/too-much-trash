@@ -174,3 +174,7 @@ The user's rear landscape reference places the camera block at lower left and vo
 ### Housing route and hardware clarification — 2026-09-27
 
 User declined dummy-phone testing and requested the housing illustration use a simple loop with two right-angle turns. The CAD now shows three straight segments, with the long run centered on the trigger-facing neck surface. These corners are a routing schematic; actual housing requires rounded bends and selected-hardware clearance. No hardware dimensions or physical tests were supplied. The lever's existing short cylinder represents a purchased screw-on cable stop; it does not assume a particular factory nipple. The README now identifies all non-printed hardware and the housing/inner-wire load paths.
+
+### Available filament — 2026-09-27
+
+User owns PETG, PLA and PLA+ and prefers all printed parts in one material or interchangeable materials. Adopt PETG for all current rigid printable parts, including rocker. Keep soft pads/shims/contact tip purchased or cut from compliant sheet; no TPU printing is required. Same STL geometry does not establish equivalent strength, fit or thermal performance between filaments. PLA+ brand/grade is unknown; no structural interchangeability has been validated.
