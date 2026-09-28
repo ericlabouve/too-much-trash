@@ -1,3 +1,5 @@
-# Printer files
+# R3 print set — fit prototypes
 
-Place reviewed STL, STEP, and Bambu Studio 3MF files here when physical prototypes exist. Record printer, material, orientation, and part revision with each print set.
+Six unique bed-oriented STL files; print **two neck caps** and one of each other part. STEP parts remain in assembly coordinates. `assembly.step` includes printed parts plus unthreaded hardware and provisional stock/phone envelopes. `assembly_meshes/` is viewer data, **not a print set**. Use only the six top-level STLs for printing.
+
+See [assembly/print instructions](../README.md), [BOM](../bom.md), and [limitations](../design-review.md). `manifest.json` records CAD volumes and bounding boxes; `validation.json` records sample checks and provisional mechanism calculations. Open `../viewer.html` through `../serve_viewer.py` to inspect the actual exports in Chrome. The viewer uses pinned Three.js modules from a public CDN and loads geometry from localhost.

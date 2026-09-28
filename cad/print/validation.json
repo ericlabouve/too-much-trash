@@ -1,0 +1,85 @@
+{
+  "samples": {
+    "wallet_near": {
+      "stop_degrees": 3.189873482203569,
+      "cable_to_stop_mm": 1.0016106952667705,
+      "tip_rise_mm": 0.6557283177808193,
+      "takeup_20_mm": 20,
+      "takeup_40_mm": 40,
+      "spring_extension_mm": 38.99838930473323,
+      "max_cable_tension_n": 3.6449114117603276,
+      "available_tip_force_n_before_stop": 5.186453612967037
+    },
+    "wallet_far": {
+      "stop_degrees": 3.189873482203569,
+      "cable_to_stop_mm": 1.0016106952667705,
+      "tip_rise_mm": 0.6557283177808193,
+      "takeup_20_mm": 20,
+      "takeup_40_mm": 40,
+      "spring_extension_mm": 38.99838930473323,
+      "max_cable_tension_n": 3.6449114117603276,
+      "available_tip_force_n_before_stop": 5.186453612967037
+    },
+    "bare_near": {
+      "stop_degrees": 3.189873482203569,
+      "cable_to_stop_mm": 1.0016106952667705,
+      "tip_rise_mm": 0.6557283177808193,
+      "takeup_20_mm": 20,
+      "takeup_40_mm": 40,
+      "spring_extension_mm": 38.99838930473323,
+      "max_cable_tension_n": 3.6449114117603276,
+      "available_tip_force_n_before_stop": 5.186453612967037
+    },
+    "bare_far": {
+      "stop_degrees": 3.189873482203569,
+      "cable_to_stop_mm": 1.0016106952667705,
+      "tip_rise_mm": 0.6557283177808193,
+      "takeup_20_mm": 20,
+      "takeup_40_mm": 40,
+      "spring_extension_mm": 38.99838930473323,
+      "max_cable_tension_n": 3.6449114117603276,
+      "available_tip_force_n_before_stop": 5.186453612967037
+    },
+    "small_near": {
+      "stop_degrees": 3.189873482203569,
+      "cable_to_stop_mm": 1.0016106952667705,
+      "tip_rise_mm": 0.6557283177808193,
+      "takeup_20_mm": 20,
+      "takeup_40_mm": 40,
+      "spring_extension_mm": 38.99838930473323,
+      "max_cable_tension_n": 3.6449114117603276,
+      "available_tip_force_n_before_stop": 5.186453612967037
+    },
+    "small_far": {
+      "stop_degrees": 3.189873482203569,
+      "cable_to_stop_mm": 1.0016106952667705,
+      "tip_rise_mm": 0.6557283177808193,
+      "takeup_20_mm": 20,
+      "takeup_40_mm": 40,
+      "spring_extension_mm": 38.99838930473323,
+      "max_cable_tension_n": 3.6449114117603276,
+      "available_tip_force_n_before_stop": 5.186453612967037
+    },
+    "large_near": {
+      "stop_degrees": 3.189873482203569,
+      "cable_to_stop_mm": 1.0016106952667705,
+      "tip_rise_mm": 0.6557283177808193,
+      "takeup_20_mm": 20,
+      "takeup_40_mm": 40,
+      "spring_extension_mm": 38.99838930473323,
+      "max_cable_tension_n": 3.6449114117603276,
+      "available_tip_force_n_before_stop": 5.186453612967037
+    },
+    "large_far": {
+      "stop_degrees": 3.189873482203569,
+      "cable_to_stop_mm": 1.0016106952667705,
+      "tip_rise_mm": 0.6557283177808193,
+      "takeup_20_mm": 20,
+      "takeup_40_mm": 40,
+      "spring_extension_mm": 38.99838930473323,
+      "max_cable_tension_n": 3.6449114117603276,
+      "available_tip_force_n_before_stop": 5.186453612967037
+    }
+  },
+  "failures": []
+}
