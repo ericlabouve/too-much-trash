@@ -6,7 +6,7 @@ import cadquery as cq
 import trimesh
 from parameters import Parameters
 from parts import all_parts
-from assembly import scene,stop_angle,module
+from assembly import scene,stop_angle,module,trigger_pivot,trigger_attach
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'print'
 
@@ -35,6 +35,13 @@ def main():
     pivot=module(cq.Workplane('XY').sphere(.1).translate((11,0,19)),p).val().Center()
     manifest['motion_pivot']=list(pivot.toTuple())
     manifest['motion_sign']=1 if p.actuator_side=='far' else -1
+    manifest['trigger_motion']={
+        'pivot':trigger_pivot(p), 'attach':trigger_attach(p),
+        'angle_radians':p.trigger_squeeze_radians, 'housing_exit':(p.cable_face_x,p.neck_cy,p.handle_z-12),
+        'spring_free_length':p.spring_free_eye_mm,
+        'note':'Provisional stock pivot/shape; prescribed motion, not force simulation.'}
+
+    manifest['phone_wire']=[list(module(cq.Workplane('XY').sphere(.1).translate(point),p).val().Center().toTuple()) for point in [(-7,0,0),(-7,0,22)]]
     assy=cq.Assembly(name='Too_Much_Trash_R4_fit_prototype')
     for name,s,c in scene(parts,p):
         assy.add(s,name=name,color=cq.Color(*c))

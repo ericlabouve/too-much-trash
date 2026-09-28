@@ -49,6 +49,19 @@ def phone(p):
     z=2*p.phone_mid_z-p.rear_face_z
     return phone_transform(box(p.phone_left,p.phone_left+p.phone_w,p.phone_y0,p.phone_y0+p.phone_l,z,z+p.phone_t),p)
 
+def trigger_pivot(p):
+    return (-27, p.neck_cy, p.handle_z-46)
+
+def trigger_attach(p):
+    return (-65, p.neck_cy, p.handle_z-47)
+
+def trigger_shape(p):
+    # Stock part envelope, not a printable retrofit. Pivot and contour provisional.
+    profile=[(-27,-40),(-39,-41),(-107,-43),(-112,-48),
+             (-109,-54),(-99,-55),(-37,-51),(-27,-51)]
+    return (cq.Workplane('XZ').polyline([(x,p.handle_z+z) for x,z in profile])
+            .close().extrude(14).edges('|Y').fillet(2).translate((0,p.neck_cy+7,0)))
+
 def proxies(p):
     z=2*p.phone_mid_z-p.rear_face_z
     camx=p.phone_left+2 if p.actuator_side=='far' else p.phone_left+p.phone_w-40
@@ -57,8 +70,9 @@ def proxies(p):
        'phone_envelope':phone(p),
        'camera_keepout':phone_transform(box(camx,camx+38,p.phone_y0+p.phone_l-43,p.phone_y0+p.phone_l-3,z-4,z),p),
        'stock_blue_handle':box(-30,-8,28,52,p.handle_z-96,p.handle_z-30),
-       'stock_blue_grip':rod((-23,40,p.handle_z-88),(-65,40,p.handle_z-153),23),
-       'stock_black_trigger':rod((p.cable_face_x,40,p.handle_z-100),(-43,40,p.handle_z-145),10)}
+       'stock_blue_grip':rod((-23,40,p.handle_z-88),(-110,40,p.handle_z-108),23),
+       'stock_black_trigger':trigger_shape(p),
+       'stock_trigger_pivot':rod((-27,31,p.handle_z-46),(-27,49,p.handle_z-46),5)}
     # Illustrative button markers; measured center and depth, provisional size.
     # Outer dimensions remain the fit datum, including the selected case.
     edge=p.phone_left if p.actuator_side=='near' else p.phone_left+p.phone_w
@@ -112,8 +126,9 @@ def hardware(p,angle=0):
             (p.cable_face_x,p.neck_cy,p.handle_z+12)]
     for i,(a,b) in enumerate(zip(points,points[1:])):h[f'housing_route_{i}']=rod(a,b,5)
     anchor=(p.cable_face_x,p.neck_cy,p.handle_z-12)
-    attach=(p.cable_face_x,p.neck_cy,p.handle_z-100)
-    start=(attach[0],attach[1],attach[2]+p.spring_free_eye_mm)
+    attach=trigger_attach(p)
+    axis=cq.Vector(*anchor).sub(cq.Vector(*attach)).normalized()
+    start=cq.Vector(*attach).add(axis.multiply(p.spring_free_eye_mm)).toTuple()
     h['handle_inner_wire']=rod(anchor,start,1.6)
     h['series_extension_spring_envelope']=rod(start,attach,p.spring_od)
     h['trigger_strap_envelope']=box(attach[0]-7,attach[0]+7,26,54,attach[2]-7,attach[2]+7)

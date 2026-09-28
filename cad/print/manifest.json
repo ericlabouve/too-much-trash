@@ -38,7 +38,8 @@
     "spring_od": 8,
     "spring_free_eye_mm": 35,
     "spring_rated_extension_mm": 45,
-    "handle_z": -370
+    "handle_z": -370,
+    "trigger_squeeze_radians": -0.55
   },
   "parts": [
     {
@@ -247,6 +248,16 @@
         0.19
       ],
       "file": "assembly_meshes/stock_black_trigger.stl",
+      "printable": false
+    },
+    {
+      "name": "stock_trigger_pivot",
+      "color": [
+        0.63,
+        0.68,
+        0.72
+      ],
+      "file": "assembly_meshes/stock_trigger_pivot.stl",
       "printable": false
     },
     {
@@ -617,5 +628,37 @@
     1.1999999999999957
   ],
   "motion_sign": -1,
+  "trigger_motion": {
+    "pivot": [
+      -27,
+      40,
+      -416
+    ],
+    "attach": [
+      -65,
+      40,
+      -417
+    ],
+    "angle_radians": -0.55,
+    "housing_exit": [
+      -38.0,
+      40,
+      -382
+    ],
+    "spring_free_length": 35,
+    "note": "Provisional stock pivot/shape; prescribed motion, not force simulation."
+  },
+  "phone_wire": [
+    [
+      -41.0,
+      69.0,
+      20.199999999999996
+    ],
+    [
+      -41.0,
+      69.0,
+      -1.8000000000000043
+    ]
+  ],
   "total_printed_solid_cm3": 92.75
 }

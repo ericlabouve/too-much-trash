@@ -190,3 +190,7 @@ User requested one Bill of Materials view combining printed parts and purchases 
 ### Dynamic BOM material selection — 2026-09-27
 
 User requested on-hand PLA/PLA+, PETG and TPU checkboxes plus a “Most Optimal Layout” override that disables them. The viewer combines the two static stage columns into one dynamic Material column and colors the BOM models to match. Working interpretation: layout means material assignment, not changed geometry. Best recommendation is PETG structure plus planned TPU soft parts and conventional metal/textile hardware. Unchecking the override restores the previous selection; no new accessory exports are implied.
+
+### Stock trigger visualization — 2026-09-27
+
+User requested a visible black squeeze trigger in Full tool, pivoting as Lever stroke changes, with the bicycle inner-wire/Velcro tie moving with it. Added a separate stock trigger envelope and pivot; corrected the simplified fixed grip so the trigger is distinct. No new dimensions were supplied: contour, pivot and 31.5° animation sweep are provisional. The slider prescribes movement and cable/spring connectivity, not force response or measured travel validation.

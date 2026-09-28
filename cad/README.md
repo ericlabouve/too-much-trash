@@ -108,3 +108,9 @@ In the BOM, check **PLA/PLA+**, **PETG**, and/or **TPU** under “Preferred mate
 Click a BOM row or model to focus and highlight it without leaving the BOM. Right-click a row/model to open the available Phone assembly, Full tool or Actuator view, focused on that component. Unavailable destinations are disabled. Use **Show all** to reset framing. Rows also support Enter/Space and Shift+F10.
 
 The **3D model** column distinguishes printable STLs, reference envelopes and table-only items. Jaw pads and the soft contact tip have reference geometry; shaft liners/shims, optional trigger saddle and cable-retaining loops do not yet have models. Selecting TPU does not create geometry or export new STLs.
+
+### Full-tool squeeze animation
+
+The black stock trigger is a separate, non-printable CAD envelope with a transverse pivot. The **Lever stroke** slider rotates it toward the fixed blue grip; its strap moves with it. The handle cable stays connected, the phone rocker reaches its stop after approximately 1 mm of illustrated cable take-up, and the series-spring envelope lengthens during the remaining squeeze. The phone-end inner wire also follows the rocker.
+
+The stock contour, pivot and 31.5° display sweep are provisional, not measured mechanism geometry. This is a prescribed kinematic illustration, not a force/friction simulation or proof of the measured 20–40 mm trigger travel. The spring is displayed as an extending envelope rather than modeled coils. The trigger is already part of the purchased reacher and adds no BOM item or printable part.

@@ -50,6 +50,8 @@ class Parameters:
     spring_rated_extension_mm: float = 45
     handle_z: float = -370  # provisional station relative to phone band
 
+    trigger_squeeze_radians: float = -0.55  # provisional stock pivot display, ~31.5 degrees
+
     @property
     def phone_left(self):
         return self.groove_x + self.pad_x_allowance
