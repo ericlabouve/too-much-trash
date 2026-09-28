@@ -12,13 +12,11 @@ This repository brings the whole effort together: a hosted service for collectin
 
 ## The current prototype
 
-These images come directly from the current 3D CAD assembly. The adjustable holder keeps the phone beside the shaft and its screen open. A cable-driven actuator presses the volume button; a spring at the handle absorbs the rest of the squeeze.
+These selected views show the 3D CAD assembly. The adjustable holder keeps the phone beside the shaft and its screen open. A cable-driven actuator presses the volume button; a spring at the handle absorbs the rest of the squeeze.
 
-![Current reacher retrofit, rendered from the CAD assembly](cad/print/full-assembly-cad.png)
+![Reacher retrofit showing the open phone screen, cable route and squeeze trigger](cad/reference/readme-view-1.png)
 
-![Phone holder from the screen and camera sides](cad/print/assembly-cad.png)
-
-![Trigger connection and phone actuator with modeled hardware](cad/print/hardware-details-cad.png)
+![Reacher retrofit from the camera side showing the phone carrier and actuator](cad/reference/readme-view-2.png)
 
 Orange marks printable retrofit parts; blue marks the stock handle and brace. This is a **fit prototype**: the printable parts are modeled, while the stock tool, phone and purchased hardware remain illustrative references. Physical grip, button force and spring behavior still need verification.
 
