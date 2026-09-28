@@ -39,7 +39,7 @@
     "spring_free_eye_mm": 35,
     "spring_rated_extension_mm": 45,
     "handle_z": -370,
-    "trigger_squeeze_radians": -0.55
+    "trigger_squeeze_radians": -0.48
   },
   "parts": [
     {
@@ -639,7 +639,7 @@
       40,
       -417
     ],
-    "angle_radians": -0.55,
+    "angle_radians": -0.48,
     "housing_exit": [
       -38.0,
       40,

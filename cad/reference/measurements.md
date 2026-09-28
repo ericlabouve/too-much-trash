@@ -193,4 +193,4 @@ User requested on-hand PLA/PLA+, PETG and TPU checkboxes plus a “Most Optimal 
 
 ### Stock trigger visualization — 2026-09-27
 
-User requested a visible black squeeze trigger in Full tool, pivoting as Lever stroke changes, with the bicycle inner-wire/Velcro tie moving with it. Added a separate stock trigger envelope and pivot; corrected the simplified fixed grip so the trigger is distinct. No new dimensions were supplied: contour, pivot and 31.5° animation sweep are provisional. The slider prescribes movement and cable/spring connectivity, not force response or measured travel validation.
+User requested a visible black squeeze trigger in Full tool, pivoting as Lever stroke changes, with the bicycle inner-wire/Velcro tie moving with it. Added a separate stock trigger envelope and pivot; corrected the simplified fixed grip so the trigger is distinct. No new dimensions were supplied: contour, pivot and 27.5° animation sweep are provisional. The slider prescribes movement and cable/spring connectivity, not force response or measured travel validation.
