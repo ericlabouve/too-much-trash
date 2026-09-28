@@ -45,7 +45,7 @@ def main():
     assy=cq.Assembly(name='Too_Much_Trash_R4_fit_prototype')
     for name,s,c in scene(parts,p):
         assy.add(s,name=name,color=cq.Color(*c))
-        cq.exporters.export(s,str(view/f'{name}.stl'),tolerance=.12,angularTolerance=.15)
+        cq.exporters.export(s,str(view/f'{name}.stl'),tolerance=.18,angularTolerance=.35)
         manifest['assembly'].append({'name':name,'color':c,'file':f'assembly_meshes/{name}.stl','printable':name in parts or name=='handle_cap'})
     # Remove only superseded generated viewer meshes; concept assets are untouched.
     current={Path(entry['file']).name for entry in manifest['assembly']}

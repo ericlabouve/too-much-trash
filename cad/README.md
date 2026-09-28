@@ -31,7 +31,7 @@ The [generated calculation](print/validation.json) uses provisional 0.35 mm rest
 1. Deburr prints, check slider movement and ream metal-pivot/fastener holes as needed. Apply thin removable shaft shims and jaw pads. Install the M4 square nut in the jaw's top-loading pocket; insert the jaw from the open right end of the guide.
 2. Insert the M4×80 draw screw from the fixed-jaw side into the jaw nut. Use a purchased thumb head no larger than 16 mm diameter / 5 mm thick; the carrier has a finger recess. Backing off permits manually spreading the jaws. Center the phone length on the jaw band, seat its rear against the padded ledges, and tighten only enough to resist slipping. Attach the independent tether.
 3. Bolt the integrated saddle and one `neck_cap` around the rectangular neck. Fit the second cap to `handle_anchor` above the handle. Each collar uses two M4 through-bolts and washers. Do not crush the fluted tube; physical shim fit controls friction.
-4. Choose the carrier rail or matching sliding-jaw rail and attach the same bracket to its slot using two M3 bolts and washers. Slide it along the phone and adjust its height through the paired vertical slots, then lock both bolts. Wallet-case button center is 6 mm from the screen side; the rear ledges locate the 18 mm case at a fixed rear datum. Leave the camera keep-out area unobstructed.
+4. Choose the carrier rail or matching sliding-jaw rail and attach the same bracket to its slot using two M3 bolts and 6 mm OD ×0.5 mm washers. Use M3×20 carriage bolts (replacing the earlier M3×25 callout) and verify tip clearance at the chosen adjustment. Slide it along the phone and adjust its height through the paired vertical slots, then lock both bolts. Wallet-case button center is 6 mm from the screen side; the rear ledges locate the 18 mm case at a fixed rear datum. Leave the camera keep-out area unobstructed.
 5. Install the pivot, torsion spring and rocker with axial washers. Set spring legs in their provided holes, with preload toward the released stop; ensure no coil/leg rubbing. Install the contact screw with a soft tip and opposed locknuts, and the stop screw with its square nut plus locking nut.
 6. Seat housing/ferrules at both reaction stops. Route the housing down the center of the neck face facing the black trigger; the handle anchor outlet and upper-trigger Velcro tie are in the same plane. Use smooth bends (follow the selected housing supplier’s bend-radius limits; the schematic two-turn loop may need more space), away from claws and fingers. Secure with removable ties. The CAD route is a diagram with straight segments, not a cut/bend template.
 7. Secure the handle inner wire to the series spring with a rated clamp/loop termination. Connect the spring's closed eye to a hook-and-loop strap on the **moving trigger**. Keep all metal ends covered and clear of the hand. Do not attach it to the stationary grip. Verify strap security through the full squeeze.
@@ -76,11 +76,11 @@ Only `cad/.venv` is used; no global Python packages are required. Export behavio
 
 ## Hardware shown in gray/white
 
-See [the purchased BOM](bom.md) for quantities and provisional sizes. White rods are simplified metal hardware, with threads and some washers/heads omitted:
+See [the purchased BOM](bom.md) for quantities and provisional sizes. Metal references now include recognizable heads, nuts, washers and cosmetic thread marks. These are assembly illustrations, not supplier drawings:
 
 - Four collar bolts close the phone and handle clamps around the shaft.
 - The long M4 draw screw and its thumb wheel pull the sliding jaw inward; a captive square nut reacts it.
-- Two M3 carriage bolts lock the actuator's position in its adjustment slots.
+- Two M3 carriage bolts and 6 mm OD washers lock the actuator's position in its adjustment slots.
 - One smooth metal pivot axle supports the rocking lever.
 - One M3 contact screw with two locknuts carries the soft button tip.
 - One M3 stop screw and its nuts limit lever travel.
@@ -95,7 +95,7 @@ Material basis: [Prusa’s PETG guide](https://help.prusa3d.com/article/petg_205
 
 ## Unified viewer bill of materials
 
-The **Bill of Materials** tab combines material-colored printable models, hardware representatives and one complete assembly table loaded from `bom.md`. Each item is counted once. Rows distinguish required, fit-dependent, recommended and optional items, with initial and later material/supply choices. Future printed alternatives replace the corresponding purchased items; the draw-screw row already includes its thumb head. The table gives actual required quantities; the 3D display shows representatives and individually scales hardware for visibility. Threads and some hardware details are omitted.
+The **Bill of Materials** tab combines material-colored printable models, hardware representatives and one complete assembly table loaded from `bom.md`. Each item is counted once. Rows distinguish required, fit-dependent, recommended and optional items, with initial and later material/supply choices. Future printed alternatives replace the corresponding purchased items; the draw-screw row already includes its thumb head. The table gives actual required quantities; the 3D display shows representatives and individually scales hardware for visibility. Thread marks, strand lay, retainers and textile details are simplified; select actual hardware before relying on its dimensions.
 
 ### Interactive material assignment
 
@@ -114,3 +114,15 @@ The **3D model** column distinguishes printable STLs, reference envelopes and ta
 The black stock trigger is a separate, non-printable CAD envelope with a transverse pivot. The **Lever stroke** slider rotates it toward the fixed blue grip; its strap moves with it. The handle cable stays connected, the phone rocker reaches its stop after approximately 1 mm of illustrated cable take-up, and the series-spring envelope lengthens during the remaining squeeze. The phone-end inner wire also follows the rocker.
 
 The stock contour, pivot and 27.5° display sweep are provisional, not measured mechanism geometry. This is a prescribed kinematic illustration, not a force/friction simulation or proof of the measured 20–40 mm trigger travel. The extension spring is displayed with helical wire and closed eyes; its coil spacing increases during squeeze while its wire diameter and eye size remain constant. The torsion return spring has a helical coil around the pivot and two legs. Coil dimensions and turn counts are illustrative, not specifications for a validated purchased spring. The trigger is already part of the purchased reacher and adds no BOM item or printable part.
+
+### Hardware visualization pass
+
+Purchased-part references now show socket-head bolt sets with washers and hex nuts, a grooved thumb head, smooth retained pivot, contact/stop screws, a bored cable stop, hollow ferrules and housing, simplified seven-strand cable, rounded pads, a hollow soft tip and a looped trigger strap with an overlap tab. Springs retain their helical geometry. `source/hardware_visuals.py` defines these details; the actuator bracket now includes an extended housing-entry relief (3.8 mm backing) and a narrower housing boss (2 mm side walls), while the carrier has a small guide-end clearance for the far-side fasteners on narrow phones. The other four printable designs are unchanged. The cable stop's side recess indicates the clamping screw location; the exact clamp and handle loop termination still need selection.
+
+The BOM displays the thumb head with its screw and the return-spring legs with their coil. Shaft liners, route ties, optional saddle and tether still have no modeled geometry. The drawings do not imply that those optional printable replacements are ready.
+
+## Recommended first print
+
+Proceed to a **fit prototype**, after slicing and reviewing supports; further cosmetic rendering is not a prerequisite. Use existing PLA/PLA+ for this first pass. Start with one neck cap, the rocker and actuator bracket to check the shaft profile, pivot hole, spring seats and ferrule/fastener interfaces. A neck cap alone checks profile fit, not clamp retention. Then print the carrier, sliding jaw, handle anchor and second cap to evaluate the assembled clamp and slider. Keep print orientations and support guidance above.
+
+Before operating against the phone, assemble the cable and actual metal springs off the phone and verify stop engagement, return and full trigger travel without binding. Spring sourcing and the actuator's lateral contact sweep remain unresolved physical checks. No dummy-phone test is required. Review Bambu Studio's sliced layers, supported ears/lips, nut pockets and sliding surfaces before sending the plate; see [Bambu's support guidance](https://wiki.bambulab.com/en/software/bambu-studio/support). A successful render or watertight STL is not a slicer approval.

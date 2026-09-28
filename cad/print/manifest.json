@@ -45,7 +45,7 @@
     {
       "name": "carrier",
       "quantity": 1,
-      "volume_mm3": 39008.66,
+      "volume_mm3": 38390.78,
       "bounds_mm": [
         126.7,
         101.3,
@@ -78,7 +78,7 @@
     {
       "name": "actuator_bracket",
       "quantity": 1,
-      "volume_mm3": 7502.26,
+      "volume_mm3": 7059.52,
       "bounds_mm": [
         48.0,
         24.0,
@@ -551,6 +551,26 @@
       "printable": false
     },
     {
+      "name": "phone_ferrule",
+      "color": [
+        0.63,
+        0.68,
+        0.72
+      ],
+      "file": "assembly_meshes/phone_ferrule.stl",
+      "printable": false
+    },
+    {
+      "name": "handle_ferrule",
+      "color": [
+        0.63,
+        0.68,
+        0.72
+      ],
+      "file": "assembly_meshes/handle_ferrule.stl",
+      "printable": false
+    },
+    {
       "name": "handle_inner_wire",
       "color": [
         0.63,
@@ -660,5 +680,5 @@
       -1.8000000000000043
     ]
   ],
-  "total_printed_solid_cm3": 92.75
+  "total_printed_solid_cm3": 91.69
 }

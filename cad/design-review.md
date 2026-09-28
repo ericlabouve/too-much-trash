@@ -1,6 +1,6 @@
 # R4 design review — fit prototype, not field-qualified
 
-R4 implements the user-selected Option B: phone beside shaft, centered gripping band, rear support, either-side actuator, and centered trigger-facing housing routing. It retains six unique printed designs / seven pieces. Solid volume is 92.75 cm³, down from 103.19 cm³ in R3 (10.1%); actual sliced mass is not measured. R3 is recoverable from tag `cad-r3-first-draft`; all original concept PNGs remain intact. The selected negative-X placement supersedes the earlier positive-X concept offset. The measured 14 ×19 mm shaft supersedes the square-section assumption.
+R4 implements the user-selected Option B: phone beside shaft, centered gripping band, rear support, either-side actuator, and centered trigger-facing housing routing. It retains six unique printed designs / seven pieces. Solid volume is 91.69 cm³, down from 103.19 cm³ in R3 (11.1%); actual sliced mass is not measured. R3 is recoverable from tag `cad-r3-first-draft`; all original concept PNGs remain intact. The selected negative-X placement supersedes the earlier positive-X concept offset. The measured 14 ×19 mm shaft supersedes the square-section assumption.
 
 ## Mechanism credibility and remaining limits
 
@@ -27,3 +27,9 @@ R4 implements the user-selected Option B: phone beside shaft, centered gripping 
 6. Verify the iOS app handles a held volume-up press as intended. Hardware holding a button is not proof of recording/event behavior.
 
 Manufacturability status: editable, exportable and designed for common FDM processes with conventional hardware. Final suitability awaits the tests above; especially source the unusually low-rate extension spring and confirm phone force before a final set.
+
+## Hardware detail review and first fit print
+
+The second hardware visualization pass exposed a carrier interference with the full 25 mm actuator bolt. The BOM now calls for standard M3×20 carriage bolts, leaving about 2.6 mm beyond the modeled nut. Confirm the actual washer/nut stack; no trimming is required for the illustrated stack. Static carriage-fastener and phone-ferrule clearance are now included in the eight-configuration checks. The ferrule/housing also revealed an obstructed entry beside the lower actuator plate. Extending the 5.6 mm entry bore down through that plate clears the route while preserving the reaction shoulder and at least 3.8 mm backing thickness. A 9.6 mm wide housing boss clears the 6 mm OD washers at low adjustment positions, retaining 2 mm walls around the 5.6 mm bore. A small rounded notch at the carrier guide end clears the far-side fasteners on narrow phones. Carrier and actuator-bracket prints changed; other four designs are unchanged.
+
+The CAD is sufficient to begin a staged PLA/PLA+ fit print after slicer review. Start with neck cap, rocker and actuator bracket; then print the remaining rigid pieces after checking their hardware interfaces. Cosmetic render refinement is not a readiness gate. Actual spring sourcing, friction/retention, stop calibration and the lateral contact sweep remain gates for reliable phone operation. No physical test or Bambu Studio slice has been performed.

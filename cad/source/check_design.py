@@ -35,6 +35,10 @@ def check():
             for pn in ('carrier','sliding_jaw','neck_cap'):
                 v=volume_overlap(hw0[hn],shapes[pn])
                 if v>.01:failures.append(f'{name}: {hn}/{pn} {v:.3f} mm3')
+        for hn in ('carriage_M3_-8','carriage_M3_8','phone_ferrule','housing_route_0'):
+            for pn in ('carrier','sliding_jaw','actuator_bracket'):
+                v=volume_overlap(hw0[hn],shapes[pn])
+                if v>.01:failures.append(f'{name}: {hn}/{pn} {v:.3f} mm3')
         amax=stop_angle(p)
         for i in range(11):
             a=amax*i/10;moving=place('rocker',parts['rocker'],p,a)

@@ -71,6 +71,8 @@ def carrier(p):
     s=s.cut(box(-5,8,31.5,48.5,-12.5,4.5))
     s=s.cut(bore((7,40,-4),(1,0,0),10,p.m4))
     s=s.translate((10,0,0))
+    # Clear far-side carriage fasteners on narrow/thin phones; retain the long guide lands.
+    s=s.cut(box(96,105,53,61,-13,3).edges('|Z').fillet(1))
     # Integral neck saddle and short bridge; both actuator sides clear its lugs.
     s=s.union(collar(p))
     s=s.union(box(-16,20,27,53,-12,-8.4))
@@ -111,8 +113,10 @@ def actuator_bracket(p):
         s=s.union(box(-6,17,ya,yb,13,24))
     s=s.cut(bore((11,-11,19),(0,1,0),22,3.2))
     # Fixed housing reaction: ferrule shoulder + inner-wire-only exit.
-    s=s.union(box(-13,-1,-7,7,-6,3))
-    s=s.cut(bore((-7,0,-7),(0,0,1),7,p.ferrule))
+    s=s.union(box(-13,-1,-4.8,4.8,-6,3))
+    # Continue the entry relief through the lower plate so housing/ferrule clear it.
+    # The shoulder at Z=0 and inner-wire-only exit are unchanged.
+    s=s.cut(bore((-7,0,-23),(0,0,1),23,p.ferrule))
     s=s.cut(bore((-7,0,-1),(0,0,1),5,p.wire))
     # M3 adjustable positive stop, top-loading square nut pocket.
     s=s.union(box(-3,4,-4,4,2,9))

@@ -198,3 +198,11 @@ User requested a visible black squeeze trigger in Full tool, pivoting as Lever s
 ### Spring visualization — 2026-09-27
 
 User requested recognizable springs instead of cylinders. CAD and BOM references now show helical wire for both metal springs, with closed eyes on the extension spring and legs on the torsion spring. The viewer changes extension-coil pitch during squeeze, keeping wire diameter and eyes unchanged. Visual extension-wire diameter 0.8 mm / 24 turns and return-coil 0.4 mm / 5.5 turns are illustrative only; they do not establish the required spring rates, force or fatigue life. No printed components or purchase quantities changed.
+
+### Hardware visualization and first-print review — 2026-09-27
+
+User requested a second visualization pass on simplified BOM models, current CAD renders in the public README, a concise PR update, and first-print advice. Added recognizable fasteners, ferrules, cable strands, compliant contacts and textile strap geometry. No new physical measurements or supplier selections were supplied, and the housing-entry collision found during this review was corrected with a relief in the actuator bracket. Original concept renderings remain preserved.
+
+Detailed hardware clearance led to a provisional 22 mm trimmed carriage bolt during review; the final BOM instead uses standard M3×20 carriage bolts with 6 mm OD ×0.5 mm washers, avoiding trimming. The actuator bracket's 5.6 mm housing entry now continues through the lower plate, preserving the reaction shoulder at its original height and 3.8 mm minimum backing material. These are clearance corrections, not newly measured tool/phone dimensions.
+
+The expanded thin-phone checks additionally required a narrower 9.6 mm housing boss (2 mm walls around the ferrule bore), standard M3 DIN 433 washers (6 mm OD ×0.5 mm), and a rounded clearance at the carrier's guide end for far-side fasteners. These are prototype clearance changes; no strength qualification is implied.

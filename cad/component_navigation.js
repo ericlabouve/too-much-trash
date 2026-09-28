@@ -4,9 +4,9 @@ export function assemblyNames(row, names){
   if(name.startsWith('`print/'))return [name.slice(7,-5)];
   const rules=[
     ['M4×80',['draw_screw_M4','draw_screw_head']],['M4 square nut',['jaw_nut']],
-    ['M4×35',['collar_M4_phone_21.2']],['M3×25',['carriage_M3_-8','carriage_M3_8']],
+    ['M4×35',['collar_M4_phone_21.2']],['M3×20 carriage',['carriage_M3_-8','carriage_M3_8']],
     ['3 mm smooth',['pivot_M3']],['M3 threaded',['contact_M3','contact_locknut','contact_rear_locknut']],
-    ['M3×20',['travel_stop_M3','travel_stop_nut']],['Bicycle brake housing',['housing_route_0']],
+    ['M3×20',['travel_stop_M3','travel_stop_nut']],['Bicycle brake housing',['housing_route_0','housing_route_1','housing_route_2','phone_ferrule','handle_ferrule']],
     ['Stainless brake',['phone_inner_wire']],['Screw-on cable',['cable_pinch_barrel']],
     ['Torsion return',['return_spring_coil','return_spring_fixed_leg','return_spring_moving_leg']],
     ['Closed-eye',['series_extension_spring_envelope']],['Side jaw pads',['soft_side_pad_left','soft_side_pad_right']],

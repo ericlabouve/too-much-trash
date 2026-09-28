@@ -18,7 +18,7 @@ def draw(ax,rows,limits=None,elev=32,azim=-65):
     right=np.array([-np.sin(ar),np.cos(ar),0]);up=np.cross(direction,right)
     vertices=[];faces=[];colors=[];offset=0
     for name,shape,color in rows:
-        vv,ff=shape.val().tessellate(.18,.15)
+        vv,ff=shape.val().tessellate(.25,.35)
         vv=np.array([[v.x,v.y,v.z] for v in vv]);ff=np.array(ff)
         normals=np.cross(vv[ff[:,1]]-vv[ff[:,0]],vv[ff[:,2]]-vv[ff[:,0]])
         normals/=np.maximum(np.linalg.norm(normals,axis=1)[:,None],1e-9)
@@ -60,13 +60,13 @@ def render_all(parts,p,out):
     fig.text(.06,.035,'Fit prototype: axial retention depends on padded clamp friction; use an independent phone tether.',fontsize=10,color='#555')
     fig.savefig(out/'assembly-cad.png',dpi=170);plt.close(fig)
     fig=plt.figure(figsize=(14,7),facecolor='white')
-    names=('actuator_bracket','rocker','pivot','return_','contact_','soft_button','travel_','phone_inner','cable_pinch','carriage_')
+    names=('actuator_bracket','rocker','pivot','return_','contact_','soft_button','travel_','phone_inner','phone_ferrule','cable_pinch','carriage_')
     for i,a in enumerate((0,stop_angle(p))):
         ax=fig.add_subplot(1,2,i+1);detail=[r for r in scene(parts,p,a,stock=False) if r[0].startswith(names)]
         draw(ax,detail,elev=15,azim=90)
         ax.set_title('Released: 0.35 mm nominal gap' if i==0 else 'Pressed: nominal 0.30 mm button travel at stop',fontsize=11)
     fig.suptitle('Fixed housing stop → pinned rocker → padded contact screw',fontsize=16,y=.96)
-    fig.text(.07,.06,'Return: torsion spring on pivot. Excess squeeze travel: inline extension spring at trigger.\nTravel values require physical calibration. Hardware uses unthreaded envelopes.',fontsize=10)
+    fig.text(.07,.06,'Return: torsion spring on pivot. Excess squeeze travel: inline extension spring at trigger.\nTravel values require physical calibration. Hardware details are illustrative, not supplier specifications.',fontsize=10)
     fig.savefig(out/'actuator-cad.png',dpi=170);plt.close(fig)
     fig=plt.figure(figsize=(11,13),facecolor='white');ax=fig.add_subplot(111);draw(ax,scene(parts,p),elev=10,azim=-86)
     fig.suptitle('R4 — phone beside shaft; cable centered on trigger-facing surface',fontsize=15,y=.95)
@@ -93,3 +93,18 @@ def render_all(parts,p,out):
     fig.suptitle('Corrected iPhone demo orientation — same printable parts',fontsize=17)
     fig.text(.07,.08,'Button centers use the supplied sample. Button sizes, spacing and camera block are illustrative envelopes.\nThis is a CAD placement view, not a dimensioned Apple device drawing.',fontsize=10)
     fig.savefig(out/'rear-landscape-cad.png',dpi=170);plt.close(fig)
+    render_hardware_details(parts,p,out)
+
+def render_hardware_details(parts,p,out):
+    names=('actuator_bracket','rocker','pivot','return_','contact_','soft_button','travel_','phone_inner','phone_ferrule','cable_pinch','carriage_')
+    rows=scene(parts,p)
+    fig=plt.figure(figsize=(14,7),facecolor='white')
+    ax=fig.add_subplot(121)
+    draw(ax,[r for r in rows if r[0].startswith(('stock_blue_handle','stock_blue_grip','stock_black_trigger','stock_trigger_pivot','handle_','series_','trigger_','collar_M4_handle'))],elev=12,azim=-75)
+    ax.set_title('Trigger strap, cable and travel-absorbing spring',fontsize=12)
+    bx=fig.add_subplot(122)
+    draw(bx,[r for r in rows if r[0].startswith(names)],elev=25,azim=150)
+    bx.set_title('Adjustable contact, return spring and hardware',fontsize=12)
+    fig.suptitle('Cable actuation — modeled hardware and connections',fontsize=17)
+    fig.text(.07,.04,'Hardware profiles and stock handle are illustrative. Purchased-part selection and physical fit remain unverified.',fontsize=10)
+    fig.savefig(out/'hardware-details-cad.png',dpi=160);plt.close(fig)

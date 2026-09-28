@@ -1,5 +1,7 @@
 """R4 assembly. A rigid installation rotation puts the bridge behind the phone."""
 import math
+from functools import lru_cache
+import hardware_visuals as hv
 import cadquery as cq
 from parts import box, bore
 ORANGE=(.96,.36,.08)
@@ -45,6 +47,7 @@ def rod(a,b,d):
     v=cq.Vector(*b).sub(cq.Vector(*a))
     return cq.Workplane('XY').newObject([bore(a,v.normalized().toTuple(),v.Length,d)])
 
+@lru_cache(maxsize=32)
 def helical_wire(radius,wire_d,height,turns):
     """Round wire along a real helix, centered on local Z."""
     pitch=height/turns
@@ -53,6 +56,7 @@ def helical_wire(radius,wire_d,height,turns):
                    normal=(0,1,pitch/(2*math.pi*radius)))
     return cq.Workplane(plane).circle(wire_d/2).sweep(path,isFrenet=True)
 
+@lru_cache(maxsize=16)
 def extension_spring(a,b,od):
     # Illustrative purchased spring: coil pitch and eyes are not sourcing specs.
     axis=cq.Vector(*b).sub(cq.Vector(*a));length=axis.Length
@@ -113,53 +117,55 @@ def proxies(p):
     return s
 
 def hardware(p,angle=0):
-    raw={'draw_screw_M4':rod((13,40,-4),(98,40,-4),4),
-       'draw_screw_head':rod((13,40,-4),(18,40,-4),16),
-       'jaw_nut':box(p.jaw_x-60,p.jaw_x-56.3,36.5,43.5,-7.5,-.5).cut(bore((p.jaw_x-61,40,-4),(1,0,0),6,4))}
+    raw={'draw_screw_M4':hv.threaded((13,40,-4),(98,40,-4),4),
+       'draw_screw_head':hv.thumbwheel(),
+       'jaw_nut':box(p.jaw_x-60,p.jaw_x-56.3,36.5,43.5,-7.5,-.5).edges('|X').chamfer(.2).cut(bore((p.jaw_x-61,40,-4),(1,0,0),6,4))}
     # Flat pads contact the two sides and rear ledges. Phone front remains open.
     z0=2*p.phone_mid_z-p.rear_face_z
     for side in ('left','right'):
         x=p.groove_x if side=='left' else p.phone_left+p.phone_w
-        raw[f'soft_side_pad_{side}']=box(x,x+p.pad_x_allowance,28,52,z0,z0+p.phone_t)
+        raw[f'soft_side_pad_{side}']=box(x,x+p.pad_x_allowance,28,52,z0,z0+p.phone_t).edges('|X').fillet(.6)
         x=p.phone_left if side=='left' else p.phone_left+p.phone_w-9
-        raw[f'soft_rear_pad_{side}']=box(x,x+9,28,52,2,z0)
+        raw[f'soft_rear_pad_{side}']=box(x,x+9,28,52,2,z0).edges('|Z').fillet(.6)
     h={n:phone_transform(s,p) for n,s in raw.items()}
-    fixed={'pivot_M3':rod((11,-13,19),(11,13,19),3),
+    fixed={'pivot_M3':hv.compound(rod((11,-13,19),(11,13,19),3),hv.ring((11,-11.5,19),(0,1,0),6,3.2,.8),hv.ring((11,10.7,19),(0,1,0),6,3.2,.8),hv.ring((11,-13,19),(0,1,0),4.5,3,1.5),hv.ring((11,11.5,19),(0,1,0),4.5,3,1.5)),
        'return_spring_coil':helical_wire(2.6,.4,2.3,5.5).rotate((0,0,0),(0,0,1),180).rotate((0,0,0),(1,0,0),-90).translate((11,2.3,19)),
        'return_spring_fixed_leg':rod((13.6,4.6,19),(14,7,15),.4)}
     a=stop_angle(p);top=19-3/math.cos(a)-12.5*math.tan(a)
-    fixed['travel_stop_M3']=rod((0,0,2),(0,0,top),3)
+    fixed['travel_stop_M3']=hv.compound(hv.threaded((0,0,2),(0,0,top),3),hv.socket_head((0,0,-1),(0,0,1),5.5,3,2.5),hv.nut((0,0,9),(0,0,1),5.5,3.1,2.4))
     fixed['travel_stop_nut']=box(-2.75,2.75,-2.75,2.75,3,5.4).cut(bore((0,0,2),(0,0,1),5,3))
     for yy in (-8,8):
         # Screw passes crossed rail/height slots; washer and nut required outside.
-        fixed[f'carriage_M3_{yy}']=rod((-10,yy,-6-p.actuator_shift),(12,yy,-6-p.actuator_shift),3)
+        fixed[f'carriage_M3_{yy}']=hv.bolt_set((-6.5,yy,-6-p.actuator_shift),(13.5,yy,-6-p.actuator_shift),3,((-6.5,yy,-6-p.actuator_shift),(8,yy,-6-p.actuator_shift)),(8.5,yy,-6-p.actuator_shift))
     h.update({n:module(s,p) for n,s in fixed.items()})
     tip=contact_x(p)
-    movable={'contact_M3':rod((5,0,7),(tip-.7,0,7),3),
-             'soft_button_tip':rod((tip-.7,0,7),(tip,0,7),4),
-             'contact_rear_locknut':box(4.6,6.9,-2.75,2.75,4.25,9.75).cut(bore((4,0,7),(1,0,0),4,3)),
-             'contact_locknut':box(15.1,17.4,-2.75,2.75,4.25,9.75).cut(bore((14,0,7),(1,0,0),5,3)),
-             'cable_pinch_barrel':rod((-7,0,22),(-7,0,26),5),
+    movable={'contact_M3':hv.threaded((5,0,7),(tip-.7,0,7),3),
+             'soft_button_tip':rod((tip-1.5,0,7),(tip,0,7),4).edges('%Circle').fillet(.2).cut(bore((tip-1.6,0,7),(1,0,0),.9,3.05)),
+             'contact_rear_locknut':hv.nut((4.6,0,7),(1,0,0),5.5,3.1,2.3),
+             'contact_locknut':hv.nut((15.1,0,7),(1,0,0),5.5,3.1,2.3),
+             'cable_pinch_barrel':rod((-7,0,22),(-7,0,26),5).cut(bore((-7,0,21),(0,0,1),6,1.8)).cut(bore((-9.6,0,24),(1,0,0),.7,2.2)),
              'return_spring_moving_leg':rod((8.4,2.3,19),(7,1,19),.4)}
     h.update({n:moving(s,p,angle) for n,s in movable.items()})
-    h['phone_inner_wire']=module(rod((-7,0,0),(11-18*math.cos(angle),0,22-18*math.sin(angle)),1.6),p)
+    h['phone_inner_wire']=module(hv.stranded((-7,0,0),(11-18*math.cos(angle),0,22-18*math.sin(angle))),p)
     # Schematic U route: axial rise, transverse leg, axial run down shaft.
     # Two 90-degree corners communicate routing, not physical bend radii.
     start=module(cq.Workplane('XY').sphere(.1).translate((-7,0,-6)),p).val().Center().toTuple()
     points=[start,(start[0],start[1],70),(p.cable_face_x,p.neck_cy,70),
             (p.cable_face_x,p.neck_cy,p.handle_z+12)]
-    for i,(a,b) in enumerate(zip(points,points[1:])):h[f'housing_route_{i}']=rod(a,b,5)
+    for i,(a,b) in enumerate(zip(points,points[1:])):h[f'housing_route_{i}']=rod(a,b,5).cut(rod(a,b,2))
+    h['phone_ferrule']=module(hv.compound(hv.ring((-7,0,-9),(0,0,1),5.5,5.1,8.5),hv.ring((-7,0,-.5),(0,0,1),5.5,2,.5)),p)
+    h['handle_ferrule']=hv.compound(hv.ring((p.cable_face_x,p.neck_cy,p.handle_z+3.5),(0,0,1),5.5,5.1,11.5),hv.ring((p.cable_face_x,p.neck_cy,p.handle_z+3),(0,0,1),5.5,2,.5))
     anchor=(p.cable_face_x,p.neck_cy,p.handle_z-12)
     attach=trigger_attach(p)
     axis=cq.Vector(*anchor).sub(cq.Vector(*attach)).normalized()
     start=cq.Vector(*attach).add(axis.multiply(p.spring_free_eye_mm)).toTuple()
-    h['handle_inner_wire']=rod(anchor,start,1.6)
+    h['handle_inner_wire']=hv.stranded(anchor,start)
     h['series_extension_spring_envelope']=extension_spring(start,attach,p.spring_od)
-    h['trigger_strap_envelope']=box(attach[0]-7,attach[0]+7,26,54,attach[2]-7,attach[2]+7)
+    h['trigger_strap_envelope']=hv.hollow_strap(attach)
     oy=(p.neck_y+p.neck_clearance)/2+9
     for yy in (p.neck_cy-oy,p.neck_cy+oy):
-        h[f'collar_M4_phone_{yy}']=phone_transform(rod((-39,yy,0),(-7,yy,0),4),p)
-        h[f'collar_M4_handle_{yy}']=rod((-39,yy,p.handle_z),(-7,yy,p.handle_z),4)
+        h[f'collar_M4_phone_{yy}']=phone_transform(hv.bolt_set((-35.1,yy,0),(-.1,yy,0),4,((-35.1,yy,0),(-11.7,yy,0)),(-10.9,yy,0)),p)
+        h[f'collar_M4_handle_{yy}']=hv.bolt_set((-35.1,yy,p.handle_z),(-.1,yy,p.handle_z),4,((-35.1,yy,p.handle_z),(-11.7,yy,p.handle_z)),(-10.9,yy,p.handle_z))
     return h
 
 def scene(parts,p,angle=0,stock=True,metal=True):
