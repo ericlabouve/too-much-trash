@@ -92,3 +92,7 @@ Other purchased items are inner cable, outer housing, two ferrules, cable end/lo
 The housing now follows three straight segments with two right-angle turns in CAD. Actual brake housing must make rounded bends at those locations; the drawing is not a specification to kink the housing. Cable length and loop clearance depend on the chosen housing.
 
 Material basis: [Prusa’s PETG guide](https://help.prusa3d.com/article/petg_2059) recommends PETG for mechanical holders and clamps; its [PLA guide](https://help.prusa3d.com/article/pla_2062) notes lower heat resistance and brittleness. PETG is the design baseline, not a certification of strength. The user chose to proceed without a brand-specific PLA+ assessment. Proposed rigid knobs and housing guides can also use PETG; flexible pads must remain compliant purchased components with the currently owned filaments.
+
+## Viewer inventories
+
+The **STL print set** tab shows the six printable models plus each part’s initial-prototype and later-use material recommendations. **Purchased hardware** shows labeled CAD representatives and the full hardware/accessory tables. Both tables load directly from `bom.md`. Hardware representatives are individually scaled for visibility, omit detailed threads and some components, and are not printable or supplier specifications; the tables provide full quantities and identify future printable accessories.
