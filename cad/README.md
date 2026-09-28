@@ -102,3 +102,9 @@ The **Bill of Materials** tab combines material-colored printable models, hardwa
 In the BOM, check **PLA/PLA+**, **PETG**, and/or **TPU** under “Preferred materials on hand.” The single **Material** column and model colors update together. PETG takes priority for rigid parts, then PLA/PLA+ for an initial prototype. TPU applies to proposed soft accessories; it does not substitute for rigid structure. With neither PETG nor PLA selected, the viewer flags the missing rigid material. Purchased hardware and textiles remain purchased.
 
 **Most Optimal Layout** disables the material checkboxes and recommends PETG structure plus TPU soft accessories. Turning it off restores the previous on-hand selections. “Layout” changes material assignment only; no geometry or structural qualification changes. The ordinary assembly retains the project's orange retrofit color convention. Planned accessory STLs stay explicitly marked unavailable, with current purchased alternatives shown. `material_strategy.js` contains the choice logic; `bom.md` remains the source for quantities, requirement status and purposes.
+
+### Component navigation and model availability
+
+Click a BOM row or model to focus and highlight it without leaving the BOM. Right-click a row/model to open the available Phone assembly, Full tool or Actuator view, focused on that component. Unavailable destinations are disabled. Use **Show all** to reset framing. Rows also support Enter/Space and Shift+F10.
+
+The **3D model** column distinguishes printable STLs, reference envelopes and table-only items. Jaw pads and the soft contact tip have reference geometry; shaft liners/shims, optional trigger saddle and cable-retaining loops do not yet have models. Selecting TPU does not create geometry or export new STLs.
