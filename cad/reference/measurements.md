@@ -182,3 +182,7 @@ User owns PETG, PLA and PLA+ and prefers all printed parts in one material or in
 ### Two-stage material plan — 2026-09-27
 
 User requested material recommendations alongside each BOM part for initial prototype and later TPU availability, and declined further PLA+ brand discussion. Initial rigid prints may use available PLA/PLA+ (PETG optional). Later recommendation is PETG structure plus separate TPU pads, liners and contact cap. Metal transmission/fastening hardware and textile strap/tether remain conventional. Proposed TPU accessories and optional printed knob/guides are identified as not yet modeled/exported; the current printable set remains six unique designs/seven pieces. Regenerate current exports and display in Chrome.
+
+### Unified BOM — 2026-09-27
+
+User requested one Bill of Materials view combining printed parts and purchases without double-counting. The BOM now has one row per component or explicit hardware set, quantities for one assembly, requirement status and alternative supply/material choices. Thumb head is included with the draw screw; future printed substitutes replace their purchased equivalents. Shaft shims are fit-dependent, tether recommended, trigger saddle optional; pads, contact cap, trigger strap and housing retention are required.

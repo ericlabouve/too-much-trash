@@ -93,6 +93,6 @@ The housing now follows three straight segments with two right-angle turns in CA
 
 Material basis: [Prusa’s PETG guide](https://help.prusa3d.com/article/petg_2059) recommends PETG for mechanical holders and clamps; its [PLA guide](https://help.prusa3d.com/article/pla_2062) notes lower heat resistance and brittleness. PETG is the design baseline, not a certification of strength. The user chose to proceed without a brand-specific PLA+ assessment. Proposed rigid knobs and housing guides can also use PETG; flexible pads must remain compliant purchased components with the currently owned filaments.
 
-## Viewer inventories
+## Unified viewer bill of materials
 
-The **STL print set** tab shows the six printable models plus each part’s initial-prototype and later-use material recommendations. **Purchased hardware** shows labeled CAD representatives and the full hardware/accessory tables. Both tables load directly from `bom.md`. Hardware representatives are individually scaled for visibility, omit detailed threads and some components, and are not printable or supplier specifications; the tables provide full quantities and identify future printable accessories.
+The **Bill of Materials** tab combines orange printable models, gray hardware representatives and one complete assembly table loaded from `bom.md`. Each item is counted once. Rows distinguish required, fit-dependent, recommended and optional items, with initial and later material/supply choices. Future printed alternatives replace the corresponding purchased items; the draw-screw row already includes its thumb head. The table gives actual required quantities; the 3D display shows representatives and individually scales hardware for visibility. Threads and some hardware details are omitted.
