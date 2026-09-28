@@ -186,3 +186,7 @@ User requested material recommendations alongside each BOM part for initial prot
 ### Unified BOM — 2026-09-27
 
 User requested one Bill of Materials view combining printed parts and purchases without double-counting. The BOM now has one row per component or explicit hardware set, quantities for one assembly, requirement status and alternative supply/material choices. Thumb head is included with the draw screw; future printed substitutes replace their purchased equivalents. Shaft shims are fit-dependent, tether recommended, trigger saddle optional; pads, contact cap, trigger strap and housing retention are required.
+
+### Dynamic BOM material selection — 2026-09-27
+
+User requested on-hand PLA/PLA+, PETG and TPU checkboxes plus a “Most Optimal Layout” override that disables them. The viewer combines the two static stage columns into one dynamic Material column and colors the BOM models to match. Working interpretation: layout means material assignment, not changed geometry. Best recommendation is PETG structure plus planned TPU soft parts and conventional metal/textile hardware. Unchecking the override restores the previous selection; no new accessory exports are implied.
