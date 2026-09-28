@@ -194,3 +194,7 @@ User requested on-hand PLA/PLA+, PETG and TPU checkboxes plus a “Most Optimal 
 ### Stock trigger visualization — 2026-09-27
 
 User requested a visible black squeeze trigger in Full tool, pivoting as Lever stroke changes, with the bicycle inner-wire/Velcro tie moving with it. Added a separate stock trigger envelope and pivot; corrected the simplified fixed grip so the trigger is distinct. No new dimensions were supplied: contour, pivot and 27.5° animation sweep are provisional. The slider prescribes movement and cable/spring connectivity, not force response or measured travel validation.
+
+### Spring visualization — 2026-09-27
+
+User requested recognizable springs instead of cylinders. CAD and BOM references now show helical wire for both metal springs, with closed eyes on the extension spring and legs on the torsion spring. The viewer changes extension-coil pitch during squeeze, keeping wire diameter and eyes unchanged. Visual extension-wire diameter 0.8 mm / 24 turns and return-coil 0.4 mm / 5.5 turns are illustrative only; they do not establish the required spring rates, force or fatigue life. No printed components or purchase quantities changed.

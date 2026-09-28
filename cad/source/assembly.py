@@ -45,6 +45,30 @@ def rod(a,b,d):
     v=cq.Vector(*b).sub(cq.Vector(*a))
     return cq.Workplane('XY').newObject([bore(a,v.normalized().toTuple(),v.Length,d)])
 
+def helical_wire(radius,wire_d,height,turns):
+    """Round wire along a real helix, centered on local Z."""
+    pitch=height/turns
+    path=cq.Wire.makeHelix(pitch,height,radius)
+    plane=cq.Plane(origin=(radius,0,0),xDir=(1,0,0),
+                   normal=(0,1,pitch/(2*math.pi*radius)))
+    return cq.Workplane(plane).circle(wire_d/2).sweep(path,isFrenet=True)
+
+def extension_spring(a,b,od):
+    # Illustrative purchased spring: coil pitch and eyes are not sourcing specs.
+    axis=cq.Vector(*b).sub(cq.Vector(*a));length=axis.Length
+    wire=.8;radius=(od-wire)/2;eye=2.5;lead=6
+    coil=helical_wire(radius,wire,length-2*lead,24).translate((0,0,lead))
+    pieces=[coil.val(),cq.Solid.makeTorus(eye,wire/2,(0,0,eye),(0,1,0)),
+            cq.Solid.makeTorus(eye,wire/2,(0,0,length-eye),(0,1,0)),
+            rod((eye,0,eye),(radius,0,lead),wire).val(),
+            rod((radius,0,length-lead),(eye,0,length-eye),wire).val()]
+    shape=cq.Workplane('XY').newObject([cq.Compound.makeCompound(pieces)])
+    direction=axis.normalized();cross=cq.Vector(0,0,1).cross(direction)
+    if cross.Length>1e-8:
+        shape=shape.rotate((0,0,0),cross.toTuple(),math.degrees(math.acos(direction.z)))
+    elif direction.z<0:shape=shape.rotate((0,0,0),(1,0,0),180)
+    return shape.translate(a)
+
 def phone(p):
     z=2*p.phone_mid_z-p.rear_face_z
     return phone_transform(box(p.phone_left,p.phone_left+p.phone_w,p.phone_y0,p.phone_y0+p.phone_l,z,z+p.phone_t),p)
@@ -101,8 +125,8 @@ def hardware(p,angle=0):
         raw[f'soft_rear_pad_{side}']=box(x,x+9,28,52,2,z0)
     h={n:phone_transform(s,p) for n,s in raw.items()}
     fixed={'pivot_M3':rod((11,-13,19),(11,13,19),3),
-       'return_spring_coil':cq.Workplane('XZ').center(11,19).circle(3).circle(1.7).extrude(2.7).translate((0,4.8,0)),
-       'return_spring_fixed_leg':rod((13,4.4,18),(14,7,15),.7)}
+       'return_spring_coil':helical_wire(2.6,.4,2.3,5.5).rotate((0,0,0),(0,0,1),180).rotate((0,0,0),(1,0,0),-90).translate((11,2.3,19)),
+       'return_spring_fixed_leg':rod((13.6,4.6,19),(14,7,15),.4)}
     a=stop_angle(p);top=19-3/math.cos(a)-12.5*math.tan(a)
     fixed['travel_stop_M3']=rod((0,0,2),(0,0,top),3)
     fixed['travel_stop_nut']=box(-2.75,2.75,-2.75,2.75,3,5.4).cut(bore((0,0,2),(0,0,1),5,3))
@@ -116,7 +140,7 @@ def hardware(p,angle=0):
              'contact_rear_locknut':box(4.6,6.9,-2.75,2.75,4.25,9.75).cut(bore((4,0,7),(1,0,0),4,3)),
              'contact_locknut':box(15.1,17.4,-2.75,2.75,4.25,9.75).cut(bore((14,0,7),(1,0,0),5,3)),
              'cable_pinch_barrel':rod((-7,0,22),(-7,0,26),5),
-             'return_spring_moving_leg':rod((9,4,19),(7,1,19),.7)}
+             'return_spring_moving_leg':rod((8.4,2.3,19),(7,1,19),.4)}
     h.update({n:moving(s,p,angle) for n,s in movable.items()})
     h['phone_inner_wire']=module(rod((-7,0,0),(11-18*math.cos(angle),0,22-18*math.sin(angle)),1.6),p)
     # Schematic U route: axial rise, transverse leg, axial run down shaft.
@@ -130,7 +154,7 @@ def hardware(p,angle=0):
     axis=cq.Vector(*anchor).sub(cq.Vector(*attach)).normalized()
     start=cq.Vector(*attach).add(axis.multiply(p.spring_free_eye_mm)).toTuple()
     h['handle_inner_wire']=rod(anchor,start,1.6)
-    h['series_extension_spring_envelope']=rod(start,attach,p.spring_od)
+    h['series_extension_spring_envelope']=extension_spring(start,attach,p.spring_od)
     h['trigger_strap_envelope']=box(attach[0]-7,attach[0]+7,26,54,attach[2]-7,attach[2]+7)
     oy=(p.neck_y+p.neck_clearance)/2+9
     for yy in (p.neck_cy-oy,p.neck_cy+oy):
