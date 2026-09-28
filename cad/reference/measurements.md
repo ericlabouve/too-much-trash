@@ -178,3 +178,7 @@ User declined dummy-phone testing and requested the housing illustration use a s
 ### Available filament — 2026-09-27
 
 User owns PETG, PLA and PLA+ and prefers all printed parts in one material or interchangeable materials. Adopt PETG for all current rigid printable parts, including rocker. Keep soft pads/shims/contact tip purchased or cut from compliant sheet; no TPU printing is required. Same STL geometry does not establish equivalent strength, fit or thermal performance between filaments. PLA+ brand/grade is unknown; no structural interchangeability has been validated.
+
+### Two-stage material plan — 2026-09-27
+
+User requested material recommendations alongside each BOM part for initial prototype and later TPU availability, and declined further PLA+ brand discussion. Initial rigid prints may use available PLA/PLA+ (PETG optional). Later recommendation is PETG structure plus separate TPU pads, liners and contact cap. Metal transmission/fastening hardware and textile strap/tether remain conventional. Proposed TPU accessories and optional printed knob/guides are identified as not yet modeled/exported; the current printable set remains six unique designs/seven pieces. Regenerate current exports and display in Chrome.
