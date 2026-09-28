@@ -1,5 +1,5 @@
 // Material choices affect BOM recommendations, not geometry or qualification.
-export const palette={pla:'#ed9b37',petg:'#159c9c',tpu:'#9557c7',buy:'#82909d',missing:'#d34e4e'};
+export const palette={pla:'#ed9b37',petg:'#159c9c',tpu:'#9557c7',buy:'#82909d',brake:'#287ed8',missing:'#d34e4e'};
 export function strategy(row,available,optimal=false){
   const [name,,,initial]=row;
   const have=optimal?new Set(['petg','tpu']):new Set(available);
@@ -15,6 +15,8 @@ export function strategy(row,available,optimal=false){
     const chosen=rigid||(have.has('tpu')?'tpu':null);
     return {key:chosen||'buy',text:`Purchased removable ties${chosen?`; ${title(chosen)} ${chosen==='tpu'?'retaining loops':'guides'} are a planned replacement (no STL yet)`:''}. Choose one routing-retention option.`,ready:false};
   }
+  if(name.startsWith('Screw-on cable stop/barrel'))return {key:'brake',text:'Purchased screw-on stop / loop clamp — budget separately; cable-tip crimps do not replace these load-bearing terminations.',ready:true};
+  if(['Bicycle brake housing','Stainless brake inner wire'].some(prefix=>name.startsWith(prefix)))return {key:'brake',text:initial,ready:true};
   if(name.startsWith('M4×80'))return {key:'buy',text:`Metal screw with purchased thumb head${rigid?`; optional ${title(rigid)} replacement knob is not yet modeled`:''}. Head counted once.`,ready:true};
   return {key:'buy',text:initial,ready:true};
 }
