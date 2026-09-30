@@ -25,6 +25,8 @@
     "neck_cx": -23,
     "neck_cy": 40,
     "neck_clearance": 0.6,
+    "collar_reduction_x": 3.0,
+    "collar_reduction_y": 2.0,
     "m3": 3.4,
     "m4": 4.5,
     "ferrule": 5.6,
@@ -45,7 +47,7 @@
     {
       "name": "carrier",
       "quantity": 1,
-      "volume_mm3": 38390.78,
+      "volume_mm3": 39339.21,
       "bounds_mm": [
         126.7,
         101.3,
@@ -67,7 +69,7 @@
     {
       "name": "neck_cap",
       "quantity": 2,
-      "volume_mm3": 5696.18,
+      "volume_mm3": 6665.78,
       "bounds_mm": [
         11.0,
         48.6,
@@ -100,7 +102,7 @@
     {
       "name": "handle_anchor",
       "quantity": 1,
-      "volume_mm3": 8676.69,
+      "volume_mm3": 9646.29,
       "bounds_mm": [
         20.7,
         48.6,
@@ -680,5 +682,5 @@
       -1.8000000000000043
     ]
   ],
-  "total_printed_solid_cm3": 91.69
+  "total_printed_solid_cm3": 95.54
 }

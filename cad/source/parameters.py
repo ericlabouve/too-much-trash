@@ -33,7 +33,10 @@ class Parameters:
     module_x_offset: float = 2
     neck_cx: float = -23
     neck_cy: float = 40
-    neck_clearance: float = 0.6  # total per axis, includes thin compliant shim
+    neck_clearance: float = 0.6  # original collar envelope allowance
+    # Successful PLA+ fit trial v2; independent of earlier stock measurements.
+    collar_reduction_x: float = 3.0
+    collar_reduction_y: float = 2.0  # photo horizontal: opening 17.6 mm
     m3: float = 3.4
     m4: float = 4.5
     ferrule: float = 5.6  # MEASURE selected housing ferrule

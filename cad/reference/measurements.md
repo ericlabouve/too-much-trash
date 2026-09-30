@@ -206,3 +206,15 @@ User requested a second visualization pass on simplified BOM models, current CAD
 Detailed hardware clearance led to a provisional 22 mm trimmed carriage bolt during review; the final BOM instead uses standard M3×20 carriage bolts with 6 mm OD ×0.5 mm washers, avoiding trimming. The actuator bracket's 5.6 mm housing entry now continues through the lower plate, preserving the reaction shoulder at its original height and 3.8 mm minimum backing material. These are clearance corrections, not newly measured tool/phone dimensions.
 
 The expanded thin-phone checks additionally required a narrower 9.6 mm housing boss (2 mm walls around the ferrule bore), standard M3 DIN 433 washers (6 mm OD ×0.5 mm), and a rounded clearance at the carrier's guide end for far-side fasteners. These are prototype clearance changes; no strength qualification is implied.
+
+### First PLA+ collar fit feedback — 2026-09-28
+
+User reported the printed pair too loose on the neck and requested the inner opening be 3 mm smaller in both height and width. The supplied photo matches handle_anchor + neck_cap, although the message called them actuator_bracket + rocker. Exported a separate fit-trial pair in `print/fit-trials/neck-minus-3mm/`: nominal assembled opening 11.6 × 16.6 mm instead of 14.6 × 19.6 mm. This adds 1.5 mm inward per wall, preserving outside faces, split gap, bolt centers and cable stop. The earlier measured shaft remains recorded as 14 × 19 mm; the smaller opening is an explicit fit experiment, not a corrected shaft measurement. No tightened retention test is available: user has no purchased hardware. Baseline carrier and assembly exports remain unchanged pending this fit result.
+
+### Collar fit trial v2 feedback — 2026-09-28
+
+User confirmed printing neck_cap + handle_anchor, then reported the 3 mm reduction was too much. Requested only the photo's horizontal opening increase by 1 mm total (left+right), with height unchanged. Photo horizontal maps to local Y, across the ear spacing; height maps to local X, across the two halves. Trial v2 therefore uses local X/Y opening 11.6/17.6 mm: **photo width 17.6, height 11.6 mm**. This is 0.5 mm removal from each lateral inner wall relative to v1. No new measured shaft dimensions were supplied. Separate versioned exports preserve v1 and the baseline; carrier changes await the fit result.
+
+### Collar v2 accepted as default — 2026-09-28
+
+User reports newly printed v2 parts correctly fit and requests this size as default. Promoted 17.6 mm photo width × 11.6 mm photo height to the standard neck cap, handle anchor and matching carrier collar. Retained outside dimensions and bolt centers. Original 14 × 19 mm shaft measurement is historical, not silently replaced by the nominal printed opening; stock reference geometry remains based on it. Confirmation is of physical fit only, not tightened or loaded retention.
