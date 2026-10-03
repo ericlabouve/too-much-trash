@@ -3,23 +3,38 @@ Sampled rigid clearance, not finger access, friction or a force simulation.
 Remove phone and release twine tension before following this sequence.
 """
 import json
+from functools import lru_cache
+from dataclasses import replace
+from itertools import product
 from pathlib import Path
 from build import SAMPLES
 import model as m
 p=m.Parameters();s=m.parts(p)
 def vol(v):return sum(t.Volume() for t in v.solids().vals())
+@lru_cache(maxsize=4096)
+def bounds(a):return a.val().BoundingBox()
 def overlap(a,b):
- aa=a.val().BoundingBox();bb=b.val().BoundingBox()
+ aa=bounds(a);bb=bounds(b)
  if any(getattr(aa,k+'max')<=getattr(bb,k+'min')+1e-7 or getattr(bb,k+'max')<=getattr(aa,k+'min')+1e-7 for k in 'xyz'):return 0.
  return vol(a.intersect(b))
 module=['actuator_bracket','rocker','pivot_key','contact_screw','rail_screw_1','rail_screw_2','rail_nut_1','rail_nut_2']
 fixed=['carrier','shaft_cap','sliding_jaw','clamp_screw_1','clamp_screw_2','clamp_screw_3','clamp_screw_4','clamp_nut_1','clamp_nut_2','clamp_nut_3','clamp_nut_4']
 report={}
-for name,p in SAMPLES.items():
+for (sample,base),side in product(SAMPLES.items(),('near','far')):
+ name=sample+'-'+side;p=replace(base,side=side)
  a=m.assembly_parts(p,s)
- # At least Y25 for the lower-Y screw. Large example is already Y41.
- dy=max(0,25-(p.button_y-24));hits=[]
- for i in range(int(dy)+1):
+ # Conservative crest/rotation envelopes avoid expensive repeated helix Booleans.
+ # Mating thread engagement is not tested by this service-path audit.
+ for j,y in enumerate((p.button_y-24,p.button_y+24),1):
+  a[f'rail_screw_{j}']=m.cylinder((12,y,-14),(1,0,0),4,14).union(m.cylinder((16,y,-14),(1,0,0),20,8))
+  a[f'rail_nut_{j}']=m.cylinder((28,y,-14),(1,0,0),6,18)
+ for j,(y,z) in enumerate(m.CLAMP_STATIONS,1):
+  a[f'clamp_screw_{j}']=m.cylinder((-16,y,z),(1,0,0),4,14).union(m.cylinder((-12,y,z),(1,0,0),20,8))
+  a[f'clamp_nut_{j}']=m.cylinder((-14,y,z),(1,0,0),6,18)
+ # Move the inner screw at least 25 mm from the rail center before withdrawal.
+ dy=max(0,25-(p.button_y-24)) if side=='near' else min(0,-25-(p.button_y+24));hits=[]
+ for step in range(int(abs(dy))+1):
+  i=step if dy>=0 else -step
   for n in module:
    part=a[n].translate((0,i,0))
    for o in fixed:
@@ -59,7 +74,7 @@ for name,p in SAMPLES.items():
 head=m.cylinder((12,5,-14),(1,0,0),4,14)
 blocked_head=overlap(head.translate((-3,0,0)),s['shaft_cap'])
 blocked_cap=overlap(s['shaft_cap'].translate((6,0,0)),head)
-result={'revision':'opposed-clamp-r11','configurations':report,'unshifted_defect_mm3':{'rail_head_withdrawal':blocked_head,'cap_with_rail_screw_installed':blocked_cap},'limits':['Near-side sampled rigid path; remove phone and release twine tension first.','Human finger access, support residue and print tolerances require physical checking.','Far-side module does not obstruct this cap; collar opening still a nominal fit target.'],'passed':all(not r['collisions'] for r in report.values())}
+result={'revision':'compact-rails-r12','configurations':report,'unshifted_defect_mm3':{'rail_head_withdrawal':blocked_head,'cap_with_rail_screw_installed':blocked_cap},'limits':['Both orientations, sampled rigid path with conservative screw-crest and rotating-nut envelopes; remove phone and release twine tension first.','Human finger access, support residue and print tolerances require physical checking.','Both phone orientations use shaft-side actuator positions and require module removal for cap service.'],'passed':all(not r['collisions'] for r in report.values())}
 (Path(__file__).resolve().parents[1]/'review/service-access.json').write_text(json.dumps(result,indent=2)+'\n')
 assert result['passed'],result
 print('Service sequence passed',flush=True)

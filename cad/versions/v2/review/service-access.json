@@ -1,7 +1,7 @@
 {
-  "revision": "opposed-clamp-r11",
+  "revision": "compact-rails-r12",
   "configurations": {
-    "wallet": {
+    "wallet-near": {
       "near_service_dy_mm": 20.0,
       "rail_screw_centers_after_service_shift_y_mm": [
         25.0,
@@ -9,7 +9,15 @@
       ],
       "collisions": []
     },
-    "bare": {
+    "wallet-far": {
+      "near_service_dy_mm": -20.0,
+      "rail_screw_centers_after_service_shift_y_mm": [
+        -73.0,
+        -25.0
+      ],
+      "collisions": []
+    },
+    "bare-near": {
       "near_service_dy_mm": 20.0,
       "rail_screw_centers_after_service_shift_y_mm": [
         25.0,
@@ -17,7 +25,15 @@
       ],
       "collisions": []
     },
-    "small": {
+    "bare-far": {
+      "near_service_dy_mm": -20.0,
+      "rail_screw_centers_after_service_shift_y_mm": [
+        -73.0,
+        -25.0
+      ],
+      "collisions": []
+    },
+    "small-near": {
       "near_service_dy_mm": 20.0,
       "rail_screw_centers_after_service_shift_y_mm": [
         25.0,
@@ -25,11 +41,27 @@
       ],
       "collisions": []
     },
-    "large": {
-      "near_service_dy_mm": 0,
+    "small-far": {
+      "near_service_dy_mm": -20.0,
       "rail_screw_centers_after_service_shift_y_mm": [
-        41.0,
-        89.0
+        -73.0,
+        -25.0
+      ],
+      "collisions": []
+    },
+    "large-near": {
+      "near_service_dy_mm": 4.0,
+      "rail_screw_centers_after_service_shift_y_mm": [
+        25.0,
+        73.0
+      ],
+      "collisions": []
+    },
+    "large-far": {
+      "near_service_dy_mm": -4.0,
+      "rail_screw_centers_after_service_shift_y_mm": [
+        -73.0,
+        -25.0
       ],
       "collisions": []
     }
@@ -39,9 +71,9 @@
     "cap_with_rail_screw_installed": 507.9955320854697
   },
   "limits": [
-    "Near-side sampled rigid path; remove phone and release twine tension first.",
+    "Both orientations, sampled rigid path with conservative screw-crest and rotating-nut envelopes; remove phone and release twine tension first.",
     "Human finger access, support residue and print tolerances require physical checking.",
-    "Far-side module does not obstruct this cap; collar opening still a nominal fit target."
+    "Both phone orientations use shaft-side actuator positions and require module removal for cap service."
   ],
   "passed": true
 }

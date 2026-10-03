@@ -11,10 +11,10 @@ OUT=ROOT/'review'
 BOM=[
  dict(id=n,name=label,quantity=q,material='PLA / PLA+',note=note)
  for n,label,q,note in [
- ('shaft_cap','Rigid shaft clamp cap',1,'Closes the extended carrier collar with four printed screws and nuts; no shaft-retaining bands. Fit and loaded retention unvalidated.'),
- ('carrier','Fixed jaw, sliding track and shaft saddle',1,'Hard rear datum and near-side slotted actuator rail; two rear bands pull the sliding jaw inward.'),
- ('sliding_jaw','Sliding opposing jaw',1,'Far-side actuator rail moves with this jaw. Same print set for 66–86 mm width; range is geometric, not qualified.'),
- ('actuator_bracket','Reversible actuator bracket',1,'Either rail; slide along the phone and adjust depth in the two vertical slots before tightening printed nuts.'),
+ ('shaft_cap','Rigid shaft clamp cap',1,'Integral paired actuator rail and four-fastener collar closure; no shaft-retaining bands. Fit and loaded retention unvalidated.'),
+ ('carrier','Fixed jaw, sliding track and shaft saddle',1,'Hard rear datum and centered band posts; the removable cap carries the actuator rail.'),
+ ('sliding_jaw','Sliding opposing jaw',1,'Compact opposing jaw without an actuator rail. Turn the phone end-for-end for originally far-side buttons; 66–86 mm width is a geometric range, not qualified.'),
+ ('actuator_bracket','Reversible actuator bracket',1,'Either shaft-side rail position; slide along the phone and adjust depth in the two vertical slots before tightening printed nuts.'),
  ('rocker','Threaded-contact rocker',1,'Tie the twine directly around the 8 mm eye with a closed loop. Contact screw adjusts button gap; printed stops limit the illustrative stroke.'),
  ('pivot_key','Quarter-turn pivot key',1,'Printed 6 mm pivot; insert cross-lug through keyway, turn and seat head at index lug.'),
  ('thumb_screw','Coarse printed thumb screw',7,'Four shaft clamps, two rail clamps plus one button contact. 8 mm major / 3 mm pitch; matches successful original-size trial. Existing trial screws can be reused.'),
@@ -23,7 +23,10 @@ BOM=[
 BOM += [dict(id='twine',name='One continuous twine length',quantity=1,material='Twine',note='Route behind the phone through closed eyes; leave enough for knots. Display diameter 2 mm is provisional; passage check uses 3 mm, actual twine unknown.'),dict(id='rubber_bands',name='Rubber bands',quantity=7,material='Rubber',note='2 jaw closing + 3 guides + 1 return + 1 trigger overtravel. Actual preload and loop count need fitting.')]
 SAMPLES={'wallet':Parameters(),'bare':Parameters(phone_thickness=8,button_from_screen=4),'small':Parameters(phone_width=66,phone_length=140,phone_thickness=7.5,button_from_end=99,button_from_screen=3.5),'large':Parameters(phone_width=86,phone_length=170,phone_thickness=20,button_from_end=150,button_from_screen=6)}
 
-def overlap(a,b):return sum(s.Volume() for s in a.intersect(b).vals())
+def overlap(a,b):
+ aa=a.val().BoundingBox();bb=b.val().BoundingBox()
+ if any(getattr(aa,k+'max')<=getattr(bb,k+'min')+1e-7 or getattr(bb,k+'max')<=getattr(aa,k+'min')+1e-7 for k in 'xyz'):return 0.
+ return sum(s.Volume() for s in a.intersect(b).vals())
 def save(path,data):path.write_text(json.dumps(data,indent=2)+'\n')
 def export(s,path,manufacturing=False):
  from OCP.BRepTools import BRepTools
@@ -60,7 +63,7 @@ def check(p,solids):
   if v>.01:r['fastener_shaft_overlap_mm3'][n]=round(v,4)
  # Orthographic screen-facing keepout includes the full phone face and the
  # space in front of it. Check added clamp parts, not intentional phone jaws.
- screen=box(p.phone_left,p.phone_right,-p.phone_length/2,p.phone_length/2,-180,18-p.phone_thickness)
+ screen=box(p.phone_left,p.phone_right,p.phone_center_y-p.phone_length/2,p.phone_center_y+p.phone_length/2,-180,18-p.phone_thickness)
  r['clamp_screen_obstruction_mm3']={}
  for n in ('shaft_cap','clamp_screw_1','clamp_screw_2','clamp_screw_3','clamp_screw_4','clamp_nut_1','clamp_nut_2','clamp_nut_3','clamp_nut_4'):
   v=overlap(a[n],screen)
@@ -70,7 +73,7 @@ def check(p,solids):
 
 def export_scene(p,solids,out):
  out.mkdir(parents=True,exist_ok=True)
- manifest={'version':'v2','title':'Recessed adjustable band clamp','revision':'opposed-clamp-r11','status':'Recessed fit prototype; camera-view clearance and physical validation pending','parameters':asdict(p),'bom':BOM,'printed_designs':9,'printed_pieces':22,'purchased_hardware':0,'soft_padding':False,'parts':[],'assembly':[]}
+ manifest={'version':'v2','title':'Recessed adjustable band clamp','revision':'compact-rails-r12','phone_rotation_degrees':180 if p.side=='far' else 0,'phone_center_y_mm':p.phone_center_y,'status':'Recessed fit prototype; camera-view clearance and physical validation pending','parameters':asdict(p),'bom':BOM,'printed_designs':9,'printed_pieces':22,'purchased_hardware':0,'soft_padding':False,'parts':[],'assembly':[]}
  for n,s in solids.items():
   file=n+'.stl'
   if out==OUT:export(s,out/file)
@@ -89,13 +92,13 @@ def export_scene(p,solids,out):
  if out==OUT:assy.export(str(out/'assembly.step'))
  path,bands,motion=flexible_paths(p);angle=stop_angle(p)
  takeup=math.dist(p.string_eye,p.first_guide)-math.dist(rotate_point(p.string_eye,p,angle),p.first_guide)
- manifest['motion']={**motion,'pivot':p.pivot,'angle':angle,'string_eye':p.string_eye,'string_points':path,'band_paths':bands,'twine_to_stop':takeup,'return_fixed':p.point((38,14,28)),'return_moving':p.point((33,8,18)),'contact':p.contact,'side_sign':p.sign,'phone_point_count':10}
+ manifest['motion']={**motion,'pivot':p.pivot,'angle':angle,'string_eye':p.string_eye,'string_points':path,'band_paths':bands,'twine_to_stop':takeup,'return_fixed':p.point((38,14,28)),'return_moving':p.point((33,8,18)),'contact':p.contact,'side_sign':p.sign,'phone_point_count':11}
  save(out/'manifest.json',manifest)
 
 def manufacturing(solids):
  out=ROOT/'print';out.mkdir(exist_ok=True)
  rotations={'shaft_cap':('Y',-90),'carrier':('Y',90),'sliding_jaw':('Y',-90),'actuator_bracket':('Y',90),'rocker':('Y',-90),'pivot_key':('X',90),'thumb_screw':('X',180),'thumb_nut':('X',0),'string_guide':('X',0)}
- notes={'shaft_cap':'Split face on bed; support removable inner roof and inspect bore/ear holes. New clamp fit is unvalidated.','carrier':'Outer rail face on bed. Supports required under rear bridge, collar, track roofs and jaw ledges. Keep slider channel support accessible from open left end; remove fully.', 'sliding_jaw':'Outer rail face toward bed. Supports required under tongue, rear ledge and hooks. Protect sliding faces when removing support.', 'actuator_bracket':'Broad outside plate toward bed. Support first fairlead, pivot ears and return hooks; remove through open sides.', 'rocker':'Contact bore vertical. Support offset arm and pivot boss; keep supports out of threaded bore.', 'pivot_key':'Large head toward bed; support cross-lug. Check layer adhesion and quarter-turn retention.', 'thumb_screw':'Head on bed; no support in threads. Fit trial first; do not force.', 'thumb_nut':'Flat on bed; no supports. Fit trial first.', 'string_guide':'Saddle end on bed; support eye underside/bridge if slicer requests.'}
+ notes={'shaft_cap':'Cap with integral rail; export orientation provisional. Compare end-on-bed and side orientations in fresh low-waste slice review; keep supports off the neck mating surface.','carrier':'Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal.', 'sliding_jaw':'Compact jaw; export orientation provisional. Inspect tongue, ledge and hooks for overhangs; protect sliding faces and minimize removable supports.', 'actuator_bracket':'Broad outside plate toward bed. Support first fairlead, pivot ears and return hooks; remove through open sides.', 'rocker':'Contact bore vertical. Support offset arm and pivot boss; keep supports out of threaded bore.', 'pivot_key':'Large head toward bed; support cross-lug. Check layer adhesion and quarter-turn retention.', 'thumb_screw':'Head on bed; no support in threads. Fit trial first; do not force.', 'thumb_nut':'Flat on bed; no supports. Fit trial first.', 'string_guide':'Saddle end on bed; support eye underside/bridge if slicer requests.'}
  result=[]
  for n,s in solids.items():
   axis,deg=rotations[n];v=(1,0,0) if axis=='X' else (0,1,0)
@@ -109,7 +112,7 @@ def manufacturing(solids):
    mesh=trimesh.load_mesh(out/(n+'.stl'))
   assert mesh.is_watertight and mesh.volume>0 and abs(mesh.bounds[0,2])<.001,n
   result.append(dict(name=n,file=n+'.stl',quantity=next(r['quantity'] for r in BOM if r['id']==n),bounds_mm=mesh.extents.round(3).tolist(),bed_z_min_mm=float(mesh.bounds[0,2]),watertight=True,layer_mm=.12 if n in ('thumb_screw','thumb_nut','rocker') else .2,supports=notes[n]))
- save(out/'manifest.json',dict(units='mm',scale_percent=100,nozzle_mm=.4,layer_mm=.2,revision='opposed-clamp-r11',status='Recessed fit prototype; camera-view clearance and physical validation pending',parts=result))
+ save(out/'manifest.json',dict(units='mm',scale_percent=100,nozzle_mm=.4,layer_mm=.2,revision='compact-rails-r12',status='Recessed fit prototype; camera-view clearance and physical validation pending',parts=result))
 
 def build():
  p=Parameters();solids=parts(p);OUT.mkdir(exist_ok=True)

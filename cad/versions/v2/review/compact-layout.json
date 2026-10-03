@@ -1,0 +1,44 @@
+{
+  "revision": "compact-rails-r12",
+  "baseline_commit": "374c882",
+  "changed_parts": {
+    "carrier": {
+      "old_solid_volume_mm3": 82018.68229316853,
+      "new_solid_volume_mm3": 75283.67610076364,
+      "new_bed_oriented_bounds_mm": [
+        130.3000030517578,
+        89.99560928344727,
+        128.9999999
+      ]
+    },
+    "shaft_cap": {
+      "old_solid_volume_mm3": 23109.238337592804,
+      "new_solid_volume_mm3": 40706.12518099802,
+      "new_bed_oriented_bounds_mm": [
+        102.0,
+        160.0,
+        21.5
+      ]
+    },
+    "sliding_jaw": {
+      "old_solid_volume_mm3": 27743.946563231064,
+      "new_solid_volume_mm3": 10407.850305623842,
+      "new_bed_oriented_bounds_mm": [
+        48.29999923706055,
+        20.998992919921875,
+        72.0
+      ]
+    },
+    "actuator_bracket": {
+      "old_solid_volume_mm3": 24205.10419799323,
+      "new_solid_volume_mm3": 25967.662044780915,
+      "new_bed_oriented_bounds_mm": [
+        89.0,
+        66.0,
+        33.99999999999999
+      ]
+    }
+  },
+  "combined_solid_volume_change_percent": -2.9995853103516144,
+  "note": "Mesh solid volumes, not sliced filament estimates or measured weights. Slice review remains required."
+}

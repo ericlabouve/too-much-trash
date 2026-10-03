@@ -5,7 +5,7 @@ import build as b
 import model as m
 
 def main():
- solids=m.parts(m.Parameters());report={'revision':'extended-saddle-r10','attachment':'Loop through the 8 mm eye and around its front ligament; tie the end back to the standing string. No stopper knot bears against the hole. Actual knot security remains untested.','assumed_knot_envelopes_mm':[[8,4],[10,6]],'samples':{},'limitations':['Illustrative cylindrical envelopes, not actual knots or finger-access simulation','Printed knot retention, twine friction and strength remain unmeasured']}
+ solids=m.parts(m.Parameters());report={'revision':'compact-rails-r12','attachment':'Loop through the 8 mm eye and around its front ligament; tie the end back to the standing string. No stopper knot bears against the hole. Actual knot security remains untested.','assumed_knot_envelopes_mm':[[8,4],[10,6]],'samples':{},'limitations':['Illustrative cylindrical envelopes, not actual knots or finger-access simulation','Printed knot retention, twine friction and strength remain unmeasured']}
  for name,base in b.SAMPLES.items():
   for side in ('near','far'):
    p=replace(base,side=side);assy=m.assembly_parts(p,solids);hits=[]

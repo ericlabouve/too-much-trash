@@ -80,6 +80,17 @@ def loop_between(a,b,width=4):
     return pts
 
 
+JAW_BAND_Y=(-6,6)
+
+def jaw_band(left,right,y,z=41,radius=3.3):
+    # Capsule centerline around vertical mushroom stems, below their heads.
+    pts=[]
+    for center,start in ((left,90),(right,270)):
+        for i in range(25):
+            a=math.radians(start+180*i/24)
+            pts.append((center+radius*math.cos(a),y+radius*math.sin(a),z))
+    return pts+[pts[0]]
+
 def rounded_band_xy(z, left=-9):
     # Rounded rectangular loop seated in the U-saddle band lane.
     pts=[]
@@ -116,14 +127,18 @@ class Parameters:
     @property
     def phone_left(self): return self.phone_right-self.phone_width
     @property
-    def button_y(self): return self.button_from_end-self.phone_length/2
+    def phone_center_y(self):
+        shift=-max(0,self.button_from_end-self.phone_length/2-45)
+        return shift if self.side=='near' else -shift
     @property
-    def sign(self): return 1 if self.side=='near' else -1
+    def button_y(self): return (self.button_from_end-self.phone_length/2)*(1 if self.side=='near' else -1)+self.phone_center_y
+    @property
+    def sign(self): return 1
     @property
     def height(self): return 18-self.phone_thickness+self.button_from_screen-6
     def point(self,q):
         x,y,z=q
-        return ((self.phone_right if self.side=='near' else self.phone_left)+self.sign*x,self.button_y+self.sign*y,z+self.height)
+        return (self.phone_right+x,self.button_y+y,z+self.height)
     @property
     def pivot(self): return self.point((19,0,18))
     @property
@@ -154,8 +169,7 @@ def thumb_nut(p):
 
 
 def placed(s,p):
-    if p.side=='far':s=s.rotate((0,0,0),(0,0,1),180)
-    return s.translate(((p.phone_right if p.side=='near' else p.phone_left),p.button_y,p.height))
+    return s.translate((p.phone_right,p.button_y,p.height))
 
 
 def assembly_parts(p,solids):
@@ -188,8 +202,11 @@ def stop_angle(p):
 
 def stock(p):
     out={n:s.translate((23,-40,0)) for n,s in v1_proxies(V1Parameters()).items() if n.startswith('stock_')}
-    out['phone_envelope']=box(p.phone_left,p.phone_right,-p.phone_length/2,p.phone_length/2,18-p.phone_thickness,18)
-    out['camera_keepout']=box(p.phone_left+2,p.phone_left+40,p.phone_length/2-43,p.phone_length/2-3,18,22)
+    out['phone_envelope']=box(p.phone_left,p.phone_right,p.phone_center_y-p.phone_length/2,p.phone_center_y+p.phone_length/2,18-p.phone_thickness,18)
+    out['camera_keepout']=box(p.phone_left+2,p.phone_left+40,p.phone_center_y+p.phone_length/2-43,p.phone_center_y+p.phone_length/2-3,18,22)
+    if p.side=='far':
+        center=((p.phone_left+p.phone_right)/2,p.phone_center_y,0)
+        out['camera_keepout']=out['camera_keepout'].rotate(center,(center[0],center[1],1),180)
     out['phone_volume_up']=placed(box(-.01,.12,-3.5,3.5,4.7,7.3),p)
     return out
 
@@ -198,19 +215,21 @@ def flexible_paths(p):
     trigger=(-42,0,-417);last=(-18,0,p.guide_stations[-1])
     v=cq.Vector(*trigger).sub(cq.Vector(*last));tail=v.Length-p.series_span_rest
     knot=cq.Vector(*last).add(v.normalized().multiply(tail)).toTuple()
-    face=p.phone_right if p.side=='near' else p.phone_left
-    side_eye=(face+25*p.sign,-48,26)
-    side_entry=(face+33*p.sign,-48,26)
+    face=p.phone_right
+    side_eye=(face+33,-46,-74)
+    side_entry=(face+43,-46,-74)
     # Thread through the first eye and wrap beneath its radiused outside edge.
     # These fixed waypoints keep the line clear of the lug; they are kinematic,
     # not a tension/contact solution. Side-eye entry is aligned with its bore.
-    under=p.point((34,0,2))
-    under_out=p.point((34,-11*p.sign,2))
-    exit_out=p.point((34,-11*p.sign,7))
-    string=[p.string_eye,p.first_guide,under,under_out,exit_out,side_entry,side_eye,(-15,-48,34),(-15,-48,26)]+[(-18,0,z) for z in p.guide_stations]+[knot]
+    lower_guide=p.point((34,0,-55))
+    under=p.point((34,0,-60))
+    wrap_y=13 if p.button_y < -40 else -11
+    under_out=p.point((34,wrap_y,-60))
+    exit_out=p.point((34,wrap_y,-55))
+    string=[p.string_eye,p.first_guide,lower_guide,under,under_out,exit_out,side_entry,side_eye,(-25,-46,-66),(-25,-46,-74)]+[(-18,0,z) for z in p.guide_stations]+[knot]
     bands={'band_return':loop_between(p.point((33,8,18)),p.point((38,14,28)),2),
         'band_overtravel':loop_between(knot,trigger,5)}
-    for i,y in enumerate((-18,-34)):bands[f'band_jaw_{i+1}']=loop_between((p.phone_left-1,y,41),(-27,y,41),2)
+    for i,y in enumerate(JAW_BAND_Y):bands[f'band_jaw_{i+1}']=jaw_band(p.phone_left-1,-27,y)
     for i,z in enumerate(p.guide_stations):bands[f'band_guide_{i+1}']=rounded_band_xy(z,left=-28)
     return string,bands,{'trigger_pivot':(-4,0,-416),'trigger_attach':trigger,'trigger_angle':-.48,'tail_length':tail,'series_span_rest':p.series_span_rest}
 
@@ -232,7 +251,7 @@ def rows(p,solids):
     out.append(('actuator_context',placed(solids['actuator_bracket'],p),ORANGE,'actuator_bracket'))
     out.append(('stock_neck_context',box(-7,7,-9.5,9.5,-105,85),(.6,.65,.69),None))
     string,bands,motion=flexible_paths(p)
-    out.extend([('twine_phone',polyline(string[:10],p.twine_diameter),TWINE,'twine'),('twine',polyline(string,p.twine_diameter),TWINE,'twine')])
+    out.extend([('twine_phone',polyline(string[:11],p.twine_diameter),TWINE,'twine'),('twine',polyline(string,p.twine_diameter),TWINE,'twine')])
     for n,path in bands.items():out.append((n,polyline(path,1.4),BAND,'rubber_bands'))
     return out
 
@@ -276,19 +295,26 @@ def low_rail(sign=1,post_top=26):
     s=s.cut(cut)
     return s if sign==1 else s.mirror('YZ')
 
+def paired_neck_rail():
+    # Continuous slot avoids a blocked screw passage where the two rails meet.
+    s=box(36,42,-80,80,-24,-4).union(box(36,42,-12,12,-4,16))
+    cut=box(35,43,-74,74,-18.4,-9.6)
+    for y in (-74,74):cut=cut.union(cylinder((35,y,-14),(1,0,0),8,8.8))
+    return s.cut(cut).cut(box(35,43,-12,-7,17,28)).translate((-20,0,0))
+
 # Split opens toward +X after actuator removal; both fasteners stay off the screen.
-# Four fasteners: opposing lower pair; upper +Y fastener offset below actuator.
-# Original end stations retain their 82 mm span.
-CLAMP_STATIONS=((-25,6),(25,-76),(25,-32),(-25,-76))
+# Four fasteners: paired on both sides, below either actuator position.
+# Upper station lowered for the second actuator position; pairs span 44 mm.
+CLAMP_STATIONS=((-25,-32),(25,-76),(25,-32),(-25,-76))
 CLAMP_BOTTOM=-86
 CLAMP_TOP=16
 def shaft_clamp_half(p,cap=False):
     x0,x1=(.5,11.3) if cap else (-11.3,-.5)
     s=box(x0,x1,-13.8,13.8,CLAMP_BOTTOM,CLAMP_TOP)
     if cap:
-        # Local relief permits a 6 mm sideways release below the integral rail.
-        # Retain the thicker lower shell; minimum upper wall is 3.5 mm.
-        s=s.cut(box(9.3,12,-14,14,-25,19))
+        # Local relief clears the rail screw heads.
+        # Retain the thicker shell elsewhere; minimum relieved wall is 3.5 mm.
+        s=s.cut(box(9.3,12,-14,14,-25,-6))  # Clearance behind rail screw heads.
     s=s.cut(box(-p.collar_opening_x/2,p.collar_opening_x/2,-p.collar_opening_y/2,p.collar_opening_y/2,CLAMP_BOTTOM-1,CLAMP_TOP+1))
     ex0,ex1=(.5,4) if cap else (-8,-.5)
     for y,z in CLAMP_STATIONS:
@@ -297,7 +323,9 @@ def shaft_clamp_half(p,cap=False):
         s=s.cut(cylinder((-15,y,z),(1,0,0),30,8.8))
     return s
 
-def shaft_cap(p): return shaft_clamp_half(p,True)
+def shaft_cap(p):
+    # Rail loads enter the cap directly through a broad central web.
+    return shaft_clamp_half(p,True).union(paired_neck_rail()).union(box(9.3,22,-12,12,-6,16))
 
 def carrier(p):
     s=box(-20,-14,-12,12,-2.4,26).union(box(-28,-14,-12,12,18,26))
@@ -305,7 +333,7 @@ def carrier(p):
     for y0,y1,li,lj in ((-16,-10.3,-16,-7.5),(10.3,16,7.5,16)):
         s=s.union(box(-113,-18,y0,y1,26,34)).union(box(-113,-18,li,lj,30.8,34))
     s=s.union(box(-18,-14,-16,16,26,34))
-    s=s.union(low_rail().translate((-20,0,0))).union(box(-14,22,-12,12,22,26))
+    # The removable shaft cap carries the actuator rail; no bridge encircles the neck.
     s=s.union(shaft_clamp_half(p,False))
     # Broad side connection: twin webs tie the fixed jaw into the long saddle.
     # End above the lower ear, with a tapered transition to the rear bridge.
@@ -314,23 +342,26 @@ def carrier(p):
         # XZ workplane normal is -Y.
         s=s.union(web.translate((0,y1,0)))
     s=s.union(box(-20,-11.3,-8.8,8.8,-4,22))
-    for y in (-18,-34):
-        s=s.union(box(-32,-22,min(y-3,-16),-12,32,38.5)).union(hook(-27,y,38.3))
+    # Center the closing force over the track; roots land on the two track lips.
+    s=s.union(box(-32,-22,-10,10,33,38.5))
+    for y in JAW_BAND_Y:s=s.union(hook(-27,y,38.3))
     s=s.cut(box(-16,-7,12,17,21,39)).cut(box(-119,-83,-10.2,10.2,21.9,26.1)).cut(box(-5.8,5.8,-8.8,8.8,21,61))
-    # Both side and neck crossover stay below the former elevated fairlead.
-    s=s.union(box(2,8,-48,-12,20,26)).union(side_lug((5,-48,26),p))
-    s=s.union(box(-9,-6,-48,-10,20,26)).union(guide_lug((-15,-48,26),p))
-    s=s.cut(side_hole((5,-48,26),p)).cut(guide_hole((-15,-48,26),p))
+    # Compact crossover: one shared shelf and two 4 mm ribs flank the rope passage.
+    # Both eyes remain fully threaded and are accessible from opposite sides.
+    s=s.union(box(-19,16,-50,-42,-84,-78).union(box(-19,-16,-50,-42,-84,-71))).union(side_lug((13,-46,-74),p))
+    s=s.union(box(-19,-6,-53,-10,-60,-54).union(box(-19,-6,-53,-49,-84,-54)).union(box(-19,-6,-44,-40,-84,-54))).union(guide_lug((-25,-46,-74),p))
+    s=s.cut(side_hole((13,-46,-74),p)).cut(guide_hole((-25,-46,-74),p))
     s=s.cut(box(-5.8,5.8,-8.8,8.8,-39,65))
-    s=s.cut(box(-11.5,11.5,-.5,15,19,45))
+
     return s
 
 def sliding_jaw(p):
     s=box(-6,0,-7.3,7.3,-2.4,33).union(box(-6,8,-7.3,7.3,18,22)).union(box(-6,2,-7.3,7.3,-4,-2))
-    s=s.union(box(-6,66,-10,10,26.4,30.4)).union(low_rail(-1,33)).union(box(-42,-5,-7.3,7.3,29.8,33))
-    for y in (-18,-34):s=s.union(box(-6,4,min(y-3,-7),-5,34.5,38.5)).union(box(-6,0,-7.3,-5,32,38.5)).union(hook(-1,y,38.3))
-    s=s.union(box(-28,-22,-48,-35,26,38.5)).union(box(-28,-5,-48,-5,34.5,38.5)).union(side_lug((-25,-48,26),p))
-    return s.cut(side_hole((-25,-48,26),p))
+    s=s.union(box(-6,66,-10,10,26.4,30.4))
+    # Narrow root clears the fixed track lips; post heads sit above the track.
+    s=s.union(box(-6,4,-7,7,32,38.5))
+    for y in JAW_BAND_Y:s=s.union(hook(-1,y,38.3))
+    return s
 
 def guide(p):
     s=saddle(-7,7,p).union(box(-17,-10,-5,5,-3,3)).union(guide_lug((-18,0,0),p))
@@ -378,6 +409,9 @@ def actuator_bracket(p):
     s=s.union(box(38,42,8,21,18,21)).union(box(35,41,17,21,18,31))
     for z in (28,):s=s.union(cylinder((38,14,z),(0,1,0),5,4)).union(cylinder((38,13,z),(0,1,0),1.5,6))
     s=s.union(box(24,25.5,-15,-6,10,13)).union(box(21,25.5,-15,-12,11,14.5))
+    # Captive lower guide gives the rope a real turning point below rail screws.
+    s=s.union(box(40.4,48,-4,4,-55,-40)).union(guide_lug((34,0,-55),p))
+    s=s.cut(guide_hole((34,0,-55),p))
     # Clearance for the loop around the front of the tie eye.
     s=s.cut(box(30.5,35.5,-11,-3.5,20.8,28))
     return s

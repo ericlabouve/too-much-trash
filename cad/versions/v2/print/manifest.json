@@ -3,7 +3,7 @@
   "scale_percent": 100,
   "nozzle_mm": 0.4,
   "layer_mm": 0.2,
-  "revision": "opposed-clamp-r11",
+  "revision": "compact-rails-r12",
   "status": "Recessed fit prototype; camera-view clearance and physical validation pending",
   "parts": [
     {
@@ -12,13 +12,13 @@
       "quantity": 1,
       "bounds_mm": [
         102.0,
-        69.991,
-        10.8
+        160.0,
+        21.5
       ],
       "bed_z_min_mm": 0.0,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Split face on bed; support removable inner roof and inspect bore/ear holes. New clamp fit is unvalidated."
+      "supports": "Cap with integral rail; export orientation provisional. Compare end-on-bed and side orientations in fresh low-waste slice review; keep supports off the neck mating surface."
     },
     {
       "name": "carrier",
@@ -26,38 +26,38 @@
       "quantity": 1,
       "bounds_mm": [
         130.3,
-        157.0,
-        135.0
+        89.996,
+        129.0
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": 9.999999406318238e-08,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Outer rail face on bed. Supports required under rear bridge, collar, track roofs and jaw ledges. Keep slider channel support accessible from open left end; remove fully."
+      "supports": "Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal."
     },
     {
       "name": "sliding_jaw",
       "file": "sliding_jaw.stl",
       "quantity": 1,
       "bounds_mm": [
-        68.3,
-        156.996,
-        108.0
+        48.3,
+        20.999,
+        72.0
       ],
-      "bed_z_min_mm": -4.876402029265305e-16,
+      "bed_z_min_mm": 8.881784197001252e-16,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Outer rail face toward bed. Supports required under tongue, rear ledge and hooks. Protect sliding faces when removing support."
+      "supports": "Compact jaw; export orientation provisional. Inspect tongue, ledge and hooks for overhangs; protect sliding faces and minimize removable supports."
     },
     {
       "name": "actuator_bracket",
       "file": "actuator_bracket.stl",
       "quantity": 1,
       "bounds_mm": [
-        80.0,
+        89.0,
         66.0,
         34.0
       ],
-      "bed_z_min_mm": -3.3250341871938604e-16,
+      "bed_z_min_mm": 6.772924150639853e-15,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Broad outside plate toward bed. Support first fairlead, pivot ears and return hooks; remove through open sides."

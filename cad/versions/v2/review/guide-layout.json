@@ -1,0 +1,56 @@
+{
+  "revision": "compact-rails-r12",
+  "purpose": "Move fixed-carrier twine crossover inward and support the eyes on one common shelf, clear of both actuator positions and cap removal.",
+  "previous_centers_mm": {
+    "side_eye": [
+      5,
+      -70,
+      -50
+    ],
+    "shaft_eye": [
+      -25,
+      -70,
+      -50
+    ]
+  },
+  "current_centers_mm": {
+    "side_eye": [
+      13,
+      -46,
+      -74
+    ],
+    "shaft_eye": [
+      -25,
+      -46,
+      -74
+    ]
+  },
+  "geometry": {
+    "inward_y_translation_mm": 24,
+    "lower_z_translation_mm": 24,
+    "side_eye_x_translation_mm": 8,
+    "bore_mm": 8,
+    "flared_mouth_mm": 11,
+    "eye_thickness_mm": 6,
+    "shared_lower_shelf_depth_mm": 6,
+    "shared_lower_shelf_width_y_mm": 8,
+    "support_rib_thickness_mm": 4,
+    "note": "The new side eye moves 8 mm toward +X to keep the near-side approach clear of the shaft. This is not a uniform reduction in all bounding-box dimensions.",
+    "support": "Upper and lower shelves joined by two 4 mm ribs flanking an open rope passage."
+  },
+  "checks": {
+    "carrier_solid_count": 1,
+    "configurations_tested": 8,
+    "cord_diameter_mm": 3,
+    "intersection_reporting_threshold_mm3": 0.01,
+    "cord_and_rigid_intersections_reported": {},
+    "scope": "Static cord segments against assembled rigid parts, phone and stock neck; carrier against all other rigid parts including clamp fasteners. Combined parent checks cover service and motion.",
+    "note": "All eight configurations passed again after the final upper-shelf and 4 mm rib completion. Combined parent service and motion checks remain separately authoritative."
+  },
+  "assembly": "Thread shaft-side fixed eye and transverse fixed eye, then the actuator lower guide and upper guide to the rocker tie eye. Large rotated-phone example wraps the positive-Y edge of the lower actuator eye; other samples use its negative-Y edge. No pulley, extra printed part or hardware.",
+  "limits": [
+    "Segmented rope path is an illustrative clearance envelope, not a friction/contact solution.",
+    "Actual twine diameter, bend friction, abrasion and slack retention remain unvalidated.",
+    "Printed strength remains unvalidated."
+  ]
+}

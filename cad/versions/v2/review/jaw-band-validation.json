@@ -1,0 +1,48 @@
+{
+  "revision": "compact-rails-r12",
+  "configurations": {
+    "wallet": {
+      "post_y_mm": [
+        -6,
+        6
+      ],
+      "equal_tension_force_center_y_mm": 0.0,
+      "post_span_x_mm": 70,
+      "collisions": {}
+    },
+    "bare": {
+      "post_y_mm": [
+        -6,
+        6
+      ],
+      "equal_tension_force_center_y_mm": 0.0,
+      "post_span_x_mm": 70,
+      "collisions": {}
+    },
+    "small": {
+      "post_y_mm": [
+        -6,
+        6
+      ],
+      "equal_tension_force_center_y_mm": 0.0,
+      "post_span_x_mm": 60,
+      "collisions": {}
+    },
+    "large": {
+      "post_y_mm": [
+        -6,
+        6
+      ],
+      "equal_tension_force_center_y_mm": 0.0,
+      "post_span_x_mm": 80,
+      "collisions": {}
+    }
+  },
+  "passed": true,
+  "limitations": [
+    "1.4 mm circular band visualization is provisional; real width/thickness and stretched cross-section unknown.",
+    "Equal band tension is an assumption, not a measured force balance.",
+    "No claim of preload, jaw friction, fatigue or loaded retention.",
+    "Capsule paths wrap outside vertical stems below the mushroom heads; verify actual bands seat and remain accessible."
+  ]
+}

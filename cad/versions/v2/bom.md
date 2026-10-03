@@ -4,10 +4,10 @@ Generated from `source/build.py`. 9 designs, 22 printed pieces; zero metal hardw
 
 | Component | Quantity | Material | Role |
 | --- | ---: | --- | --- |
-| Rigid shaft clamp cap | 1 | PLA / PLA+ | Closes the extended carrier collar with four printed screws and nuts; no shaft-retaining bands. Fit and loaded retention unvalidated. |
-| Fixed jaw, sliding track and shaft saddle | 1 | PLA / PLA+ | Hard rear datum and near-side slotted actuator rail; two rear bands pull the sliding jaw inward. |
-| Sliding opposing jaw | 1 | PLA / PLA+ | Far-side actuator rail moves with this jaw. Same print set for 66–86 mm width; range is geometric, not qualified. |
-| Reversible actuator bracket | 1 | PLA / PLA+ | Either rail; slide along the phone and adjust depth in the two vertical slots before tightening printed nuts. |
+| Rigid shaft clamp cap | 1 | PLA / PLA+ | Integral paired actuator rail and four-fastener collar closure; no shaft-retaining bands. Fit and loaded retention unvalidated. |
+| Fixed jaw, sliding track and shaft saddle | 1 | PLA / PLA+ | Hard rear datum and centered band posts; the removable cap carries the actuator rail. |
+| Sliding opposing jaw | 1 | PLA / PLA+ | Compact opposing jaw without an actuator rail. Turn the phone end-for-end for originally far-side buttons; 66–86 mm width is a geometric range, not qualified. |
+| Reversible actuator bracket | 1 | PLA / PLA+ | Either shaft-side rail position; slide along the phone and adjust depth in the two vertical slots before tightening printed nuts. |
 | Threaded-contact rocker | 1 | PLA / PLA+ | Tie the twine directly around the 8 mm eye with a closed loop. Contact screw adjusts button gap; printed stops limit the illustrative stroke. |
 | Quarter-turn pivot key | 1 | PLA / PLA+ | Printed 6 mm pivot; insert cross-lug through keyway, turn and seat head at index lug. |
 | Coarse printed thumb screw | 7 | PLA / PLA+ | Four shaft clamps, two rail clamps plus one button contact. 8 mm major / 3 mm pitch; matches successful original-size trial. Existing trial screws can be reused. |

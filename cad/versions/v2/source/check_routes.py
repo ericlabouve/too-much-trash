@@ -5,12 +5,13 @@ import build as b
 import model as m
 
 def envelope(p,half):
- x0,x1=p.phone_left+2,p.phone_left+40;y0,y1=p.phone_length/2-43,p.phone_length/2-3
+ bb=m.stock(p)['camera_keepout'].val().BoundingBox()
+ x0,x1,y0,y1=bb.xmin,bb.xmax,bb.ymin,bb.ymax
  growth=100*math.tan(math.radians(half))
  return m.cq.Workplane('XY',origin=((x0+x1)/2,(y0+y1)/2,22)).rect(x1-x0,y1-y0).workplane(offset=100).rect(x1-x0+2*growth,y1-y0+2*growth).loft()
 
 def main():
- solids=m.parts(m.Parameters());result={'revision':'extended-saddle-r10','assumptions':{'twine_diameter_mm':3,'camera_lens_plane_z_mm':22,'camera':'Illustrative rectangle, not measured lenses; expanding square envelopes at 40/50/60 degree half angles','limitations':'Segmented route clearance only, not a contact, friction, force, wear or physical threading simulation'},'configurations':{}}
+ solids=m.parts(m.Parameters());result={'revision':'compact-rails-r12','assumptions':{'twine_diameter_mm':3,'camera_lens_plane_z_mm':22,'camera':'Illustrative rectangle, not measured lenses; expanding square envelopes at 40/50/60 degree half angles','limitations':'Segmented route clearance only, not a contact, friction, force, wear or physical threading simulation'},'configurations':{}}
  for name,base in b.SAMPLES.items():
   for side in ('near','far'):
    p=replace(base,side=side);a=m.assembly_parts(p,solids);path,bands,_=m.flexible_paths(p)

@@ -1,5 +1,5 @@
 {
-  "revision": "extended-saddle-r10",
+  "revision": "compact-rails-r12",
   "assumptions": {
     "twine_diameter_mm": 3,
     "camera_lens_plane_z_mm": 22,
@@ -11,9 +11,15 @@
       "twine_intersections_mm3": {},
       "view_envelope_intersections_mm3": {
         "40": {},
-        "50": {},
+        "50": {
+          "carrier": 2.174,
+          "sliding_jaw": 35.543,
+          "band_jaw_2": 0.967
+        },
         "60": {
-          "carrier": 315.636
+          "carrier": 561.334,
+          "sliding_jaw": 249.724,
+          "band_jaw_2": 232.125
         }
       }
     },
@@ -21,9 +27,14 @@
       "twine_intersections_mm3": {},
       "view_envelope_intersections_mm3": {
         "40": {},
-        "50": {},
+        "50": {
+          "carrier": 35.543,
+          "band_jaw_1": 0.929
+        },
         "60": {
-          "carrier": 315.636
+          "carrier": 590.304,
+          "sliding_jaw": 77.595,
+          "band_jaw_1": 210.567
         }
       }
     },
@@ -31,9 +42,15 @@
       "twine_intersections_mm3": {},
       "view_envelope_intersections_mm3": {
         "40": {},
-        "50": {},
+        "50": {
+          "carrier": 2.174,
+          "sliding_jaw": 35.543,
+          "band_jaw_2": 0.967
+        },
         "60": {
-          "carrier": 315.636
+          "carrier": 561.334,
+          "sliding_jaw": 249.724,
+          "band_jaw_2": 232.125
         }
       }
     },
@@ -41,50 +58,94 @@
       "twine_intersections_mm3": {},
       "view_envelope_intersections_mm3": {
         "40": {},
-        "50": {},
+        "50": {
+          "carrier": 35.543,
+          "band_jaw_1": 0.929
+        },
         "60": {
-          "carrier": 315.636
+          "carrier": 590.304,
+          "sliding_jaw": 77.595,
+          "band_jaw_1": 210.567
         }
       }
     },
     "small-near": {
       "twine_intersections_mm3": {},
       "view_envelope_intersections_mm3": {
-        "40": {},
+        "40": {
+          "carrier": 3.905,
+          "sliding_jaw": 12.725
+        },
         "50": {
-          "carrier": 294.429
+          "carrier": 483.438,
+          "sliding_jaw": 176.504,
+          "band_jaw_2": 100.337
         },
         "60": {
-          "carrier": 1981.305
+          "carrier": 2661.879,
+          "sliding_jaw": 559.781,
+          "band_jaw_1": 100.337,
+          "band_jaw_2": 200.009
         }
       }
     },
     "small-far": {
       "twine_intersections_mm3": {},
       "view_envelope_intersections_mm3": {
-        "40": {},
+        "40": {
+          "carrier": 12.725
+        },
         "50": {
-          "carrier": 294.429
+          "carrier": 476.334,
+          "sliding_jaw": 35.521,
+          "band_jaw_1": 90.314
         },
         "60": {
-          "carrier": 1981.305
+          "carrier": 2422.675,
+          "sliding_jaw": 425.705,
+          "band_jaw_1": 200.009,
+          "band_jaw_2": 101.001
         }
       }
     },
     "large-near": {
       "twine_intersections_mm3": {},
       "view_envelope_intersections_mm3": {
-        "40": {},
-        "50": {},
-        "60": {}
+        "40": {
+          "carrier": 544.341,
+          "sliding_jaw": 123.741,
+          "band_jaw_2": 92.309
+        },
+        "50": {
+          "carrier": 1688.446,
+          "sliding_jaw": 314.135,
+          "band_jaw_2": 203.919
+        },
+        "60": {
+          "carrier": 3059.83,
+          "sliding_jaw": 1043.886,
+          "band_jaw_1": 235.546,
+          "band_jaw_2": 235.841
+        }
       }
     },
     "large-far": {
       "twine_intersections_mm3": {},
       "view_envelope_intersections_mm3": {
-        "40": {},
-        "50": {},
-        "60": {}
+        "40": {
+          "carrier": 682.194,
+          "band_jaw_1": 79.992
+        },
+        "50": {
+          "carrier": 2108.287,
+          "band_jaw_1": 179.285
+        },
+        "60": {
+          "carrier": 4041.77,
+          "sliding_jaw": 63.219,
+          "band_jaw_1": 210.913,
+          "band_jaw_2": 210.872
+        }
       }
     }
   },
