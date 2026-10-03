@@ -1,0 +1,1 @@
+Superseded dedicated-case V2 concept, preserved before the adjustable-jaw revision. Viewer assets are self-contained. Source is historical; its V1 import path assumes the former cad/versions/v2/source location. Do not regenerate this snapshot in place.

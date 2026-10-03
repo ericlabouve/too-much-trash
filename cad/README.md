@@ -1,5 +1,7 @@
 # R4 — adjustable reacher phone retrofit
 
+This guide describes **Version 1**, preserved at `printed-prototype-checkpoint`. The [versioned viewer](viewer.html) now also includes [Version 2: adjustable jaws, twine and rubber bands](versions/v2/README.md), a separate fit prototype with its own exports and an archived dedicated-cradle concept. V2 does not replace these V1 manufacturing files or accepted prints.
+
 Editable **fit prototype**, based on the [confirmed measurements](reference/measurements.md). Six unique printed designs make seven pieces, down from eleven in R2. One carrier integrates the fixed jaw, rectangular shaft saddle and near-side actuator rail. One sliding jaw accommodates different phone widths and thicknesses; a separate compact rocker module adjusts to the volume-up button on either side. The source and exports are real CadQuery solids. Physical reliability remains to be established.
 
 ![R4 CAD assembly](print/assembly-cad.png)
@@ -144,3 +146,5 @@ Print one each: [neck cap v2](print/fit-trials/neck-fit-v2/neck_cap_fit_v2.stl) 
 User confirmed the v2 printed pair correctly fits the actual grabber. Standard `print/neck_cap.stl` and `print/handle_anchor.stl` now match v2 exactly. The integrated collar in `print/carrier.stl` uses the same opening so the shared cap remains compatible. **Photo width × height: 17.6 × 11.6 mm** (local CAD X/Y: 11.6/17.6 mm). Outside faces, bolt centers and cable stop remain unchanged. Existing successful v2 prints can be used; no reprint is needed.
 
 `collar_reduction_x/y` in `source/parameters.py` records this empirical fit independently from the earlier 14 × 19 mm shaft measurement. The stock shaft remains an illustrative envelope based on that earlier measurement and overlaps the tightened CAD opening; it is not a verified stock-to-clamp clearance model. Reported hand fit does not establish bolted retention or loaded strength. Regenerate standard exports using `source/build.py`; fit-trial exports remain ignored, and `source/build_fit_trial.py` can reproduce them.
+
+Active V2 uses a closed printed shaft clamp and windowed actuator bracket (`screen-clear-r9`), retaining reinforced twine guides and the successful 8×3 thread profile. See [V2 guide dimensions, assembly and current limitations](versions/v2/README.md). Earlier recessed-r3 is preserved in the viewer version selector. V1 files and accepted printed collar fit are unchanged.

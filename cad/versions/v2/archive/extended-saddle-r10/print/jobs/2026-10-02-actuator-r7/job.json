@@ -1,0 +1,87 @@
+{
+  "revision": "thread-8x3-r7",
+  "status": "paused_superseded_by_closed_clamp_r8",
+  "printer_profile": "tmt-a1-mini",
+  "remote_file": "/tmt-actuator-r7-20261002.gcode.3mf",
+  "gcode_md5": "db68248baa8ed2d89c16c05a5d1d8b86",
+  "files": [
+    {
+      "name": "rocker.stl",
+      "quantity": 1,
+      "sha256": "4a9c0c01b1bc5e1e65c28716ca238d3a074df7167ff42a3badcc9f9fe54f68eb"
+    },
+    {
+      "name": "actuator_bracket.stl",
+      "quantity": 1,
+      "sha256": "f14c3f84e30b754d7cace91d0a0bf53144554ae96275f45b1cda3735f3b82e4e"
+    },
+    {
+      "name": "pivot_key.stl",
+      "quantity": 1,
+      "sha256": "f580f3d69493b01280e361ff7c5dad70f4eb2eb5dc2b969515241c34dd97dbbb"
+    },
+    {
+      "name": "string_guide.stl",
+      "quantity": 1,
+      "sha256": "136e5e5c5edf0a62019f7b3545664a2f1cc96698e5b884ec56e42d836e9084df"
+    },
+    {
+      "name": "thumb_screw.stl",
+      "quantity": 1,
+      "sha256": "a9b26b0da7bfad8291103f93eb8ee573f98028e85c52f440d6467df1e86bea1c"
+    }
+  ],
+  "object_settings": {
+    "rocker": {
+      "wall_loops": "5",
+      "sparse_infill_density": "60%",
+      "enable_support": "1",
+      "support_threshold_angle": "20",
+      "layer_height": "0.12"
+    },
+    "actuator_bracket": {
+      "wall_loops": "5",
+      "sparse_infill_density": "40%",
+      "enable_support": "1",
+      "support_threshold_angle": "30",
+      "layer_height": "0.2"
+    },
+    "pivot_key": {
+      "wall_loops": "6",
+      "sparse_infill_density": "100%",
+      "sparse_infill_pattern": "zig-zag",
+      "enable_support": "1",
+      "support_threshold_angle": "30",
+      "layer_height": "0.2"
+    },
+    "string_guide": {
+      "wall_loops": "5",
+      "sparse_infill_density": "40%",
+      "enable_support": "1",
+      "support_threshold_angle": "30",
+      "layer_height": "0.2"
+    },
+    "thumb_screw": {
+      "wall_loops": "2",
+      "sparse_infill_density": "15%",
+      "enable_support": "0",
+      "layer_height": "0.12"
+    }
+  },
+  "estimated_minutes": 181.94,
+  "estimated_grams": 41.67,
+  "bed_check": "User reported cleared bed; current camera shows empty plate.",
+  "material": "Previously confirmed external off-brand PLA+; live external spool selected.",
+  "review": {
+    "layout": "Five separated objects; minimum conservative assigned model/support XY bounding gap 3.519 mm; sampled brim/toolpaths visually reviewed.",
+    "rocker": "Sampled thread-bore layers open; support beside boss/arm, not filling bore.",
+    "slicer_warning_message": "",
+    "diagnostics": "Slicer emitted two ZFiller encounter idx from clip messages; completed successfully. Retained slice.log and reviewed output paths.",
+    "physical_print_verified": false
+  },
+  "print_start_sent": false,
+  "notes": [
+    "User requested pause before print command. No start command sent. Initial upload attempt used a file path where CLI expected a directory and returned FTP 550; retried using uniquely named local file and root destination."
+  ],
+  "superseded_reason": "User requested rigid shaft attachment and lighter bracket. Old uploaded file includes solid r7 bracket. No start command sent."
+}

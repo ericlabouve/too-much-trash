@@ -1,0 +1,130 @@
+# Version 2 — adjustable band-clamped phone mount
+
+**Active revision: closed-clamp-r8.** The carrier now captures the shaft with a rigid split collar and removable printed cap, secured by two successful 8×3 screws and matching nuts. The two shaft-retaining bands are removed; the phone jaws still use two bands. Previous geometry is preserved under [thread-8x3-r7](archive/thread-8x3-r7/). The actuator bracket has two rounded through-windows, reducing its CAD solid volume by **23.0%** while preserving the slots, plate thickness and mechanism interfaces. Matched A1 mini reference slices estimate 29.5 g → 26.1 g including supports (11.4% less filament; about five minutes longer). See [slice comparison](review/bracket-slice-comparison.json). This does not prove unchanged stiffness or strength.
+
+The collar extends toward the handle, ending 4 mm above the modeled blue brace. The first separate string guide moves below that brace to local Z −130 mm; the other two remain at −175 and −300 mm. These are modeled clearances, not measured stock fit.
+
+The nominal shaft opening remains 11.6 × 17.6 mm, now over a 74 mm collar length. Two fasteners are 54 mm apart along the shaft. A 1 mm split gap allows limited take-up; do not force the split faces together. This is a new fit target, not a physically accepted clamp. Remove the actuator module before releasing the collar; after removing both screws, the cap withdraws toward local +Y. The printed fasteners are unchanged and existing successful pairs are reusable.
+
+Individual reference slices estimate about **108 g for the carrier and 20 g for the cap**, including supports. These are additional attachment costs, not a claim that the whole assembly uses less material. The carrier is bed-oriented on a flat lower ear face, with 4.6 mm nominal hole-to-edge material at that flat. See [clamp slice record](review/clamp-slice-review.json).
+
+**Printing remains paused.** The previously uploaded actuator-r7 job contains the superseded solid bracket and must not be started as the current design. Review this revision and prepare a fresh slice before any print.
+
+The original 8×2 and enlarged 12×4 trials failed. The user reported the original-envelope 8×3 trial printed perfectly at 0.12 mm layers, then confirmed the automated reprint succeeded on 2026-10-02. This establishes isolated print success, not assembly strength.
+
+This recessed-rail PLA/PLA+ fit prototype replaces the dedicated cradle with opposing hard jaws and a sliding track inspired by V1. Two rubber bands behind the phone close the jaws. There is no padding, metal hardware, adhesive, TPU or additional string strap. Nine printed designs make eighteen pieces; one continuous twine length and seven rubber bands complete the starting BOM. Restoring adjustment increases printed piece count compared with the earlier dedicated concept.
+
+Open [the viewer](../../viewer.html?version=v2); its official V2 is now the recessed layout. V1 and the [earlier dedicated V2](archive/dedicated-r1/viewer.html) remain available in the version selector. V1's checkpoint is `printed-prototype-checkpoint` (`ade5b54b246ed41e6fefb4f4fcfecef211164ca3`). Original V1 CAD, manufacturing files, hardware BOM and concept renders are unchanged.
+
+## What adjusts
+
+- **Phone width:** the far jaw slides in the carrier track. Two rear bands pull it toward the fixed jaw. The modeled width range is 66–86 mm. Hard rear ledges provide a datum; small front lips retain the thickest modeled envelope. Thin phones have more clearance at these lips, so this is not positive retention in every direction. Grip and resistance to sliding along the phone depend on actual contact and band preload.
+- **Either button side:** both jaws carry the same slotted rail interface. Move the same bracket, rocker and contact screw to the other rail and reverse the module; no mirrored print set is required. The far-side actuator follows the sliding jaw. Both string routes remain behind the phone, with the screen open.
+- **Position along the phone:** loosen the two printed rail nuts and slide the actuator to the button. The checked button centers are 29–65 mm toward the camera end from the middle gripping band. This is a checked envelope, not universal phone compatibility.
+- **Button depth:** vertical slots in the bracket allow movement across the phone's thickness. Four envelopes are displayed: wallet 76 × 152 × 18, illustrative bare 76 × 152 × 8, small 66 × 140 × 7.5, large 86 × 170 × 20 mm. Only the wallet dimensions came from the measured case; the others are geometric examples. Camera protrusions and unusual cases require separate review.
+- **Fine contact gap:** the third printed screw is the rocker’s hard button contact. A nominal 8 mm major diameter, 3 mm pitch custom thread advances 0.1875 mm per 1/16 turn geometrically; this is not a printed accuracy claim. Set a small released gap, then check release and the stop with the actual mechanism. It is a pivoting contact, not a guided linear piston. Do not preload the phone button merely to compensate for a loose clamp.
+
+The rigid collar uses the accepted V1 opening dimensions as a starting point, but its length, closure direction, printed screws and cap are new. The historical 14 × 19 mm shaft proxy still overlaps that smaller opening and is excluded from fit claims. Actual shaft ribs, taper, clamp friction, thread loosening and strength require physical checks. V1 successful prints need no reprint for V1.
+
+## Assembly and motion
+
+Slide the moving jaw into the open track end. Fit two jaw-closing bands onto the paired rear mushroom hooks. Fit the carrier and rigid cap around the shaft, insert two printed screws, and finger-tighten the two nuts evenly. Fit one band at each of the three shaft guides. The bands described by the user as roughly 2–3 cm radius have no measured force specification; wrapping, installed span and preload must be fitted to the actual bands.
+
+Assemble the actuator **off the rail first**. Insert the printed pivot key through the bearing/keyways, rotate its cross-lug and seat its indexed head. Check that it cannot migrate back to the insertion angle. Then clamp the completed actuator to the chosen rail with two printed screws/nuts. Pivot insertion/turning in the installed far-side assembly can hit the carrier track; remove the module before servicing its pivot. Thread the contact screw into the rocker; all three screws use the same print design. Fit the return band between the rocker hook and the fixed return hook; choose a band/preload that gives reliable release.
+
+The twine attaches directly to the rocker's **8 mm tie eye**. Pass the free end through the eye, around its front ligament, and tie the end back onto the standing string to form a closed loop around the printed material. The loop bears on the eye; there is no stopper knot that must be larger than the hole. Tie and inspect the loop while the rocker/bracket is off the rail. The visible brown loop shows its route, not a validated knot topology. Actual knot choice and security depend on the twine. Pass it downward through the bracket's guide, around its rounded underside toward the side guide, through that guide and the neck crossover, then down the three shaft guides. Follow the viewer route for the chosen actuator side. Tie the lower end to the overtravel band around the moving black trigger. No pulley, gear, cable housing or metal cable stop is required in this first arrangement. Smooth eye surfaces and remove support remnants; actual twine diameter/fuzz and drag are not known. A 2 mm line is illustrative, not a measured input.
+
+The **Lever stroke** slider and **Animate squeeze** show squeeze, hold and release in both actuator-side configurations, with a synchronized close-up. The rocker stops after the nominal button press; continued handle motion stretches the separate trigger band. The animation conserves the modeled twine centerline length. It prescribes motion and illustrates slack take-up; it does not predict rubber-band force, twine stretch, friction or real trigger travel. The provisional 0.30 mm button travel is not a safe-force specification.
+
+## Prototype printing
+
+Use the bed-oriented **manufacturing STLs in `print/`**, in millimetres at **100% scale**. `review/` meshes use assembly coordinates and are not print files. The same print set serves both actuator sides and every displayed phone envelope. Individual STEP files in `print/` use the matching bed orientation.
+
+| STL | Copies | Starting PLA+ settings | Support review |
+| --- | ---: | --- | --- |
+| `shaft_cap.stl` | 1 | 5 walls, 40% infill | Split face on bed; removable support under the inner roof. Clear the opening and both fastener holes. |
+| `carrier.stl` | 1 | 5 walls, 35% infill | Supports under rear bridge, track roof and jaw ledges; remove through the open track end. |
+| `sliding_jaw.stl` | 1 | 5 walls, 35% infill | Support tongue/ledges/hooks. Inspect sliding faces after removal. |
+| `actuator_bracket.stl` | 1 | 5 walls, 40% infill | Support guide lug, pivot ears and return hooks. Keep bores and slots open. |
+| `rocker.stl` | 1 | 0.12 mm layers, 5 walls, 60% infill | Thread axis vertical; support the offset arm/pivot boss. Use a 20° support threshold in the reference profile to keep the bore clear; inspect your slice. |
+| `pivot_key.stl` | 1 | 6 walls, 100% infill | Head toward bed; support cross-lug. Inspect axle layer bonding. |
+| `thumb_screw.stl` | 5 | 0.12 mm layers; successful reprint used 2 walls, 15% infill | Head flat on bed, no supports in threads. |
+| `thumb_nut.stl` | 4 | 0.12 mm layers; successful reprint used 2 walls, 15% infill | Flat on bed, no supports. |
+| `string_guide.stl` | 3 | 5 walls, 40% infill | Support eye underside/bridge where needed. |
+
+Baseline: A1 mini, 0.4 mm nozzle, off-brand PLA+. Use **0.12 mm layers for screw, nut and rocker**, and 0.2 mm for the remaining parts. Successful fastener reprint settings included 30/60 mm/s outer/inner walls, 80 mm/s internal solid infill and 100% cooling after initial layers. The successful job record is [here](print/jobs/2026-10-02-thread-pair/job.json). Its 2-wall/15% infill result does not establish retention strength.
+
+Reuse the successful screws/nuts; next check the same screw in the updated rocker using fingers only. Remove supports from the bore, pivot and eyes. Check return, stops and full trigger overtravel off the phone before setting phone contact. No dummy-phone test is required. Grip, collar slip, thread loosening, pivot retention, band/twine wear and camera framing remain physical checks.
+
+The earlier `print/slicer-review.json` and slice images are historical reference slices from before this thread promotion. They do not validate the new screw/nut/rocker exports. Reslice the next batch with the actual A1 mini profile and inspect its toolpaths before sending. The thread axis remains vertical in the bed-oriented rocker; review supports, especially the threaded bore. No print was sent by the promotion step.
+
+## Reproducibility and scope of checks
+
+From repository root: `cad/.venv/bin/python cad/versions/v2/source/build.py`. This writes only active V2 assets. `source/model.py` contains the parametric geometry; `source/build.py` is the BOM/export/check source. Do not rebuild V1 for a V2 edit or regenerate CAD for a viewer-only change.
+
+`review/clamp-revision.json` records unchanged reusable parts, bracket volume reduction, shaft-opening clearance and cap removal. `review/thread-promotion.json` compares the active fasteners with the preserved successful trial and checks helical mating through rotation/translation. `review/validation.json` records connected-solid checks, rigid intersections, phone/camera keepout clearance and eleven rocker positions for four phone envelopes on both sides. Printed threads are real helical geometry. Manufacturing meshes are checked for watertightness, positive volume and bed Z=0. These checks do not establish adequate force, strength, fatigue, glass safety, retention or physical fit. The wallet camera keepout is still a simplified envelope.
+
+## Research and history
+
+The user initially selected dedicated fit, then explicitly superseded that choice with adjustable opposing jaws and either-side actuator mounting on 2026-09-30. The first V2 remains under `archive/dedicated-r1/` with its source, review assets, BOM and working viewer.
+
+Prior research: [Samson rope guidance](https://www.samsonrope.com/warning-statement) motivates smooth rounded guides, [Alliance band terminology](https://www.rubberband.com/about-us/common-rubber-band-terminology/) distinguishes elongation/permanent set, and [Vernier's experiment](https://www.vernier.com/vernier-ideas/elastic-hysteresis-of-a-rubber-band/) shows elastic hysteresis. These do not qualify unknown twine or bands for this assembly. The user's [printed screw example](https://makerworld.com/en/models/1055250-screw-generator-parametric-screws-nuts-washer#profileId-1042636) motivated coarse printed fasteners; its geometry was not copied. [BOSL2 threading documentation](https://github.com/BelfrySCAD/BOSL2/wiki/threading.scad) informed earlier research, not strength qualification.
+
+## Reinforced guides and lower routing — reinforced-r4
+
+The active V2 uses solid D-shaped lugs: a flat attachment side, a semicircular exposed end and a circular **8 mm through-hole**. Both entrances flare to **11 mm**. The lug is **6 mm thick**, with a nominal **5 mm radial wall at the straight bore**, reduced at the flared and rounded edges. This replaces the former 6 mm bore / 3 mm round-section eyes. The rocker tie hole is separate: 6 mm diameter in a 14 mm diameter, 6 mm thick pad. These dimensions improve access and add material; strength remains untested.
+
+The user's twine diameter and fuzz remain unmeasured. Passage checks provisionally use **3 mm twine**; the viewer displays 2 mm. Remove support remnants and smooth the bores before threading. Thread a free end, not a pre-tied knot. The guides are captive once threaded; no snap-open slit is introduced.
+
+The input arm now pulls downward toward the handle, with its return band above it. The string wraps under the first guide, then crosses behind the phone through supported side and neck guides. The neck support is outside the outgoing passage. Jaw-band hooks move away from the camera region. Rails move a further 20 mm toward the handle compared with recessed-r3. These changes preserve either-side mounting and the BOM count, but change six printable designs: carrier, sliding jaw, actuator bracket, rocker, pivot key and shaft guide. The printed screw and nut designs are unchanged.
+
+The previous recessed-r3 source, viewer and exports are preserved in `archive/recessed-r3/` and in the version selector. Raised-r2 and dedicated-r1 remain preserved. The [earlier camera comparison](studies/camera-clearance/viewer.html) describes those historical layouts, not reinforced-r4.
+
+[Current routing and camera sensitivity checks](review/route-validation.json) use 3 mm cylindrical string segments and conservative expanding square view envelopes from an illustrative camera rectangle at Z=22 mm. These are geometric checks, not a solution for tension-dependent string contact or friction. They do not establish actual camera framing: carrier geometry still enters some wider illustrative viewing envelopes. Actual lens position, selected lens and crop remain unknown. Do not call this a camera-clear or mechanically validated print release.
+
+Run `cad/.venv/bin/python cad/versions/v2/source/check_routes.py` after the normal build to reproduce the routing and optical report. Reference slicing remains separate in `source/check_slices.py`.
+
+## Earlier knot access audit — knot-access-r5 (superseded attachment)
+
+An assembly audit found that reinforced-r4 left only 2 mm between the rocker tie pad and the bracket roof. Illustrative stopper knots collided with that roof; the earlier clear-centerline test had not included a knot. That revision is preserved in `archive/reinforced-r4/`. That bracket revision introduced an open fork above the attachment. The return-band support also moves below the free band span, with a single fixed return hook instead of three choices. Only `actuator_bracket.stl` changes from reinforced-r4; use the matching current assembly. No additional printed part or hardware is introduced.
+
+`source/check_attachment.py` checks 8 × 4 mm and 10 × 6 mm cylindrical knot envelopes at eleven stroke positions in all eight configurations. These are assumed envelopes, not measured knots. The audit also checks the illustrative return-band free span through the stroke, excluding a 4 mm radius around its intentional fixed-hook attachment. Band deformation and wrapping are not simulated. The viewer line does not model the internal topology of a real knot. The attachment is intended to be tied while the actuator is off the phone and rail; finger access and actual threading remain physical checks.
+
+Assembly order: put the contact screw into the rocker; thread and tie the rocker end of the twine; assemble the pivot in the loose bracket; fit the return band; thread the free long end down through the first guide, the side guide, neck guide and three shaft guides; mount the actuator and guide saddles; tie the remaining end to the trigger overtravel band and set slack. The fixed-guide turns and two independently adjusted bands make this moderately fiddly, not yet an established easy-assembly design. Do not tighten the contact screw against a phone during off-phone checks.
+
+Physical validation is pending. The following is a short exploratory procedure, not strength certification or a dummy-phone test:
+
+1. **Twine and knot, off the phone:** record approximate twine diameter/material, print material and settings. Check that a free end threads without tools, that the tied loop is secure and stays around the front ligament, and that the rocker reaches both stops without snagging. Do not assume the modeled 2 mm line or the 3 mm clearance-check diameter describes the real twine.
+2. **Friction and return:** pull the actual twine through one finished guide in both directions, then through the complete route. Compare drag and look for fuzz or sharp support remnants. Fit the actual bands and perform 20 slow squeeze/hold/release cycles off the phone, including full intended trigger overtravel. Record any sticking, delayed return, lost knot tension, guide movement or newly abraded fibers. Twenty cycles is an initial screen, not fatigue qualification. The free twine may take a different path from the prescribed animation; observe its real contact points.
+3. **Printed structure:** during those normal-use cycles inspect guide-to-support junctions, pivot ears/key, band hooks and rail clamps for cracking, whitening, layer separation, loosening or permanent deflection. Do not infer a load rating from passing CAD or slicing. A quantitative strength margin requires actual loads and representative material/print measurements; neither is available. Do not perform destructive loading with the phone fitted.
+4. **Camera framing:** first use the actual phone/case and intended video lens/crop while supporting the assembly over a table. Keep the contact screw backed away from the button during this framing check. Inspect all four image edges at rest and while opening/closing the claws and changing normal working angle. Record whether any rail, carrier, guide, band, twine or actuator appears. Repeat only for camera modes you intend to use. The simplified camera footprint and Z=22 mm lens plane do not establish real framing.
+
+The current optical audit has no mount intersections at the assumed 40° half-angle. The small phone envelope intersects the carrier at 50° and 60°; the wallet/bare envelopes intersect it at 60°. The large example is clear in these assumed cases. These are sensitivity results, not measured phone fields of view or a promise of clear footage.
+
+Twine friction cannot be assigned from diameter alone: fiber and construction affect it ([Samson guidance](https://www.samsonrope.com/warning-statement)). Actual PLA layer bonding also depends on print conditions ([Prusa layer-separation guidance](https://help.prusa3d.com/article/layer-separation-and-splitting-fdm_1806)). No generic coefficient or filament strength is substituted for your actual parts here.
+
+## Direct tie-on attachment — active tie-eye-r6
+
+The user rejected the stopper-knot termination. The active rocker now has an 8 mm eye, providing room for two provisional 3 mm string legs. The original 14 mm outer pad and 6 mm axial thickness remain, leaving a nominal 3 mm radial ligament. A closed string loop passes through the eye and around its front edge, with the end tied back onto the standing string. Load transfers through the loop around the printed ligament; knot diameter does not retain the string against the hole.
+
+The bracket provides a front threading opening, and its first guide moves 1 mm lower to clear the loop as the rocker rotates. The rocker and actuator bracket are the two changed printable designs. The earlier stopper attachment is preserved under `archive/knot-access-r5/` and in the version selector. Counts remain eight designs / thirteen pieces, one continuous twine length and nine bands.
+
+In the viewer, **Locate string attachment** highlights the rocker and explains the loop. The visible loop moves with the rocker during the lever animation. Its geometry and knot envelope are schematic, not knot-tying instructions or physical validation. Digital checks use a 3 mm loop and assumed tied-end envelopes, plus the existing free return-band, main string-route and rigid-motion checks. Actual threading, knot security, ligament strength, friction, band return and camera framing remain untested.
+
+The 2026-09-30 thread audit found no need to enlarge the custom 8 mm / 2 mm pitch threads for the 0.4 mm nozzle / 0.2 mm layer baseline. Follow the [current print sequence](print/README.md). The user accepts handle attachment, bands, slack/return and camera framing as post-print checks for this first prototype.
+
+## Original-size trapezoidal thread experiment
+
+User requires the original screw and nut envelopes: 14 mm head diameter ×4 mm thick, 24 mm total screw length, 8 mm shaft outside diameter, 4 mm contact nose, and a nut 18 mm across corners (15.59 mm across flats) ×6 mm thick. Those dimensions are verified on the new exports. The oversized 12×4 trial is preserved as failed history, not the next print.
+
+The new isolated pair uses 3 mm pitch, 0.8 mm radial depth, 0.6 mm crest flat, 45° flanks relative to the plane perpendicular to the screw (90° included angle), and the original 0.30 mm radial clearance. It adds small internal entry chamfers without changing the nut body. This is an FDM-oriented trapezoid, **not standard 29° ACME**. Both earlier profiles were already trapezoidal. The proposed improvement is the gentler overhang, not merely a different thread name. At the new 3 mm pitch the 6 mm nut has two nominal turns, fewer than before; engagement strength remains untested.
+
+[BOSL2 documentation](https://github.com/BelfrySCAD/BOSL2/wiki/threading.scad) defines standard trapezoidal/ACME angles. [Bambu's official A1 mini Fine profile](https://raw.githubusercontent.com/bambulab/BambuStudio/master/resources/profiles/BBL/process/0.12mm%20Fine%20@BBL%20A1M.json) supports 0.12 mm layers with the 0.4 mm nozzle. [Author-published FDM thread profiles](https://github.com/BalzGuenat/CustomThreads) also use customized trapezoids. A [firsthand Bambu A-series discussion](https://forum.bambulab.com/t/thread-printing-problem-on-the-screw/96806) reports similar malformed threads and discusses overhangs, thin layers and cooling; its eventual calibration fix is anecdotal, not a diagnosis for this printer. Some official Bambu wiki pages could not be fetched; no inaccessible content was used as evidence.
+
+The original profile's simple axial-section radial step is about 0.475 mm per 0.2 mm layer; the enlarged trial's is about 0.375 mm. The new 45° flank advances 0.12 mm per 0.12 mm layer. These calculations motivate testing better layer support; they do not prove the cause of the failures or predict successful printing. Detailed assumptions and sources are in the trial's `research.json`.
+
+Next print: one each of `trial_screw_8x3.stl` and `trial_nut_8x3.stl` from `print/thread-trials/original-size-trapezoid-8x3/`. Use A1 mini / 0.4 mm nozzle / 0.12 mm Fine, 100% scale, supplied upright orientation, no supports, 6 walls and 100% Zig-zag infill. Experimental overrides: outer wall 30 mm/s, inner wall 60 mm/s, part cooling 100% after initial layers, and slow down for cooling at 12 seconds per layer. Keep the filament maker's PLA+ temperature range; do not change temperature blindly. These are trial settings, not a Bambu-qualified recipe. The reference slice uses Generic PLA because the exact PLA+ brand/profile is unknown.
+
+Inspect thread formation before checking fit. If threads are still ragged or drooping, stop and inspect the as-printed parts/slicer preview; do not respond by increasing clearance or part size again. If the profiles look intact, check finger-only engagement and reversal. The pair is not compatible with the old 2 mm-pitch screw, nut or rocker. This historical trial subsequently succeeded; its profile is now promoted as thread-8x3-r7.
+
+Reproduce: `cad/.venv/bin/python cad/versions/v2/source/build_fixed_envelope_thread_trial.py`, then `cad/.venv/bin/python cad/versions/v2/source/check_slices.py --print-dir cad/versions/v2/print/thread-trials/original-size-trapezoid-8x3 --a1-mini-threads`.

@@ -1,0 +1,63 @@
+{
+  "revision": "extended-saddle-r10",
+  "status": "completed_print_unusable_for_fit_check",
+  "print_start_sent": true,
+  "start_requested_at": "2026-10-03T02:05:39.381271+00:00",
+  "printer_profile": "tmt-a1-mini",
+  "remote_file": "/tmt-r10-neck-coupon-20261002.gcode.3mf",
+  "plate": 1,
+  "gcode_md5": "bffa2d307f74df628098f48f806fa831",
+  "files": [
+    {
+      "name": "carrier_fit_section",
+      "file": "carrier_fit_section.stl",
+      "quantity": 1,
+      "layer_mm": 0.2,
+      "walls": 5,
+      "infill_percent": 35,
+      "bounds_mm": [
+        20.0,
+        48.79560852050781,
+        12.210810661315918
+      ],
+      "watertight": true,
+      "bed_z_min_mm": 2.220446049250313e-16,
+      "sha256": "209e85f4fb9ae0e1d278790600dd6de4fe170c229653ad9c2ff85006168c1217",
+      "cad_volume_mm3": 6540.26231611926
+    },
+    {
+      "name": "shaft_cap_fit_section",
+      "file": "shaft_cap_fit_section.stl",
+      "quantity": 1,
+      "layer_mm": 0.2,
+      "walls": 5,
+      "infill_percent": 40,
+      "bounds_mm": [
+        20.0,
+        48.79560852050781,
+        10.800000190734863
+      ],
+      "watertight": true,
+      "bed_z_min_mm": 0.0,
+      "sha256": "e3bbb5e6f82508cfa5fd67306735053a231f2f368949157cb202f56cbff6ff8b",
+      "cad_volume_mm3": 5216.904396170968
+    }
+  ],
+  "estimated_minutes": 49.53,
+  "estimated_grams": 13.05,
+  "bed_check": "Recent camera showed empty Textured PEI bed; no print since successful thread pair. User approved this sample.",
+  "material": "Previously confirmed off-brand PLA+; current external PLA spool active.",
+  "full_size_print": "On hold; full-size uploaded file must not be started.",
+  "physical_result": "User reports excessive, difficult-to-remove support and brim; neck-contact surface could not be cleaned. Fit remains untested.",
+  "watch_log": "/private/tmp/tmt-neck-coupon-live.log",
+  "observed_status": {
+    "gcode_state": "RUNNING",
+    "subtask_name": "tmt-r10-neck-coupon-20261002.gcode.3mf",
+    "stage": "heatbed_preheating",
+    "mc_percent": 0,
+    "remaining_time_min": 49,
+    "print_error": 0
+  },
+  "observed_status_note": "observed_status below is historical startup telemetry, not current printer status",
+  "reprint_review": "../../../review/support-failure-rca.md"
+}

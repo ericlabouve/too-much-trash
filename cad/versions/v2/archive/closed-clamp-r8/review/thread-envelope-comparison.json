@@ -1,0 +1,31 @@
+{
+  "carrier": {
+    "max_outer_bound_change_mm": 0.0,
+    "symmetric_difference_mm3": 0
+  },
+  "sliding_jaw": {
+    "max_outer_bound_change_mm": 0.0,
+    "symmetric_difference_mm3": 0
+  },
+  "actuator_bracket": {
+    "max_outer_bound_change_mm": 0.0,
+    "symmetric_difference_mm3": 0
+  },
+  "rocker": {
+    "max_outer_bound_change_mm": 1.0000000000287557e-07
+  },
+  "pivot_key": {
+    "max_outer_bound_change_mm": 0.0,
+    "symmetric_difference_mm3": 0
+  },
+  "thumb_screw": {
+    "max_outer_bound_change_mm": 1.0000000028043132e-07
+  },
+  "thumb_nut": {
+    "max_outer_bound_change_mm": 1.0000000028043132e-07
+  },
+  "string_guide": {
+    "max_outer_bound_change_mm": 0.0,
+    "symmetric_difference_mm3": 0
+  }
+}

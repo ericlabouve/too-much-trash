@@ -218,3 +218,43 @@ User confirmed printing neck_cap + handle_anchor, then reported the 3 mm reducti
 ### Collar v2 accepted as default — 2026-09-28
 
 User reports newly printed v2 parts correctly fit and requests this size as default. Promoted 17.6 mm photo width × 11.6 mm photo height to the standard neck cap, handle anchor and matching carrier collar. Retained outside dimensions and bolt centers. Original 14 × 19 mm shaft measurement is historical, not silently replaced by the nominal printed opening; stock reference geometry remains based on it. Confirmation is of physical fit only, not tightened or loaded retention.
+
+### V2 minimal-material concept — 2026-09-30
+
+User defines the checkpointed current assembly as Version 1 and requests a separately selectable Version 2. V2 is to use only PLA/PLA+, one continuous piece of string/twine and rubber bands; no soft padding, bicycle brake cable or purchased metal hardware. User selected a dedicated fit to the existing wallet-case phone to start. Existing 76 × 152 × 18 mm case and button measurements remain the inputs; no new phone dimensions were measured. Twine is available in any length; its diameter/material is unspecified. Available rubber bands are described as mostly 2–3 cm in radius, not a measured flat length or force/extension specification. V2 geometry and physical performance are unvalidated; V1 accepted fit and prints remain preserved.
+
+### V2 adjustable jaws supersede dedicated fit — 2026-09-30
+
+User rejects phone-specific cradle dimensions and requests V1-inspired opposing jaws closed by rubber bands, rails on both sides for either volume-button location, and adjustable actuator distance/fine contact position. No new phone or band measurements were supplied. Preserve the first dedicated V2 as history. The active model checks widths 66–86 mm and four illustrative thickness/length/button configurations; only the existing wallet-case dimensions are measured. These checks are geometric examples, not physically established compatibility. Printed threaded fasteners, band grip, new open saddle, return and overtravel remain unvalidated. No padding or metal parts are introduced; dummy-phone testing remains declined.
+
+### Recessed V2 rails selected — 2026-09-30
+
+User states that the recessed layout is superior to the earlier raised rails. Record it as the preferred direction for subsequent V2 refinement: the studied long rails move 64 mm toward the handle and 8 mm outward per side. No new measurements or physical results were supplied. Preserve both comparison layouts. Remaining camera-envelope intrusions from hooks, bands, actuator and twine still require work; the preference is not a camera-clear or print-release validation. Existing manufacturing files remain unchanged.
+
+### Recessed V2 promoted to the official viewer — 2026-09-30
+
+User requests that official Version 2 use the selected recessed layout. Promoted the studied geometry into active V2 source, viewer and manufacturing exports as recessed-r3; archived the raised layout as raised-r2. No additional measurements or physical validation were supplied. The three changed print designs are carrier, sliding jaw and actuator bracket. Optical-clearance limitations remain explicitly unresolved.
+
+### 2026-09-30: reinforced V2 twine guides
+
+User requested easier threading at the neck outlet and sturdier guides, suggesting a square with one semicircular edge and a circular through-hole. Reinforced-r4 uses supported D-shaped lugs with an 8 mm throat, 11 mm flared entrances and 6 mm thickness. Nominal straight-bore radial wall is 5 mm. Twine remains unmeasured; 3 mm is a provisional clearance-check diameter, not a supplied measurement. No new physical prints, strength, friction, band performance or camera framing have been validated. Earlier recessed-r3 is archived.
+
+### 2026-09-30: actuator attachment audit
+
+The user asked where the string terminates and whether assembly is too complex, and requested progress on friction, strength and camera framing. No physical test results were provided. Digital audit found only 2 mm above the reinforced-r4 rocker tie pad, insufficient for the assumed stopper knots. Knot-access-r5 replaces the bracket roof with an open fork and adjusts the released stop for knot clearance. Attachment remains a 6 mm rocker hole; 8 × 4 and 10 × 6 mm knot envelopes are assumptions, not measured knots. Friction, strength and actual camera framing remain pending physical evidence.
+
+### 2026-09-30: direct tie-on endpoint
+
+User explicitly rejected a stopper knot and requested tying the string directly to an endpoint. Tie-eye-r6 uses a loop around the rocker eye’s front ligament. Eye diameter becomes 8 mm for the provisional pair of 3 mm string legs; no new twine measurement was supplied. Bracket front access and guide clearance accommodate the loop. This is a design update, not physical validation.
+
+### 2026-09-30: original V2 thread print failed
+
+User reports the original thread did not print properly and attributes this to its fineness. They request larger pitch, thread depth and pitch diameter. Printer, nozzle, layer height and affected threaded part were requested but are not yet confirmed. Preserve the original 8 mm major / 2 mm pitch / 0.8 mm depth geometry as history. The isolated coarse-12x4 trial uses 12 mm major, 10.5 mm nominal pitch diameter, 4 mm pitch, 1.5 mm depth, 1.2 mm axial crest and 0.40 mm female radial clearance, with tapered entries. It has not been physically validated and is not compatible with active assembly slots/rocker. Confirm the trial before propagating interface changes.
+
+### 2026-09-30: enlarged trial failed; preserve original envelopes
+
+User reports excessive material/size for the 12×4 trial and another failed thread print. They require unchanged original outer dimensions and suggest an ACME-like trapezoid. User confirms Bambu Lab A1 mini, 0.4 mm nozzle, 0.2 mm layers, with threads malformed directly from printing rather than merely tight engagement. The new isolated original-size-trapezoid-8x3 trial changes pitch/flanks while restoring original envelopes, keeps 0.30 mm radial clearance, and is sliced at 0.12 mm with slower wall speeds. Physical success remains unknown. Prior profiles were already trapezoidal; standard ACME angles are not represented as an automatic printing improvement.
+
+## End-face r10 coupon feedback
+
+User confirmed the revised 20 mm neck coupon printed successfully and sizing is correct. Preserve the 11.6 × 17.6 mm nominal opening. Single-sided screw tightening makes the two halves diverge into a V-shaped gap. This is a closure/retention defect, not a request to change opening dimensions. The short coupon does not establish full-length or loaded fit. User requests opposing fasteners, potentially four total on the long collar.

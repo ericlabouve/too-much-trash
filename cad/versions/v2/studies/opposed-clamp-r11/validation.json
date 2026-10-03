@@ -1,0 +1,82 @@
+{
+  "wallet-near": {
+    "phone_overlap": {},
+    "camera_overlap": {},
+    "rigid_overlap": {},
+    "sweep": [],
+    "pivot_turn": [],
+    "fastener_shaft_overlap_mm3": {},
+    "clamp_screen_obstruction_mm3": {},
+    "passed": true
+  },
+  "wallet-far": {
+    "phone_overlap": {},
+    "camera_overlap": {},
+    "rigid_overlap": {},
+    "sweep": [],
+    "pivot_turn": [],
+    "fastener_shaft_overlap_mm3": {},
+    "clamp_screen_obstruction_mm3": {},
+    "passed": true
+  },
+  "bare-near": {
+    "phone_overlap": {},
+    "camera_overlap": {},
+    "rigid_overlap": {},
+    "sweep": [],
+    "pivot_turn": [],
+    "fastener_shaft_overlap_mm3": {},
+    "clamp_screen_obstruction_mm3": {},
+    "passed": true
+  },
+  "bare-far": {
+    "phone_overlap": {},
+    "camera_overlap": {},
+    "rigid_overlap": {},
+    "sweep": [],
+    "pivot_turn": [],
+    "fastener_shaft_overlap_mm3": {},
+    "clamp_screen_obstruction_mm3": {},
+    "passed": true
+  },
+  "small-near": {
+    "phone_overlap": {},
+    "camera_overlap": {},
+    "rigid_overlap": {},
+    "sweep": [],
+    "pivot_turn": [],
+    "fastener_shaft_overlap_mm3": {},
+    "clamp_screen_obstruction_mm3": {},
+    "passed": true
+  },
+  "small-far": {
+    "phone_overlap": {},
+    "camera_overlap": {},
+    "rigid_overlap": {},
+    "sweep": [],
+    "pivot_turn": [],
+    "fastener_shaft_overlap_mm3": {},
+    "clamp_screen_obstruction_mm3": {},
+    "passed": true
+  },
+  "large-near": {
+    "phone_overlap": {},
+    "camera_overlap": {},
+    "rigid_overlap": {},
+    "sweep": [],
+    "pivot_turn": [],
+    "fastener_shaft_overlap_mm3": {},
+    "clamp_screen_obstruction_mm3": {},
+    "passed": true
+  },
+  "large-far": {
+    "phone_overlap": {},
+    "camera_overlap": {},
+    "rigid_overlap": {},
+    "sweep": [],
+    "pivot_turn": [],
+    "fastener_shaft_overlap_mm3": {},
+    "clamp_screen_obstruction_mm3": {},
+    "passed": true
+  }
+}

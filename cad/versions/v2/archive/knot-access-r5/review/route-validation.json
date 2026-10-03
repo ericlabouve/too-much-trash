@@ -1,0 +1,92 @@
+{
+  "revision": "knot-access-r5",
+  "assumptions": {
+    "twine_diameter_mm": 3,
+    "camera_lens_plane_z_mm": 22,
+    "camera": "Illustrative rectangle, not measured lenses; expanding square envelopes at 40/50/60 degree half angles",
+    "limitations": "Segmented route clearance only, not a contact, friction, force, wear or physical threading simulation"
+  },
+  "configurations": {
+    "wallet-near": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {},
+        "60": {
+          "carrier": 315.636
+        }
+      }
+    },
+    "wallet-far": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {},
+        "60": {
+          "carrier": 315.636
+        }
+      }
+    },
+    "bare-near": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {},
+        "60": {
+          "carrier": 315.636
+        }
+      }
+    },
+    "bare-far": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {},
+        "60": {
+          "carrier": 315.636
+        }
+      }
+    },
+    "small-near": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {
+          "carrier": 294.429
+        },
+        "60": {
+          "carrier": 1981.305
+        }
+      }
+    },
+    "small-far": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {
+          "carrier": 294.429
+        },
+        "60": {
+          "carrier": 1981.305
+        }
+      }
+    },
+    "large-near": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {},
+        "60": {}
+      }
+    },
+    "large-far": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {},
+        "60": {}
+      }
+    }
+  },
+  "twine_passed": true
+}

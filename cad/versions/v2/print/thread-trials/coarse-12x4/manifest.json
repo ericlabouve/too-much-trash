@@ -1,0 +1,57 @@
+{
+  "status": "Unvalidated coarse thread fit trial; not compatible with current assembly",
+  "units": "mm",
+  "scale_percent": 100,
+  "nozzle_baseline_mm": 0.4,
+  "layer_baseline_mm": 0.2,
+  "major_diameter_mm": 12.0,
+  "core_diameter_mm": 9.0,
+  "nominal_pitch_diameter_mm": 10.5,
+  "pitch_mm": 4.0,
+  "radial_depth_mm": 1.5,
+  "crest_axial_flat_mm": 1.2,
+  "female_radial_clearance_mm": 0.4,
+  "female_minor_diameter_mm": 9.8,
+  "female_groove_diameter_mm": 12.8,
+  "nut_thickness_mm": 12.0,
+  "nominal_nut_turns": 3,
+  "male_shaft_length_mm": 24.0,
+  "assembled_intersection_mm3": 0.0,
+  "parts": [
+    {
+      "name": "trial_screw_12x4",
+      "file": "trial_screw_12x4.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        22.0,
+        21.993162155151367,
+        29.0
+      ],
+      "stl_sha256": "40519b3dcc8dd86d6a898a34974e69b7a9c89dce864ca7213b01a08ec2342f86",
+      "watertight": true,
+      "valid_single_solid": true
+    },
+    {
+      "name": "trial_nut_12x4",
+      "file": "trial_nut_12x4.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        24.0,
+        20.784608840942383,
+        12.0
+      ],
+      "stl_sha256": "ba89078b98f3be318fe88cd78252dec43783fe9054de8b5fe6436b6572b31d1b",
+      "watertight": true,
+      "valid_single_solid": true
+    }
+  ],
+  "physical_fit_verified": false,
+  "remaining": "Print this pair first; confirm fit before enlarging active rocker, rail slots, bracket and fasteners.",
+  "physical_feedback": {
+    "result": "User reports malformed threads and excessive overall size/material; this trial is superseded.",
+    "printer": "Bambu Lab A1 mini",
+    "nozzle_mm": 0.4,
+    "layer_mm": 0.2,
+    "next": "../original-size-trapezoid-8x3/"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "revision": "reinforced-r4",
+  "status": "Assembly access blocker found; no physical validation claimed",
+  "attachment": "6 mm axial hole through rocker input pad; intended tied end is not represented by the viewer centerline",
+  "released_pad_top_z_mm": 21,
+  "bracket_roof_bottom_z_mm": 23,
+  "headroom_mm": 2,
+  "knot_probes": [
+    {
+      "assumed_knot_diameter_mm": 8,
+      "assumed_knot_height_mm": 4,
+      "bracket_intersection_mm3": 100.531
+    },
+    {
+      "assumed_knot_diameter_mm": 10,
+      "assumed_knot_height_mm": 6,
+      "bracket_intersection_mm3": 330.509
+    }
+  ],
+  "route_turns": [
+    {
+      "waypoint": 1,
+      "turn_degrees": 5.7
+    },
+    {
+      "waypoint": 2,
+      "turn_degrees": 90.0
+    },
+    {
+      "waypoint": 3,
+      "turn_degrees": 90.0
+    },
+    {
+      "waypoint": 4,
+      "turn_degrees": 74.7
+    },
+    {
+      "waypoint": 5,
+      "turn_degrees": 89.2
+    },
+    {
+      "waypoint": 6,
+      "turn_degrees": 21.8
+    },
+    {
+      "waypoint": 7,
+      "turn_degrees": 111.8
+    },
+    {
+      "waypoint": 8,
+      "turn_degrees": 32.3
+    },
+    {
+      "waypoint": 9,
+      "turn_degrees": 32.3
+    },
+    {
+      "waypoint": 10,
+      "turn_degrees": 0.0
+    },
+    {
+      "waypoint": 11,
+      "turn_degrees": 11.6
+    }
+  ],
+  "limitations": [
+    "Knot probes are illustrative cylinders, not actual knots",
+    "Clear string centerline is insufficient evidence of attachment access or knot clearance",
+    "Route waypoints are prescribed; free twine may take a different contact path",
+    "No measured friction, force, strength, fatigue or camera framing"
+  ],
+  "next": "Provide accessible knot space or another captive attachment, then repeat knot sweep and physical threading checks before full assembly printing"
+}

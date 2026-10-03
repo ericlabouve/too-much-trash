@@ -1,0 +1,78 @@
+{
+  "status": "User reports latest 8x3 trial printed perfectly with no issues (2026-09-30). Active assembly still uses older 2 mm-pitch threads.",
+  "units": "mm",
+  "scale_percent": 100,
+  "printer": "Bambu Lab A1 mini",
+  "confirmed_nozzle_mm": 0.4,
+  "recommended_layer_mm": 0.12,
+  "major_diameter_mm": 8,
+  "core_diameter_mm": 6.4,
+  "pitch_mm": 3,
+  "radial_depth_mm": 0.8,
+  "crest_axial_flat_mm": 0.6,
+  "flank_angle_from_horizontal_degrees": 45,
+  "included_angle_degrees": 90,
+  "standard_ACME": false,
+  "female_radial_clearance_mm": 0.3,
+  "nut_nominal_turns": 2,
+  "nut_leadin_depth_each_mm": 0.6,
+  "outer_geometry": "Original 14 mm head \u00d74 mm, 24 mm total screw, 4 mm contact nose; nut 18 mm corners \u00d76 mm thick. Thread OD stays 8 mm.",
+  "mating_sweep": [
+    {
+      "rotation_degrees": 0,
+      "intersection_mm3": 0.0
+    },
+    {
+      "rotation_degrees": 90,
+      "intersection_mm3": 0.0
+    },
+    {
+      "rotation_degrees": 180,
+      "intersection_mm3": 0.0
+    },
+    {
+      "rotation_degrees": 270,
+      "intersection_mm3": 0.0
+    }
+  ],
+  "parts": [
+    {
+      "name": "trial_screw_8x3",
+      "file": "trial_screw_8x3.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        14.0,
+        13.995648384094238,
+        24.0
+      ],
+      "original_envelope_verified": true,
+      "volume_mm3": 1368.2785896143157,
+      "stl_sha256": "dd9df4eb63d102adff7b7a59b1f76ff9da6a245e69254b20afe082bbfe257241",
+      "watertight": true
+    },
+    {
+      "name": "trial_nut_8x3",
+      "file": "trial_nut_8x3.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        18.0,
+        15.588457107543945,
+        6.0
+      ],
+      "original_envelope_verified": true,
+      "volume_mm3": 971.8919443469152,
+      "stl_sha256": "309212ff451c03d90509c5494fd0f1d915c39bc5050fb4549ea3730dda0c2c0d",
+      "watertight": true
+    }
+  ],
+  "physical_fit_verified": false,
+  "physical_feedback": {
+    "date": "2026-09-30",
+    "user_report": "The latest print worked perfectly. No issues.",
+    "material": "off-brand PLA+",
+    "printer": "Bambu Lab A1 mini",
+    "nozzle_mm": 0.4,
+    "layer_mm": 0.12,
+    "loaded_assembly_validated": false
+  }
+}

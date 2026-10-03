@@ -1,0 +1,279 @@
+{
+  "status": "Historical comparison; recessed candidate promoted to active V2 recessed-r3. Optical clearance remains unresolved.",
+  "camera_assumptions": {
+    "lens_plane_z_mm": 22,
+    "camera_rectangle": "Existing illustrative camera_keepout footprint; not measured lens centers",
+    "half_angles_degrees": [
+      40,
+      50,
+      60
+    ],
+    "depth_mm": 100,
+    "method": "Expanding square view envelope from every point in the camera rectangle. Intersection signals possible intrusion, not actual pixel obstruction."
+  },
+  "rail_change": {
+    "long_rail_z_current": [
+      60,
+      80
+    ],
+    "long_rail_z_candidate": [
+      -4,
+      16
+    ],
+    "toward_handle_mm": 64,
+    "outward_per_side_mm": 8
+  },
+  "valid_solids": {
+    "carrier": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "sliding_jaw": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "actuator_bracket": {
+      "valid": true,
+      "solid_count": 1
+    }
+  },
+  "mechanical_checks": {
+    "wallet-near": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "passed": true,
+      "fastener_shaft_overlap_mm3": {
+        "rail_screw_1": 0.0,
+        "rail_screw_2": 0.0,
+        "rail_nut_1": 0.0,
+        "rail_nut_2": 0.0
+      }
+    },
+    "wallet-far": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "passed": true,
+      "fastener_shaft_overlap_mm3": {
+        "rail_screw_1": 0.0,
+        "rail_screw_2": 0.0,
+        "rail_nut_1": 0.0,
+        "rail_nut_2": 0.0
+      }
+    },
+    "bare-near": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "passed": true,
+      "fastener_shaft_overlap_mm3": {
+        "rail_screw_1": 0.0,
+        "rail_screw_2": 0.0,
+        "rail_nut_1": 0.0,
+        "rail_nut_2": 0.0
+      }
+    },
+    "bare-far": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "passed": true,
+      "fastener_shaft_overlap_mm3": {
+        "rail_screw_1": 0.0,
+        "rail_screw_2": 0.0,
+        "rail_nut_1": 0.0,
+        "rail_nut_2": 0.0
+      }
+    },
+    "small-near": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "passed": true,
+      "fastener_shaft_overlap_mm3": {
+        "rail_screw_1": 0.0,
+        "rail_screw_2": 0.0,
+        "rail_nut_1": 0.0,
+        "rail_nut_2": 0.0
+      }
+    },
+    "small-far": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "passed": true,
+      "fastener_shaft_overlap_mm3": {
+        "rail_screw_1": 0.0,
+        "rail_screw_2": 0.0,
+        "rail_nut_1": 0.0,
+        "rail_nut_2": 0.0
+      }
+    },
+    "large-near": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "passed": true,
+      "fastener_shaft_overlap_mm3": {
+        "rail_screw_1": 0.0,
+        "rail_screw_2": 0.0,
+        "rail_nut_1": 0.0,
+        "rail_nut_2": 0.0
+      }
+    },
+    "large-far": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "passed": true,
+      "fastener_shaft_overlap_mm3": {
+        "rail_screw_1": 0.0,
+        "rail_screw_2": 0.0,
+        "rail_nut_1": 0.0,
+        "rail_nut_2": 0.0
+      }
+    }
+  },
+  "view_envelope_intersections_mm3": {
+    "wallet-near": {
+      "current": {
+        "40": {
+          "sliding_jaw": 6331.31,
+          "band_jaw_2": 85.03
+        },
+        "50": {
+          "carrier": 1309.27,
+          "sliding_jaw": 8650.45,
+          "actuator_bracket": 775.3,
+          "rail_screw_1": 98.33,
+          "rail_screw_2": 98.33,
+          "twine": 104.5,
+          "band_jaw_2": 191.34
+        },
+        "60": {
+          "carrier": 7888.63,
+          "sliding_jaw": 9900.59,
+          "actuator_bracket": 7304.54,
+          "rail_screw_1": 1302.17,
+          "rail_nut_1": 618.29,
+          "rail_screw_2": 1302.17,
+          "rail_nut_2": 618.29,
+          "twine": 162.87,
+          "band_jaw_2": 214.45
+        }
+      },
+      "candidate": {
+        "40": {
+          "sliding_jaw": 109.87,
+          "band_jaw_2": 85.03
+        },
+        "50": {
+          "carrier": 142.68,
+          "sliding_jaw": 243.3,
+          "actuator_bracket": 356.56,
+          "twine": 104.5,
+          "band_jaw_2": 191.34
+        },
+        "60": {
+          "carrier": 1014.76,
+          "sliding_jaw": 529.94,
+          "actuator_bracket": 636.83,
+          "twine": 162.87,
+          "band_jaw_2": 214.45
+        }
+      },
+      "long_rails_candidate_max_z_mm": 16
+    },
+    "wallet-far": {
+      "current": {
+        "40": {
+          "sliding_jaw": 6331.31,
+          "actuator_bracket": 7376.55,
+          "rocker": 240.45,
+          "rail_screw_1": 1015.29,
+          "rail_nut_1": 149.64,
+          "rail_screw_2": 1015.29,
+          "rail_nut_2": 149.64,
+          "twine": 276.55,
+          "band_jaw_2": 85.03
+        },
+        "50": {
+          "carrier": 1309.27,
+          "sliding_jaw": 8650.45,
+          "actuator_bracket": 11915.76,
+          "rocker": 443.19,
+          "pivot_key": 88.07,
+          "rail_screw_1": 1346.74,
+          "rail_nut_1": 981.79,
+          "rail_screw_2": 1346.74,
+          "rail_nut_2": 981.79,
+          "twine": 326.02,
+          "band_return": 1.77,
+          "band_jaw_2": 191.34
+        },
+        "60": {
+          "carrier": 7888.63,
+          "sliding_jaw": 9900.59,
+          "actuator_bracket": 16507.25,
+          "rocker": 547.62,
+          "pivot_key": 483.29,
+          "rail_screw_1": 1346.74,
+          "rail_nut_1": 983.22,
+          "rail_screw_2": 1346.74,
+          "rail_nut_2": 983.22,
+          "twine": 357.32,
+          "band_return": 9.84,
+          "band_jaw_2": 214.45
+        }
+      },
+      "candidate": {
+        "40": {
+          "sliding_jaw": 109.87,
+          "actuator_bracket": 1967.0,
+          "rocker": 240.45,
+          "twine": 276.55,
+          "band_jaw_2": 85.03
+        },
+        "50": {
+          "carrier": 142.68,
+          "sliding_jaw": 243.3,
+          "actuator_bracket": 2501.9,
+          "rocker": 443.19,
+          "pivot_key": 88.07,
+          "twine": 326.02,
+          "band_return": 1.77,
+          "band_jaw_2": 191.34
+        },
+        "60": {
+          "carrier": 1014.76,
+          "sliding_jaw": 529.94,
+          "actuator_bracket": 3291.4,
+          "rocker": 547.62,
+          "pivot_key": 483.29,
+          "twine": 357.32,
+          "band_return": 9.84,
+          "band_jaw_2": 214.45
+        }
+      },
+      "long_rails_candidate_max_z_mm": 16
+    }
+  },
+  "mechanical_checks_passed": true
+}
