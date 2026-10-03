@@ -5,4 +5,4 @@
 </style></head><body>
 <header><label for="version">Design <select id="version" disabled aria-label="Design version"></select></label><p id="note" role="status">Loading versions…</p></header>
 <iframe id="design" title="Selected Too Much Trash CAD version" allow="fullscreen"></iframe>
-<script type="module" src="version_navigation.js"></script></body></html>
+<script type="module">import(`./version_navigation.js?load=${Date.now()}`);</script></body></html>

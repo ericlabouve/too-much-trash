@@ -15,12 +15,14 @@ const assembly=new THREE.Group(),inventory=new THREE.Group();root.add(assembly,i
 const meshes=new Map(),bomMeshes=new Map();let manifest,mode='phone',selected=null,outline,flipped=false,selectionTargets=[];
 let playing=false,elapsedMs=0,lastFrame=null,lastPoseTime=0,strokeFraction=0,stopFraction=.05;
 let previewRenderer,previewScene,previewCamera,previewRoot;const previewMeshes=new Map();
+const assetLoad=Date.now();
+const freshAsset=path=>{const url=new URL(path,location.href);url.searchParams.set('load',assetLoad);return url.href;};
 const loader=new STLLoader(),raycaster=new THREE.Raycaster();let pointerStart;
 const details={
- phone:['EXTENDED NECK SUPPORT','Longer support. Broader connection.','The 102 mm collar joins the carrier through twin 5 mm webs. Its screw stations are 82 mm apart and sit beside the shaft, off the modeled screen. Loaded strength and grip remain unvalidated. Two rear rubber bands still close the phone jaws. Both jaws have a recessed actuator rail, moved toward the handle. Camera-view clearance is still in progress. Width range 66–86 mm is a geometric envelope, not a qualified phone compatibility list.'],
+ phone:['FOUR-FASTENER CLAMP','Four fasteners. Balanced closure.','The 102 mm collar joins the carrier through twin 5 mm webs. Four screws close the collar: an opposing lower pair and an offset upper pair that clears the actuator. The original end stations remain 82 mm apart, beside the shaft and off the modeled screen. Loaded strength and grip remain unvalidated. Two rear rubber bands still close the phone jaws. Both jaws have a recessed actuator rail, moved toward the handle. Camera-view clearance is still in progress. Width range 66–86 mm is a geometric envelope, not a qualified phone compatibility list.'],
  full:['ONE CONTINUOUS LINE','Keep the twine captive.','Supported D-shaped guides have 8 mm holes with 11 mm flared entrances. The line wraps beneath the actuator guide and crosses behind the phone. The lower end ties to an overtravel band around the moving trigger. Fixed guides are the first hypothesis; no pulleys or gears yet.'],
  actuator:['STRING ATTACHMENT','Tie to the moving rocker.','The string loops through the 8 mm rocker eye and around its front edge, then ties back to itself. The loop grips the printed eye directly. Tie it before mounting the actuator. The visible loop is schematic; actual knot security is untested. One band returns the rocker. A separate band at the trigger absorbs continued squeeze after the printed stop engages. Band selection and end knots allow preload adjustment; forces are not simulated. Move the bracket along either rail, adjust its depth, then turn the contact screw to set the button gap.'],
- bom:['NINE PRINTED DESIGNS','Eighteen pieces. No metal hardware.','Two jaws, rigid shaft cap, windowed bracket, rocker, pivot, five screws, four nuts and three guides. One continuous twine length and seven rubber bands are the starting assembly. Loaded retention remains unvalidated.']
+ bom:['NINE PRINTED DESIGNS','Twenty-two pieces. No metal hardware.','Two jaws, rigid shaft cap, windowed bracket, rocker, pivot, seven screws, six nuts and three guides. One continuous twine length and seven rubber bands are the starting assembly. Loaded retention remains unvalidated.']
 };
 function setDetail(label,title,text){$('#detail-label').textContent=label;$('#detail-title').textContent=title;$('#detail-text').textContent=text;}
 function material(rgb){return new THREE.MeshStandardMaterial({color:new THREE.Color(...rgb),roughness:.7});}
@@ -182,9 +184,9 @@ try{
  const params=new URLSearchParams(location.search);const sample=params.get('sample')||'wallet',side=params.get('side')||'near';const base=sample==='wallet'&&side==='near'?'review/':`review/${sample}-${side}/`;
  $('#sample').value=sample;$('#side').value=side;
  for(const id of ['sample','side'])$('#'+id).onchange=()=>{location.search=new URLSearchParams({sample:$('#sample').value,side:$('#side').value});};
- const response=await fetch(base+'manifest.json');if(!response.ok)throw new Error(`Manifest HTTP ${response.status}`);manifest=await response.json();
+ const response=await fetch(base+'manifest.json',{cache:'no-store'});if(!response.ok)throw new Error(`Manifest HTTP ${response.status}`);manifest=await response.json();
  await Promise.all(manifest.assembly.map(async entry=>{
-  const geometry=await loader.loadAsync(base+entry.file);geometry.computeVertexNormals();
+  const geometry=await loader.loadAsync(freshAsset(base+entry.file));geometry.computeVertexNormals();
   const mesh=new THREE.Mesh(geometry,material(entry.color));mesh.name=entry.name;mesh.userData.bomId=entry.bom_id;meshes.set(entry.name,mesh);assembly.add(mesh);
  }));
  $('#pieces').textContent=manifest.printed_pieces;
@@ -195,7 +197,7 @@ try{
   tr.oncontextmenu=e=>{e.preventDefault();menu(row.id,e);};$('#bom-rows').append(tr);
   let geometry;
   const part=manifest.parts.find(p=>p.name===row.id);
-  if(part)geometry=await loader.loadAsync(base+part.file);
+  if(part)geometry=await loader.loadAsync(freshAsset(base+part.file));
   else if(row.id==='twine')geometry=tube([[0,0,0],[20,20,0],[40,0,0],[60,20,0],[80,0,0]],2);
   else geometry=tube(bandPoints(new THREE.Vector3(0,0,0),new THREE.Vector3(0,50,0),12),1.4);
   geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);geometry.scale(...Array(3).fill(105/Math.max(extent.x,extent.y,extent.z)));
