@@ -53,7 +53,7 @@
       "file": "actuator_bracket.stl",
       "quantity": 1,
       "bounds_mm": [
-        89.0,
+        80.0,
         66.0,
         35.5
       ],

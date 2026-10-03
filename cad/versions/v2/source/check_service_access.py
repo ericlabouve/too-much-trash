@@ -59,16 +59,30 @@ for (sample,base),side in product(SAMPLES.items(),('near','far')):
     target=a[o].translate((0,dy,0)) if o.startswith('rail_screw_') else a[o]
     v=overlap(moving,target)
     if v>.01:hits.append(['module-removal',dx,n,o,round(v,4)])
- # Nuts and module removed. Withdraw both screw envelopes -X.
- # Diameter8 entire shaft deliberately bounds thread crests (nose is smaller).
- for j,y in enumerate((p.button_y-24+dy,p.button_y+24+dy)):
+ # Nuts/module removed: move each screw independently beyond the upper ear.
+ # The continuous rail slot allows this without disassembling the shaft clamp.
+ withdrawal_y=50 if side=='near' else -50
+ screw_ys=(p.button_y-24+dy,p.button_y+24+dy)
+ for j,y in enumerate(screw_ys):
   screw=m.cylinder((12,y,-14),(1,0,0),4,14).union(m.cylinder((16,y,-14),(1,0,0),20,8))
+  shift=withdrawal_y-y
+  for step in range(int(abs(shift))+1):
+   moved_y=step if shift>=0 else -step
+   moving=screw.translate((0,moved_y,0))
+   targets={o:a[o] for o in fixed}
+   if j==0:
+    remaining_y=screw_ys[1]
+    targets['remaining_rail_screw']=m.cylinder((12,remaining_y,-14),(1,0,0),4,14).union(m.cylinder((16,remaining_y,-14),(1,0,0),20,8))
+   for o,target in targets.items():
+    v=overlap(moving,target)
+    if v>.01:hits.append(['individual-rail-screw-slide',moved_y,j+1,o,round(v,4)])
+  screw=screw.translate((0,shift,0))
   for dx in range(25):
    moving=screw.translate((-dx,0,0))
    for o in fixed:
     v=overlap(moving,a[o])
     if v>.01:hits.append(['rail-screw-withdrawal',-dx,j+1,o,round(v,4)])
- report[name]={'near_service_dy_mm':dy,'rail_screw_centers_after_service_shift_y_mm':[p.button_y-24+dy,p.button_y+24+dy],'collisions':hits}
+ report[name]={'near_service_dy_mm':dy,'rail_screw_centers_after_service_shift_y_mm':list(screw_ys),'individual_screw_withdrawal_y_mm':withdrawal_y,'collisions':hits}
  print(name,json.dumps(report[name]),flush=True)
 # Reproduce the straight-withdrawal defect: screw head meets cap after 2.7mm.
 head=m.cylinder((12,5,-14),(1,0,0),4,14)

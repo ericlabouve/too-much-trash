@@ -144,7 +144,7 @@ class Parameters:
     @property
     def string_eye(self): return self.point((33,1.5,24))
     @property
-    def first_guide(self): return self.point((34,0,-55))
+    def first_guide(self): return self.point((34,0,-43))
     @property
     def contact(self): return self.point((self.rest_gap,0,6))
 
@@ -297,8 +297,8 @@ def paired_neck_rail():
 
 # Split opens toward +X after actuator removal; both fasteners stay off the screen.
 # Four fasteners: paired on both sides, below either actuator position.
-# Upper station lowered for the second actuator position; pairs span 44 mm.
-CLAMP_STATIONS=((-25,-32),(25,-76),(25,-32),(-25,-76))
+# Upper station lowered for the second actuator position; pairs span 52 mm.
+CLAMP_STATIONS=((-25,-24),(25,-76),(25,-24),(-25,-76))
 CLAMP_BOTTOM=-86
 CLAMP_TOP=16
 def shaft_clamp_half(p,cap=False):
@@ -413,14 +413,15 @@ def actuator_bracket(p):
     s=s.cut(cylinder((33,0,20.9),(0,0,1),12,12))
     s=s.cut(cylinder((19,-13,18),(0,1,0),26,6.5)).cut(box(14.5,23.5,-13,13,16.9,19.1))
     a=abs(stop_angle(Parameters()));stop=18-21*math.sin(a)-3*math.cos(a)
+    # Functional hard stops: lower limits button-press travel; upper limits return.
     s=s.union(box(38,42,-1.5,1.5,stop-2.4,stop)).union(box(39,42,-1.5,1.5,21,23.4))
     s=s.union(box(38,42,8,21,18,21)).union(box(35,41,17,21,18,31))
     for z in (28,):s=s.union(cylinder((38,14,z),(0,1,0),5,4)).union(cylinder((38,13,z),(0,1,0),1.5,6))
     s=s.union(box(24,25.5,-15,-6,10,13)).union(box(12.5,25.5,-15,-12,11,14.1))
-    # Broad central plate extension supports a full-width base fairlead.
-    # Keep this below the upper collar screws throughout height adjustment.
-    s=s.union(box(42,48,-9,9,-58,-40)).union(box(34,48,-9,9,-58,-52))
-    s=s.union(guide_lug((34,0,-55),p)).cut(guide_hole((34,0,-55),p))
+    # Inset fairlead stays inside the rectangular plate outline in Y/Z.
+    # The matching upper collar screws move to Z -24 for thin-phone clearance.
+    s=s.union(box(34,48,-9,9,-46,-40))
+    s=s.union(guide_lug((34,0,-43),p)).cut(guide_hole((34,0,-43),p))
     # Clearance for the loop around the front of the tie eye.
     s=s.cut(box(30.5,35.5,-11,-3.5,20.8,28))
     return s

@@ -1,10 +1,10 @@
 {
   "revision": "compact-rails-r12",
-  "change": "Remove redundant upper actuator eye and vertical root; integrate the remaining eye into the bottom plate foot.",
+  "change": "Inset the remaining actuator fairlead within the original rectangular plate outline; retain both functional rocker stops.",
   "single_eye_canonical_center_mm": [
     34,
     0,
-    -55
+    -43
   ],
   "bore_mm": 8,
   "flared_mouth_mm": 11,
@@ -18,17 +18,17 @@
       9
     ],
     "z": [
-      -58,
-      -52
+      -46,
+      -40
     ]
   },
-  "integration": "Broad 18 mm-wide central extension joins the plate directly to the full-width base foot. The eye remains below the upper collar screws, rather than flush with the old Z -49 plate edge.",
+  "integration": "Foot projects normal to plate, with its Y/Z footprint inside the original rectangle. No below-plate extension.",
   "first_dual_shaft_guide_station_mm": -190,
   "remaining_original_guide_stations_mm": [
     -230,
     -300
   ],
-  "reason_for_first_station": "Station -190 retained from direct-route clearance refinement; final fairlead is at Z -55, below the upper collar screws. The rejected Z -46 fairlead collided with bare/small upper clamp screws.",
+  "reason_for_first_station": "Station -190 retains direct-route clearance. Upper clamp pair moved from Z -32 to -24 to clear the inset fairlead in every modeled phone configuration.",
   "checks": {
     "bracket_solids": 1,
     "bracket_valid": true,
@@ -42,24 +42,22 @@
     "threshold_mm3": 0.01,
     "bracket_rigid_intersections_mm3": {},
     "bracket_rigid_scope": "All other assembled rigid parts, phone and stock proxies in all eight configurations.",
-    "stroke_status": "Final Z -55 sweep and actual bracket-rigid check both passed all eight configurations in check_twine_stroke.py. Re-run after subsequent geometry changes."
+    "stroke_status": "Final Z -43 sweep and actual bracket-rigid check passed all eight configurations in check_twine_stroke.py."
   },
   "limitations": [
     "Finite geometric samples are not physical friction, force, abrasion or strength validation.",
     "Actual twine and bands remain unmeasured."
   ],
-  "central_plate_extension_mm": {
-    "x": [
-      42,
-      48
-    ],
+  "original_plate_outline_mm": {
     "y": [
-      -9,
-      9
+      -33,
+      33
     ],
     "z": [
-      -58,
-      -40
+      -49,
+      27
     ]
-  }
+  },
+  "upper_clamp_station_z_mm": -24,
+  "clamp_station_separation_mm": 52
 }

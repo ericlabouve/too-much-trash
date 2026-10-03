@@ -10,7 +10,7 @@ Ten designs / twenty-two pieces: carrier ×1, shaft_cap ×1, sliding_jaw ×1, ac
 
 ## Layout and validation
 
-Both actuator positions are beside the shaft on the 160 mm paired rail, now integral with the removable shaft cap. Turn the phone end-for-end for originally outer-edge buttons. The large example shifts 20 mm along the jaws. Four collar screws form opposing pairs at Z −32/−76 mm:44 mm spacing, 102 mm collar. The 11.6 ×17.6 mm opening is unchanged from the accepted short coupon; full-length closure and loaded strength remain unvalidated.
+Both actuator positions are beside the shaft on the 160 mm paired rail, now integral with the removable shaft cap. Turn the phone end-for-end for originally outer-edge buttons. The large example shifts 20 mm along the jaws. Four collar screws form opposing pairs at Z −24/−76 mm:52 mm spacing, 102 mm collar. The 11.6 ×17.6 mm opening is unchanged from the accepted short coupon; full-length closure and loaded strength remain unvalidated.
 
 Read the current [V2 README](../README.md) for the service path and rotated-camera framing concern. The camera keepout is transformed with the phone; expanded rotated viewing envelopes intersect carrier/bands. A clear lens block does not establish a clear image.
 
@@ -23,3 +23,5 @@ Read the current [V2 README](../README.md) for the service path and rotated-came
 - Arrange actual supports and brims within the A1 mini bed; respect its purge areas. Verify nozzle, material, bed, object quantities, warnings and toolpaths. Manufacturing mesh bounds alone are not print approval.
 
 No extra coupon is scheduled. Following layout approval, prepare and review fresh carrier/cap slices first, then the remaining changed jaw. Validate closure with alternating gentle tightening, interface cleanup, cap service, band grip, button alignment, return and actual camera framing before field use.
+
+Inset-guide update: carrier, shaft cap and actuator bracket exports replace the prior Z−32 upper-hole layout. Use these matching parts together; the nominal shaft opening, lower pair and fastener quantities stay unchanged. The bracket’s press/return stop tabs are intentional.

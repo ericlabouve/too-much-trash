@@ -44,7 +44,7 @@
     "flared_mouth_mm": 11,
     "eye_thickness_mm": 6
   },
-  "routing_reason": "Broad-face first eye avoids crossing shaft and blue brace. Station -190 retained for direct-route clamp-screw clearance. Integrated actuator eye remains at canonical Z -55 below upper collar fasteners; transition to original X-negative eyes clears the stock neck corner.",
+  "routing_reason": "First dual eye avoids crossing the shaft and blue brace. Station -190 retains direct-route clearance. Actuator eye is inset at canonical Z -43; upper collar fasteners are at Z -24. Transition to original X-negative eyes clears the stock neck corner.",
   "checks": {
     "configurations_tested": 8,
     "cord_diameter_mm": 3,

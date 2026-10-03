@@ -7,6 +7,7 @@
         25.0,
         73.0
       ],
+      "individual_screw_withdrawal_y_mm": 50,
       "collisions": []
     },
     "wallet-far": {
@@ -15,6 +16,7 @@
         -73.0,
         -25.0
       ],
+      "individual_screw_withdrawal_y_mm": -50,
       "collisions": []
     },
     "bare-near": {
@@ -23,6 +25,7 @@
         25.0,
         73.0
       ],
+      "individual_screw_withdrawal_y_mm": 50,
       "collisions": []
     },
     "bare-far": {
@@ -31,6 +34,7 @@
         -73.0,
         -25.0
       ],
+      "individual_screw_withdrawal_y_mm": -50,
       "collisions": []
     },
     "small-near": {
@@ -39,6 +43,7 @@
         25.0,
         73.0
       ],
+      "individual_screw_withdrawal_y_mm": 50,
       "collisions": []
     },
     "small-far": {
@@ -47,6 +52,7 @@
         -73.0,
         -25.0
       ],
+      "individual_screw_withdrawal_y_mm": -50,
       "collisions": []
     },
     "large-near": {
@@ -55,6 +61,7 @@
         25.0,
         73.0
       ],
+      "individual_screw_withdrawal_y_mm": 50,
       "collisions": []
     },
     "large-far": {
@@ -63,6 +70,7 @@
         -73.0,
         -25.0
       ],
+      "individual_screw_withdrawal_y_mm": -50,
       "collisions": []
     }
   },
