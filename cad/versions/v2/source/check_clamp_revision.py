@@ -4,8 +4,15 @@ import importlib.util,sys,json
 import build as b
 import model as m
 root=Path(__file__).resolve().parents[1]
-spec=importlib.util.spec_from_file_location('r7_reference',root/'archive/thread-8x3-r7/source/model.py')
-old=importlib.util.module_from_spec(spec);sys.modules[spec.name]=old;spec.loader.exec_module(old)
+# Historical baseline is pinned in Git; no duplicate archived source tree required.
+import subprocess,types
+BASELINE_COMMIT='f8f11822459f5e140ed34d06caa46a720999467c'
+BASELINE_PATH='cad/versions/v2/archive/thread-8x3-r7/source/model.py'
+old=types.ModuleType('r7_reference');sys.modules[old.__name__]=old
+# Historical model imports V1 proxies relative to source/model.py.
+old.__file__=str(root/'source/model.py')
+baseline_source=subprocess.check_output(['git','show',BASELINE_COMMIT+':'+BASELINE_PATH],cwd=root,text=True)
+exec(compile(baseline_source,BASELINE_PATH,'exec'),old.__dict__)
 def volume(s):return sum(v.Volume() for v in s.solids().vals())
 def main():
  p=m.Parameters();new=m.parts(p);prior=old.parts(old.Parameters())

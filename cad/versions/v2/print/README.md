@@ -2,7 +2,7 @@
 
 **Full-size printing held for short neck fit test.** See [20 mm fit sample](fit-coupons/neck-r11-opposed-20mm/README.md). The uploaded actuator-r7 job contains the older solid bracket. Do not start it as the current revision; generate and inspect a fresh slice after review.
 
-All manufacturing STLs here are millimetres, 100% scale and bed-oriented. Only carrier and shaft cap change from r10. Sliding jaw, actuator bracket, rocker, pivot key, thumb screw, thumb nut and string guide are unchanged. Preserve the prior collar in `../archive/extended-saddle-r10/`.
+All manufacturing STLs here are millimetres, 100% scale and bed-oriented. Only carrier and shaft cap change from r10. Sliding jaw, actuator bracket, rocker, pivot key, thumb screw, thumb nut and string guide are unchanged. Retrieve the prior collar from Git; see [history](../history.md).
 
 ## Quantities
 

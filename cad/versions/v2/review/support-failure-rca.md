@@ -14,7 +14,7 @@ Approximate positive-extrusion feature analysis: failed pair ~1.36 g supports/in
 
 ## Prepared replacement, not sent
 
-`../print/fit-coupons/neck-r10-endface-r2/` contains the same actual cropped solids, cut end on the bed, neck passage vertical. Nominal 11.6 × 17.6 mm opening and geometry volumes unchanged. Original failed exports remain intact. Build with `cad/.venv/bin/python cad/versions/v2/source/build_neck_fit_coupon.py --end-face` from repository root.
+`../print/fit-coupons/neck-r10-endface-r2/` contains the same actual cropped solids, cut end on the bed, neck passage vertical. Nominal 11.6 × 17.6 mm opening and geometry volumes unchanged. Original failed exports remain intact. Historical generator and source are preserved in commit `f8f11822459f5e140ed34d06caa46a720999467c`; restore that worktree to reproduce r10. Current two-fastener coupons use `source/build_opposed_fit_coupon.py`.
 
 - A1 mini, 0.4 mm nozzle, 0.2 mm layers; three walls, 15% gyroid.
 - No brim or raft. Native Normal (auto), snug, buildplate-only, 0.2 mm top/bottom support gaps, two top interface layers, zero bottom interface layers.

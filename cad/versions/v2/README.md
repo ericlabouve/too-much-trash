@@ -4,7 +4,7 @@
 
 The full 102 mm collar now has four printed screw/nut pairs, two on each side. A directly opposing pair is at local Z −76 mm, Y ±25 mm. The original upper fastener remains at Y −25/Z +6; the added Y +25 fastener is offset to Z −32 to clear the near-side actuator. A symmetric top pair at Z +6 collided with the actuator and was rejected. The original 82 mm end-station span, opening, split gap and carrier webs remain unchanged. This is a geometric solution for testing, not proof that tightening eliminates all flex or establishes a load rating.
 
-Preserve r10 under [extended-saddle-r10](archive/extended-saddle-r10/). Only carrier and shaft-cap geometry change. Existing successful 8×3 screws/nuts remain compatible. Total: nine designs / twenty-two pieces (seven screws, six nuts). Phone jaws remain band-closed.
+Preserve r10 under [extended-saddle-r10](history.md). Only carrier and shaft-cap geometry change. Existing successful 8×3 screws/nuts remain compatible. Total: nine designs / twenty-two pieces (seven screws, six nuts). Phone jaws remain band-closed.
 
 **Next physical check:** [two-fastener lower coupon](print/fit-coupons/neck-r11-opposed-20mm/README.md). Print on its cut end, then tighten both sides alternately in small increments and check that the split stays parallel. Full-size printing remains held pending this check and a new low-waste orientation/slice review. Old full-size uploaded jobs must not be started.
 
@@ -18,7 +18,7 @@ The original 8×2 and enlarged 12×4 trials failed. The user reported the origin
 
 This recessed-rail PLA/PLA+ fit prototype replaces the dedicated cradle with opposing hard jaws and a sliding track inspired by V1. Two rubber bands behind the phone close the jaws. There is no padding, metal hardware, adhesive, TPU or additional string strap. Nine printed designs make twenty-two pieces; one continuous twine length and seven rubber bands complete the starting BOM. Restoring adjustment increases printed piece count compared with the earlier dedicated concept.
 
-Open [the viewer](../../viewer.html?version=v2); its official V2 is now the recessed layout. V1 and the [earlier dedicated V2](archive/dedicated-r1/viewer.html) remain available in the version selector. V1's checkpoint is `printed-prototype-checkpoint` (`ade5b54b246ed41e6fefb4f4fcfecef211164ca3`). Original V1 CAD, manufacturing files, hardware BOM and concept renders are unchanged.
+Open [the viewer](../../viewer.html?version=v2); its official V2 is now the recessed layout. V1 and the [earlier dedicated V2](history.md) are preserved in Git history; the selector contains only V1 and current V2. V1's checkpoint is `printed-prototype-checkpoint` (`ade5b54b246ed41e6fefb4f4fcfecef211164ca3`). Original V1 CAD, manufacturing files, hardware BOM and concept renders are unchanged.
 
 ## What adjusts
 
@@ -73,7 +73,7 @@ From repository root: `cad/.venv/bin/python cad/versions/v2/source/build.py`. Th
 
 ## Research and history
 
-The user initially selected dedicated fit, then explicitly superseded that choice with adjustable opposing jaws and either-side actuator mounting on 2026-09-30. The first V2 remains under `archive/dedicated-r1/` with its source, review assets, BOM and working viewer.
+The user initially selected dedicated fit, then explicitly superseded that choice with adjustable opposing jaws and either-side actuator mounting on 2026-09-30. The first V2 remains in the Git checkpoint at `cad/versions/v2/archive/dedicated-r1/` with its source, review assets, BOM and working viewer.
 
 Prior research: [Samson rope guidance](https://www.samsonrope.com/warning-statement) motivates smooth rounded guides, [Alliance band terminology](https://www.rubberband.com/about-us/common-rubber-band-terminology/) distinguishes elongation/permanent set, and [Vernier's experiment](https://www.vernier.com/vernier-ideas/elastic-hysteresis-of-a-rubber-band/) shows elastic hysteresis. These do not qualify unknown twine or bands for this assembly. The user's [printed screw example](https://makerworld.com/en/models/1055250-screw-generator-parametric-screws-nuts-washer#profileId-1042636) motivated coarse printed fasteners; its geometry was not copied. [BOSL2 threading documentation](https://github.com/BelfrySCAD/BOSL2/wiki/threading.scad) informed earlier research, not strength qualification.
 
@@ -85,7 +85,7 @@ The user's twine diameter and fuzz remain unmeasured. Passage checks provisional
 
 The input arm now pulls downward toward the handle, with its return band above it. The string wraps under the first guide, then crosses behind the phone through supported side and neck guides. The neck support is outside the outgoing passage. Jaw-band hooks move away from the camera region. Rails move a further 20 mm toward the handle compared with recessed-r3. These changes preserve either-side mounting and the BOM count, but change six printable designs: carrier, sliding jaw, actuator bracket, rocker, pivot key and shaft guide. The printed screw and nut designs are unchanged.
 
-The previous recessed-r3 source, viewer and exports are preserved in `archive/recessed-r3/` and in the version selector. Raised-r2 and dedicated-r1 remain preserved. The [earlier camera comparison](studies/camera-clearance/viewer.html) describes those historical layouts, not reinforced-r4.
+The previous recessed-r3 source, viewer and exports are preserved in the Git checkpoint at `cad/versions/v2/archive/recessed-r3/` in Git history. Raised-r2 and dedicated-r1 remain preserved. The [earlier camera comparison](history.md) describes those historical layouts, not reinforced-r4.
 
 [Current routing and camera sensitivity checks](review/route-validation.json) use 3 mm cylindrical string segments and conservative expanding square view envelopes from an illustrative camera rectangle at Z=22 mm. These are geometric checks, not a solution for tension-dependent string contact or friction. They do not establish actual camera framing: carrier geometry still enters some wider illustrative viewing envelopes. Actual lens position, selected lens and crop remain unknown. Do not call this a camera-clear or mechanically validated print release.
 
@@ -93,7 +93,7 @@ Run `cad/.venv/bin/python cad/versions/v2/source/check_routes.py` after the norm
 
 ## Earlier knot access audit — knot-access-r5 (superseded attachment)
 
-An assembly audit found that reinforced-r4 left only 2 mm between the rocker tie pad and the bracket roof. Illustrative stopper knots collided with that roof; the earlier clear-centerline test had not included a knot. That revision is preserved in `archive/reinforced-r4/`. That bracket revision introduced an open fork above the attachment. The return-band support also moves below the free band span, with a single fixed return hook instead of three choices. Only `actuator_bracket.stl` changes from reinforced-r4; use the matching current assembly. No additional printed part or hardware is introduced.
+An assembly audit found that reinforced-r4 left only 2 mm between the rocker tie pad and the bracket roof. Illustrative stopper knots collided with that roof; the earlier clear-centerline test had not included a knot. That revision is preserved in the Git checkpoint at `cad/versions/v2/archive/reinforced-r4/`. That bracket revision introduced an open fork above the attachment. The return-band support also moves below the free band span, with a single fixed return hook instead of three choices. Only `actuator_bracket.stl` changes from reinforced-r4; use the matching current assembly. No additional printed part or hardware is introduced.
 
 `source/check_attachment.py` checks 8 × 4 mm and 10 × 6 mm cylindrical knot envelopes at eleven stroke positions in all eight configurations. These are assumed envelopes, not measured knots. The audit also checks the illustrative return-band free span through the stroke, excluding a 4 mm radius around its intentional fixed-hook attachment. Band deformation and wrapping are not simulated. The viewer line does not model the internal topology of a real knot. The attachment is intended to be tied while the actuator is off the phone and rail; finger access and actual threading remain physical checks.
 
@@ -114,7 +114,7 @@ Twine friction cannot be assigned from diameter alone: fiber and construction af
 
 The user rejected the stopper-knot termination. The active rocker now has an 8 mm eye, providing room for two provisional 3 mm string legs. The original 14 mm outer pad and 6 mm axial thickness remain, leaving a nominal 3 mm radial ligament. A closed string loop passes through the eye and around its front edge, with the end tied back onto the standing string. Load transfers through the loop around the printed ligament; knot diameter does not retain the string against the hole.
 
-The bracket provides a front threading opening, and its first guide moves 1 mm lower to clear the loop as the rocker rotates. The rocker and actuator bracket are the two changed printable designs. The earlier stopper attachment is preserved under `archive/knot-access-r5/` and in the version selector. Counts remain eight designs / thirteen pieces, one continuous twine length and nine bands.
+The bracket provides a front threading opening, and its first guide moves 1 mm lower to clear the loop as the rocker rotates. The rocker and actuator bracket are the two changed printable designs. The earlier stopper attachment is preserved in the Git checkpoint at `cad/versions/v2/archive/knot-access-r5/` in Git history. Counts remain eight designs / thirteen pieces, one continuous twine length and nine bands.
 
 In the viewer, **Locate string attachment** highlights the rocker and explains the loop. The visible loop moves with the rocker during the lever animation. Its geometry and knot envelope are schematic, not knot-tying instructions or physical validation. Digital checks use a 3 mm loop and assumed tied-end envelopes, plus the existing free return-band, main string-route and rigid-motion checks. Actual threading, knot security, ligament strength, friction, band return and camera framing remain untested.
 

@@ -12,66 +12,6 @@
       "label": "Version 2 \u00b7 four-fastener neck clamp",
       "viewer": "versions/v2/viewer.html",
       "note": "Opposed lower fasteners and offset upper pair; nominal short-coupon fit accepted, closure and loaded retention pending."
-    },
-    {
-      "id": "v2-extended-r10",
-      "label": "V2 earlier \u00b7 two-fastener long collar",
-      "viewer": "versions/v2/archive/extended-saddle-r10/viewer.html",
-      "note": "Preserved before adding opposing clamp fasteners following physical V-gap feedback."
-    },
-    {
-      "id": "v2-screen-r9",
-      "label": "V2 earlier \u00b7 short screen-clear clamp",
-      "viewer": "versions/v2/archive/screen-clear-r9/viewer.html",
-      "note": "Preserved before extending the saddle and broadening the carrier connection."
-    },
-    {
-      "id": "v2-clamp-r8",
-      "label": "V2 earlier \u00b7 diagonal clamp screws",
-      "viewer": "versions/v2/archive/closed-clamp-r8/viewer.html",
-      "note": "Preserved before relocating the screen-obstructing shaft fastener."
-    },
-    {
-      "id": "v2-thread-r7",
-      "label": "V2 earlier \u00b7 band-held shaft",
-      "viewer": "versions/v2/archive/thread-8x3-r7/viewer.html",
-      "note": "Successful 8\u00d73 thread profile; shaft attachment retained by two bands, superseded by closed clamp."
-    },
-    {
-      "id": "v2-tie-eye-r6",
-      "label": "V2 earlier \u00b7 2 mm-pitch threads",
-      "viewer": "versions/v2/archive/tie-eye-r6/viewer.html",
-      "note": "Preserved direct tie-on layout before the successful 8\u00d73 thread promotion. Old fasteners failed printing."
-    },
-    {
-      "id": "v2-knot-access-r5",
-      "label": "V2 earlier \u00b7 stopper attachment",
-      "viewer": "versions/v2/archive/knot-access-r5/viewer.html",
-      "note": "Preserved stopper-knot concept, superseded by direct tie-on loop."
-    },
-    {
-      "id": "v2-reinforced-r4",
-      "label": "V2 earlier \u00b7 reinforced r4",
-      "viewer": "versions/v2/archive/reinforced-r4/viewer.html",
-      "note": "Preserved before knot-access correction; bracket crowds the intended knot."
-    },
-    {
-      "id": "v2-recessed-r3",
-      "label": "V2 earlier \u00b7 recessed r3",
-      "viewer": "versions/v2/archive/recessed-r3/viewer.html",
-      "note": "Preserved before the reinforced guides and lower twine route."
-    },
-    {
-      "id": "v2-raised",
-      "label": "V2 earlier \u00b7 raised rails",
-      "viewer": "versions/v2/archive/raised-r2/viewer.html",
-      "note": "Preserved adjustable raised-rail prototype; superseded by recessed V2."
-    },
-    {
-      "id": "v2-dedicated",
-      "label": "V2 earlier \u00b7 dedicated cradle",
-      "viewer": "versions/v2/archive/dedicated-r1/viewer.html",
-      "note": "Preserved first V2 concept; superseded by the adjustable two-jaw design."
     }
   ]
 }

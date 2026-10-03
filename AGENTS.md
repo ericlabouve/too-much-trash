@@ -46,6 +46,9 @@ For requests to connect to the Bambu printer, configure a CAD print, or send a p
 
 ## Product versions
 
+**Current history policy (supersedes earlier archive-directory instructions below):** Keep only current V1 and V2 in the working tree and viewer. Preserve earlier V2 revisions through Git commits, not duplicated archive folders. Existing snapshots are recoverable at `f8f11822459f5e140ed34d06caa46a720999467c`; see `cad/versions/v2/history.md`. References below to archive paths describe paths in that historical commit. Keep physical experiment records; do not recreate archive directories for future design changes.
+
+
 The checkpointed R4 prototype is product Version 1 (`printed-prototype-checkpoint`, `ade5b54`). V2 is isolated in `cad/versions/v2/`; the active revision uses adjustable opposing band-clamped jaws and either-side actuator rails using only PLA/PLA+, one continuous twine length, and rubber bands, with no padding or metal hardware. The user reports bands roughly 2–3 cm in radius; force, thickness and twine diameter remain unknown. Do not confuse V1/V2 product versions with earlier R2/R3/R4 revisions. Preserve V1 source, standard exports, BOM and `viewer-v1.html`. Register additional viewers in `cad/versions.json`. Preserve the earlier dedicated V2 under `archive/dedicated-r1/`. V2 `print/` contains bed-oriented fit-prototype exports; `review/` contains visualization meshes. Neither establishes physical validation; its new open saddle is not the accepted V1 collar assembly.
 
 The user selected the recessed rail study as the preferred V2 direction on 2026-09-30. The recessed layout is now promoted to active `cad/versions/v2/source/`, viewer and print exports (recessed-r3). Preserve the raised-rail reference under `cad/versions/v2/archive/raised-r2/`. Camera-view clearance remains unresolved; the comparison study imports the archived raised baseline for reproducibility.
