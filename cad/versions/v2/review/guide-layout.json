@@ -1,56 +1,47 @@
 {
   "revision": "compact-rails-r12",
-  "purpose": "Move fixed-carrier twine crossover inward and support the eyes on one common shelf, clear of both actuator positions and cap removal.",
-  "previous_centers_mm": {
-    "side_eye": [
-      5,
-      -70,
-      -50
+  "supersedes": "Framed carrier crossover preserved at Git checkpoint 0ced78d. User requested complete removal.",
+  "layout": "No fixed-carrier twine eyes or support arm. One continuous line runs from the rocker through upper and lower actuator eyes directly to three shaft-mounted eyes, then to the trigger series band.",
+  "shaft_guide": {
+    "eye_center_local_mm": [
+      0,
+      18,
+      0
     ],
-    "shaft_eye": [
-      -25,
-      -70,
-      -50
-    ]
-  },
-  "current_centers_mm": {
-    "side_eye": [
-      13,
-      -46,
-      -74
+    "opposite_orientation": "Rotate same guide 180 degrees about Z: eye becomes [0,-18,0]; rectangular opening axes are preserved.",
+    "opening_mm": [
+      11.6,
+      17.6
     ],
-    "shaft_eye": [
-      -25,
-      -46,
-      -74
-    ]
-  },
-  "geometry": {
-    "inward_y_translation_mm": 24,
-    "lower_z_translation_mm": 24,
-    "side_eye_x_translation_mm": 8,
     "bore_mm": 8,
     "flared_mouth_mm": 11,
     "eye_thickness_mm": 6,
-    "shared_lower_shelf_depth_mm": 6,
-    "shared_lower_shelf_width_y_mm": 8,
-    "support_rib_thickness_mm": 4,
-    "note": "The new side eye moves 8 mm toward +X to keep the near-side approach clear of the shaft. This is not a uniform reduction in all bounding-box dimensions.",
-    "support": "Upper and lower shelves joined by two 4 mm ribs flanking an open rope passage."
+    "stations_z_mm": [
+      -160,
+      -230,
+      -300
+    ],
+    "retention": "Printed open U saddle with rubber band in perimeter lane; revised band loop surrounds the opening and stays outside the twine bore.",
+    "new_print_required": true
   },
+  "routing_reason": "Previous X-negative guide placement forced a direct line through the collar, shaft and blue brace. Broad-face eyes avoid crossing the neck. First guide moved from -130 to -160 so the direct line clears lower printed clamp screws; remaining stations are evenly spaced.",
   "checks": {
-    "carrier_solid_count": 1,
     "configurations_tested": 8,
     "cord_diameter_mm": 3,
-    "intersection_reporting_threshold_mm3": 0.01,
-    "cord_and_rigid_intersections_reported": {},
-    "scope": "Static cord segments against assembled rigid parts, phone and stock neck; carrier against all other rigid parts including clamp fasteners. Combined parent checks cover service and motion.",
-    "note": "All eight configurations passed again after the final upper-shelf and 4 mm rib completion. Combined parent service and motion checks remain separately authoritative."
+    "threshold_mm3": 0.01,
+    "cord_intersections_reported": {},
+    "targets": "All assembled rigid parts, phone and every stock proxy.",
+    "overtravel_band_diameter_mm": 1.4,
+    "overtravel_band_intersections_reported": {},
+    "overtravel_targets": "Stock neck, blue brace, handle, grip and trigger pivot; intentional trigger attachment excluded.",
+    "shaft_guide_solid_count": 1,
+    "shaft_guide_valid": true,
+    "guide_band_body_intersection_mm3": 0,
+    "guide_band_bore_intersection_mm3": 0
   },
-  "assembly": "Thread shaft-side fixed eye and transverse fixed eye, then the actuator lower guide and upper guide to the rocker tie eye. Large rotated-phone example wraps the positive-Y edge of the lower actuator eye; other samples use its negative-Y edge. No pulley, extra printed part or hardware.",
   "limits": [
-    "Segmented rope path is an illustrative clearance envelope, not a friction/contact solution.",
-    "Actual twine diameter, bend friction, abrasion and slack retention remain unvalidated.",
-    "Printed strength remains unvalidated."
+    "Segmented geometry establishes clearance only, not tension, friction, wear or a force solution.",
+    "The band model is schematic and does not validate rubber-band stretch or holding force.",
+    "Actual threading, retention and loaded assembly remain physically unvalidated."
   ]
 }

@@ -20,7 +20,7 @@ BOM=[
  ('thumb_screw','Coarse printed thumb screw',7,'Four shaft clamps, two rail clamps plus one button contact. 8 mm major / 3 mm pitch; matches successful original-size trial. Existing trial screws can be reused.'),
  ('thumb_nut','Printed clamp nut',6,'Matches successful 8×3 trial nut, including entry lead-ins. Hand-tighten only; loaded retention remains untested.'),
  ('string_guide','Captive shaft guide',3,'Band-held open saddle with reinforced D-shaped lug; 8 mm bore, 11 mm flared mouths. Smooth the twine-contact surfaces.')]]
-BOM += [dict(id='twine',name='One continuous twine length',quantity=1,material='Twine',note='Route behind the phone through closed eyes; leave enough for knots. Display diameter 2 mm is provisional; passage check uses 3 mm, actual twine unknown.'),dict(id='rubber_bands',name='Rubber bands',quantity=7,material='Rubber',note='2 jaw closing + 3 guides + 1 return + 1 trigger overtravel. Actual preload and loop count need fitting.')]
+BOM += [dict(id='twine',name='One continuous twine length',quantity=1,material='Twine',note='Route through the captive actuator eyes directly to broad-face shaft guides; leave enough for knots. Display diameter 2 mm is provisional; passage check uses 3 mm, actual twine unknown.'),dict(id='rubber_bands',name='Rubber bands',quantity=7,material='Rubber',note='2 jaw closing + 3 guides + 1 return + 1 trigger overtravel. Actual preload and loop count need fitting.')]
 SAMPLES={'wallet':Parameters(),'bare':Parameters(phone_thickness=8,button_from_screen=4),'small':Parameters(phone_width=66,phone_length=140,phone_thickness=7.5,button_from_end=99,button_from_screen=3.5),'large':Parameters(phone_width=86,phone_length=170,phone_thickness=20,button_from_end=150,button_from_screen=6)}
 
 def overlap(a,b):
@@ -83,7 +83,7 @@ def export_scene(p,solids,out):
  assy=cq.Assembly(name='V2_adjustable')
  for name,s,col,bid in rows(p,solids):
   file='assembly_'+name+'.stl'
-  shared=name=='carrier' or name.startswith(('stock_','guide_','band_guide_','band_collar_'))
+  shared=name=='carrier' or name.startswith(('stock_','band_collar_'))
   if out!=OUT and shared:
    (out/file).unlink(missing_ok=True);file='../'+file
   else:export(s,out/file)
@@ -92,7 +92,7 @@ def export_scene(p,solids,out):
  if out==OUT:assy.export(str(out/'assembly.step'))
  path,bands,motion=flexible_paths(p);angle=stop_angle(p)
  takeup=math.dist(p.string_eye,p.first_guide)-math.dist(rotate_point(p.string_eye,p,angle),p.first_guide)
- manifest['motion']={**motion,'pivot':p.pivot,'angle':angle,'string_eye':p.string_eye,'string_points':path,'band_paths':bands,'twine_to_stop':takeup,'return_fixed':p.point((38,14,28)),'return_moving':p.point((33,8,18)),'contact':p.contact,'side_sign':p.sign,'phone_point_count':11}
+ manifest['motion']={**motion,'pivot':p.pivot,'angle':angle,'string_eye':p.string_eye,'string_points':path,'band_paths':bands,'twine_to_stop':takeup,'return_fixed':p.point((38,14,28)),'return_moving':p.point((33,8,18)),'contact':p.contact,'side_sign':p.sign,'phone_point_count':len(path)-len(p.guide_stations)}
  save(out/'manifest.json',manifest)
 
 def manufacturing(solids):

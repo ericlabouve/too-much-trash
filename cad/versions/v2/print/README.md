@@ -2,7 +2,7 @@
 
 **Printing is paused for layout review.** The user declined another coupon. Do not send earlier r10/r11 prepared or uploaded jobs as this revision. These are geometric exports, not an approved full-harness slice. Review orientation, support cleanup and low-material settings before submission.
 
-STLs are millimetres, 100% scale and bed-oriented. Carrier, shaft cap, sliding jaw and actuator bracket changed from r11. Rocker, pivot, screw, nut and shaft guide remain reusable. Earlier revisions are in [Git history](../history.md).
+STLs are millimetres, 100% scale and bed-oriented. Carrier, shaft cap, sliding jaw, actuator bracket and string guide changed from r11. Rocker, pivot, screw and nut remain reusable. Print three copies of the revised broad-face string guide. Earlier revisions are in [Git history](../history.md).
 
 ## Quantities
 

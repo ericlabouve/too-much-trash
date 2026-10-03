@@ -15,7 +15,7 @@ def main():
  for name,base in b.SAMPLES.items():
   for side in ('near','far'):
    p=replace(base,side=side);a=m.assembly_parts(p,solids);path,bands,_=m.flexible_paths(p)
-   targets={**a,'phone':m.stock(p)['phone_envelope'],'shaft':m.stock(p)['stock_neck']}
+   targets={**a,'phone':m.stock(p)['phone_envelope'],**{n:s for n,s in m.stock(p).items() if n.startswith('stock_')}}
    hits={}
    for i,(u,v) in enumerate(zip(path,path[1:])):
     cord=m.rod(u,v,3)

@@ -123,7 +123,7 @@ class Parameters:
     rest_gap: float=.35
     button_stroke: float=.30
     series_span_rest: float=80
-    guide_stations: tuple=(-130,-175,-300)
+    guide_stations: tuple=(-160,-230,-300)
     @property
     def phone_left(self): return self.phone_right-self.phone_width
     @property
@@ -186,7 +186,9 @@ def assembly_parts(p,solids):
     for i,(y,z) in enumerate(CLAMP_STATIONS):
         out[f'clamp_screw_{i+1}']=solids['thumb_screw'].rotate((0,0,0),(0,1,0),90).translate((-16,y,z))
         out[f'clamp_nut_{i+1}']=solids['thumb_nut'].rotate((0,0,0),(0,1,0),90).translate((-14,y,z))
-    for i,z in enumerate(p.guide_stations):out[f'guide_{i+1}']=solids['string_guide'].translate((0,0,z))
+    for i,z in enumerate(p.guide_stations):
+        guide=solids['string_guide'] if p.side=='near' else solids['string_guide'].rotate((0,0,0),(0,0,1),180)
+        out[f'guide_{i+1}']=guide.translate((0,0,z))
     return out
 
 
@@ -212,25 +214,18 @@ def stock(p):
 
 
 def flexible_paths(p):
-    trigger=(-42,0,-417);last=(-18,0,p.guide_stations[-1])
+    trigger=(-42,0,-417);last=(0,18 if p.side=='near' else -18,p.guide_stations[-1])
     v=cq.Vector(*trigger).sub(cq.Vector(*last));tail=v.Length-p.series_span_rest
     knot=cq.Vector(*last).add(v.normalized().multiply(tail)).toTuple()
-    face=p.phone_right
-    side_eye=(face+33,-46,-74)
-    side_entry=(face+43,-46,-74)
-    # Thread through the first eye and wrap beneath its radiused outside edge.
-    # These fixed waypoints keep the line clear of the lug; they are kinematic,
-    # not a tension/contact solution. Side-eye entry is aligned with its bore.
     lower_guide=p.point((34,0,-55))
-    under=p.point((34,0,-60))
-    wrap_y=13 if p.button_y < -40 else -11
-    under_out=p.point((34,wrap_y,-60))
-    exit_out=p.point((34,wrap_y,-55))
-    string=[p.string_eye,p.first_guide,lower_guide,under,under_out,exit_out,side_entry,side_eye,(-25,-46,-66),(-25,-46,-74)]+[(-18,0,z) for z in p.guide_stations]+[knot]
+    guide_side=1 if p.side=='near' else -1
+    string=[p.string_eye,p.first_guide,lower_guide]+[(0,guide_side*18,z) for z in p.guide_stations]+[knot]
     bands={'band_return':loop_between(p.point((33,8,18)),p.point((38,14,28)),2),
         'band_overtravel':loop_between(knot,trigger,5)}
     for i,y in enumerate(JAW_BAND_Y):bands[f'band_jaw_{i+1}']=jaw_band(p.phone_left-1,-27,y)
-    for i,z in enumerate(p.guide_stations):bands[f'band_guide_{i+1}']=rounded_band_xy(z,left=-28)
+    for i,z in enumerate(p.guide_stations):
+        pts=shaft_guide_band(z)
+        bands[f'band_guide_{i+1}']=pts if p.side=='near' else [(-x,-y,z) for x,y,z in pts]
     return string,bands,{'trigger_pivot':(-4,0,-416),'trigger_attach':trigger,'trigger_angle':-.48,'tail_length':tail,'series_span_rest':p.series_span_rest}
 
 
@@ -251,7 +246,7 @@ def rows(p,solids):
     out.append(('actuator_context',placed(solids['actuator_bracket'],p),ORANGE,'actuator_bracket'))
     out.append(('stock_neck_context',box(-7,7,-9.5,9.5,-105,85),(.6,.65,.69),None))
     string,bands,motion=flexible_paths(p)
-    out.extend([('twine_phone',polyline(string[:11],p.twine_diameter),TWINE,'twine'),('twine',polyline(string,p.twine_diameter),TWINE,'twine')])
+    out.extend([('twine_phone',polyline(string[:len(string)-len(p.guide_stations)],p.twine_diameter),TWINE,'twine'),('twine',polyline(string,p.twine_diameter),TWINE,'twine')])
     for n,path in bands.items():out.append((n,polyline(path,1.4),BAND,'rubber_bands'))
     return out
 
@@ -346,11 +341,6 @@ def carrier(p):
     s=s.union(box(-32,-22,-10,10,33,38.5))
     for y in JAW_BAND_Y:s=s.union(hook(-27,y,38.3))
     s=s.cut(box(-16,-7,12,17,21,39)).cut(box(-119,-83,-10.2,10.2,21.9,26.1)).cut(box(-5.8,5.8,-8.8,8.8,21,61))
-    # Compact crossover: one shared shelf and two 4 mm ribs flank the rope passage.
-    # Both eyes remain fully threaded and are accessible from opposite sides.
-    s=s.union(box(-19,16,-50,-42,-84,-78).union(box(-19,-16,-50,-42,-84,-71))).union(side_lug((13,-46,-74),p))
-    s=s.union(box(-19,-6,-53,-10,-60,-54).union(box(-19,-6,-53,-49,-84,-54)).union(box(-19,-6,-44,-40,-84,-54))).union(guide_lug((-25,-46,-74),p))
-    s=s.cut(side_hole((13,-46,-74),p)).cut(guide_hole((-25,-46,-74),p))
     s=s.cut(box(-5.8,5.8,-8.8,8.8,-39,65))
 
     return s
@@ -364,9 +354,21 @@ def sliding_jaw(p):
     return s
 
 def guide(p):
-    s=saddle(-7,7,p).union(box(-17,-10,-5,5,-3,3)).union(guide_lug((-18,0,0),p))
-    lane=box(-12,8,-15,15,-2,2).cut(box(-10.4,6.4,-12.9,12.9,-3,3)).cut(box(-30,-10,-6,6,-3,3))
-    return s.cut(lane).cut(guide_hole((-18,0,0),p))
+    # One reusable saddle: rotate 180 degrees about Z for the opposite phone position.
+    # The broad-face eye permits a direct line from the actuator without crossing the neck.
+    s=saddle(-7,7,p).union(guide_lug((0,18,0),p))
+    lane=box(-12,10,-15,29,-2,2).cut(box(-10.4,8.4,-12.9,25.6,-3,3))
+    return s.cut(lane).cut(guide_hole((0,18,0),p))
+
+
+def shaft_guide_band(z):
+    pts=[]
+    for cx,cy,start in ((8.4,25.6,0),(-10.4,25.6,90),(-10.4,-12.9,180),(8.4,-12.9,270)):
+        for i in range(9):
+            a=math.radians(start+i*90/8)
+            pts.append((cx+1.2*math.cos(a),cy+1.2*math.sin(a),z))
+    return pts+[pts[0]]
+
 
 def rocker(p):
     s=box(17,35,-3.5,3.5,16,20).union(cylinder((33,0,15),(0,0,1),6,14))

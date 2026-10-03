@@ -26,10 +26,10 @@
       "quantity": 1,
       "bounds_mm": [
         130.3,
-        89.996,
-        129.0
+        69.991,
+        112.5
       ],
-      "bed_z_min_mm": 9.999999406318238e-08,
+      "bed_z_min_mm": 2.220446049250313e-16,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal."
@@ -123,11 +123,11 @@
       "file": "string_guide.stl",
       "quantity": 3,
       "bounds_mm": [
-        34.296,
-        27.6,
+        20.3,
+        40.8,
         14.0
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": 1.0000000116860974e-07,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Saddle end on bed; support eye underside/bridge if slicer requests."

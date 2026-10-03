@@ -16,7 +16,7 @@ exec(compile(baseline_source,BASELINE_PATH,'exec'),old.__dict__)
 def volume(s):return sum(v.Volume() for v in s.solids().vals())
 def main():
  p=m.Parameters();new=m.parts(p);prior=old.parts(old.Parameters())
- unchanged={n:volume(new[n].cut(prior[n]))+volume(prior[n].cut(new[n])) for n in ('rocker','pivot_key','thumb_screw','thumb_nut','string_guide')}
+ unchanged={n:volume(new[n].cut(prior[n]))+volume(prior[n].cut(new[n])) for n in ('rocker','pivot_key','thumb_screw','thumb_nut')}
  before=volume(prior['actuator_bracket']);after=volume(new['actuator_bracket'])
  # Added lower twine guide is intentional; protect the upper mechanism interfaces.
  added=volume(new['actuator_bracket'].cut(prior['actuator_bracket']))
