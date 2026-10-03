@@ -96,3 +96,9 @@ Active V2 compact-rails-r12 supersedes the r11 layout: user chose end-for-end ph
 R12 compact refinements: jaw bands centered at Y ±6 mm on raised retaining posts. The paired rail is now integral with the removable shaft cap, through a 24 mm-wide ×22 mm-high web. Do not recreate a closed bridge around the stock neck: both halves must install sideways. Bracket gains a lower captive twine guide, so it is a changed manufacturing part. Printed strength and real camera framing remain unvalidated.
 
 The later r12 routing revision removes the carrier’s entire two-eye crossover arm. Use captive actuator guides and three broad-face shaft guides; rotate guides 180 degrees around the shaft for the opposite actuator side. New string-guide prints are required. The earlier framed-guide arrangement is recoverable at `0ced78d`.
+
+Final guide selection requested by user: two exact copies of the original centered-eye `string_guide` plus one `dual_string_guide` nearest the harness, with opposite selectable eyes. Ten printable designs, twenty-two pieces. Do not replace all three with the temporary single-sided broad-face guide.
+
+The actuator bracket now has one guide in a broad bottom foot (bore local 34,0,−55; broad foot and extended central plate root); its redundant upper guide is removed. Shaft guide stations are −190/−230/−300 mm: the first dual-eye position is lowered to clear clamp-screw tips. Modelled cord sweep passes do not validate friction or force.
+
+Pivot insertion correction: original 8.4 mm cross-tab could not pass the round 6.5 mm rocker bore. Rocker now has a 9×2.2 mm keyway in a 12 mm boss. Four-flat pivot head and revised indexing ledge permit aligned insertion, quarter-turn and seating; `check_pivot_assembly.py` checks the complete path plus geometric retention obstructions. Rocker, pivot and bracket are changed parts; only screw/nut thread geometry remains physically print-validated.

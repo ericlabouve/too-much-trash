@@ -1,0 +1,65 @@
+{
+  "revision": "compact-rails-r12",
+  "change": "Remove redundant upper actuator eye and vertical root; integrate the remaining eye into the bottom plate foot.",
+  "single_eye_canonical_center_mm": [
+    34,
+    0,
+    -55
+  ],
+  "bore_mm": 8,
+  "flared_mouth_mm": 11,
+  "foot_bounds_mm": {
+    "x": [
+      34,
+      48
+    ],
+    "y": [
+      -9,
+      9
+    ],
+    "z": [
+      -58,
+      -52
+    ]
+  },
+  "integration": "Broad 18 mm-wide central extension joins the plate directly to the full-width base foot. The eye remains below the upper collar screws, rather than flush with the old Z -49 plate edge.",
+  "first_dual_shaft_guide_station_mm": -190,
+  "remaining_original_guide_stations_mm": [
+    -230,
+    -300
+  ],
+  "reason_for_first_station": "Station -190 retained from direct-route clearance refinement; final fairlead is at Z -55, below the upper collar screws. The rejected Z -46 fairlead collided with bare/small upper clamp screws.",
+  "checks": {
+    "bracket_solids": 1,
+    "bracket_valid": true,
+    "configurations": 8,
+    "cord_diameter_mm": 3,
+    "route_targets": "Every assembled rigid part, phone and all stock proxies.",
+    "route_intersections_mm3": {},
+    "stroke_samples_per_configuration": 11,
+    "stroke": "String-eye endpoint and rocker rotated from rest to mechanical stop; first cord segment tested against moved rocker and all other assembled rigid parts.",
+    "stroke_intersections_mm3": {},
+    "threshold_mm3": 0.01,
+    "bracket_rigid_intersections_mm3": {},
+    "bracket_rigid_scope": "All other assembled rigid parts, phone and stock proxies in all eight configurations.",
+    "stroke_status": "Final Z -55 sweep and actual bracket-rigid check both passed all eight configurations in check_twine_stroke.py. Re-run after subsequent geometry changes."
+  },
+  "limitations": [
+    "Finite geometric samples are not physical friction, force, abrasion or strength validation.",
+    "Actual twine and bands remain unmeasured."
+  ],
+  "central_plate_extension_mm": {
+    "x": [
+      42,
+      48
+    ],
+    "y": [
+      -9,
+      9
+    ],
+    "z": [
+      -58,
+      -40
+    ]
+  }
+}

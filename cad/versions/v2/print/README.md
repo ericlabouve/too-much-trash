@@ -2,11 +2,11 @@
 
 **Printing is paused for layout review.** The user declined another coupon. Do not send earlier r10/r11 prepared or uploaded jobs as this revision. These are geometric exports, not an approved full-harness slice. Review orientation, support cleanup and low-material settings before submission.
 
-STLs are millimetres, 100% scale and bed-oriented. Carrier, shaft cap, sliding jaw, actuator bracket and string guide changed from r11. Rocker, pivot, screw and nut remain reusable. Print three copies of the revised broad-face string guide. Earlier revisions are in [Git history](../history.md).
+STLs are millimetres, 100% scale and bed-oriented. Carrier, shaft cap, sliding jaw, actuator bracket, rocker, pivot key and new dual-eye string guide changed from r11. The successful screw/nut designs remain reusable. The revised rocker and pivot key must be printed together with the updated bracket. Use two exact copies of the original centered-eye string guide and one new dual-eye guide nearest the harness. Earlier revisions are in [Git history](../history.md).
 
 ## Quantities
 
-Nine designs / twenty-two pieces: carrier ×1, shaft_cap ×1, sliding_jaw ×1, actuator_bracket ×1, rocker ×1, pivot_key ×1, thumb_screw ×7, thumb_nut ×6, string_guide ×3. Four screw/nut pairs close the collar; two clamp the actuator; one screw contacts the button. One continuous twine length and seven modeled rubber bands remain. Count retained successful fasteners before making more.
+Ten designs / twenty-two pieces: carrier ×1, shaft_cap ×1, sliding_jaw ×1, actuator_bracket ×1, rocker ×1, pivot_key ×1, thumb_screw ×7, thumb_nut ×6, string_guide ×2, dual_string_guide ×1. Four screw/nut pairs close the collar; two clamp the actuator; one screw contacts the button. One continuous twine length and seven modeled rubber bands remain. Count retained successful fasteners before making more.
 
 ## Layout and validation
 

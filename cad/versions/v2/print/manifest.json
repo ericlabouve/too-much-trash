@@ -55,9 +55,9 @@
       "bounds_mm": [
         89.0,
         66.0,
-        34.0
+        35.5
       ],
-      "bed_z_min_mm": 6.772924150639853e-15,
+      "bed_z_min_mm": -3.3250341871938604e-16,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Broad outside plate toward bed. Support first fairlead, pivot ears and return hooks; remove through open sides."
@@ -67,7 +67,7 @@
       "file": "rocker.stl",
       "quantity": 1,
       "bounds_mm": [
-        22.897,
+        24.195,
         17.499,
         34.0
       ],
@@ -81,11 +81,11 @@
       "file": "pivot_key.stl",
       "quantity": 1,
       "bounds_mm": [
-        9.599,
-        9.598,
+        7.4,
+        8.4,
         25.0
       ],
-      "bed_z_min_mm": -5.327278196484361e-16,
+      "bed_z_min_mm": -3.9424468256615646e-16,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Large head toward bed; support cross-lug. Check layer adhesion and quarter-turn retention."
@@ -121,16 +121,30 @@
     {
       "name": "string_guide",
       "file": "string_guide.stl",
-      "quantity": 3,
+      "quantity": 2,
       "bounds_mm": [
-        20.3,
-        40.8,
+        34.296,
+        27.6,
         14.0
       ],
-      "bed_z_min_mm": 1.0000000116860974e-07,
+      "bed_z_min_mm": 0.0,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Saddle end on bed; support eye underside/bridge if slicer requests."
+    },
+    {
+      "name": "dual_string_guide",
+      "file": "dual_string_guide.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        20.3,
+        57.992,
+        14.0
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Dual-eye saddle, provisional bed orientation; inspect both bores and band lane. Prefer support-free holes and neck mating surfaces in fresh slice review."
     }
   ]
 }

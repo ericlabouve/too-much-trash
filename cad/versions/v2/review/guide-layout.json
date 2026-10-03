@@ -1,47 +1,87 @@
 {
   "revision": "compact-rails-r12",
-  "supersedes": "Framed carrier crossover preserved at Git checkpoint 0ced78d. User requested complete removal.",
-  "layout": "No fixed-carrier twine eyes or support arm. One continuous line runs from the rocker through upper and lower actuator eyes directly to three shaft-mounted eyes, then to the trigger series band.",
-  "shaft_guide": {
-    "eye_center_local_mm": [
-      0,
-      18,
-      0
-    ],
-    "opposite_orientation": "Rotate same guide 180 degrees about Z: eye becomes [0,-18,0]; rectangular opening axes are preserved.",
+  "supersedes": "Carrier crossover preserved at Git checkpoint 0ced78d; first direct-guide iteration preserved at cb9dd3e.",
+  "layout": "No fixed-carrier twine eyes or support arm. One continuous line runs from rocker through one integrated actuator fairlead, selected eye of first dual-eye shaft guide, two original centered-eye shaft guides, then trigger series band.",
+  "guide_types": {
+    "dual_string_guide": {
+      "quantity": 1,
+      "eye_centers_local_mm": [
+        [
+          0,
+          -20,
+          0
+        ],
+        [
+          0,
+          20,
+          0
+        ]
+      ],
+      "station_z_mm": -190,
+      "selection": "Use +Y eye for near phone orientation, -Y eye for far. Guide itself stays in the same orientation.",
+      "new_print_required": true
+    },
+    "string_guide": {
+      "quantity": 2,
+      "eye_center_local_mm": [
+        -18,
+        0,
+        0
+      ],
+      "stations_z_mm": [
+        -230,
+        -300
+      ],
+      "geometry": "Original centered-eye guide restored from 0ced78d; existing matching prints reusable."
+    }
+  },
+  "common_geometry": {
     "opening_mm": [
       11.6,
       17.6
     ],
     "bore_mm": 8,
     "flared_mouth_mm": 11,
-    "eye_thickness_mm": 6,
-    "stations_z_mm": [
-      -160,
-      -230,
-      -300
-    ],
-    "retention": "Printed open U saddle with rubber band in perimeter lane; revised band loop surrounds the opening and stays outside the twine bore.",
-    "new_print_required": true
+    "eye_thickness_mm": 6
   },
-  "routing_reason": "Previous X-negative guide placement forced a direct line through the collar, shaft and blue brace. Broad-face eyes avoid crossing the neck. First guide moved from -130 to -160 so the direct line clears lower printed clamp screws; remaining stations are evenly spaced.",
+  "routing_reason": "Broad-face first eye avoids crossing shaft and blue brace. Station -190 retained for direct-route clamp-screw clearance. Integrated actuator eye remains at canonical Z -55 below upper collar fasteners; transition to original X-negative eyes clears the stock neck corner.",
   "checks": {
     "configurations_tested": 8,
     "cord_diameter_mm": 3,
     "threshold_mm3": 0.01,
     "cord_intersections_reported": {},
-    "targets": "All assembled rigid parts, phone and every stock proxy.",
-    "overtravel_band_diameter_mm": 1.4,
-    "overtravel_band_intersections_reported": {},
-    "overtravel_targets": "Stock neck, blue brace, handle, grip and trigger pivot; intentional trigger attachment excluded.",
-    "shaft_guide_solid_count": 1,
-    "shaft_guide_valid": true,
-    "guide_band_body_intersection_mm3": 0,
-    "guide_band_bore_intersection_mm3": 0
+    "targets": "Every assembled rigid part, phone and all stock proxies.",
+    "actuator_stroke_samples_per_configuration": 11,
+    "actuator_stroke_intersections_reported": {},
+    "dual_guide_body_and_band": "Parent verified one valid solid and zero 1.4 mm band/body overlap."
   },
   "limits": [
-    "Segmented geometry establishes clearance only, not tension, friction, wear or a force solution.",
-    "The band model is schematic and does not validate rubber-band stretch or holding force.",
-    "Actual threading, retention and loaded assembly remain physically unvalidated."
-  ]
+    "Clearance envelopes are not a force, friction, abrasion or tension solution.",
+    "Band retention and actual threading remain physical checks.",
+    "No loaded harness validation or camera framing validation is implied."
+  ],
+  "dual_guide_display_name": "Duel captive guide",
+  "dual_guide_ears": {
+    "centers_mm": [
+      [
+        0,
+        20,
+        0
+      ],
+      [
+        0,
+        -20,
+        0
+      ]
+    ],
+    "rotation_about_z_degrees": [
+      -90,
+      90
+    ],
+    "connection": "Flat faces point inward and join the opposite broad faces of the saddle.",
+    "bore_mm": 8,
+    "flared_mouth_mm": 11,
+    "band_body_intersection_mm3": 0,
+    "solid_count": 1
+  }
 }

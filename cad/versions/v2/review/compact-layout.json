@@ -1,58 +1,122 @@
 {
   "revision": "compact-rails-r12",
   "baseline_commit": "374c882",
-  "changed_parts": {
-    "carrier": {
-      "old_solid_volume_mm3": 82018.68229316853,
-      "new_solid_volume_mm3": 65854.95370868068,
-      "new_bed_oriented_bounds_mm": [
-        130.3000030517578,
-        69.99121856689453,
-        112.5
-      ],
-      "quantity": 1
-    },
+  "parts": {
     "shaft_cap": {
-      "old_solid_volume_mm3": 23109.238337592804,
-      "new_solid_volume_mm3": 40706.12518099802,
-      "new_bed_oriented_bounds_mm": [
+      "old_quantity": 1,
+      "new_quantity": 1,
+      "old_total_solid_mm3": 23109.238337592804,
+      "new_total_solid_mm3": 40706.12518099802,
+      "bounds_mm": [
         102.0,
         160.0,
         21.5
-      ],
-      "quantity": 1
+      ]
+    },
+    "carrier": {
+      "old_quantity": 1,
+      "new_quantity": 1,
+      "old_total_solid_mm3": 82018.68229316853,
+      "new_total_solid_mm3": 65854.95370868068,
+      "bounds_mm": [
+        130.3000030517578,
+        69.99121856689453,
+        112.5
+      ]
     },
     "sliding_jaw": {
-      "old_solid_volume_mm3": 27743.946563231064,
-      "new_solid_volume_mm3": 10407.850305623842,
-      "new_bed_oriented_bounds_mm": [
+      "old_quantity": 1,
+      "new_quantity": 1,
+      "old_total_solid_mm3": 27743.946563231064,
+      "new_total_solid_mm3": 10407.850305623842,
+      "bounds_mm": [
         48.29999923706055,
         20.998992919921875,
         72.0
-      ],
-      "quantity": 1
+      ]
     },
     "actuator_bracket": {
-      "old_solid_volume_mm3": 24205.10419799323,
-      "new_solid_volume_mm3": 25967.662044780915,
-      "new_bed_oriented_bounds_mm": [
+      "old_quantity": 1,
+      "new_quantity": 1,
+      "old_total_solid_mm3": 24205.10419799323,
+      "new_total_solid_mm3": 25034.2445248383,
+      "bounds_mm": [
         89.0,
         66.0,
-        33.99999999999999
-      ],
-      "quantity": 1
+        35.5
+      ]
+    },
+    "rocker": {
+      "old_quantity": 1,
+      "new_quantity": 1,
+      "old_total_solid_mm3": 2092.8869170216253,
+      "new_total_solid_mm3": 2234.047991073218,
+      "bounds_mm": [
+        24.19456958770752,
+        17.49921703338623,
+        33.9999999
+      ]
+    },
+    "pivot_key": {
+      "old_quantity": 1,
+      "new_quantity": 1,
+      "old_total_solid_mm3": 841.7286775037487,
+      "new_total_solid_mm3": 790.0098482117105,
+      "bounds_mm": [
+        7.400000095367432,
+        8.399999618530273,
+        25.0
+      ]
+    },
+    "thumb_screw": {
+      "old_quantity": 7,
+      "new_quantity": 7,
+      "old_total_solid_mm3": 9577.95012730021,
+      "new_total_solid_mm3": 9577.95012730021,
+      "bounds_mm": [
+        14.0,
+        13.995648384094238,
+        24.0
+      ]
+    },
+    "thumb_nut": {
+      "old_quantity": 6,
+      "new_quantity": 6,
+      "old_total_solid_mm3": 5831.351568522987,
+      "new_total_solid_mm3": 5831.351568522987,
+      "bounds_mm": [
+        18.0,
+        15.588457107543945,
+        5.999999899999999
+      ]
     },
     "string_guide": {
-      "old_solid_volume_mm3": 4833.4428478086475,
-      "new_solid_volume_mm3": 4664.557010429376,
-      "new_bed_oriented_bounds_mm": [
+      "old_quantity": 3,
+      "new_quantity": 2,
+      "old_total_solid_mm3": 14500.328543425941,
+      "new_total_solid_mm3": 9666.885695617295,
+      "bounds_mm": [
+        34.29604721069336,
+        27.600000381469727,
+        14.0
+      ]
+    },
+    "dual_string_guide": {
+      "old_quantity": 0,
+      "new_quantity": 1,
+      "old_total_solid_mm3": 0,
+      "new_total_solid_mm3": 5888.1673738231775,
+      "bounds_mm": [
         20.299999237060547,
-        40.79999923706055,
-        13.999999899999999
-      ],
-      "quantity": 3
+        57.992034912109375,
+        14.0
+      ]
     }
   },
-  "combined_solid_volume_change_percent": -8.536699009457376,
-  "note": "Mesh solid volumes weighted by quantities, not sliced filament estimates or measured weights. Slice review remains required."
+  "note": "Solid mesh volume times required quantities; not sliced filament consumption or measured weight.",
+  "total_solid_volume_mm3": {
+    "before": 189921.2172257601,
+    "after": 175991.58632468944
+  },
+  "change_percent": -7.334425876447734
 }

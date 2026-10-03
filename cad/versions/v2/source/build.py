@@ -19,7 +19,8 @@ BOM=[
  ('pivot_key','Quarter-turn pivot key',1,'Printed 6 mm pivot; insert cross-lug through keyway, turn and seat head at index lug.'),
  ('thumb_screw','Coarse printed thumb screw',7,'Four shaft clamps, two rail clamps plus one button contact. 8 mm major / 3 mm pitch; matches successful original-size trial. Existing trial screws can be reused.'),
  ('thumb_nut','Printed clamp nut',6,'Matches successful 8×3 trial nut, including entry lead-ins. Hand-tighten only; loaded retention remains untested.'),
- ('string_guide','Captive shaft guide',3,'Band-held open saddle with reinforced D-shaped lug; 8 mm bore, 11 mm flared mouths. Smooth the twine-contact surfaces.')]]
+ ('dual_string_guide','Duel captive guide',1,'Install nearest the harness; select the eye facing the actuator. Two 8 mm bores with flared entrances.'),
+ ('string_guide','Original centered captive shaft guide',2,'Band-held open saddle with reinforced D-shaped lug; 8 mm bore, 11 mm flared mouths. Smooth the twine-contact surfaces.')]]
 BOM += [dict(id='twine',name='One continuous twine length',quantity=1,material='Twine',note='Route through the captive actuator eyes directly to broad-face shaft guides; leave enough for knots. Display diameter 2 mm is provisional; passage check uses 3 mm, actual twine unknown.'),dict(id='rubber_bands',name='Rubber bands',quantity=7,material='Rubber',note='2 jaw closing + 3 guides + 1 return + 1 trigger overtravel. Actual preload and loop count need fitting.')]
 SAMPLES={'wallet':Parameters(),'bare':Parameters(phone_thickness=8,button_from_screen=4),'small':Parameters(phone_width=66,phone_length=140,phone_thickness=7.5,button_from_end=99,button_from_screen=3.5),'large':Parameters(phone_width=86,phone_length=170,phone_thickness=20,button_from_end=150,button_from_screen=6)}
 
@@ -73,7 +74,7 @@ def check(p,solids):
 
 def export_scene(p,solids,out):
  out.mkdir(parents=True,exist_ok=True)
- manifest={'version':'v2','title':'Recessed adjustable band clamp','revision':'compact-rails-r12','phone_rotation_degrees':180 if p.side=='far' else 0,'phone_center_y_mm':p.phone_center_y,'status':'Recessed fit prototype; camera-view clearance and physical validation pending','parameters':asdict(p),'bom':BOM,'printed_designs':9,'printed_pieces':22,'purchased_hardware':0,'soft_padding':False,'parts':[],'assembly':[]}
+ manifest={'version':'v2','title':'Recessed adjustable band clamp','revision':'compact-rails-r12','phone_rotation_degrees':180 if p.side=='far' else 0,'phone_center_y_mm':p.phone_center_y,'status':'Recessed fit prototype; camera-view clearance and physical validation pending','parameters':asdict(p),'bom':BOM,'printed_designs':10,'printed_pieces':22,'purchased_hardware':0,'soft_padding':False,'parts':[],'assembly':[]}
  for n,s in solids.items():
   file=n+'.stl'
   if out==OUT:export(s,out/file)
@@ -97,8 +98,8 @@ def export_scene(p,solids,out):
 
 def manufacturing(solids):
  out=ROOT/'print';out.mkdir(exist_ok=True)
- rotations={'shaft_cap':('Y',-90),'carrier':('Y',90),'sliding_jaw':('Y',-90),'actuator_bracket':('Y',90),'rocker':('Y',-90),'pivot_key':('X',90),'thumb_screw':('X',180),'thumb_nut':('X',0),'string_guide':('X',0)}
- notes={'shaft_cap':'Cap with integral rail; export orientation provisional. Compare end-on-bed and side orientations in fresh low-waste slice review; keep supports off the neck mating surface.','carrier':'Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal.', 'sliding_jaw':'Compact jaw; export orientation provisional. Inspect tongue, ledge and hooks for overhangs; protect sliding faces and minimize removable supports.', 'actuator_bracket':'Broad outside plate toward bed. Support first fairlead, pivot ears and return hooks; remove through open sides.', 'rocker':'Contact bore vertical. Support offset arm and pivot boss; keep supports out of threaded bore.', 'pivot_key':'Large head toward bed; support cross-lug. Check layer adhesion and quarter-turn retention.', 'thumb_screw':'Head on bed; no support in threads. Fit trial first; do not force.', 'thumb_nut':'Flat on bed; no supports. Fit trial first.', 'string_guide':'Saddle end on bed; support eye underside/bridge if slicer requests.'}
+ rotations={'shaft_cap':('Y',-90),'carrier':('Y',90),'sliding_jaw':('Y',-90),'actuator_bracket':('Y',90),'rocker':('Y',-90),'pivot_key':('X',90),'thumb_screw':('X',180),'thumb_nut':('X',0),'string_guide':('X',0),'dual_string_guide':('X',0)}
+ notes={'dual_string_guide':'Dual-eye saddle, provisional bed orientation; inspect both bores and band lane. Prefer support-free holes and neck mating surfaces in fresh slice review.','shaft_cap':'Cap with integral rail; export orientation provisional. Compare end-on-bed and side orientations in fresh low-waste slice review; keep supports off the neck mating surface.','carrier':'Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal.', 'sliding_jaw':'Compact jaw; export orientation provisional. Inspect tongue, ledge and hooks for overhangs; protect sliding faces and minimize removable supports.', 'actuator_bracket':'Broad outside plate toward bed. Support first fairlead, pivot ears and return hooks; remove through open sides.', 'rocker':'Contact bore vertical. Support offset arm and pivot boss; keep supports out of threaded bore.', 'pivot_key':'Large head toward bed; support cross-lug. Check layer adhesion and quarter-turn retention.', 'thumb_screw':'Head on bed; no support in threads. Fit trial first; do not force.', 'thumb_nut':'Flat on bed; no supports. Fit trial first.', 'string_guide':'Saddle end on bed; support eye underside/bridge if slicer requests.'}
  result=[]
  for n,s in solids.items():
   axis,deg=rotations[n];v=(1,0,0) if axis=='X' else (0,1,0)

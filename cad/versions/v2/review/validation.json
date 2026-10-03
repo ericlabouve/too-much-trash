@@ -35,6 +35,10 @@
     "string_guide": {
       "valid": true,
       "solid_count": 1
+    },
+    "dual_string_guide": {
+      "valid": true,
+      "solid_count": 1
     }
   },
   "configurations": {

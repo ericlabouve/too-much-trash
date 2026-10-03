@@ -12,6 +12,7 @@ Generated from `source/build.py`. 9 designs, 22 printed pieces; zero metal hardw
 | Quarter-turn pivot key | 1 | PLA / PLA+ | Printed 6 mm pivot; insert cross-lug through keyway, turn and seat head at index lug. |
 | Coarse printed thumb screw | 7 | PLA / PLA+ | Four shaft clamps, two rail clamps plus one button contact. 8 mm major / 3 mm pitch; matches successful original-size trial. Existing trial screws can be reused. |
 | Printed clamp nut | 6 | PLA / PLA+ | Matches successful 8×3 trial nut, including entry lead-ins. Hand-tighten only; loaded retention remains untested. |
-| Captive shaft guide | 3 | PLA / PLA+ | Band-held open saddle with reinforced D-shaped lug; 8 mm bore, 11 mm flared mouths. Smooth the twine-contact surfaces. |
-| One continuous twine length | 1 | Twine | Route behind the phone through closed eyes; leave enough for knots. Display diameter 2 mm is provisional; passage check uses 3 mm, actual twine unknown. |
+| Duel captive guide | 1 | PLA / PLA+ | Install nearest the harness; select the eye facing the actuator. Two 8 mm bores with flared entrances. |
+| Original centered captive shaft guide | 2 | PLA / PLA+ | Band-held open saddle with reinforced D-shaped lug; 8 mm bore, 11 mm flared mouths. Smooth the twine-contact surfaces. |
+| One continuous twine length | 1 | Twine | Route through the captive actuator eyes directly to broad-face shaft guides; leave enough for knots. Display diameter 2 mm is provisional; passage check uses 3 mm, actual twine unknown. |
 | Rubber bands | 7 | Rubber | 2 jaw closing + 3 guides + 1 return + 1 trigger overtravel. Actual preload and loop count need fitting. |

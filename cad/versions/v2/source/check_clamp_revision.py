@@ -16,11 +16,13 @@ exec(compile(baseline_source,BASELINE_PATH,'exec'),old.__dict__)
 def volume(s):return sum(v.Volume() for v in s.solids().vals())
 def main():
  p=m.Parameters();new=m.parts(p);prior=old.parts(old.Parameters())
- unchanged={n:volume(new[n].cut(prior[n]))+volume(prior[n].cut(new[n])) for n in ('rocker','pivot_key','thumb_screw','thumb_nut')}
+ unchanged={n:volume(new[n].cut(prior[n]))+volume(prior[n].cut(new[n])) for n in ('thumb_screw','thumb_nut','string_guide')}
  before=volume(prior['actuator_bracket']);after=volume(new['actuator_bracket'])
  # Added lower twine guide is intentional; protect the upper mechanism interfaces.
  added=volume(new['actuator_bracket'].cut(prior['actuator_bracket']))
- protected=m.box(-50,41,-100,100,0,100)
+ protected=m.box(-50,40,-100,100,15,100)
+ # The upper twine eye is removed and the lower indexing ledge revised.
+ # Protect the retained upper mechanism; check_pivot_assembly covers the new ledge.
  mechanism_delta=volume(new['actuator_bracket'].intersect(protected).cut(prior['actuator_bracket']))+volume(prior['actuator_bracket'].intersect(protected).cut(new['actuator_bracket']))
  # Accepted opening is a fit target, not the inconsistent historical stock proxy.
  opening=m.box(-5.8,5.8,-8.8,8.8,m.CLAMP_BOTTOM,m.CLAMP_TOP)
