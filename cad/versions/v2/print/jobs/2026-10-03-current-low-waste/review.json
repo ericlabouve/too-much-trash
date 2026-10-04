@@ -1,6 +1,6 @@
 {
   "status": "prepared_not_uploaded_not_started",
-  "source_commit": "4a8d2798eca0183f113d3478e8a66e5e3306c318",
+  "source_commit": "94751795b4b4532a90a73ed07cb578dd6066b578",
   "printer": "Bambu Lab A1 mini / 0.4 mm nozzle / Textured PEI",
   "slicer_version": "02.07.01.62",
   "existing_printed_inventory": {
@@ -8,9 +8,9 @@
     "thumb_nut": 2
   },
   "new_piece_count": 18,
-  "total_estimated_grams": 144.88388228416443,
-  "total_estimated_minutes": 759.3783203125,
-  "support_grams_from_extrusion": 15.892391162052622,
+  "total_estimated_grams": 138.1460816860199,
+  "total_estimated_minutes": 753.2861979166667,
+  "support_grams_from_extrusion": 10.017263968464654,
   "filament_recipe": "Same 220 C nozzle / 65 C textured plate, 100% cooling after initial layers as successful PLA+ coupon; confirm current spool and plate before starting.",
   "limitations": [
     "Clearances and support cleanup are geometric reviews, not a guarantee of physical removal or fit.",
@@ -20,36 +20,35 @@
   ],
   "plates": [
     {
-      "name": "01-carrier",
+      "name": "01-carrier-neck-contact",
       "parts": [
         [
           "carrier",
-          "end_reverse-sparse",
+          "export-sparse",
           1
         ]
       ],
-      "grams": 55.19896697998047,
-      "minutes": 245.36009114583334,
+      "grams": 48.46116638183594,
+      "minutes": 239.26796875,
       "warning": "",
       "objects": [
         {
-          "bbox": {
-            "depth": 112.5,
-            "height": 130.3000030517578,
-            "width": 69.99121856689453,
-            "x": 55.004390716552734,
-            "y": 33.75,
-            "z": 0.0
-          },
-          "id": 5,
-          "name": "carrier-1.stl",
-          "triangle_count": 4506
+          "area": 2300.809814453125,
+          "bbox": [
+            24.85,
+            55.00439000000001,
+            126.85000000000001,
+            124.99561000000001
+          ],
+          "id": 28,
+          "layer_height": 0.20000000298023224,
+          "name": "carrier-1.stl"
         }
       ],
       "command": [
         "/Applications/BambuStudio.app/Contents/MacOS/BambuStudio",
         "--load-settings",
-        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/machine.json;/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/01-carrier/process.json",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/machine.json;/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/01-carrier-neck-contact/process.json",
         "--load-filaments",
         "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/filament.json",
         "--arrange",
@@ -60,39 +59,39 @@
         "--slice",
         "0",
         "--export-3mf",
-        "01-carrier.gcode.3mf",
+        "01-carrier-neck-contact.gcode.3mf",
         "--outputdir",
-        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/01-carrier",
-        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/01-carrier/carrier-1.stl"
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/01-carrier-neck-contact",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/01-carrier-neck-contact/carrier-1.stl"
       ],
-      "file_sha256": "ec89a56f3a203d6cd3740cfbc9f7334e659d353b0e69379ae6c303ffb4148639",
+      "file_sha256": "258fbbe022e33cb00061d3cf041ae07d394f80575738aa4eaacdd09ff768f6f9",
       "feature_grams": {
-        "Support": 8.173313312374182,
-        "Inner wall": 18.624499105747567,
-        "Outer wall": 9.020373036001368,
-        "Bottom surface": 0.015549909682641999,
-        "Internal solid infill": 5.551022722903895,
-        "Top surface": 1.0449414158957284,
-        "Gap infill": 0.0012451846014017505,
-        "Support transition": 0.4885282802808145,
-        "Support interface": 0.9490578768909965,
-        "Overhang wall": 0.24850164211700873,
-        "Bridge": 2.5034772395386375,
-        "Sparse infill": 6.887030401356458,
-        "Floating vertical shell": 1.6206114421730413
+        "Support": 2.702105076221664,
+        "Inner wall": 18.087671627231256,
+        "Outer wall": 8.75988079915492,
+        "Bottom surface": 0.3401805021026842,
+        "Internal solid infill": 6.710159696776973,
+        "Sparse infill": 6.357416218865872,
+        "Support transition": 0.34897595117690067,
+        "Support interface": 0.6846912485594608,
+        "Overhang wall": 0.07041629424386811,
+        "Bridge": 2.2669114027167594,
+        "Floating vertical shell": 0.7739327690729008,
+        "Gap infill": 0.06443977202818174,
+        "Top surface": 1.2235726896340273
       },
-      "support_grams": 9.610899469545993,
-      "model_grams": 45.51725210001775,
-      "gcode_md5": "7f880c115941612ce3adc72f3bcd1cae",
+      "support_grams": 3.7357722759580256,
+      "model_grams": 44.654581771827445,
+      "gcode_md5": "66deb8a6bc62ca0f38442e5d52126a06",
       "object_extrusion_bounds_xy": {},
       "extrusion_xy_bounds": [
         [
-          55.214,
-          32.0
+          23.1,
+          55.214
         ],
         [
-          124.786,
-          148.0
+          156.921,
+          124.786
         ]
       ],
       "within_bed_with_0_25mm_line_margin": true,
@@ -128,13 +127,13 @@
         "fan_min_speed": "100",
         "fan_max_speed": "100"
       },
-      "max_z": 130.4,
+      "max_z": 112.4,
       "model_object_count": 1,
       "sha256_inputs": {
-        "carrier-1.stl": "ce8334b0f8dbbcf468fd3d0b05a69bc0b1509f69f90ae3e4087559e613d92765"
+        "carrier-1.stl": "038dd4af8e754851abe5ea9d31b259d8aa2e4e4c02a121a38649cfd5fe8c0285"
       },
-      "sliced_file": "cad/exports/2026-10-03-v2-low-waste/01-carrier/01-carrier.gcode.3mf",
-      "layer_preview": "01-carrier-layers.png"
+      "sliced_file": "cad/exports/2026-10-03-v2-low-waste/01-carrier-neck-contact/01-carrier-neck-contact.gcode.3mf",
+      "layer_preview": "01-carrier-neck-contact-layers.png"
     },
     {
       "name": "02-cap-and-jaw",
@@ -1643,5 +1642,12 @@
     "thumb_nut.stl": "78fc48665a63e62b76f8f408ef8f48804022bd901e3e8d6150797a44f551c9bb",
     "pivot_key.stl": "b6be284803b6f86d6923f0a6442d6ddcd5cf3b53cf0ce55bb6de00234bbab665",
     "thumb_screw.stl": "a9b26b0da7bfad8291103f93eb8ee573f98028e85c52f440d6467df1e86bea1c"
+  },
+  "plate_01_orientation_change": {
+    "supersedes": "01-carrier",
+    "active": "01-carrier-neck-contact",
+    "rotation_from_previous_plate_about_Y_degrees": -90,
+    "priority": "Keep supports off sliding track; accept accessible support against static neck-contact face.",
+    "cleanup": "Remove neck-face residue before checking fit."
   }
 }

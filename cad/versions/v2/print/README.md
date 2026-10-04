@@ -27,3 +27,5 @@ No extra coupon is scheduled. Following layout approval, prepare and review fres
 Inset-guide update: carrier, shaft cap and actuator bracket exports replace the prior Z−32 upper-hole layout. Use these matching parts together; the nominal shaft opening, lower pair and fastener quantities stay unchanged. The bracket’s press/return stop tabs are intentional.
 
 Indexing-ledge refinement: the bracket now has a 4 mm-wide outer support joining the upper beam, replacing its thin 1.5 mm connector. Use the refreshed actuator bracket STL. The linked 2026-10-03 low-waste review includes this refinement. Earlier jobs and reference slice estimates do not qualify this revision; physical support removal and assembly fit still require testing.
+
+Plate 01 orientation update: prioritize the fixed jaw’s sliding track finish. The current `01-carrier-neck-contact` job places support against the static neck-contact face and prints the track vertically. It supersedes `01-carrier`; remove support residue from the neck face before checking seating. Other plates are unchanged.
