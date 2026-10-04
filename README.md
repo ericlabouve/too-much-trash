@@ -22,4 +22,6 @@ Orange marks printable retrofit parts; blue marks the stock handle and brace. Th
 
 The [CAD guide](cad/README.md) includes editable models, printable files, a bill of materials and assembly instructions. The [original concept drawings](cad/renders/README.md) are preserved as the project's design history.
 
+The [developer documentation](https://ericlabouve.github.io/too-much-trash/) covers the repository and local setup. The public project website is served by the hosted backend stack.
+
 The aspiration is simple: make it easier to gather honest examples of litter pickup at scale, learn from the awkward attempts as well as the clean ones, and help future robots do more of the work of keeping shared spaces clean.

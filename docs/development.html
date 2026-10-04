@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Development guide for the Too Much Trash research and product project.">
+  <meta name="theme-color" content="#f7f4ed">
+  <title>Development — Too Much Trash</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><div class="shell header-inner"><a class="brand" href="./" aria-label="Too Much Trash developer docs home"><span class="brand-mark" aria-hidden="true">✳</span><span>TOO MUCH TRASH / DOCS</span></a><nav aria-label="Main navigation"><a href="./">Overview</a><a href="development.html" aria-current="page">Development</a><a href="https://github.com/ericlabouve/too-much-trash/tree/main/cad">CAD</a><a href="https://github.com/ericlabouve/too-much-trash/tree/main/ml">Research</a></nav><a class="header-repo" href="https://github.com/ericlabouve/too-much-trash">GitHub <span aria-hidden="true">↗</span></a></div></header>
+  <main id="main" class="shell guide">
+    <p class="kicker">PROJECT GUIDE / FIRST DRAFT</p>
+    <h1>Development</h1>
+    <p class="guide-lead">Too Much Trash spans field capture, a hosted service, review tools, research workflows, and a physical reacher retrofit. Start with the area you want to work on.</p>
+    <div class="guide-note"><strong>Current status</strong><p>This repository is an early scaffold and CAD fit prototype. Capture, authentication, media upload, processing flows, and model training are planned. The printable design has not been physically validated.</p></div>
+    <div class="guide-grid" aria-label="Repository areas">
+      <a href="https://github.com/ericlabouve/too-much-trash/tree/main/cad"><span>01 / HARDWARE</span><h2>CAD retrofit <span aria-hidden="true">↗</span></h2><p>Editable models, measured dimensions, printable exports, assembly notes, and the bill of materials.</p></a>
+      <a href="https://github.com/ericlabouve/too-much-trash/tree/main/ios"><span>02 / CAPTURE</span><h2>iPhone app <span aria-hidden="true">↗</span></h2><p>A dedicated SwiftUI experience for eventual field capture and review.</p></a>
+      <a href="https://github.com/ericlabouve/too-much-trash/tree/main/frontend"><span>03 / REVIEW</span><h2>Browser and desktop <span aria-hidden="true">↗</span></h2><p>Shared interface code, with an Electron shell for desktop use.</p></a>
+      <a href="https://github.com/ericlabouve/too-much-trash/tree/main/backend"><span>04 / SERVICES</span><h2>Hosted stack <span aria-hidden="true">↗</span></h2><p>FastAPI, Caddy, Postgres, MinIO, and Prefect scaffolding for future ingestion and processing.</p></a>
+      <a href="https://github.com/ericlabouve/too-much-trash/tree/main/ml"><span>05 / RESEARCH</span><h2>Model experiments <span aria-hidden="true">↗</span></h2><p>Questions, run records, and future segmentation and classification training.</p></a>
+    </div>
+    <section class="guide-setup" aria-labelledby="setup-title"><p class="kicker">LOCAL PREVIEW</p><h2 id="setup-title">Run the existing stack</h2><p>Copy <code>.env.example</code> to <code>.env</code>, replace the example passwords, and run the Compose stack from the repository root. Caddy serves the public site at <code>/</code>, the browser workspace at <code>/app/</code>, and proxies <code>/api/*</code> to FastAPI. The health endpoint is <code>/api/v1/health</code>.</p><pre><code>cp .env.example .env
+# Edit .env before starting the stack
+docker compose up --build</code></pre><p>For a desktop preview, run <code>npm install</code> and <code>npm run desktop</code> in <code>frontend/</code> while the stack is running. The iOS project is described by <code>ios/project.yml</code> for XcodeGen.</p><p>For full component details, use the <a href="https://github.com/ericlabouve/too-much-trash/blob/main/docs/development.md">development note</a> and the README in each component directory.</p></section>
+  </main>
+  <footer class="site-footer"><div class="shell footer-inner"><span>© Too Much Trash</span><span>Real attempts. Better evidence. Cleaner places.</span><a href="https://github.com/ericlabouve/too-much-trash">GitHub <span aria-hidden="true">↗</span></a></div></footer>
+</body>
+</html>

@@ -13,7 +13,8 @@ function createWindow() {
     }
   });
 
-  window.loadURL(process.env.TMT_SERVER_URL || "http://localhost");
+  const serverUrl = (process.env.TMT_SERVER_URL || "http://localhost").replace(/\/$/, "");
+  window.loadURL(`${serverUrl}/app/`);
 }
 
 app.whenReady().then(() => {
