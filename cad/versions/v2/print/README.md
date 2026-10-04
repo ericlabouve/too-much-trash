@@ -25,3 +25,5 @@ Read the current [V2 README](../README.md) for the service path and rotated-came
 No extra coupon is scheduled. Following layout approval, prepare and review fresh carrier/cap slices first, then the remaining changed jaw. Validate closure with alternating gentle tightening, interface cleanup, cap service, band grip, button alignment, return and actual camera framing before field use.
 
 Inset-guide update: carrier, shaft cap and actuator bracket exports replace the prior Z−32 upper-hole layout. Use these matching parts together; the nominal shaft opening, lower pair and fastener quantities stay unchanged. The bracket’s press/return stop tabs are intentional.
+
+Indexing-ledge refinement: the bracket now has a 4 mm-wide outer support joining the upper beam, replacing its thin 1.5 mm connector. Use the refreshed actuator bracket STL. Existing prepared jobs and reference slice estimates do not qualify this revision; fresh low-waste slicing and support-removal review remain required before sending the next batch.

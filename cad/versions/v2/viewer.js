@@ -13,7 +13,7 @@ const scene=new THREE.Scene();scene.add(new THREE.HemisphereLight(0xffffff,0x8d9
 const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-150,250,180);scene.add(light);
 const camera=new THREE.PerspectiveCamera(35,1,.1,4000),controls=new OrbitControls(camera,canvas);controls.enableDamping=true;
 const viewCube=installViewCube({canvas,camera,controls});
-let marking=false,featureOverlay=null,featureHit=null,stepIndex=-1;const steps=assemblySteps();
+let marking=false,featureOverlay=null,featureHit=null,stepIndex=-1,painting=false,paintLast=null;const featureOverlays=[];let paintTime=0;const steps=assemblySteps();
 const featureLabel=document.createElement('div');featureLabel.className='feature-label';featureLabel.hidden=true;$('#stage').append(featureLabel);
 const root=new THREE.Group();root.rotation.x=-Math.PI/2;scene.add(root);
 const assembly=new THREE.Group(),inventory=new THREE.Group();root.add(assembly,inventory);
@@ -182,18 +182,18 @@ function renderPreview(){
 }
 function pick(e){const r=canvas.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),viewCube.camera);return raycaster.intersectObjects(visibleMeshes(),false).find(h=>h.object.userData.bomId);}
 
-function clearFeature(){if(featureOverlay){featureOverlay.removeFromParent();featureOverlay.geometry.dispose();featureOverlay.material.dispose();featureOverlay=null;}featureHit=null;featureLabel.hidden=true;delete canvas.dataset.feature;}
-function highlightFeature(hit){
- clearSelection();setPlaying(false);featureHit=hit;
+function clearFeature(){for(const overlay of featureOverlays){overlay.removeFromParent();overlay.geometry.dispose();overlay.material.dispose();}featureOverlays.length=0;featureOverlay=null;featureHit=null;featureLabel.hidden=true;delete canvas.dataset.feature;delete canvas.dataset.paintCount;}
+function highlightFeature(hit,append=false){
+ if(!append)clearSelection();setPlaying(false);featureHit=hit;
  const mesh=hit.object,point=mesh.worldToLocal(hit.point.clone()),radiusMm=Number($('#feature-radius').value),radius=radiusMm*(mesh.userData.displayScale||1);
  const g=mesh.geometry,p=g.attributes.position,idx=g.index,verts=[],triangle=new THREE.Triangle(),nearest=new THREE.Vector3();
  // Select actual surface triangles within the brush radius, not the entire STL.
  for(let i=0;i<(idx?idx.count:p.count);i+=3){const ids=[0,1,2].map(j=>idx?idx.getX(i+j):i+j);triangle.set(...ids.map(j=>new THREE.Vector3().fromBufferAttribute(p,j)));triangle.closestPointToPoint(point,nearest);if(nearest.distanceTo(point)<=radius)for(const j of ids)verts.push(p.getX(j),p.getY(j),p.getZ(j));}
  const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
- featureOverlay=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:0x00b7c7,side:THREE.DoubleSide,transparent:true,opacity:.85,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));featureOverlay.material.onBeforeCompile=shader=>{shader.uniforms.featurePoint={value:point};shader.uniforms.featureRadius={value:radius};shader.vertexShader='varying vec3 featurePosition;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nfeaturePosition=position;');shader.fragmentShader='varying vec3 featurePosition; uniform vec3 featurePoint; uniform float featureRadius;\n'+shader.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(distance(featurePosition,featurePoint)>featureRadius) discard;');};featureOverlay.renderOrder=3;mesh.add(featureOverlay);
+ featureOverlay=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:0x00b7c7,side:THREE.DoubleSide,transparent:true,opacity:.85,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));featureOverlay.material.onBeforeCompile=shader=>{shader.uniforms.featurePoint={value:point};shader.uniforms.featureRadius={value:radius};shader.vertexShader='varying vec3 featurePosition;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nfeaturePosition=position;');shader.fragmentShader='varying vec3 featurePosition; uniform vec3 featurePoint; uniform float featureRadius;\n'+shader.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(distance(featurePosition,featurePoint)>featureRadius) discard;');};featureOverlay.renderOrder=3;mesh.add(featureOverlay);featureOverlays.push(featureOverlay);canvas.dataset.paintCount=String(featureOverlays.length);
  const row=manifest.bom.find(r=>r.id===mesh.userData.bomId),name=row?.name||mesh.name;
  featureLabel.textContent=`${name} · ${mesh.name||mesh.userData.bomId} · point (${point.toArray().map(n=>n.toFixed(1)).join(', ')}) · radius ${radiusMm} mm`;featureLabel.hidden=false;featureLabel.style.top=`${canvas.offsetTop+canvas.clientHeight-60}px`;canvas.dataset.feature=mesh.name||mesh.userData.bomId;
- status.textContent='Highlighted surface region. Adjust radius or click another feature; drag to orbit. Coordinates identify this point in the displayed mesh.';
+ status.textContent='Drag to paint more surface. Alt + drag or use the cube to orbit. Clear highlight starts over.';
 }
 function exitSteps(reset=true){
  stepIndex=-1;$('#assembly-walkthrough').hidden=true;$('#assembly-toggle').setAttribute('aria-pressed','false');delete canvas.dataset.assemblyStep;
@@ -250,7 +250,7 @@ try{
  }
  for(const [i,step] of steps.entries()){const option=document.createElement('option');option.value=i;option.textContent=`${i+1}. ${step.title}`;$('#assembly-step').append(option);}
  $('#assembly-toggle').onclick=()=>stepIndex<0?showStep(0):exitSteps();$('#assembly-exit').onclick=()=>exitSteps();$('#step-back').onclick=()=>showStep(stepIndex-1);$('#step-next').onclick=()=>showStep(stepIndex+1);$('#assembly-step').onchange=e=>showStep(Number(e.target.value));
- $('#mark-feature').onclick=()=>{marking=!marking;setPlaying(false);$('#mark-feature').setAttribute('aria-pressed',String(marking));status.textContent=marking?'Click a surface to highlight a local feature. Drag still orbits.':'Click a component to inspect.';};$('#clear-feature').onclick=()=>clearFeature();$('#feature-radius').oninput=()=>{if(featureHit)highlightFeature(featureHit);};
+ $('#mark-feature').onclick=()=>{marking=!marking;setPlaying(false);$('#mark-feature').setAttribute('aria-pressed',String(marking));status.textContent=marking?'Click and drag to paint a highlight. Alt + drag or use the cube to orbit.':'Click a component to inspect.';};$('#clear-feature').onclick=()=>clearFeature();$('#feature-radius').oninput=()=>{status.textContent=`Brush radius: ${$('#feature-radius').value} mm. Drag to extend the highlight.`;};
  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setMode(b.dataset.view));
  $('#string-attachment').disabled=false;$('#string-attachment').onclick=()=>{setPlaying(false);pose(0);setMode('actuator');focus('rocker',meshes.get('rocker'));setDetail('STRING ENDS HERE','Loop around the rocker eye','Pass the free end through the 8 mm eye, around its front edge, and tie it back to the standing string. The brown loop shows the attachment path. Tie before mounting the actuator; check the knot with your actual twine. No stopper knot is needed.');};
  $('#flip').onclick=()=>{flipped=!flipped;frameObjects(visibleMeshes());};
@@ -258,8 +258,13 @@ try{
  $('#animate').onclick=()=>{if(!playing&&mode==='phone')setMode('full');setPlaying(!playing);};
  $('#release').onclick=()=>{setPlaying(false);elapsedMs=0;pose(0);};
  document.addEventListener('visibilitychange',()=>{if(document.hidden)setPlaying(false);});
+ // Capture paint gestures before OrbitControls sees them; Alt/right drag keep navigation.
+ canvas.addEventListener('pointerdown',e=>{if(!marking||e.button!==0||e.altKey)return;e.stopImmediatePropagation();e.preventDefault();painting=true;paintLast=[e.clientX,e.clientY];paintTime=0;controls.enabled=false;canvas.setPointerCapture(e.pointerId);const hit=pick(e);if(hit)highlightFeature(hit,featureOverlays.length>0);},true);
+ canvas.addEventListener('pointermove',e=>{if(!painting)return;e.stopImmediatePropagation();if(performance.now()-paintTime<45||Math.hypot(e.clientX-paintLast[0],e.clientY-paintLast[1])<3)return;paintLast=[e.clientX,e.clientY];paintTime=performance.now();const hit=pick(e);if(hit)highlightFeature(hit,true);},true);
+ const endPaint=e=>{if(!painting)return;e.stopImmediatePropagation();painting=false;controls.enabled=true;pointerStart=null;};
+ canvas.addEventListener('pointerup',endPaint,true);canvas.addEventListener('pointercancel',endPaint,true);
  canvas.addEventListener('pointerdown',e=>{pointerStart=[e.clientX,e.clientY];});
- canvas.addEventListener('click',e=>{if(!pointerStart||Math.hypot(e.clientX-pointerStart[0],e.clientY-pointerStart[1])>5)return;const m=pick(e);if(m){if(marking)highlightFeature(m);else focus(m.object.userData.bomId,m.object);}});
+ canvas.addEventListener('click',e=>{if(!pointerStart||Math.hypot(e.clientX-pointerStart[0],e.clientY-pointerStart[1])>5)return;const m=pick(e);if(m){if(marking)return;else focus(m.object.userData.bomId,m.object);}});
  canvas.addEventListener('contextmenu',e=>{e.preventDefault();const m=pick(e);if(m)menu(m.object.userData.bomId,e);});
  document.addEventListener('pointerdown',e=>{if(!$('#context').contains(e.target))$('#context').hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#context').hidden=true;});
  stopFraction=findStopFraction();setupPreview();pose(0);setMode('phone');canvas.dataset.ready='true';

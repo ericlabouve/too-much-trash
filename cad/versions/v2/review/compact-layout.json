@@ -39,7 +39,7 @@
       "old_quantity": 1,
       "new_quantity": 1,
       "old_total_solid_mm3": 24205.10419799323,
-      "new_total_solid_mm3": 24062.244480216457,
+      "new_total_solid_mm3": 24330.09447964426,
       "bounds_mm": [
         80.0,
         66.0,
@@ -94,7 +94,7 @@
       "old_quantity": 3,
       "new_quantity": 2,
       "old_total_solid_mm3": 14500.328543425941,
-      "new_total_solid_mm3": 9666.885695617297,
+      "new_total_solid_mm3": 9666.885695617295,
       "bounds_mm": [
         34.29604721069336,
         27.600000381469727,
@@ -105,7 +105,7 @@
       "old_quantity": 0,
       "new_quantity": 1,
       "old_total_solid_mm3": 0,
-      "new_total_solid_mm3": 5888.167524329424,
+      "new_total_solid_mm3": 5888.1675252964305,
       "bounds_mm": [
         20.299999237060547,
         57.992034912109375,
@@ -116,7 +116,7 @@
   "note": "Solid mesh volume times required quantities; not sliced filament consumption or measured weight.",
   "total_solid_volume_mm3": {
     "before": 189921.2172257601,
-    "after": 175019.5863622658
+    "after": 175287.4363626606
   },
-  "change_percent": -7.846217016280321
+  "change_percent": -7.705184853414382
 }

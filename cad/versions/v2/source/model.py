@@ -417,7 +417,8 @@ def actuator_bracket(p):
     s=s.union(box(38,42,-1.5,1.5,stop-2.4,stop)).union(box(39,42,-1.5,1.5,21,23.4))
     s=s.union(box(38,42,8,21,18,21)).union(box(35,41,17,21,18,31))
     for z in (28,):s=s.union(cylinder((38,14,z),(0,1,0),5,4)).union(cylinder((38,13,z),(0,1,0),1.5,6))
-    s=s.union(box(24,25.5,-15,-6,10,13)).union(box(12.5,25.5,-15,-12,11,14.1))
+    # Broad indexing-ledge post joins the upper outer beam; keep head clearance.
+    s=s.union(box(25,29,-15,-8,11,24)).union(box(12.5,29,-15,-12,11,14.1))
     # Inset fairlead stays inside the rectangular plate outline in Y/Z.
     # The matching upper collar screws move to Z -24 for thin-phone clearance.
     s=s.union(box(34,48,-9,9,-46,-40))
