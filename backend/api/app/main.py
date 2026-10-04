@@ -12,7 +12,10 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from psycopg.rows import dict_row
 
+from app.admin_auth import router as admin_router
+
 app = FastAPI(title="Too Much Trash API", version="0.2.0")
+app.include_router(admin_router)
 BUCKET = os.environ["S3_BUCKET"]
 MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 MEDIA_TYPES = {

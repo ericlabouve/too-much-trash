@@ -8,4 +8,5 @@ RUN npm run build
 FROM caddy:2-alpine
 COPY backend/caddy/Caddyfile /etc/caddy/Caddyfile
 COPY backend/caddy/public/ /srv/public/
+COPY backend/caddy/admin/ /srv/admin/
 COPY --from=web-build /web/dist/ /srv/app/

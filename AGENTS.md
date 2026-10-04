@@ -10,13 +10,12 @@ The aspiration is a useful, varied dataset and a humane path from field capture 
 
 | Path | Intent |
 | --- | --- |
-| `compose.yaml`, `.env.example` | Define the hosted stack and its local configuration shape. |
+| `backend/compose.yaml`, `backend/.env.example` | Define the hosted stack and its local configuration shape. |
 | `backend/api/` | uv-managed FastAPI service for client-facing endpoints and future capture metadata and media coordination. |
 | `backend/caddy/` | Reverse proxy and browser UI serving layer. |
 | `backend/postgres/` | Database initialization and future schema or migration support. |
 | `backend/workflows/` | Prefect flows for ingestion, event alignment, frame extraction, proposed labels, and review processing. |
-| `frontend/src/` | Shared browser and Electron interface; keep visual language consistent with iOS. |
-| `frontend/electron/` | Secure desktop shell for the shared interface. |
+| `frontend/src/` | Authenticated admin portal; keep visual language consistent with iOS. |
 | `ios/` | Dedicated SwiftUI iPhone experience, including eventual capture and review. |
 | `ml/training/` | Reproducible image and video segmentation and classifier training code. |
 | `ml/experiments/` | Research questions, run records, comparisons, and evaluations. |

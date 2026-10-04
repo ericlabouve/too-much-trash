@@ -8,7 +8,7 @@ The collection tool starts with an ordinary reacher grabber. A lightweight, 3D-p
 
 The person collecting litter holds a separate bucket in their other hand. A successful deposit into that bucket provides a useful signal that the object was picked up and accepted as trash; misses, drops, and rejected objects are valuable examples too. Those signals are starting points for labeling, not a claim that every outcome can be inferred perfectly without review.
 
-This repository brings the whole effort together: a hosted service for collecting and processing media, desktop and browser experiences for reviewing it, a dedicated iOS experience for capture and review, a workspace for segmentation and classification experiments, and an editable CAD design for the grabber retrofit.
+This repository brings the whole effort together: a hosted service for collecting and processing media, an admin portal for reviewing it, a dedicated iOS experience for capture and review, a workspace for segmentation and classification experiments, and an editable CAD design for the grabber retrofit.
 
 ## The current prototype
 
