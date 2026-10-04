@@ -1,42 +1,33 @@
-# Current V2 low-waste slice review
+# Current V2 low-waste print records
 
-**Plate 01 started with user authorization; other plates remain prepared only.** Source CAD at `9475179`. All five sliced 3MFs are stored under `cad/exports/2026-10-03-v2-low-waste/` (generated files excluded from Git).
+Plate 01 completed: the user reports a successful fixed-jaw print with supports that peeled off easily. This validates cleanup for this exact part/orientation/recipe, not loaded assembly strength. Two screws and two nuts were previously successful. Seventeen pieces remain to print. Other current plates have not been uploaded or started.
 
-The user has two successful screws and two nuts. These plates add 18 parts to complete the 22-piece assembly; no duplicate copies of those four retained parts are included.
+## Reproducibility
+
+The exact sliced 3MFs are preserved alongside this record, including the successfully printed plate 01. Complete machine, filament and per-plate process profiles, source/input hashes, output SHA-256 and embedded G-code MD5 are in `review.json`. The sliced 3MF retains arranged geometry, orientation and actual toolpaths. Recheck printer, nozzle, material, plate and clearance before replaying a file. Firmware behavior and physical material can vary even with identical G-code.
 
 | Plate | Parts | Layer | Walls / infill | Total g | Support g | Time |
 | --- | --- | --- | --- | --- | --- | --- |
-| 01 | Carrier | 0.2 mm | 3 / 10% | 48.5 | 3.74 | 3h 59m |
-| 02 | Shaft cap + sliding jaw | 0.2 mm | 3 / 10% | 44.0 | 4.40 | 3h 30m |
-| 03 | Bracket + 3 guides | 0.2 mm | 3 / 10% | 33.1 | 1.46 | 2h 31m |
+| 01 | Fixed jaw — completed | 0.2 mm | 3 / 10% | 48.5 | 3.74 | 3h 59m |
+| 02 | Shaft cap only — flat | 0.2 mm | 3 / 10% | 35.8 | 6.74 | 2h 11m |
+| 03 | Sliding jaw + bracket + 3 guides | 0.2 mm | 3 / 10% | 41.7 | 1.46 | 3h 34m |
 | 04 | Rocker + pivot | 0.12 mm | 3 / 15% | 4.0 | 0.42 | 1h 08m |
 | 05 | 5 screws + 4 nuts | 0.12 mm | 2 / 15% | 8.6 | 0.00 | 1h 25m |
 
-Total: **138.1 g**, about **12h 33m**; support 10.0 g. Slicer time estimates include each plate’s startup, exclude manual changes/cleanup, and are not guarantees.
+## Latest placement and support review
 
-## Orientation and cleanup decisions
+- Plate 01 keeps the sliding track vertical, with support against the static neck-contact face. Its actual printed recipe is preserved unchanged.
+- Plate 02 replaces the previous upright cap/jaw batch. Cap lies flat, neck opening down and actuator rail above it, matching the user’s image. All four fastener-ear undersides lie at bed Z=0 and appear in the first model layer, so there is no elevated second pair to support. Supports remain beneath the neck recess and rail. Do not confuse deliberate open screw bores with missing support. Cleanup of this orientation has not yet been physically tested.
+- Plate 03 now has five objects: sliding jaw, bracket, two centered guides and one dual guide. It uses the successful plate 01 support recipe: Normal Snug, 5 mm base spacing, 0.24 mm top/bottom gaps, 0.4 mm XY gap, two top interface layers at 0.5 mm spacing. This replaces the prior plate 03 settings (2.5 mm base spacing and 0.2 mm gaps); transferring a successful recipe does not establish cleanup on different parts.
+- Plates 04 and 05 are unchanged. All parts remain 100% scale, by-layer printing, A1 mini / 0.4 mm nozzle / Textured PEI, 220 °C nozzle and 65 °C bed. No brim or raft. Actual first layer is 0.2 mm, including fine-layer jobs.
+- Embedded G-code and file hashes verified. Model/support extrusion bounds fit the bed with a 0.25 mm line-width margin, and every multi-object projected bounding box remains separated after a 0.5 mm line-width allowance. No slicer warnings. Profiles and layer paths checked; removal and fit still need physical validation.
 
-- Plate 01 was reoriented at the user’s request to prioritize smooth sliding-jaw contact surfaces. The neck-contact face now faces downward and receives support; the sliding track runs vertically, clear of the support scaffolding. This supersedes the earlier end-reversed plate 01. Static neck-contact surfaces will require careful residue removal before checking fit. Plate 02 cap orientation is unchanged. Sparse normal supports use 5 mm base spacing, 0.24 mm top/bottom gaps and 0.4 mm XY clearance.
-- Revised plate 01: 48.46 g total, 3.74 g support, about 3h 59m. Previous plate 01: 55.20 g total / 9.61 g support. The earlier rejection of neck-face support is superseded by the user’s explicit sliding-surface priority; removal success is still a physical check.
-- Cap selected orientation: 35.20 g alone, 4.21 g support, compared with 37.27 g / 8.20 g support for the flat export.
-- Sliding jaw stays upright; bracket has its broad outside plate down; guide bores are vertical. Rocker thread axis stays vertical; upright pivot requires no support. No support in any screw/nut threads or the rocker thread bore.
-- All plates use native automatic supports where enabled. No brim, raft or prime tower. Support removal remains a physical check; support material is not assumed to peel successfully merely because slicing succeeded.
+The previous plate 02 and 03 records remain in Git history. Do not use those superseded sliced files. Plate 02 estimate is 35.8 g; actual required spool reserve should allow for variation and startup waste. Remaining spool quantity is unknown.
 
-## Checks
+[Support-style comparison](support-comparison.md) records the algorithm exploration; the generic trial order is also in the bambu-print skill reference.
 
-- Official A1 mini 0.4 mm preset; 100% scale; 180 × 180 mm bed; print by layer.
-- Actual G-code confirms 220 °C nozzle, 65 °C textured bed, 100% fan settings after initial layers, layer heights and infill above. First layer is 0.2 mm even on fine-layer plates.
-- Actual model/support extrusion envelopes fit the bed, with a 0.25 mm line-width allowance. Multi-object projected extrusion boxes are separated by at least 7.10 mm after subtracting 0.5 mm for line width. Calibration region avoidance enabled for arranged plates; fasteners occupy a deliberately spaced central grid.
-- Nine fastener instances verified in sliced 3MF metadata; global and actual subsequent G-code layers are 0.12 mm. Metadata thumbnail entries use first-layer height 0.2 mm.
-- No slicer warnings. Embedded G-code matches the reviewed G-code and MD5. Input and output SHA-256 hashes are in review.json.
-- Orange lines in the previews are model; blue lines are supports. Full layer paths were parsed; arc fitting disabled and absence of extrusion arcs asserted.
-
-## Suggested print order
-
-Print plate 05 first for the missing fasteners, then plates 01 and 02 for full-length collar closure, cap service and jaw return checks. Continue with 03 and 04 for actuator fit and complete twine routing. Verify the current bed, nozzle, spool and printer state before authorizing a start. Only revised plate 01 has been uploaded and started; see `plate-01-start.json`.
-
-- [01-carrier-neck-contact layer review](01-carrier-neck-contact-layers.png) · [support side views](01-carrier-neck-contact-support-sides.png)
-- [02-cap-and-jaw layer review](02-cap-and-jaw-layers.png) · [support side views](02-cap-and-jaw-support-sides.png)
-- [03-bracket-and-guides layer review](03-bracket-and-guides-layers.png) · [support side views](03-bracket-and-guides-support-sides.png)
-- [04-rocker-and-pivot layer review](04-rocker-and-pivot-layers.png) · [support side views](04-rocker-and-pivot-support-sides.png)
-- [05-fasteners layer review](05-fasteners-layers.png) · [support side views](05-fasteners-support-sides.png)
+- [01-carrier-neck-contact sliced file](01-carrier-neck-contact.gcode.3mf) · [layers](01-carrier-neck-contact-layers.png) · [side views](01-carrier-neck-contact-support-sides.png)
+- [02-shaft-cap-flat sliced file](02-shaft-cap-flat.gcode.3mf) · [layers](02-shaft-cap-flat-layers.png) · [side views](02-shaft-cap-flat-support-sides.png)
+- [03-jaw-bracket-and-guides sliced file](03-jaw-bracket-and-guides.gcode.3mf) · [layers](03-jaw-bracket-and-guides-layers.png) · [side views](03-jaw-bracket-and-guides-support-sides.png)
+- [04-rocker-and-pivot sliced file](04-rocker-and-pivot.gcode.3mf) · [layers](04-rocker-and-pivot-layers.png) · [side views](04-rocker-and-pivot-support-sides.png)
+- [05-fasteners sliced file](05-fasteners.gcode.3mf) · [layers](05-fasteners-layers.png) · [side views](05-fasteners-support-sides.png)

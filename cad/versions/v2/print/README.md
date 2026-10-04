@@ -1,6 +1,6 @@
 # V2 compact-rails-r12 manufacturing files
 
-**Fresh slices reviewed; revised plate 01 started with user authorization.** See the [2026-10-03 five-plate review](jobs/2026-10-03-current-low-waste/README.md) for the current files, settings, support previews and checksums. Reuse the user’s two successful screws and two nuts; the prepared plates contain the remaining eighteen pieces. Only revised plate 01 has been uploaded and started; remaining plates await review. The user declined another coupon. Do not send earlier r10/r11 prepared or uploaded jobs as this revision.
+**Plate 01 completed successfully; revised plates 02/03 prepared for review.** See the [2026-10-03 five-plate review](jobs/2026-10-03-current-low-waste/README.md) for the current files, settings, support previews and checksums. Reuse the user’s two successful screws and two nuts; the fixed jaw is now complete and seventeen pieces remain. The user confirms plate 01 finished and its supports peeled off easily. Remaining plates await review. The user declined another coupon. Do not send earlier r10/r11 prepared or uploaded jobs as this revision.
 
 STLs are millimetres, 100% scale and bed-oriented. Carrier, shaft cap, sliding jaw, actuator bracket, rocker, pivot key and new dual-eye string guide changed from r11. The successful screw/nut designs remain reusable. The revised rocker and pivot key must be printed together with the updated bracket. Use two exact copies of the original centered-eye string guide and one new dual-eye guide nearest the harness. Earlier revisions are in [Git history](../history.md).
 
@@ -29,3 +29,5 @@ Inset-guide update: carrier, shaft cap and actuator bracket exports replace the 
 Indexing-ledge refinement: the bracket now has a 4 mm-wide outer support joining the upper beam, replacing its thin 1.5 mm connector. Use the refreshed actuator bracket STL. The linked 2026-10-03 low-waste review includes this refinement. Earlier jobs and reference slice estimates do not qualify this revision; physical support removal and assembly fit still require testing.
 
 Plate 01 orientation update: prioritize the fixed jaw’s sliding track finish. The current `01-carrier-neck-contact` job places support against the static neck-contact face and prints the track vertically. It supersedes `01-carrier`; remove support residue from the neck face before checking seating. Other plates are unchanged.
+
+Plate 02 now contains only the flat shaft cap, with all four fastener ears on the bed. Sliding jaw moved to plate 03 beside the bracket and three guides. Exact sliced files and complete per-plate profiles are preserved in the linked job record for reproducibility.

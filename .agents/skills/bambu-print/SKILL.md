@@ -7,7 +7,7 @@ description: Set up, connect to, configure, and control Bambu Lab A1-family prin
 
 Use Bambu Studio for slicing and `bambu-rs` or `bambu-printer-mcp` for printer communication. Select the exact printer model, nozzle, plate and filament; A1 and A1 mini profiles are distinct. Keep CAD revisions, part quantities, material recipes and physical test results in the project's print records rather than this skill.
 
-Read [tooling and setup](references/tooling.md) when installing on a new machine, restoring private connection settings, choosing between CLI and MCP, or checking version-specific behavior. Check installed `--help` and live MCP tool schemas before using commands.
+Read [tooling and setup](references/tooling.md) when installing on a new machine, restoring private connection settings, choosing between CLI and MCP, comparing support styles and their trial order, or checking version-specific behavior. Check installed `--help` and live MCP tool schemas before using commands.
 
 ## Connect and inspect
 

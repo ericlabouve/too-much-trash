@@ -14,7 +14,10 @@
     "mc_percent": 0,
     "remaining_time_min": 239
   },
-  "completion_verified": false,
-  "physical_result": "pending",
-  "follow_up": "If support removal is difficult, explore alternate support-generation algorithms and compare access, contact area and interface gaps."
+  "completion_verified": true,
+  "physical_result": "Print and support removal successful; full assembly fit/load not yet established.",
+  "follow_up": "If support removal is difficult, explore alternate support-generation algorithms and compare access, contact area and interface gaps.",
+  "completion_evidence": "User reports fixed jaw finished and supports peeled off easily.",
+  "successful_file": "01-carrier-neck-contact.gcode.3mf",
+  "file_sha256": "258fbbe022e33cb00061d3cf041ae07d394f80575738aa4eaacdd09ff768f6f9"
 }
