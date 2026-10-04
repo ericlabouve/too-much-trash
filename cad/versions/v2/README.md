@@ -145,3 +145,11 @@ Next print: one each of `trial_screw_8x3.stl` and `trial_nut_8x3.stl` from `prin
 Inspect thread formation before checking fit. If threads are still ragged or drooping, stop and inspect the as-printed parts/slicer preview; do not respond by increasing clearance or part size again. If the profiles look intact, check finger-only engagement and reversal. The pair is not compatible with the old 2 mm-pitch screw, nut or rocker. This historical trial subsequently succeeded; its profile is now promoted as thread-8x3-r7.
 
 Reproduce: `cad/.venv/bin/python cad/versions/v2/source/build_fixed_envelope_thread_trial.py`, then `cad/.venv/bin/python cad/versions/v2/source/check_slices.py --print-dir cad/versions/v2/print/thread-trials/original-size-trapezoid-8x3 --a1-mini-threads`.
+
+### Viewer inspection and assembly
+
+Use **Highlight a feature** to click a local surface region on an individual part. Adjust **Radius** to cover a lug, stop or connection; the label identifies the instance and clicked mesh coordinates for screenshots. This is a surface-region annotation, not automatic recognition of CAD features. **Clear highlight** removes it. Ordinary dragging still orbits.
+
+Each interactive 3D viewport has a view cube. Drag it to orbit; click a face, edge or corner for an orthographic axis, diagonal or isometric view. The projection button returns to perspective. With the cube focused, arrow keys select side/top/bottom views, Home selects front and End selects isometric.
+
+In **Phone assembly → Assembly steps**, use Previous/Next or the step selector to walk through 35 assembly states. The jaws and actuator are built off the grabber before installation; teal marks the current additions. The sequence also includes each printed fastener, guide and band. These are staged assembly states and instructions, not collision-validated animations of every insertion path. Exit steps restores the complete phone view and squeeze controls.

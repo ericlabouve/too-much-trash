@@ -1,3 +1,5 @@
+import {installViewCube} from '../../view_cube.js';
+import {assemblySteps} from './assembly_steps.js';
 import * as THREE from 'three';
 import {cycleStroke} from './stroke_animation.js';
 import {STLLoader} from 'three/addons/loaders/STLLoader.js';
@@ -10,11 +12,14 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0xf8
 const scene=new THREE.Scene();scene.add(new THREE.HemisphereLight(0xffffff,0x8d9698,2.6));
 const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-150,250,180);scene.add(light);
 const camera=new THREE.PerspectiveCamera(35,1,.1,4000),controls=new OrbitControls(camera,canvas);controls.enableDamping=true;
+const viewCube=installViewCube({canvas,camera,controls});
+let marking=false,featureOverlay=null,featureHit=null,stepIndex=-1;const steps=assemblySteps();
+const featureLabel=document.createElement('div');featureLabel.className='feature-label';featureLabel.hidden=true;$('#stage').append(featureLabel);
 const root=new THREE.Group();root.rotation.x=-Math.PI/2;scene.add(root);
 const assembly=new THREE.Group(),inventory=new THREE.Group();root.add(assembly,inventory);
 const meshes=new Map(),bomMeshes=new Map();let manifest,mode='phone',selected=null,outline,flipped=false,selectionTargets=[];
 let playing=false,elapsedMs=0,lastFrame=null,lastPoseTime=0,strokeFraction=0,stopFraction=.05;
-let previewRenderer,previewScene,previewCamera,previewRoot;const previewMeshes=new Map();
+let previewRenderer,previewScene,previewCamera,previewRoot,previewControls,previewCube;const previewMeshes=new Map();
 const assetLoad=Date.now();
 const freshAsset=path=>{const url=new URL(path,location.href);url.searchParams.set('load',assetLoad);return url.href;};
 const loader=new STLLoader(),raycaster=new THREE.Raycaster();let pointerStart;
@@ -36,6 +41,7 @@ function allowed(name){
  return !name.startsWith('stock_')&&!name.startsWith('guide_')&&!name.startsWith('band_guide_')&&!['twine','band_overtravel'].includes(name);
 }
 function clearSelection(){
+ clearFeature();
  for(const m of [...meshes.values(),...bomMeshes.values()])m.material.emissive?.setHex(0);
  if(outline){scene.remove(outline);outline.geometry.dispose();outline.material.dispose();outline=null;}
  selected=null;selectionTargets=[];document.querySelectorAll('tr[data-id]').forEach(el=>el.classList.remove('selected'));
@@ -68,6 +74,8 @@ function focus(id,object){
  document.querySelectorAll('tr[data-id]').forEach(el=>el.classList.toggle('selected',el.dataset.id===id));
 }
 function setMode(next){
+ if(stepIndex>=0)exitSteps(false);viewCube.perspective();
+ $('#assembly-toggle').hidden=next!=='phone';
  if(next==='bom')setPlaying(false);
  clearSelection();mode=next;inventory.visible=mode==='bom';assembly.visible=!inventory.visible;
  document.body.classList.toggle('bom',inventory.visible);$('#inventory').hidden=!inventory.visible;
@@ -157,6 +165,7 @@ function setupPreview(){
  previewCamera=new THREE.PerspectiveCamera(35,1,.1,500);
  const target=new THREE.Vector3(...manifest.motion.pivot).applyAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2);target.y-=10;
  previewCamera.position.copy(target).add(new THREE.Vector3(5,3,82));previewCamera.lookAt(target);
+ previewControls=new OrbitControls(previewCamera,$('#actuator-preview'));previewControls.target.copy(target);previewControls.enableDamping=true;previewControls.update();previewCube=installViewCube({canvas:$('#actuator-preview'),camera:previewCamera,controls:previewControls});
 }
 function renderPreview(){
  if(!previewRenderer||mode==='bom')return;
@@ -169,9 +178,41 @@ function renderPreview(){
   if(name==='actuator_context'){clone.material.transparent=true;clone.material.opacity=.15;clone.material.depthWrite=false;}
   if(name==='phone_volume_up')clone.material.emissive.copy(source.material.emissive);
  }
- previewRenderer.render(previewScene,previewCamera);
+ previewControls.update();previewCube.tick();previewRenderer.render(previewScene,previewCube.camera);
 }
-function pick(e){const r=canvas.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),camera);return raycaster.intersectObjects(visibleMeshes(),false).find(h=>h.object.userData.bomId)?.object;}
+function pick(e){const r=canvas.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),viewCube.camera);return raycaster.intersectObjects(visibleMeshes(),false).find(h=>h.object.userData.bomId);}
+
+function clearFeature(){if(featureOverlay){featureOverlay.removeFromParent();featureOverlay.geometry.dispose();featureOverlay.material.dispose();featureOverlay=null;}featureHit=null;featureLabel.hidden=true;delete canvas.dataset.feature;}
+function highlightFeature(hit){
+ clearSelection();setPlaying(false);featureHit=hit;
+ const mesh=hit.object,point=mesh.worldToLocal(hit.point.clone()),radiusMm=Number($('#feature-radius').value),radius=radiusMm*(mesh.userData.displayScale||1);
+ const g=mesh.geometry,p=g.attributes.position,idx=g.index,verts=[],triangle=new THREE.Triangle(),nearest=new THREE.Vector3();
+ // Select actual surface triangles within the brush radius, not the entire STL.
+ for(let i=0;i<(idx?idx.count:p.count);i+=3){const ids=[0,1,2].map(j=>idx?idx.getX(i+j):i+j);triangle.set(...ids.map(j=>new THREE.Vector3().fromBufferAttribute(p,j)));triangle.closestPointToPoint(point,nearest);if(nearest.distanceTo(point)<=radius)for(const j of ids)verts.push(p.getX(j),p.getY(j),p.getZ(j));}
+ const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
+ featureOverlay=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:0x00b7c7,side:THREE.DoubleSide,transparent:true,opacity:.85,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));featureOverlay.material.onBeforeCompile=shader=>{shader.uniforms.featurePoint={value:point};shader.uniforms.featureRadius={value:radius};shader.vertexShader='varying vec3 featurePosition;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nfeaturePosition=position;');shader.fragmentShader='varying vec3 featurePosition; uniform vec3 featurePoint; uniform float featureRadius;\n'+shader.fragmentShader.replace('#include <clipping_planes_fragment>','#include <clipping_planes_fragment>\nif(distance(featurePosition,featurePoint)>featureRadius) discard;');};featureOverlay.renderOrder=3;mesh.add(featureOverlay);
+ const row=manifest.bom.find(r=>r.id===mesh.userData.bomId),name=row?.name||mesh.name;
+ featureLabel.textContent=`${name} · ${mesh.name||mesh.userData.bomId} · point (${point.toArray().map(n=>n.toFixed(1)).join(', ')}) · radius ${radiusMm} mm`;featureLabel.hidden=false;featureLabel.style.top=`${canvas.offsetTop+canvas.clientHeight-60}px`;canvas.dataset.feature=mesh.name||mesh.userData.bomId;
+ status.textContent='Highlighted surface region. Adjust radius or click another feature; drag to orbit. Coordinates identify this point in the displayed mesh.';
+}
+function exitSteps(reset=true){
+ stepIndex=-1;$('#assembly-walkthrough').hidden=true;$('#assembly-toggle').setAttribute('aria-pressed','false');delete canvas.dataset.assemblyStep;
+ for(const mesh of meshes.values()){mesh.position.set(0,0,0);mesh.rotation.set(0,0,0);mesh.material.emissive.setHex(0);mesh.material.color.copy(mesh.userData.baseColor);}
+ if(reset)setMode('phone');
+}
+function showStep(index){
+ if(stepIndex<0){setMode('phone');setPlaying(false);pose(0);}
+ clearSelection();stepIndex=Math.max(0,Math.min(steps.length-1,index));const step=steps[stepIndex];
+ $('#assembly-walkthrough').hidden=false;$('#assembly-toggle').setAttribute('aria-pressed','true');$('#assembly-step').value=String(stepIndex);
+ $('#step-title').textContent=`${stepIndex+1} / ${steps.length} · ${step.title}`;$('#step-text').textContent=step.text;
+ $('#step-back').disabled=stepIndex===0;$('#step-next').disabled=stepIndex===steps.length-1;
+ for(const [name,mesh] of meshes){mesh.visible=step.visible.includes(name);if(name==='stock_neck_context'&&step.visible.includes('stock_neck'))mesh.visible=false;mesh.material.color.copy(mesh.userData.baseColor);if(step.added.includes(name))mesh.material.color.setHex(0x008b99);mesh.material.emissive.setHex(0);}
+ // Separate bench assemblies are shown without any stock neck or other assembly.
+ $('#stroke-panel').hidden=true;for(const id of ['animate','release','stroke','phone','transparent'])$('#'+id).disabled=true;
+ frameObjects(visibleMeshes());status.textContent=step.bench?'Work surface · assemble these parts off the grabber.':'On the grabber · teal identifies the current step.';
+ canvas.dataset.assemblyStep=String(stepIndex);
+}
+
 function menu(id,e){
  const el=$('#context');el.replaceChildren();
  for(const [view,title] of [['phone','Phone assembly'],['full','Full tool'],['actuator','Actuator']]){
@@ -188,7 +229,7 @@ try{
  $('#orientation').textContent=(side==='far'?'Phone rotated 180° · camera at opposite end · framing unresolved':'Phone in standard orientation')+(manifest.phone_center_y_mm?` · phone shifted ${Math.abs(manifest.phone_center_y_mm)} mm along jaws`:'');
  await Promise.all(manifest.assembly.map(async entry=>{
   const geometry=await loader.loadAsync(freshAsset(base+entry.file));geometry.computeVertexNormals();
-  const mesh=new THREE.Mesh(geometry,material(entry.color));mesh.name=entry.name;mesh.userData.bomId=entry.bom_id;meshes.set(entry.name,mesh);assembly.add(mesh);
+  const mesh=new THREE.Mesh(geometry,material(entry.color));mesh.name=entry.name;mesh.userData.bomId=entry.bom_id;mesh.userData.baseColor=mesh.material.color.clone();meshes.set(entry.name,mesh);assembly.add(mesh);
  }));
  $('#pieces').textContent=manifest.printed_pieces;
  for(const [i,row] of manifest.bom.entries()){
@@ -203,10 +244,13 @@ try{
   else geometry=tube(bandPoints(new THREE.Vector3(0,0,0),new THREE.Vector3(0,50,0),12),1.4);
   geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);geometry.scale(...Array(3).fill(105/Math.max(extent.x,extent.y,extent.z)));
   const rgb=row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
-  const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;inventory.add(mesh);bomMeshes.set(row.id,mesh);
+  const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=105/Math.max(extent.x,extent.y,extent.z);inventory.add(mesh);bomMeshes.set(row.id,mesh);
   const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',rocker:'Rocker',pivot_key:'Printed pivot',thumb_screw:'Thumb screw',thumb_nut:'Printed nut',string_guide:'Captive guide',dual_string_guide:'Duel captive guide',twine:'Continuous twine',rubber_bands:'Rubber bands'};
   label(`${titles[row.id]||row.name||row.id} ×${row.quantity}`,mesh.position.x,mesh.position.y-65,0);
  }
+ for(const [i,step] of steps.entries()){const option=document.createElement('option');option.value=i;option.textContent=`${i+1}. ${step.title}`;$('#assembly-step').append(option);}
+ $('#assembly-toggle').onclick=()=>stepIndex<0?showStep(0):exitSteps();$('#assembly-exit').onclick=()=>exitSteps();$('#step-back').onclick=()=>showStep(stepIndex-1);$('#step-next').onclick=()=>showStep(stepIndex+1);$('#assembly-step').onchange=e=>showStep(Number(e.target.value));
+ $('#mark-feature').onclick=()=>{marking=!marking;setPlaying(false);$('#mark-feature').setAttribute('aria-pressed',String(marking));status.textContent=marking?'Click a surface to highlight a local feature. Drag still orbits.':'Click a component to inspect.';};$('#clear-feature').onclick=()=>clearFeature();$('#feature-radius').oninput=()=>{if(featureHit)highlightFeature(featureHit);};
  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setMode(b.dataset.view));
  $('#string-attachment').disabled=false;$('#string-attachment').onclick=()=>{setPlaying(false);pose(0);setMode('actuator');focus('rocker',meshes.get('rocker'));setDetail('STRING ENDS HERE','Loop around the rocker eye','Pass the free end through the 8 mm eye, around its front edge, and tie it back to the standing string. The brown loop shows the attachment path. Tie before mounting the actuator; check the knot with your actual twine. No stopper knot is needed.');};
  $('#flip').onclick=()=>{flipped=!flipped;frameObjects(visibleMeshes());};
@@ -215,8 +259,8 @@ try{
  $('#release').onclick=()=>{setPlaying(false);elapsedMs=0;pose(0);};
  document.addEventListener('visibilitychange',()=>{if(document.hidden)setPlaying(false);});
  canvas.addEventListener('pointerdown',e=>{pointerStart=[e.clientX,e.clientY];});
- canvas.addEventListener('click',e=>{if(!pointerStart||Math.hypot(e.clientX-pointerStart[0],e.clientY-pointerStart[1])>5)return;const m=pick(e);if(m)focus(m.userData.bomId,m);});
- canvas.addEventListener('contextmenu',e=>{e.preventDefault();const m=pick(e);if(m)menu(m.userData.bomId,e);});
+ canvas.addEventListener('click',e=>{if(!pointerStart||Math.hypot(e.clientX-pointerStart[0],e.clientY-pointerStart[1])>5)return;const m=pick(e);if(m){if(marking)highlightFeature(m);else focus(m.object.userData.bomId,m.object);}});
+ canvas.addEventListener('contextmenu',e=>{e.preventDefault();const m=pick(e);if(m)menu(m.object.userData.bomId,e);});
  document.addEventListener('pointerdown',e=>{if(!$('#context').contains(e.target))$('#context').hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#context').hidden=true;});
  stopFraction=findStopFraction();setupPreview();pose(0);setMode('phone');canvas.dataset.ready='true';
 }catch(error){status.textContent=`Load failed: ${error.message}`;console.error(error);}
@@ -229,5 +273,5 @@ function frame(now){
   lastFrame=now;
   if(now-lastPoseTime>=1000/30){pose(cycleStroke(elapsedMs,stopFraction));lastPoseTime=now;}
  }
- controls.update();renderer.render(scene,camera);renderPreview();
+ controls.update();viewCube.tick();renderer.render(scene,viewCube.camera);renderPreview();
 }requestAnimationFrame(frame);
