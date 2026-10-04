@@ -1,6 +1,6 @@
 # Current V2 low-waste slice review
 
-**Prepared only: no upload or print start.** Source CAD at `9475179`. All five sliced 3MFs are stored under `cad/exports/2026-10-03-v2-low-waste/` (generated files excluded from Git).
+**Plate 01 started with user authorization; other plates remain prepared only.** Source CAD at `9475179`. All five sliced 3MFs are stored under `cad/exports/2026-10-03-v2-low-waste/` (generated files excluded from Git).
 
 The user has two successful screws and two nuts. These plates add 18 parts to complete the 22-piece assembly; no duplicate copies of those four retained parts are included.
 
@@ -33,7 +33,7 @@ Total: **138.1 g**, about **12h 33m**; support 10.0 g. Slicer time estimates inc
 
 ## Suggested print order
 
-Print plate 05 first for the missing fasteners, then plates 01 and 02 for full-length collar closure, cap service and jaw return checks. Continue with 03 and 04 for actuator fit and complete twine routing. Verify the current bed, nozzle, spool and printer state before authorizing a start. No files have been uploaded.
+Print plate 05 first for the missing fasteners, then plates 01 and 02 for full-length collar closure, cap service and jaw return checks. Continue with 03 and 04 for actuator fit and complete twine routing. Verify the current bed, nozzle, spool and printer state before authorizing a start. Only revised plate 01 has been uploaded and started; see `plate-01-start.json`.
 
 - [01-carrier-neck-contact layer review](01-carrier-neck-contact-layers.png) · [support side views](01-carrier-neck-contact-support-sides.png)
 - [02-cap-and-jaw layer review](02-cap-and-jaw-layers.png) · [support side views](02-cap-and-jaw-support-sides.png)

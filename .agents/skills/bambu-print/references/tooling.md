@@ -101,3 +101,9 @@ Discover live tool names and schemas. Useful capabilities include `get_printer_s
 - Slicer rejects `from: project`: extract effective values and apply them to accepted, resolved presets rather than loading the project settings as a preset.
 - Wrong plate or temperature in G-code: explicitly set the plate and reslice; changing only the job-start plate argument does not repair sliced temperatures.
 - Pause with a numeric error and no HMS entries: inspect the printer's touchscreen prompt or official error lookup. Establish the physical condition before resuming.
+
+## Support style selection
+
+Locally verified with Bambu Studio 02.07.01.62: process JSON accepts `support_type: "normal(auto)"` with `support_style: "grid"` or `"snug"`, and `support_type: "tree(auto)"` with `"tree_slim"`, `"tree_strong"`, `"tree_hybrid"` or `"tree_organic"`. All six produced sliced output retaining the requested style. Use explicit styles instead of relying on `default`; inspect effective settings after slicing. Bambu Studio generates these supports; bambu-rs sends the resulting G-code.
+
+Compare styles with geometry/orientation held constant, then tune contact gaps and interfaces separately. Tree support is not automatically lighter or easier to remove. Organic is a candidate when branching and fewer interfaces would improve access; Snug is a candidate for closely following mechanical overhangs. Verify removal physically. See [upstream support option descriptions](https://github.com/bambulab/BambuStudio/blob/master/src/libslic3r/PrintConfig.cpp).

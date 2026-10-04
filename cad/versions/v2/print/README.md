@@ -1,6 +1,6 @@
 # V2 compact-rails-r12 manufacturing files
 
-**Fresh slices reviewed; printing remains paused.** See the [2026-10-03 five-plate review](jobs/2026-10-03-current-low-waste/README.md) for the current files, settings, support previews and checksums. Reuse the user’s two successful screws and two nuts; the prepared plates contain the remaining eighteen pieces. No upload or start has been performed. The user declined another coupon. Do not send earlier r10/r11 prepared or uploaded jobs as this revision.
+**Fresh slices reviewed; revised plate 01 started with user authorization.** See the [2026-10-03 five-plate review](jobs/2026-10-03-current-low-waste/README.md) for the current files, settings, support previews and checksums. Reuse the user’s two successful screws and two nuts; the prepared plates contain the remaining eighteen pieces. Only revised plate 01 has been uploaded and started; remaining plates await review. The user declined another coupon. Do not send earlier r10/r11 prepared or uploaded jobs as this revision.
 
 STLs are millimetres, 100% scale and bed-oriented. Carrier, shaft cap, sliding jaw, actuator bracket, rocker, pivot key and new dual-eye string guide changed from r11. The successful screw/nut designs remain reusable. The revised rocker and pivot key must be printed together with the updated bracket. Use two exact copies of the original centered-eye string guide and one new dual-eye guide nearest the harness. Earlier revisions are in [Git history](../history.md).
 
