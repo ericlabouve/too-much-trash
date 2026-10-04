@@ -31,3 +31,9 @@ The previous plate 02 and 03 records remain in Git history. Do not use those sup
 - [03-jaw-bracket-and-guides sliced file](03-jaw-bracket-and-guides.gcode.3mf) · [layers](03-jaw-bracket-and-guides-layers.png) · [side views](03-jaw-bracket-and-guides-support-sides.png)
 - [04-rocker-and-pivot sliced file](04-rocker-and-pivot.gcode.3mf) · [layers](04-rocker-and-pivot-layers.png) · [side views](04-rocker-and-pivot-support-sides.png)
 - [05-fasteners sliced file](05-fasteners.gcode.3mf) · [layers](05-fasteners-layers.png) · [side views](05-fasteners-support-sides.png)
+
+## Plate 02 Tree Organic experiment — prepared, not started
+
+Alternative to the flat-cap Snug file: [Tree Organic sliced 3MF](02-shaft-cap-tree-organic.gcode.3mf), [layers](02-tree-organic-layers.png), [side views](02-tree-organic-support-sides.png), [settings and checksums](02-tree-organic-experiment.json). Same flat cap, 0.2 mm layers, three walls, 10% gyroid, 0.24 mm support Z gaps, 0.4 mm XY clearance, two interface layers and 0.5 mm interface spacing. Explicit Tree Organic style verified in generated G-code.
+
+Organic: 36.90 g total, 7.86 g supports, 2h 44m. Snug: 35.80 g total, 6.74 g supports, 2h 11m. Organic is a removal-quality experiment, not a material-saving improvement here. Both all-four-ear first-layer contact and rail/neck support reviewed. Bed bounds and embedded MD5 passed; no slicer warnings. Automatic tree arrangement failed; explicit centered placement succeeded without scaling or changing the flat orientation. Compare cleanup effort, residual material, underside finish and neck fit after printing. Neither cap candidate has been printed yet.
