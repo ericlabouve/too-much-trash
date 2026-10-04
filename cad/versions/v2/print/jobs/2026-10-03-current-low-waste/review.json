@@ -1,0 +1,1647 @@
+{
+  "status": "prepared_not_uploaded_not_started",
+  "source_commit": "4a8d2798eca0183f113d3478e8a66e5e3306c318",
+  "printer": "Bambu Lab A1 mini / 0.4 mm nozzle / Textured PEI",
+  "slicer_version": "02.07.01.62",
+  "existing_printed_inventory": {
+    "thumb_screw": 2,
+    "thumb_nut": 2
+  },
+  "new_piece_count": 18,
+  "total_estimated_grams": 144.88388228416443,
+  "total_estimated_minutes": 759.3783203125,
+  "support_grams_from_extrusion": 15.892391162052622,
+  "filament_recipe": "Same 220 C nozzle / 65 C textured plate, 100% cooling after initial layers as successful PLA+ coupon; confirm current spool and plate before starting.",
+  "limitations": [
+    "Clearances and support cleanup are geometric reviews, not a guarantee of physical removal or fit.",
+    "No loaded harness strength validation; start with staged assembly tests.",
+    "Extrusion-derived mass uses 1.75 mm diameter and 1.24 g/cm3; actual spool density and waste vary.",
+    "Original successful coupon was short; the full-length collar and clamp loads remain to be tested."
+  ],
+  "plates": [
+    {
+      "name": "01-carrier",
+      "parts": [
+        [
+          "carrier",
+          "end_reverse-sparse",
+          1
+        ]
+      ],
+      "grams": 55.19896697998047,
+      "minutes": 245.36009114583334,
+      "warning": "",
+      "objects": [
+        {
+          "bbox": {
+            "depth": 112.5,
+            "height": 130.3000030517578,
+            "width": 69.99121856689453,
+            "x": 55.004390716552734,
+            "y": 33.75,
+            "z": 0.0
+          },
+          "id": 5,
+          "name": "carrier-1.stl",
+          "triangle_count": 4506
+        }
+      ],
+      "command": [
+        "/Applications/BambuStudio.app/Contents/MacOS/BambuStudio",
+        "--load-settings",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/machine.json;/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/01-carrier/process.json",
+        "--load-filaments",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/filament.json",
+        "--arrange",
+        "1",
+        "--orient",
+        "0",
+        "--avoid-extrusion-cali-region",
+        "--slice",
+        "0",
+        "--export-3mf",
+        "01-carrier.gcode.3mf",
+        "--outputdir",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/01-carrier",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/01-carrier/carrier-1.stl"
+      ],
+      "file_sha256": "ec89a56f3a203d6cd3740cfbc9f7334e659d353b0e69379ae6c303ffb4148639",
+      "feature_grams": {
+        "Support": 8.173313312374182,
+        "Inner wall": 18.624499105747567,
+        "Outer wall": 9.020373036001368,
+        "Bottom surface": 0.015549909682641999,
+        "Internal solid infill": 5.551022722903895,
+        "Top surface": 1.0449414158957284,
+        "Gap infill": 0.0012451846014017505,
+        "Support transition": 0.4885282802808145,
+        "Support interface": 0.9490578768909965,
+        "Overhang wall": 0.24850164211700873,
+        "Bridge": 2.5034772395386375,
+        "Sparse infill": 6.887030401356458,
+        "Floating vertical shell": 1.6206114421730413
+      },
+      "support_grams": 9.610899469545993,
+      "model_grams": 45.51725210001775,
+      "gcode_md5": "7f880c115941612ce3adc72f3bcd1cae",
+      "object_extrusion_bounds_xy": {},
+      "extrusion_xy_bounds": [
+        [
+          55.214,
+          32.0
+        ],
+        [
+          124.786,
+          148.0
+        ]
+      ],
+      "within_bed_with_0_25mm_line_margin": true,
+      "gaps": [],
+      "actual_settings": {
+        "printer_model": "Bambu Lab A1 mini",
+        "printer_variant": "0.4",
+        "nozzle_diameter": "0.4",
+        "layer_height": "0.2",
+        "wall_loops": "3",
+        "sparse_infill_density": "10%",
+        "sparse_infill_pattern": "gyroid",
+        "curr_bed_type": "Textured PEI Plate",
+        "outer_wall_speed": "30",
+        "inner_wall_speed": "60",
+        "nozzle_temperature": "220",
+        "nozzle_temperature_initial_layer": "220",
+        "textured_plate_temp": "65",
+        "textured_plate_temp_initial_layer": "65",
+        "enable_support": "1",
+        "support_type": "normal(auto)",
+        "support_on_build_plate_only": "1",
+        "support_top_z_distance": "0.24",
+        "support_bottom_z_distance": "0.24",
+        "support_object_xy_distance": "0.4",
+        "support_interface_spacing": "0.5",
+        "support_interface_top_layers": "2",
+        "brim_type": "no_brim",
+        "brim_width": "0",
+        "raft_layers": "0",
+        "print_sequence": "by layer",
+        "enable_arc_fitting": "0",
+        "fan_min_speed": "100",
+        "fan_max_speed": "100"
+      },
+      "max_z": 130.4,
+      "model_object_count": 1,
+      "sha256_inputs": {
+        "carrier-1.stl": "ce8334b0f8dbbcf468fd3d0b05a69bc0b1509f69f90ae3e4087559e613d92765"
+      },
+      "sliced_file": "cad/exports/2026-10-03-v2-low-waste/01-carrier/01-carrier.gcode.3mf",
+      "layer_preview": "01-carrier-layers.png"
+    },
+    {
+      "name": "02-cap-and-jaw",
+      "parts": [
+        [
+          "shaft_cap",
+          "end_reverse-sparse",
+          1
+        ],
+        [
+          "sliding_jaw",
+          "export",
+          1
+        ]
+      ],
+      "grams": 44.0357780456543,
+      "minutes": 209.60128580729167,
+      "warning": "",
+      "objects": [
+        {
+          "bbox": {
+            "depth": 160.0,
+            "height": 102.0,
+            "width": 21.500001907348633,
+            "x": 95.7494888305664,
+            "y": 10.0,
+            "z": 0.0
+          },
+          "id": 38,
+          "name": "shaft_cap-1.stl",
+          "triangle_count": 3104
+        },
+        {
+          "bbox": {
+            "depth": 48.29999542236328,
+            "height": 72.0,
+            "width": 20.998992919921875,
+            "x": 62.75050354003906,
+            "y": 65.85001373291016,
+            "z": 0.0
+          },
+          "id": 49,
+          "name": "sliding_jaw-1.stl",
+          "triangle_count": 1784
+        }
+      ],
+      "command": [
+        "/Applications/BambuStudio.app/Contents/MacOS/BambuStudio",
+        "--load-settings",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/machine.json;/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/02-cap-and-jaw/process.json",
+        "--load-filaments",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/filament.json",
+        "--arrange",
+        "1",
+        "--orient",
+        "0",
+        "--avoid-extrusion-cali-region",
+        "--slice",
+        "0",
+        "--export-3mf",
+        "02-cap-and-jaw.gcode.3mf",
+        "--outputdir",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/02-cap-and-jaw",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/02-cap-and-jaw/shaft_cap-1.stl",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/02-cap-and-jaw/sliding_jaw-1.stl"
+      ],
+      "file_sha256": "8b478a80596d57d54bcc6f368c9865fd56bb70f16552b150f7d1444888e3ecd9",
+      "feature_grams": {
+        "Support": 3.9576914085699326,
+        "Inner wall": 18.44243533506332,
+        "Outer wall": 9.246475075021392,
+        "Bottom surface": 0.1954780257801136,
+        "Support interface": 0.28631213826368196,
+        "Support transition": 0.15809516758440711,
+        "Internal solid infill": 3.193135148869923,
+        "Overhang wall": 0.23551028271932276,
+        "Gap infill": 0.06855944838577659,
+        "Sparse infill": 5.645594924359251,
+        "Floating vertical shell": 0.8156782919360422,
+        "Bridge": 1.010323321459167,
+        "Top surface": 0.7096754395991937
+      },
+      "support_grams": 4.402098714418022,
+      "model_grams": 39.562865293193504,
+      "gcode_md5": "3778ac4d1065fa9b2bb383e9e95afa6c",
+      "object_extrusion_bounds_xy": {
+        "58": [
+          [
+            61.759,
+            64.1
+          ],
+          [
+            84.741,
+            113.94
+          ]
+        ],
+        "47": [
+          [
+            93.999,
+            8.25
+          ],
+          [
+            119.0,
+            171.75
+          ]
+        ]
+      },
+      "extrusion_xy_bounds": [
+        [
+          61.759,
+          8.25
+        ],
+        [
+          119.0,
+          171.75
+        ]
+      ],
+      "within_bed_with_0_25mm_line_margin": true,
+      "gaps": [
+        {
+          "objects": [
+            "58",
+            "47"
+          ],
+          "bbox_separation_minus_line_width_mm": 8.757999999999996
+        }
+      ],
+      "actual_settings": {
+        "printer_model": "Bambu Lab A1 mini",
+        "printer_variant": "0.4",
+        "nozzle_diameter": "0.4",
+        "layer_height": "0.2",
+        "wall_loops": "3",
+        "sparse_infill_density": "10%",
+        "sparse_infill_pattern": "gyroid",
+        "curr_bed_type": "Textured PEI Plate",
+        "outer_wall_speed": "30",
+        "inner_wall_speed": "60",
+        "nozzle_temperature": "220",
+        "nozzle_temperature_initial_layer": "220",
+        "textured_plate_temp": "65",
+        "textured_plate_temp_initial_layer": "65",
+        "enable_support": "1",
+        "support_type": "normal(auto)",
+        "support_on_build_plate_only": "1",
+        "support_top_z_distance": "0.24",
+        "support_bottom_z_distance": "0.24",
+        "support_object_xy_distance": "0.4",
+        "support_interface_spacing": "0.5",
+        "support_interface_top_layers": "2",
+        "brim_type": "no_brim",
+        "brim_width": "0",
+        "raft_layers": "0",
+        "print_sequence": "by layer",
+        "enable_arc_fitting": "0",
+        "fan_min_speed": "100",
+        "fan_max_speed": "100"
+      },
+      "max_z": 102.0,
+      "model_object_count": 2,
+      "sha256_inputs": {
+        "sliding_jaw-1.stl": "18df2e01ab35b46d3cb88a32906f3d33f7f5467cb8a9cf201e49f8046ea5da52",
+        "shaft_cap-1.stl": "1a96c2a57c7a4506865fb4f5c5d2214d24ff00dcd2049a2a44cc76ca8402243b"
+      },
+      "sliced_file": "cad/exports/2026-10-03-v2-low-waste/02-cap-and-jaw/02-cap-and-jaw.gcode.3mf",
+      "layer_preview": "02-cap-and-jaw-layers.png"
+    },
+    {
+      "name": "03-bracket-and-guides",
+      "parts": [
+        [
+          "actuator_bracket",
+          "export",
+          1
+        ],
+        [
+          "string_guide",
+          "export",
+          2
+        ],
+        [
+          "dual_string_guide",
+          "export",
+          1
+        ]
+      ],
+      "grams": 33.09771728515625,
+      "minutes": 151.02591145833333,
+      "warning": "",
+      "objects": [
+        {
+          "bbox": {
+            "depth": 66.0,
+            "height": 35.5,
+            "width": 80.0,
+            "x": 66.1500015258789,
+            "y": 76.80001068115234,
+            "z": 0.0
+          },
+          "id": 74,
+          "name": "actuator_bracket-1.stl",
+          "triangle_count": 10986
+        },
+        {
+          "bbox": {
+            "depth": 57.99203109741211,
+            "height": 14.0,
+            "width": 20.299999237060547,
+            "x": 33.85000991821289,
+            "y": 84.80797576904297,
+            "z": 0.0
+          },
+          "id": 107,
+          "name": "dual_string_guide-1.stl",
+          "triangle_count": 16060
+        },
+        {
+          "bbox": {
+            "depth": 27.60000228881836,
+            "height": 14.0,
+            "width": 34.296051025390625,
+            "x": 111.85394287109375,
+            "y": 37.200008392333984,
+            "z": 0.0
+          },
+          "id": 85,
+          "name": "string_guide-1.stl",
+          "triangle_count": 7692
+        },
+        {
+          "bbox": {
+            "depth": 27.599998474121094,
+            "height": 14.0,
+            "width": 34.29604721069336,
+            "x": 65.55790710449219,
+            "y": 37.20000076293945,
+            "z": 0.0
+          },
+          "id": 96,
+          "name": "string_guide-2.stl",
+          "triangle_count": 7692
+        }
+      ],
+      "command": [
+        "/Applications/BambuStudio.app/Contents/MacOS/BambuStudio",
+        "--load-settings",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/machine.json;/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/03-bracket-and-guides/process.json",
+        "--load-filaments",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/filament.json",
+        "--arrange",
+        "1",
+        "--orient",
+        "0",
+        "--avoid-extrusion-cali-region",
+        "--slice",
+        "0",
+        "--export-3mf",
+        "03-bracket-and-guides.gcode.3mf",
+        "--outputdir",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/03-bracket-and-guides",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/03-bracket-and-guides/actuator_bracket-1.stl",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/03-bracket-and-guides/string_guide-1.stl",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/03-bracket-and-guides/string_guide-2.stl",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/03-bracket-and-guides/dual_string_guide-1.stl"
+      ],
+      "file_sha256": "8f805b86acb63d2ea57eeccf4fed0842737520fadaec5362913f3ad4b99f3b37",
+      "feature_grams": {
+        "Support": 1.193421261366854,
+        "Inner wall": 11.658781979267827,
+        "Outer wall": 5.837023214568041,
+        "Bottom surface": 0.7074027666862509,
+        "Internal solid infill": 5.9040873319232725,
+        "Sparse infill": 3.066932383361742,
+        "Support transition": 0.09495742755158315,
+        "Support interface": 0.17207434738493885,
+        "Floating vertical shell": 1.5343108646192034,
+        "Overhang wall": 0.16150988853615414,
+        "Bridge": 1.4352938590829742,
+        "Gap infill": 0.08447397474791096,
+        "Top surface": 1.1766335041546385
+      },
+      "support_grams": 1.460453036303376,
+      "model_grams": 31.566449766948015,
+      "gcode_md5": "0554908ae412b31a342e5773fee1041e",
+      "object_extrusion_bounds_xy": {
+        "105": [
+          [
+            64.373,
+            37.41
+          ],
+          [
+            99.644,
+            64.59
+          ]
+        ],
+        "83": [
+          [
+            64.4,
+            77.01
+          ],
+          [
+            145.94,
+            142.59
+          ]
+        ],
+        "116": [
+          [
+            32.386,
+            83.58
+          ],
+          [
+            53.94,
+            144.028
+          ]
+        ],
+        "94": [
+          [
+            110.669,
+            37.41
+          ],
+          [
+            145.94,
+            64.59
+          ]
+        ]
+      },
+      "extrusion_xy_bounds": [
+        [
+          32.386,
+          37.41
+        ],
+        [
+          145.94,
+          144.028
+        ]
+      ],
+      "within_bed_with_0_25mm_line_margin": true,
+      "gaps": [
+        {
+          "objects": [
+            "105",
+            "83"
+          ],
+          "bbox_separation_minus_line_width_mm": 11.920000000000002
+        },
+        {
+          "objects": [
+            "105",
+            "116"
+          ],
+          "bbox_separation_minus_line_width_mm": 18.489999999999995
+        },
+        {
+          "objects": [
+            "105",
+            "94"
+          ],
+          "bbox_separation_minus_line_width_mm": 10.524999999999991
+        },
+        {
+          "objects": [
+            "83",
+            "116"
+          ],
+          "bbox_separation_minus_line_width_mm": 9.960000000000008
+        },
+        {
+          "objects": [
+            "83",
+            "94"
+          ],
+          "bbox_separation_minus_line_width_mm": 11.920000000000002
+        },
+        {
+          "objects": [
+            "116",
+            "94"
+          ],
+          "bbox_separation_minus_line_width_mm": 56.229
+        }
+      ],
+      "actual_settings": {
+        "printer_model": "Bambu Lab A1 mini",
+        "printer_variant": "0.4",
+        "nozzle_diameter": "0.4",
+        "layer_height": "0.2",
+        "wall_loops": "3",
+        "sparse_infill_density": "10%",
+        "sparse_infill_pattern": "gyroid",
+        "curr_bed_type": "Textured PEI Plate",
+        "outer_wall_speed": "30",
+        "inner_wall_speed": "60",
+        "nozzle_temperature": "220",
+        "nozzle_temperature_initial_layer": "220",
+        "textured_plate_temp": "65",
+        "textured_plate_temp_initial_layer": "65",
+        "enable_support": "1",
+        "support_type": "normal(auto)",
+        "support_on_build_plate_only": "1",
+        "support_top_z_distance": "0.2",
+        "support_bottom_z_distance": "0.2",
+        "support_object_xy_distance": "0.4",
+        "support_interface_spacing": "0.5",
+        "support_interface_top_layers": "2",
+        "brim_type": "no_brim",
+        "brim_width": "0",
+        "raft_layers": "0",
+        "print_sequence": "by layer",
+        "enable_arc_fitting": "0",
+        "fan_min_speed": "100",
+        "fan_max_speed": "100"
+      },
+      "max_z": 35.6,
+      "model_object_count": 4,
+      "sha256_inputs": {
+        "actuator_bracket-1.stl": "daa1e4c191e03e9a24ef569600e4985e4aafb573835d8f7f84c9d74a0c831d78",
+        "dual_string_guide-1.stl": "fb010d1bbc5174ce9b347628b6156841364932b1a4caadde23abbb5c53c723ac",
+        "string_guide-2.stl": "0e80119d4545d21c8813a3219541758c745b5da4ee3b5429b7ddee1ac323cbe6",
+        "string_guide-1.stl": "0e80119d4545d21c8813a3219541758c745b5da4ee3b5429b7ddee1ac323cbe6"
+      },
+      "sliced_file": "cad/exports/2026-10-03-v2-low-waste/03-bracket-and-guides/03-bracket-and-guides.gcode.3mf",
+      "layer_preview": "03-bracket-and-guides-layers.png"
+    },
+    {
+      "name": "04-rocker-and-pivot",
+      "parts": [
+        [
+          "rocker",
+          "export",
+          1
+        ],
+        [
+          "pivot_key",
+          "export",
+          1
+        ]
+      ],
+      "grams": 3.9730002880096436,
+      "minutes": 68.414990234375,
+      "warning": "",
+      "objects": [
+        {
+          "bbox": {
+            "depth": 17.499216079711914,
+            "height": 34.0,
+            "width": 24.19456672668457,
+            "x": 77.90271759033203,
+            "y": 90.03285217285156,
+            "z": 0.0
+          },
+          "id": 38,
+          "name": "rocker-1.stl",
+          "triangle_count": 7540
+        },
+        {
+          "bbox": {
+            "depth": 8.399995803833008,
+            "height": 25.0,
+            "width": 7.400002479553223,
+            "x": 77.92733764648438,
+            "y": 72.46793365478516,
+            "z": 0.0
+          },
+          "id": 49,
+          "name": "pivot_key-1.stl",
+          "triangle_count": 524
+        }
+      ],
+      "command": [
+        "/Applications/BambuStudio.app/Contents/MacOS/BambuStudio",
+        "--load-settings",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/machine.json;/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/04-rocker-and-pivot/process.json",
+        "--load-filaments",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/filament.json",
+        "--arrange",
+        "1",
+        "--orient",
+        "0",
+        "--avoid-extrusion-cali-region",
+        "--slice",
+        "0",
+        "--export-3mf",
+        "04-rocker-and-pivot.gcode.3mf",
+        "--outputdir",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/04-rocker-and-pivot",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/04-rocker-and-pivot/rocker-1.stl",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/04-rocker-and-pivot/pivot_key-1.stl"
+      ],
+      "file_sha256": "03341d4f50edc32995660c7948bb308b7ee588859e9747d98fcd703af33f4fe4",
+      "feature_grams": {
+        "Support": 0.3738522634002949,
+        "Inner wall": 1.6520555372300452,
+        "Outer wall": 1.0321310376032666,
+        "Gap infill": 0.13564593486288867,
+        "Bottom surface": 0.005406646477848663,
+        "Internal solid infill": 0.4929487467580603,
+        "Sparse infill": 0.05415334644616434,
+        "Floating vertical shell": 0.024357229303972577,
+        "Bridge": 0.05456115044278639,
+        "Top surface": 0.023992374020517935,
+        "Support transition": 0.01789595331390647,
+        "Support interface": 0.027191725071028502,
+        "Overhang wall": 0.007996513532822894
+      },
+      "support_grams": 0.4189399417852299,
+      "model_grams": 3.4832485166783735,
+      "gcode_md5": "126f4171f7d70bedc696b65db59b690d",
+      "object_extrusion_bounds_xy": {
+        "58": [
+          [
+            78.137,
+            72.678
+          ],
+          [
+            85.117,
+            80.658
+          ]
+        ],
+        "47": [
+          [
+            78.113,
+            88.264
+          ],
+          [
+            101.887,
+            107.321
+          ]
+        ]
+      },
+      "extrusion_xy_bounds": [
+        [
+          78.113,
+          72.678
+        ],
+        [
+          101.887,
+          107.321
+        ]
+      ],
+      "within_bed_with_0_25mm_line_margin": true,
+      "gaps": [
+        {
+          "objects": [
+            "58",
+            "47"
+          ],
+          "bbox_separation_minus_line_width_mm": 7.1059999999999945
+        }
+      ],
+      "actual_settings": {
+        "printer_model": "Bambu Lab A1 mini",
+        "printer_variant": "0.4",
+        "nozzle_diameter": "0.4",
+        "layer_height": "0.12",
+        "wall_loops": "3",
+        "sparse_infill_density": "15%",
+        "sparse_infill_pattern": "gyroid",
+        "curr_bed_type": "Textured PEI Plate",
+        "outer_wall_speed": "30",
+        "inner_wall_speed": "60",
+        "nozzle_temperature": "220",
+        "nozzle_temperature_initial_layer": "220",
+        "textured_plate_temp": "65",
+        "textured_plate_temp_initial_layer": "65",
+        "enable_support": "1",
+        "support_type": "normal(auto)",
+        "support_on_build_plate_only": "1",
+        "support_top_z_distance": "0.24",
+        "support_bottom_z_distance": "0.24",
+        "support_object_xy_distance": "0.4",
+        "support_interface_spacing": "0.5",
+        "support_interface_top_layers": "2",
+        "brim_type": "no_brim",
+        "brim_width": "0",
+        "raft_layers": "0",
+        "print_sequence": "by layer",
+        "enable_arc_fitting": "0",
+        "fan_min_speed": "100",
+        "fan_max_speed": "100"
+      },
+      "max_z": 34.04,
+      "model_object_count": 2,
+      "sha256_inputs": {
+        "pivot_key-1.stl": "30d7796440bc812562d9524cc924c8842dd388a55a6ec043936cdaa39060d7c5",
+        "rocker-1.stl": "0bee0c784fb0644c5feec7c1f53a52999ad2d2af4a890851e727436dc9021da5"
+      },
+      "sliced_file": "cad/exports/2026-10-03-v2-low-waste/04-rocker-and-pivot/04-rocker-and-pivot.gcode.3mf",
+      "layer_preview": "04-rocker-and-pivot-layers.png"
+    },
+    {
+      "name": "05-fasteners",
+      "parts": [
+        [
+          "thumb_screw",
+          "original",
+          5
+        ],
+        [
+          "thumb_nut",
+          "original",
+          4
+        ]
+      ],
+      "grams": 8.57841968536377,
+      "minutes": 84.97604166666666,
+      "warning": "",
+      "objects": [
+        {
+          "area": 153.8740692138672,
+          "bbox": [
+            32.99998,
+            38.00218,
+            47.00000000000001,
+            51.997820000000004
+          ],
+          "id": 114,
+          "layer_height": 0.20000000298023224,
+          "name": "thumb_screw-1"
+        },
+        {
+          "area": 153.8740692138672,
+          "bbox": [
+            72.99998000000001,
+            38.00218,
+            87.00000000000001,
+            51.997820000000004
+          ],
+          "id": 115,
+          "layer_height": 0.20000000298023224,
+          "name": "thumb_screw-2"
+        },
+        {
+          "area": 153.8740692138672,
+          "bbox": [
+            112.99998000000001,
+            38.00218,
+            127.00000000000001,
+            51.997820000000004
+          ],
+          "id": 116,
+          "layer_height": 0.20000000298023224,
+          "name": "thumb_screw-3"
+        },
+        {
+          "area": 153.8740692138672,
+          "bbox": [
+            32.99998,
+            78.00218000000001,
+            47.00000000000001,
+            91.99782
+          ],
+          "id": 117,
+          "layer_height": 0.20000000298023224,
+          "name": "thumb_screw-4"
+        },
+        {
+          "area": 153.8740692138672,
+          "bbox": [
+            72.99998000000001,
+            78.00218000000001,
+            87.00000000000001,
+            91.99782
+          ],
+          "id": 118,
+          "layer_height": 0.20000000298023224,
+          "name": "thumb_screw-5"
+        },
+        {
+          "area": 153.45298767089844,
+          "bbox": [
+            110.99999000000001,
+            77.20577,
+            128.99999,
+            92.79423000000001
+          ],
+          "id": 119,
+          "layer_height": 0.20000000298023224,
+          "name": "thumb_nut-1"
+        },
+        {
+          "area": 153.45298767089844,
+          "bbox": [
+            30.999990000000004,
+            117.20576000000001,
+            48.999990000000004,
+            132.79422000000002
+          ],
+          "id": 120,
+          "layer_height": 0.20000000298023224,
+          "name": "thumb_nut-2"
+        },
+        {
+          "area": 153.45298767089844,
+          "bbox": [
+            70.99999000000001,
+            117.20576000000001,
+            88.99999000000001,
+            132.79422000000002
+          ],
+          "id": 121,
+          "layer_height": 0.20000000298023224,
+          "name": "thumb_nut-3"
+        },
+        {
+          "area": 153.45298767089844,
+          "bbox": [
+            110.99999000000001,
+            117.20576000000001,
+            128.99999,
+            132.79422000000002
+          ],
+          "id": 122,
+          "layer_height": 0.20000000298023224,
+          "name": "thumb_nut-4"
+        }
+      ],
+      "command": [
+        "/Applications/BambuStudio.app/Contents/MacOS/BambuStudio",
+        "--load-settings",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/machine.json;/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/05-fasteners/process.json",
+        "--load-filaments",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/filament.json",
+        "--arrange",
+        "0",
+        "--orient",
+        "0",
+        "--avoid-extrusion-cali-region",
+        "--slice",
+        "0",
+        "--export-3mf",
+        "05-fasteners.gcode.3mf",
+        "--outputdir",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/05-fasteners",
+        "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/05-fasteners/spaced-fasteners.3mf"
+      ],
+      "file_sha256": "2aef4ccbbc7e3ff686e8aa02df010cc0fbe9f121e68d38b2a37c3e50ad3ecd59",
+      "feature_grams": {
+        "Inner wall": 2.2518010910087094,
+        "Outer wall": 2.2795843153013426,
+        "Bottom surface": 0.22521616215952944,
+        "Internal solid infill": 0.9194617396945011,
+        "Sparse infill": 1.9029674670951258,
+        "Floating vertical shell": 0.3484909587985582,
+        "Bridge": 0.4021233433191076,
+        "Top surface": 0.175278321387214,
+        "Gap infill": 0.0026843840494373923
+      },
+      "support_grams": 0,
+      "model_grams": 8.507607782813526,
+      "gcode_md5": "da919c5554f9ae9aab181f0e7727c346",
+      "object_extrusion_bounds_xy": {
+        "32": [
+          [
+            31.242,
+            117.416
+          ],
+          [
+            48.758,
+            132.584
+          ]
+        ],
+        "36": [
+          [
+            71.242,
+            117.416
+          ],
+          [
+            88.758,
+            132.584
+          ]
+        ],
+        "40": [
+          [
+            111.242,
+            117.416
+          ],
+          [
+            128.758,
+            132.584
+          ]
+        ],
+        "8": [
+          [
+            33.219,
+            38.212
+          ],
+          [
+            46.781,
+            51.788
+          ]
+        ],
+        "12": [
+          [
+            73.219,
+            38.212
+          ],
+          [
+            86.781,
+            51.788
+          ]
+        ],
+        "16": [
+          [
+            113.219,
+            38.212
+          ],
+          [
+            126.781,
+            51.788
+          ]
+        ],
+        "20": [
+          [
+            33.219,
+            78.212
+          ],
+          [
+            46.781,
+            91.788
+          ]
+        ],
+        "24": [
+          [
+            73.219,
+            78.212
+          ],
+          [
+            86.781,
+            91.788
+          ]
+        ],
+        "28": [
+          [
+            111.242,
+            77.416
+          ],
+          [
+            128.758,
+            92.584
+          ]
+        ]
+      },
+      "extrusion_xy_bounds": [
+        [
+          31.242,
+          38.212
+        ],
+        [
+          128.758,
+          132.584
+        ]
+      ],
+      "within_bed_with_0_25mm_line_margin": true,
+      "gaps": [
+        {
+          "objects": [
+            "32",
+            "36"
+          ],
+          "bbox_separation_minus_line_width_mm": 21.984
+        },
+        {
+          "objects": [
+            "32",
+            "40"
+          ],
+          "bbox_separation_minus_line_width_mm": 61.984
+        },
+        {
+          "objects": [
+            "32",
+            "8"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.128
+        },
+        {
+          "objects": [
+            "32",
+            "12"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.128
+        },
+        {
+          "objects": [
+            "32",
+            "16"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.128
+        },
+        {
+          "objects": [
+            "32",
+            "20"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.128
+        },
+        {
+          "objects": [
+            "32",
+            "24"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.128
+        },
+        {
+          "objects": [
+            "32",
+            "28"
+          ],
+          "bbox_separation_minus_line_width_mm": 61.984
+        },
+        {
+          "objects": [
+            "36",
+            "40"
+          ],
+          "bbox_separation_minus_line_width_mm": 21.98400000000001
+        },
+        {
+          "objects": [
+            "36",
+            "8"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.128
+        },
+        {
+          "objects": [
+            "36",
+            "12"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.128
+        },
+        {
+          "objects": [
+            "36",
+            "16"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.128
+        },
+        {
+          "objects": [
+            "36",
+            "20"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.128
+        },
+        {
+          "objects": [
+            "36",
+            "24"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.128
+        },
+        {
+          "objects": [
+            "36",
+            "28"
+          ],
+          "bbox_separation_minus_line_width_mm": 24.331999999999994
+        },
+        {
+          "objects": [
+            "40",
+            "8"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.128
+        },
+        {
+          "objects": [
+            "40",
+            "12"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.128
+        },
+        {
+          "objects": [
+            "40",
+            "16"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.128
+        },
+        {
+          "objects": [
+            "40",
+            "20"
+          ],
+          "bbox_separation_minus_line_width_mm": 63.96100000000001
+        },
+        {
+          "objects": [
+            "40",
+            "24"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.128
+        },
+        {
+          "objects": [
+            "40",
+            "28"
+          ],
+          "bbox_separation_minus_line_width_mm": 24.331999999999994
+        },
+        {
+          "objects": [
+            "8",
+            "12"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.937999999999995
+        },
+        {
+          "objects": [
+            "8",
+            "16"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.93799999999999
+        },
+        {
+          "objects": [
+            "8",
+            "20"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.924000000000007
+        },
+        {
+          "objects": [
+            "8",
+            "24"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.937999999999995
+        },
+        {
+          "objects": [
+            "8",
+            "28"
+          ],
+          "bbox_separation_minus_line_width_mm": 63.96100000000001
+        },
+        {
+          "objects": [
+            "12",
+            "16"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.937999999999988
+        },
+        {
+          "objects": [
+            "12",
+            "20"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.937999999999995
+        },
+        {
+          "objects": [
+            "12",
+            "24"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.924000000000007
+        },
+        {
+          "objects": [
+            "12",
+            "28"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.128
+        },
+        {
+          "objects": [
+            "16",
+            "20"
+          ],
+          "bbox_separation_minus_line_width_mm": 65.93799999999999
+        },
+        {
+          "objects": [
+            "16",
+            "24"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.937999999999988
+        },
+        {
+          "objects": [
+            "16",
+            "28"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.128
+        },
+        {
+          "objects": [
+            "20",
+            "24"
+          ],
+          "bbox_separation_minus_line_width_mm": 25.937999999999995
+        },
+        {
+          "objects": [
+            "20",
+            "28"
+          ],
+          "bbox_separation_minus_line_width_mm": 63.96100000000001
+        },
+        {
+          "objects": [
+            "24",
+            "28"
+          ],
+          "bbox_separation_minus_line_width_mm": 23.961
+        }
+      ],
+      "actual_settings": {
+        "printer_model": "Bambu Lab A1 mini",
+        "printer_variant": "0.4",
+        "nozzle_diameter": "0.4",
+        "layer_height": "0.12",
+        "wall_loops": "2",
+        "sparse_infill_density": "15%",
+        "sparse_infill_pattern": "grid",
+        "curr_bed_type": "Textured PEI Plate",
+        "outer_wall_speed": "30",
+        "inner_wall_speed": "60",
+        "nozzle_temperature": "220",
+        "nozzle_temperature_initial_layer": "220",
+        "textured_plate_temp": "65",
+        "textured_plate_temp_initial_layer": "65",
+        "enable_support": "0",
+        "support_type": "normal(auto)",
+        "support_on_build_plate_only": "1",
+        "support_top_z_distance": "0.24",
+        "support_bottom_z_distance": "0.24",
+        "support_object_xy_distance": "0.4",
+        "support_interface_spacing": "0.5",
+        "support_interface_top_layers": "2",
+        "brim_type": "no_brim",
+        "brim_width": "0",
+        "raft_layers": "0",
+        "print_sequence": "by layer",
+        "enable_arc_fitting": "0",
+        "fan_min_speed": "100",
+        "fan_max_speed": "100"
+      },
+      "max_z": 23.96,
+      "model_object_count": 9,
+      "sha256_inputs": {
+        "thumb_nut-4.stl": "78fc48665a63e62b76f8f408ef8f48804022bd901e3e8d6150797a44f551c9bb",
+        "thumb_nut-2.stl": "78fc48665a63e62b76f8f408ef8f48804022bd901e3e8d6150797a44f551c9bb",
+        "thumb_nut-3.stl": "78fc48665a63e62b76f8f408ef8f48804022bd901e3e8d6150797a44f551c9bb",
+        "thumb_nut-1.stl": "78fc48665a63e62b76f8f408ef8f48804022bd901e3e8d6150797a44f551c9bb",
+        "thumb_screw-4.stl": "a9b26b0da7bfad8291103f93eb8ee573f98028e85c52f440d6467df1e86bea1c",
+        "thumb_screw-5.stl": "a9b26b0da7bfad8291103f93eb8ee573f98028e85c52f440d6467df1e86bea1c",
+        "thumb_screw-2.stl": "a9b26b0da7bfad8291103f93eb8ee573f98028e85c52f440d6467df1e86bea1c",
+        "thumb_screw-3.stl": "a9b26b0da7bfad8291103f93eb8ee573f98028e85c52f440d6467df1e86bea1c",
+        "thumb_screw-1.stl": "a9b26b0da7bfad8291103f93eb8ee573f98028e85c52f440d6467df1e86bea1c"
+      },
+      "sliced_file": "cad/exports/2026-10-03-v2-low-waste/05-fasteners/05-fasteners.gcode.3mf",
+      "layer_preview": "05-fasteners-layers.png"
+    }
+  ],
+  "orientation_candidates": [
+    {
+      "part": "carrier",
+      "orientation": "export",
+      "rotation_from_print_stl": [
+        null,
+        0
+      ],
+      "source_sha256": "04438fa042491fd19786de7b1d094a47304e1a322982cd9e1da0a5fcfeec3b49",
+      "grams": 49.51046371459961,
+      "minutes": 239.55227864583333,
+      "warnings": "",
+      "support_grams": 4.785064635101535,
+      "model_grams": 44.654581771827445
+    },
+    {
+      "part": "carrier",
+      "orientation": "end",
+      "rotation_from_print_stl": [
+        "Y",
+        -90
+      ],
+      "source_sha256": "04438fa042491fd19786de7b1d094a47304e1a322982cd9e1da0a5fcfeec3b49",
+      "grams": 99.35086059570312,
+      "minutes": 314.153515625,
+      "warnings": "",
+      "support_grams": 53.9031872521518,
+      "model_grams": 45.37685594800394
+    },
+    {
+      "part": "carrier",
+      "orientation": "side",
+      "rotation_from_print_stl": [
+        "X",
+        90
+      ],
+      "source_sha256": "04438fa042491fd19786de7b1d094a47304e1a322982cd9e1da0a5fcfeec3b49",
+      "grams": 57.8239860534668,
+      "minutes": 221.46080729166667,
+      "warnings": "",
+      "support_grams": 13.16875428534397,
+      "model_grams": 44.58441395378299
+    },
+    {
+      "part": "shaft_cap",
+      "orientation": "export",
+      "rotation_from_print_stl": [
+        null,
+        0
+      ],
+      "source_sha256": "87963a9f9c9986d4f0965db258e5d094ae15647ca52ea6f475ecb25fd0a655d3",
+      "grams": 37.26829147338867,
+      "minutes": 133.61661783854166,
+      "warnings": "",
+      "support_grams": 8.216953977030613,
+      "model_grams": 28.980523495011568
+    },
+    {
+      "part": "shaft_cap",
+      "orientation": "end",
+      "rotation_from_print_stl": [
+        "Y",
+        90
+      ],
+      "source_sha256": "87963a9f9c9986d4f0965db258e5d094ae15647ca52ea6f475ecb25fd0a655d3",
+      "grams": 46.56209182739258,
+      "minutes": 196.88131510416667,
+      "warnings": "",
+      "support_grams": 15.599961635764306,
+      "model_grams": 30.891316157994538
+    },
+    {
+      "part": "shaft_cap",
+      "orientation": "rail_down",
+      "rotation_from_print_stl": [
+        "Y",
+        180
+      ],
+      "source_sha256": "87963a9f9c9986d4f0965db258e5d094ae15647ca52ea6f475ecb25fd0a655d3",
+      "grams": 39.19224166870117,
+      "minutes": 137.19293619791668,
+      "warnings": "",
+      "support_grams": 10.085645239341684,
+      "model_grams": 29.03578357611018
+    },
+    {
+      "part": "sliding_jaw",
+      "orientation": "export",
+      "rotation_from_print_stl": [
+        null,
+        0
+      ],
+      "source_sha256": "b72f4865f0ccc857d546fed6941df4baed1f0d23ec9eac1d4fde61a04dfdce9e",
+      "grams": 8.785619735717773,
+      "minutes": 80.33280436197917,
+      "warnings": "",
+      "support_grams": 0.07135666228376374,
+      "model_grams": 8.643450864200249
+    },
+    {
+      "part": "sliding_jaw",
+      "orientation": "side",
+      "rotation_from_print_stl": [
+        "X",
+        90
+      ],
+      "source_sha256": "b72f4865f0ccc857d546fed6941df4baed1f0d23ec9eac1d4fde61a04dfdce9e",
+      "grams": 9.17183780670166,
+      "minutes": 48.90345458984375,
+      "warnings": "",
+      "support_grams": 0.46324860805959805,
+      "model_grams": 8.637776504076973
+    },
+    {
+      "part": "actuator_bracket",
+      "orientation": "export",
+      "rotation_from_print_stl": [
+        null,
+        0
+      ],
+      "source_sha256": "7ef8efd7961fd1b46022f48d64244b25a3fd7952a635e173a19f958b3a8fec93",
+      "grams": 18.87187385559082,
+      "minutes": 93.7006591796875,
+      "warnings": "",
+      "support_grams": 0.48590139978623587,
+      "model_grams": 18.315159299109546
+    },
+    {
+      "part": "actuator_bracket",
+      "orientation": "edge",
+      "rotation_from_print_stl": [
+        "X",
+        90
+      ],
+      "source_sha256": "7ef8efd7961fd1b46022f48d64244b25a3fd7952a635e173a19f958b3a8fec93",
+      "grams": 22.016141891479492,
+      "minutes": 119.52202962239583,
+      "warnings": "",
+      "support_grams": 2.9035453079796993,
+      "model_grams": 19.041784150105553
+    },
+    {
+      "part": "rocker",
+      "orientation": "export",
+      "rotation_from_print_stl": [
+        null,
+        0
+      ],
+      "source_sha256": "488fa3393243db00f03f4ce130b9497e5f35c570247528af964c96f2a541ed2a",
+      "grams": 3.0608725547790527,
+      "minutes": 59.996317545572914,
+      "warnings": "",
+      "support_grams": 0.4206355211904776,
+      "model_grams": 2.569425078083361
+    },
+    {
+      "part": "pivot_key",
+      "orientation": "export",
+      "rotation_from_print_stl": [
+        null,
+        0
+      ],
+      "source_sha256": "b6be284803b6f86d6923f0a6442d6ddcd5cf3b53cf0ce55bb6de00234bbab665",
+      "grams": 0.9871127605438232,
+      "minutes": 20.866505940755207,
+      "warnings": "",
+      "support_grams": 0,
+      "model_grams": 0.916300982834833
+    },
+    {
+      "part": "pivot_key",
+      "orientation": "side",
+      "rotation_from_print_stl": [
+        "Y",
+        90
+      ],
+      "source_sha256": "b6be284803b6f86d6923f0a6442d6ddcd5cf3b53cf0ce55bb6de00234bbab665",
+      "grams": 0.8803340792655945,
+      "minutes": 14.774609375,
+      "warnings": "",
+      "support_grams": 0.05048272274512936,
+      "model_grams": 0.7590395869702763
+    },
+    {
+      "part": "string_guide",
+      "orientation": "export",
+      "rotation_from_print_stl": [
+        null,
+        0
+      ],
+      "source_sha256": "136e5e5c5edf0a62019f7b3545664a2f1cc96698e5b884ec56e42d836e9084df",
+      "grams": 4.48229455947876,
+      "minutes": 28.455489095052084,
+      "warnings": "",
+      "support_grams": 0.24216691570330948,
+      "model_grams": 4.169315794286921
+    },
+    {
+      "part": "string_guide",
+      "orientation": "side",
+      "rotation_from_print_stl": [
+        "X",
+        90
+      ],
+      "source_sha256": "136e5e5c5edf0a62019f7b3545664a2f1cc96698e5b884ec56e42d836e9084df",
+      "grams": 4.309961795806885,
+      "minutes": 40.450984700520834,
+      "warnings": "",
+      "support_grams": 0.17003076410105522,
+      "model_grams": 4.069119011460335
+    },
+    {
+      "part": "dual_string_guide",
+      "orientation": "export",
+      "rotation_from_print_stl": [
+        null,
+        0
+      ],
+      "source_sha256": "e5ee0a9ae6235602352c355c2980a464f05ebd6ae146e70b0a0c3d86fba39d14",
+      "grams": 5.471700668334961,
+      "minutes": 32.74171549479167,
+      "warnings": "",
+      "support_grams": 0.48822978672430273,
+      "model_grams": 4.912658879265359
+    },
+    {
+      "part": "dual_string_guide",
+      "orientation": "side",
+      "rotation_from_print_stl": [
+        "X",
+        90
+      ],
+      "source_sha256": "e5ee0a9ae6235602352c355c2980a464f05ebd6ae146e70b0a0c3d86fba39d14",
+      "grams": 6.088883876800537,
+      "minutes": 64.09070231119792,
+      "warnings": "",
+      "support_grams": 0.9462936499907484,
+      "model_grams": 5.071778224531305
+    },
+    {
+      "part": "carrier",
+      "orientation": "side_reverse",
+      "rotation_from_print_stl": [
+        "X",
+        -90
+      ],
+      "source_sha256": "04438fa042491fd19786de7b1d094a47304e1a322982cd9e1da0a5fcfeec3b49",
+      "grams": 57.36042404174805,
+      "minutes": 221.7626953125,
+      "warnings": "",
+      "support_grams": 12.669875872223283,
+      "model_grams": 44.61973148590895
+    },
+    {
+      "part": "carrier",
+      "orientation": "end_reverse",
+      "rotation_from_print_stl": [
+        "Y",
+        90
+      ],
+      "source_sha256": "04438fa042491fd19786de7b1d094a47304e1a322982cd9e1da0a5fcfeec3b49",
+      "grams": 58.283966064453125,
+      "minutes": 248.93323567708333,
+      "warnings": "",
+      "support_grams": 12.69589816945002,
+      "model_grams": 45.51725210001775
+    },
+    {
+      "part": "carrier",
+      "orientation": "opposite",
+      "rotation_from_print_stl": [
+        "Y",
+        180
+      ],
+      "source_sha256": "04438fa042491fd19786de7b1d094a47304e1a322982cd9e1da0a5fcfeec3b49",
+      "grams": 130.92538452148438,
+      "minutes": 369.6062825520833,
+      "warnings": "",
+      "support_grams": 86.51924233715434,
+      "model_grams": 44.33531469821394
+    },
+    {
+      "part": "shaft_cap",
+      "orientation": "end_reverse",
+      "rotation_from_print_stl": [
+        "Y",
+        -90
+      ],
+      "source_sha256": "87963a9f9c9986d4f0965db258e5d094ae15647ca52ea6f475ecb25fd0a655d3",
+      "grams": 36.22452163696289,
+      "minutes": 177.85380859375,
+      "warnings": "",
+      "support_grams": 5.234294634055943,
+      "model_grams": 30.919414428992393
+    },
+    {
+      "part": "shaft_cap",
+      "orientation": "side",
+      "rotation_from_print_stl": [
+        "X",
+        90
+      ],
+      "source_sha256": "87963a9f9c9986d4f0965db258e5d094ae15647ca52ea6f475ecb25fd0a655d3",
+      "grams": 49.581600189208984,
+      "minutes": 246.24015299479166,
+      "warnings": "",
+      "support_grams": 16.023905281582152,
+      "model_grams": 33.486876482455756
+    },
+    {
+      "part": "carrier",
+      "orientation": "end_reverse-sparse",
+      "rotation_from_print_stl": [
+        "Y",
+        90
+      ],
+      "source_sha256": "04438fa042491fd19786de7b1d094a47304e1a322982cd9e1da0a5fcfeec3b49",
+      "grams": 55.19896697998047,
+      "minutes": 245.35983072916667,
+      "warnings": "",
+      "support_grams": 9.610899469545993,
+      "model_grams": 45.51725210001775
+    },
+    {
+      "part": "shaft_cap",
+      "orientation": "end_reverse-sparse",
+      "rotation_from_print_stl": [
+        "Y",
+        -90
+      ],
+      "source_sha256": "87963a9f9c9986d4f0965db258e5d094ae15647ca52ea6f475ecb25fd0a655d3",
+      "grams": 35.19817352294922,
+      "minutes": 176.4826171875,
+      "warnings": "",
+      "support_grams": 4.2079470284118985,
+      "model_grams": 30.919414428992393
+    }
+  ],
+  "additional_rejected_tree_trials": [
+    "Carrier end-reversed tree support increased support to 17.23 g vs 9.61 g selected sparse normal support.",
+    "Cap end-reversed tree support failed arrangement within the bed; rejected."
+  ],
+  "source_stl_sha256": {
+    "carrier.stl": "04438fa042491fd19786de7b1d094a47304e1a322982cd9e1da0a5fcfeec3b49",
+    "actuator_bracket.stl": "7ef8efd7961fd1b46022f48d64244b25a3fd7952a635e173a19f958b3a8fec93",
+    "dual_string_guide.stl": "e5ee0a9ae6235602352c355c2980a464f05ebd6ae146e70b0a0c3d86fba39d14",
+    "shaft_cap.stl": "87963a9f9c9986d4f0965db258e5d094ae15647ca52ea6f475ecb25fd0a655d3",
+    "sliding_jaw.stl": "b72f4865f0ccc857d546fed6941df4baed1f0d23ec9eac1d4fde61a04dfdce9e",
+    "rocker.stl": "488fa3393243db00f03f4ce130b9497e5f35c570247528af964c96f2a541ed2a",
+    "string_guide.stl": "136e5e5c5edf0a62019f7b3545664a2f1cc96698e5b884ec56e42d836e9084df",
+    "thumb_nut.stl": "78fc48665a63e62b76f8f408ef8f48804022bd901e3e8d6150797a44f551c9bb",
+    "pivot_key.stl": "b6be284803b6f86d6923f0a6442d6ddcd5cf3b53cf0ce55bb6de00234bbab665",
+    "thumb_screw.stl": "a9b26b0da7bfad8291103f93eb8ee573f98028e85c52f440d6467df1e86bea1c"
+  }
+}

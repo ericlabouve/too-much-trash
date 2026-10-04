@@ -1,6 +1,6 @@
 # V2 compact-rails-r12 manufacturing files
 
-**Printing is paused for layout review.** The user declined another coupon. Do not send earlier r10/r11 prepared or uploaded jobs as this revision. These are geometric exports, not an approved full-harness slice. Review orientation, support cleanup and low-material settings before submission.
+**Fresh slices reviewed; printing remains paused.** See the [2026-10-03 five-plate review](jobs/2026-10-03-current-low-waste/README.md) for the current files, settings, support previews and checksums. Reuse the user’s two successful screws and two nuts; the prepared plates contain the remaining eighteen pieces. No upload or start has been performed. The user declined another coupon. Do not send earlier r10/r11 prepared or uploaded jobs as this revision.
 
 STLs are millimetres, 100% scale and bed-oriented. Carrier, shaft cap, sliding jaw, actuator bracket, rocker, pivot key and new dual-eye string guide changed from r11. The successful screw/nut designs remain reusable. The revised rocker and pivot key must be printed together with the updated bracket. Use two exact copies of the original centered-eye string guide and one new dual-eye guide nearest the harness. Earlier revisions are in [Git history](../history.md).
 
@@ -26,4 +26,4 @@ No extra coupon is scheduled. Following layout approval, prepare and review fres
 
 Inset-guide update: carrier, shaft cap and actuator bracket exports replace the prior Z−32 upper-hole layout. Use these matching parts together; the nominal shaft opening, lower pair and fastener quantities stay unchanged. The bracket’s press/return stop tabs are intentional.
 
-Indexing-ledge refinement: the bracket now has a 4 mm-wide outer support joining the upper beam, replacing its thin 1.5 mm connector. Use the refreshed actuator bracket STL. Existing prepared jobs and reference slice estimates do not qualify this revision; fresh low-waste slicing and support-removal review remain required before sending the next batch.
+Indexing-ledge refinement: the bracket now has a 4 mm-wide outer support joining the upper beam, replacing its thin 1.5 mm connector. Use the refreshed actuator bracket STL. The linked 2026-10-03 low-waste review includes this refinement. Earlier jobs and reference slice estimates do not qualify this revision; physical support removal and assembly fit still require testing.
