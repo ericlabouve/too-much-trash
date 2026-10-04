@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-10-04T05:39:10.150862+00:00",
+  "remote_file": "tmt-v2-plate2-organic-3b8ad86a.gcode.3mf",
+  "gcode_md5": "42d4df792859cd0e852972c820a5c14d",
+  "user_confirmed": "Plate clear and ready; authorized Tree Organic plate 2.",
+  "start_outcome": "verified",
+  "observed_state": {
+    "gcode_state": "PREPARE",
+    "subtask_name": "tmt-v2-plate2-organic-3b8ad86a.gcode.3mf",
+    "stage": "no_stage",
+    "print_error": 0,
+    "remaining_time_min": 0
+  },
+  "physical_result": "User stopped early because Tree Organic supports were not adhering well to plate. Cleanup comparison not reached."
+}
