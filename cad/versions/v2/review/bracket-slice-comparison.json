@@ -1,0 +1,23 @@
+{
+  "r7": {
+    "stl_sha256": "f14c3f84e30b754d7cace91d0a0bf53144554ae96275f45b1cda3735f3b82e4e",
+    "grams_including_support": 29.453529357910156,
+    "minutes": 99.7548583984375,
+    "warning": ""
+  },
+  "r8": {
+    "stl_sha256": "49a571bdfac917c264ec9ff938055eafbf141cd7ee81c646213c4d5e9435cf60",
+    "grams_including_support": 26.099308013916016,
+    "minutes": 104.80999348958333,
+    "warning": ""
+  },
+  "mass_reduction_percent": 11.388181372882967,
+  "settings": {
+    "printer": "A1 mini 0.4 mm",
+    "layer_height_mm": 0.2,
+    "walls": 5,
+    "infill_percent": 40,
+    "support_threshold_degrees": 30
+  },
+  "scope": "Identical reference profiles for bracket comparison only; no job sent or physical strength validation."
+}

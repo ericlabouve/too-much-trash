@@ -1,0 +1,27 @@
+{
+  "change": "Replace narrow indexing-ledge connector with a full-height outer support into the upper bracket beam.",
+  "old_connector_width_mm": 1.5,
+  "new_support_bounds_mm": {
+    "x": [
+      25,
+      29
+    ],
+    "y": [
+      -15,
+      -8
+    ],
+    "z": [
+      11,
+      24
+    ]
+  },
+  "ledge_top_z_mm": 14.1,
+  "pivot_head_contact_geometry": "unchanged",
+  "added_solid_mesh_volume_mm3": 267.8499994278027,
+  "checks": {
+    "assembly_configurations": 8,
+    "pivot_insertion_samples": 131,
+    "attachment_and_twine_stroke": "passed"
+  },
+  "limitations": "Geometric clearance checks; physical print strength and retention remain unvalidated. Fresh low-waste slice required before printing."
+}

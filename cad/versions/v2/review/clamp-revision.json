@@ -1,0 +1,74 @@
+{
+  "stock_nonshaft_intersections_mm3": {},
+  "revision": "compact-rails-r12",
+  "unchanged_parts_symmetric_difference_mm3": {
+    "thumb_screw": 0,
+    "thumb_nut": 0,
+    "string_guide": 0
+  },
+  "bracket": {
+    "before_mm3": 31421.357576951672,
+    "after_mm3": 24061.48772161585,
+    "solid_volume_reduction_percent": 23.423144074253702,
+    "added_volume_mm3": 1329.4126064382303,
+    "mechanism_feature_difference_mm3": 0,
+    "plate_thickness_mm": 6,
+    "rounded_window_corner_radius_mm": 3,
+    "minimum_window_to_slot_ligament_mm": 4.6,
+    "strength": "Unvalidated; material removal retains interfaces but may reduce stiffness."
+  },
+  "shaft_clamp": {
+    "nominal_opening_mm": [
+      11.6,
+      17.6
+    ],
+    "length_mm": 102,
+    "split_gap_mm": 1,
+    "screw_station_separation_mm": 52,
+    "screws": 4,
+    "nuts": 4,
+    "nut_engagement_mm": 6,
+    "opening_intrusion_mm3": {
+      "carrier": 0,
+      "shaft_cap": 0
+    },
+    "minimum_cap_wall_mm": 3.5,
+    "carrier_webs": {
+      "count": 2,
+      "thickness_mm": 5,
+      "connection_span_y_mm": 27.6
+    },
+    "cap_withdrawal_path_mm": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        40,
+        0,
+        0
+      ]
+    ],
+    "carrier_withdrawal_path_mm": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        -40,
+        0,
+        0
+      ]
+    ],
+    "carrier_withdrawal_nominal_shaft_max_mm3": 0,
+    "cap_withdrawal_carrier_max_mm3": 0,
+    "cap_withdrawal_nominal_shaft_max_mm3": 0,
+    "limitations": [
+      "Shaft proxy mismatch remains excluded. New long collar must be fitted physically.",
+      "Closed capture does not prove friction, strength, fatigue or printed fastener preload retention."
+    ]
+  },
+  "passed": true
+}

@@ -1,0 +1,150 @@
+{
+  "units": "mm",
+  "scale_percent": 100,
+  "nozzle_mm": 0.4,
+  "layer_mm": 0.2,
+  "revision": "compact-rails-r12",
+  "status": "Recessed fit prototype; camera-view clearance and physical validation pending",
+  "parts": [
+    {
+      "name": "shaft_cap",
+      "file": "shaft_cap.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        102.0,
+        160.0,
+        21.5
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Cap with integral rail; export orientation provisional. Compare end-on-bed and side orientations in fresh low-waste slice review; keep supports off the neck mating surface."
+    },
+    {
+      "name": "carrier",
+      "file": "carrier.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        130.3,
+        69.991,
+        112.5
+      ],
+      "bed_z_min_mm": 2.220446049250313e-16,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal."
+    },
+    {
+      "name": "sliding_jaw",
+      "file": "sliding_jaw.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        48.3,
+        20.999,
+        72.0
+      ],
+      "bed_z_min_mm": 8.881784197001252e-16,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Compact jaw; export orientation provisional. Inspect tongue, ledge and hooks for overhangs; protect sliding faces and minimize removable supports."
+    },
+    {
+      "name": "actuator_bracket",
+      "file": "actuator_bracket.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        80.0,
+        66.0,
+        35.5
+      ],
+      "bed_z_min_mm": -3.3250341871938604e-16,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Broad outside plate toward bed. Support first fairlead, pivot ears and return hooks; remove through open sides."
+    },
+    {
+      "name": "rocker",
+      "file": "rocker.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        24.195,
+        17.499,
+        34.0
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.12,
+      "supports": "Contact bore vertical. Support offset arm and pivot boss; keep supports out of threaded bore."
+    },
+    {
+      "name": "pivot_key",
+      "file": "pivot_key.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        7.4,
+        8.4,
+        25.0
+      ],
+      "bed_z_min_mm": -3.9424468256615646e-16,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Large head toward bed; support cross-lug. Check layer adhesion and quarter-turn retention."
+    },
+    {
+      "name": "thumb_screw",
+      "file": "thumb_screw.stl",
+      "quantity": 7,
+      "bounds_mm": [
+        14.0,
+        13.996,
+        24.0
+      ],
+      "bed_z_min_mm": -8.569863255383672e-16,
+      "watertight": true,
+      "layer_mm": 0.12,
+      "supports": "Head on bed; no support in threads. Fit trial first; do not force."
+    },
+    {
+      "name": "thumb_nut",
+      "file": "thumb_nut.stl",
+      "quantity": 6,
+      "bounds_mm": [
+        18.0,
+        15.588,
+        6.0
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.12,
+      "supports": "Flat on bed; no supports. Fit trial first."
+    },
+    {
+      "name": "string_guide",
+      "file": "string_guide.stl",
+      "quantity": 2,
+      "bounds_mm": [
+        34.296,
+        27.6,
+        14.0
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Saddle end on bed; support eye underside/bridge if slicer requests."
+    },
+    {
+      "name": "dual_string_guide",
+      "file": "dual_string_guide.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        20.3,
+        57.992,
+        14.0
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Dual-eye saddle, provisional bed orientation; inspect both bores and band lane. Prefer support-free holes and neck mating surfaces in fresh slice review."
+    }
+  ]
+}

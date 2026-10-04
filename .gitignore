@@ -8,6 +8,8 @@ ios/*.xcworkspace/
 ml/data/
 ml/checkpoints/
 cad/exports/
+# Generated collar fit-trial exports; regenerate from cad/source/build_fit_trial.py
+/cad/print/fit-trials/
 __pycache__/
 *.py[codz]
 *$py.class

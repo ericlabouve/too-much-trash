@@ -1,0 +1,81 @@
+{
+    "error_string": "Success.",
+    "export_time": 463,
+    "layer_height": 0.20000000298023224,
+    "plate_index": 0,
+    "prepare_time": 17,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 29.03527069091797,
+                "Bridge": 29.78005027770996,
+                "Custom": 385.4579162597656,
+                "Flush": 28.0,
+                "Gap infill": 1.033279538154602,
+                "Inner wall": 1045.6934814453125,
+                "Internal solid infill": 202.8798828125,
+                "Outer wall": 1113.3941650390625,
+                "Overhang wall": 22.677959442138672,
+                "Sparse infill": 383.3682556152344,
+                "Support": 11.825047492980957,
+                "Support interface": 4.606532096862793,
+                "Support transition": 2.0382649898529053,
+                "Top surface": 35.165199279785156,
+                "Travel": 334.5789489746094,
+                "Undefined": 316.2314758300781
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFL99",
+                    "id": 1,
+                    "main_used_g": 12.4201078414917,
+                    "total_used_g": 12.4201078414917
+                }
+            ],
+            "generate_support_material_time": 5,
+            "id": 1,
+            "infill_time": 29,
+            "layer_filament_change": 0,
+            "main_predication": 3188.12890625,
+            "make_perimeters_time": 24,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 69.99121856689453,
+                        "height": 20.0,
+                        "width": 12.210811614990234,
+                        "x": 95.29459381103516,
+                        "y": 55.004390716552734,
+                        "z": 0.0
+                    },
+                    "id": 38,
+                    "name": "carrier_fit_section.stl",
+                    "triangle_count": 1324
+                },
+                {
+                    "bbox": {
+                        "depth": 69.99121856689453,
+                        "height": 20.0,
+                        "width": 10.800002098083496,
+                        "x": 72.49459838867188,
+                        "y": 55.004390716552734,
+                        "z": 0.0
+                    },
+                    "id": 49,
+                    "name": "shaft_cap_fit_section.stl",
+                    "triangle_count": 1308
+                }
+            ],
+            "sliced_time": 233,
+            "sliced_time_with_cache": 159,
+            "total_predication": 3611.2392578125,
+            "triangle_count": 2632,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 15.0,
+    "wall_loops": 3
+}

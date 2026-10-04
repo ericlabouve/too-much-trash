@@ -1,0 +1,36 @@
+{
+  "revision": "compact-rails-r12",
+  "tabs": "Retained: press travel stop and return travel stop, not unused guide remnants.",
+  "nominal_stroke_degrees": [
+    0,
+    3.248331496237844
+  ],
+  "stop_intersections_mm3": [
+    {
+      "angle_degrees": -1,
+      "press_stop": 0.0,
+      "return_stop": 0.958165512061077
+    },
+    {
+      "angle_degrees": 0,
+      "press_stop": 0.0,
+      "return_stop": 0.0
+    },
+    {
+      "angle_degrees": 3.248331496237844,
+      "press_stop": 0.0,
+      "return_stop": 0.0
+    },
+    {
+      "angle_degrees": 4.248331496237844,
+      "press_stop": 1.4963232666500295,
+      "return_stop": 0.0
+    }
+  ],
+  "stop_material_in_bracket_mm3": {
+    "press_stop": 28.799999999999983,
+    "return_stop": 21.599999999999987
+  },
+  "passed": true,
+  "limitations": "Geometric contact only; printed strength, deformation, wear and actual button force remain unvalidated."
+}

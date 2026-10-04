@@ -1,0 +1,68 @@
+{
+  "slicer": "Bambu Studio 02.07.01.62",
+  "model": "Current plate 01 carrier, neck-contact support orientation",
+  "method": "Same STL, material, 0.2 mm layers, 3 walls, 10% gyroid, 0.24 mm Z gaps, 0.4 mm XY gap, 5 mm support base spacing, 2 top interface layers and 0.5 mm interface spacing. Only support_type and support_style changed; style-specific parameters retain profile values. Not separately optimized per algorithm.",
+  "status": "Local slices only; no alternative uploaded or started; cleanup not physically tested.",
+  "results": [
+    {
+      "style": "snug",
+      "exit_code": 0,
+      "total_g": 48.46116638183594,
+      "minutes": 239.26796875,
+      "support_g": 3.7357722759580256,
+      "effective_type": "normal(auto)",
+      "effective_style": "snug",
+      "warnings": ""
+    },
+    {
+      "style": "grid",
+      "exit_code": 0,
+      "total_g": 49.57060241699219,
+      "minutes": 241.16383463541666,
+      "support_g": 4.845204644431743,
+      "effective_type": "normal(auto)",
+      "effective_style": "grid",
+      "warnings": ""
+    },
+    {
+      "style": "tree_slim",
+      "exit_code": 0,
+      "total_g": 49.34788131713867,
+      "minutes": 253.26393229166666,
+      "support_g": 4.622486218372263,
+      "effective_type": "tree(auto)",
+      "effective_style": "tree_slim",
+      "warnings": ""
+    },
+    {
+      "style": "tree_strong",
+      "exit_code": 0,
+      "total_g": 50.26560592651367,
+      "minutes": 255.15856119791667,
+      "support_g": 5.540205254378861,
+      "effective_type": "tree(auto)",
+      "effective_style": "tree_strong",
+      "warnings": ""
+    },
+    {
+      "style": "tree_hybrid",
+      "exit_code": 0,
+      "total_g": 50.3486213684082,
+      "minutes": 244.78479817708333,
+      "support_g": 5.623223953737075,
+      "effective_type": "tree(auto)",
+      "effective_style": "tree_hybrid",
+      "warnings": ""
+    },
+    {
+      "style": "tree_organic",
+      "exit_code": 0,
+      "total_g": 49.27266311645508,
+      "minutes": 252.5142578125,
+      "support_g": 4.54726942119078,
+      "effective_type": "tree(auto)",
+      "effective_style": "tree_organic",
+      "warnings": ""
+    }
+  ]
+}

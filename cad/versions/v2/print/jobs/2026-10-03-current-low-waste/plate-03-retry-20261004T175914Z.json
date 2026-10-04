@@ -1,0 +1,17 @@
+{
+  "recorded_at": "2026-10-04T17:59:14.440490+00:00",
+  "remote_file": "tmt-v2-plate3-jaw-bracket-guides-29fa716b.gcode.3mf",
+  "gcode_md5": "29fa716bf24b2d5f549f74ff03ac6b68",
+  "authorization": "User requested restart and confirmed plate ready.",
+  "previous_attempt": "Printer reported FAILED with print_error 0; cause not supplied.",
+  "settings": "Unchanged reviewed Normal Snug plate 03.",
+  "dry_run": "Remote G-code MD5 matches, textured plate, external spool, no warnings.",
+  "start_outcome": "verified",
+  "observed_state": {
+    "gcode_state": "PREPARE",
+    "stage": "no_stage",
+    "print_error": 0,
+    "remaining_time_min": 199
+  },
+  "physical_result": "pending"
+}
