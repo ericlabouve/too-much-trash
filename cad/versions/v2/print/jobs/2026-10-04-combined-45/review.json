@@ -1,0 +1,629 @@
+{
+  "feature_grams": {
+    "Inner wall": 3.903849977153515,
+    "Outer wall": 3.3117222425941577,
+    "Bottom surface": 0.23062280863737844,
+    "Support": 0.3689459992563403,
+    "Gap infill": 0.13831176745427784,
+    "Internal solid infill": 1.4125839813584682,
+    "Sparse infill": 1.9579041503486732,
+    "Floating vertical shell": 0.37285913405928933,
+    "Bridge": 0.456965002544768,
+    "Top surface": 0.1992711726156558,
+    "Support transition": 0.017964104570564184,
+    "Support interface": 0.026687644375723456,
+    "Overhang wall": 0.007992934473392293
+  },
+  "support_grams": 0.41359774820262796,
+  "model_grams": 11.992083171239576,
+  "gcode_md5": "61dfe2440ddc27df7957c5637ee8dd55",
+  "object_extrusion_bounds_xy": {
+    "32": [
+      [
+        101.242,
+        77.416
+      ],
+      [
+        118.758,
+        92.584
+      ]
+    ],
+    "36": [
+      [
+        141.242,
+        77.416
+      ],
+      [
+        158.758,
+        92.584
+      ]
+    ],
+    "40": [
+      [
+        21.242,
+        122.416
+      ],
+      [
+        38.758,
+        137.584
+      ]
+    ],
+    "8": [
+      [
+        23.219,
+        33.212
+      ],
+      [
+        36.781,
+        46.788
+      ]
+    ],
+    "44": [
+      [
+        58.113,
+        121.462
+      ],
+      [
+        81.887,
+        140.521
+      ]
+    ],
+    "12": [
+      [
+        63.219,
+        33.212
+      ],
+      [
+        76.781,
+        46.788
+      ]
+    ],
+    "48": [
+      [
+        106.51,
+        126.01
+      ],
+      [
+        113.49,
+        133.99
+      ]
+    ],
+    "16": [
+      [
+        103.219,
+        33.212
+      ],
+      [
+        116.781,
+        46.788
+      ]
+    ],
+    "20": [
+      [
+        143.219,
+        33.212
+      ],
+      [
+        156.781,
+        46.788
+      ]
+    ],
+    "24": [
+      [
+        23.219,
+        78.212
+      ],
+      [
+        36.781,
+        91.788
+      ]
+    ],
+    "28": [
+      [
+        61.242,
+        77.416
+      ],
+      [
+        78.758,
+        92.584
+      ]
+    ]
+  },
+  "extrusion_xy_bounds": [
+    [
+      21.242,
+      33.212
+    ],
+    [
+      158.758,
+      140.521
+    ]
+  ],
+  "within_bed_with_0_25mm_line_margin": true,
+  "gaps": [
+    {
+      "objects": [
+        "32",
+        "36"
+      ],
+      "bbox_separation_minus_line_width_mm": 21.983999999999995
+    },
+    {
+      "objects": [
+        "32",
+        "40"
+      ],
+      "bbox_separation_minus_line_width_mm": 61.984
+    },
+    {
+      "objects": [
+        "32",
+        "8"
+      ],
+      "bbox_separation_minus_line_width_mm": 63.96100000000001
+    },
+    {
+      "objects": [
+        "32",
+        "44"
+      ],
+      "bbox_separation_minus_line_width_mm": 28.378
+    },
+    {
+      "objects": [
+        "32",
+        "12"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.128
+    },
+    {
+      "objects": [
+        "32",
+        "48"
+      ],
+      "bbox_separation_minus_line_width_mm": 32.926
+    },
+    {
+      "objects": [
+        "32",
+        "16"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.128
+    },
+    {
+      "objects": [
+        "32",
+        "20"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.128
+    },
+    {
+      "objects": [
+        "32",
+        "24"
+      ],
+      "bbox_separation_minus_line_width_mm": 63.96100000000001
+    },
+    {
+      "objects": [
+        "32",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 21.98400000000001
+    },
+    {
+      "objects": [
+        "36",
+        "40"
+      ],
+      "bbox_separation_minus_line_width_mm": 101.98399999999998
+    },
+    {
+      "objects": [
+        "36",
+        "8"
+      ],
+      "bbox_separation_minus_line_width_mm": 103.96099999999998
+    },
+    {
+      "objects": [
+        "36",
+        "44"
+      ],
+      "bbox_separation_minus_line_width_mm": 58.85499999999999
+    },
+    {
+      "objects": [
+        "36",
+        "12"
+      ],
+      "bbox_separation_minus_line_width_mm": 63.960999999999984
+    },
+    {
+      "objects": [
+        "36",
+        "48"
+      ],
+      "bbox_separation_minus_line_width_mm": 32.926
+    },
+    {
+      "objects": [
+        "36",
+        "16"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.128
+    },
+    {
+      "objects": [
+        "36",
+        "20"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.128
+    },
+    {
+      "objects": [
+        "36",
+        "24"
+      ],
+      "bbox_separation_minus_line_width_mm": 103.96099999999998
+    },
+    {
+      "objects": [
+        "36",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 61.983999999999995
+    },
+    {
+      "objects": [
+        "40",
+        "8"
+      ],
+      "bbox_separation_minus_line_width_mm": 75.128
+    },
+    {
+      "objects": [
+        "40",
+        "44"
+      ],
+      "bbox_separation_minus_line_width_mm": 18.854999999999997
+    },
+    {
+      "objects": [
+        "40",
+        "12"
+      ],
+      "bbox_separation_minus_line_width_mm": 75.128
+    },
+    {
+      "objects": [
+        "40",
+        "48"
+      ],
+      "bbox_separation_minus_line_width_mm": 67.25200000000001
+    },
+    {
+      "objects": [
+        "40",
+        "16"
+      ],
+      "bbox_separation_minus_line_width_mm": 75.128
+    },
+    {
+      "objects": [
+        "40",
+        "20"
+      ],
+      "bbox_separation_minus_line_width_mm": 103.96099999999998
+    },
+    {
+      "objects": [
+        "40",
+        "24"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.128
+    },
+    {
+      "objects": [
+        "40",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 29.331999999999994
+    },
+    {
+      "objects": [
+        "8",
+        "44"
+      ],
+      "bbox_separation_minus_line_width_mm": 74.174
+    },
+    {
+      "objects": [
+        "8",
+        "12"
+      ],
+      "bbox_separation_minus_line_width_mm": 25.938000000000002
+    },
+    {
+      "objects": [
+        "8",
+        "48"
+      ],
+      "bbox_separation_minus_line_width_mm": 78.72200000000001
+    },
+    {
+      "objects": [
+        "8",
+        "16"
+      ],
+      "bbox_separation_minus_line_width_mm": 65.93799999999999
+    },
+    {
+      "objects": [
+        "8",
+        "20"
+      ],
+      "bbox_separation_minus_line_width_mm": 105.93799999999999
+    },
+    {
+      "objects": [
+        "8",
+        "24"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.924000000000007
+    },
+    {
+      "objects": [
+        "8",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.128
+    },
+    {
+      "objects": [
+        "44",
+        "12"
+      ],
+      "bbox_separation_minus_line_width_mm": 74.174
+    },
+    {
+      "objects": [
+        "44",
+        "48"
+      ],
+      "bbox_separation_minus_line_width_mm": 24.123000000000005
+    },
+    {
+      "objects": [
+        "44",
+        "16"
+      ],
+      "bbox_separation_minus_line_width_mm": 74.174
+    },
+    {
+      "objects": [
+        "44",
+        "20"
+      ],
+      "bbox_separation_minus_line_width_mm": 74.174
+    },
+    {
+      "objects": [
+        "44",
+        "24"
+      ],
+      "bbox_separation_minus_line_width_mm": 29.174000000000007
+    },
+    {
+      "objects": [
+        "44",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 28.378
+    },
+    {
+      "objects": [
+        "12",
+        "48"
+      ],
+      "bbox_separation_minus_line_width_mm": 78.72200000000001
+    },
+    {
+      "objects": [
+        "12",
+        "16"
+      ],
+      "bbox_separation_minus_line_width_mm": 25.937999999999988
+    },
+    {
+      "objects": [
+        "12",
+        "20"
+      ],
+      "bbox_separation_minus_line_width_mm": 65.93799999999999
+    },
+    {
+      "objects": [
+        "12",
+        "24"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.924000000000007
+    },
+    {
+      "objects": [
+        "12",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.128
+    },
+    {
+      "objects": [
+        "48",
+        "16"
+      ],
+      "bbox_separation_minus_line_width_mm": 78.72200000000001
+    },
+    {
+      "objects": [
+        "48",
+        "20"
+      ],
+      "bbox_separation_minus_line_width_mm": 78.72200000000001
+    },
+    {
+      "objects": [
+        "48",
+        "24"
+      ],
+      "bbox_separation_minus_line_width_mm": 69.22900000000001
+    },
+    {
+      "objects": [
+        "48",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 32.926
+    },
+    {
+      "objects": [
+        "16",
+        "20"
+      ],
+      "bbox_separation_minus_line_width_mm": 25.937999999999988
+    },
+    {
+      "objects": [
+        "16",
+        "24"
+      ],
+      "bbox_separation_minus_line_width_mm": 65.93799999999999
+    },
+    {
+      "objects": [
+        "16",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 30.128
+    },
+    {
+      "objects": [
+        "20",
+        "24"
+      ],
+      "bbox_separation_minus_line_width_mm": 105.93799999999999
+    },
+    {
+      "objects": [
+        "20",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 63.961
+    },
+    {
+      "objects": [
+        "24",
+        "28"
+      ],
+      "bbox_separation_minus_line_width_mm": 23.961
+    }
+  ],
+  "actual_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "printer_variant": "0.4",
+    "nozzle_diameter": "0.4",
+    "layer_height": "0.12",
+    "wall_loops": "2",
+    "sparse_infill_density": "15%",
+    "sparse_infill_pattern": "grid",
+    "curr_bed_type": "Textured PEI Plate",
+    "outer_wall_speed": "30",
+    "inner_wall_speed": "60",
+    "nozzle_temperature": "220",
+    "nozzle_temperature_initial_layer": "220",
+    "textured_plate_temp": "65",
+    "textured_plate_temp_initial_layer": "65",
+    "enable_support": "0",
+    "support_type": "normal(auto)",
+    "support_on_build_plate_only": "1",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_spacing": "0.5",
+    "support_interface_top_layers": "2",
+    "brim_type": "no_brim",
+    "brim_width": "0",
+    "raft_layers": "0",
+    "print_sequence": "by layer",
+    "enable_arc_fitting": "0",
+    "fan_min_speed": "100",
+    "fan_max_speed": "100"
+  },
+  "max_z": 34.04,
+  "grams": 12.476493835449219,
+  "minutes": 114.2596923828125,
+  "warning": "",
+  "object_settings": [
+    {
+      "name": "thumb_screw-2",
+      "extruder": "1",
+      "null": null
+    },
+    {
+      "name": "thumb_screw-3",
+      "extruder": "1",
+      "null": null
+    },
+    {
+      "name": "thumb_screw-1",
+      "extruder": "1",
+      "null": null
+    },
+    {
+      "name": "thumb_screw-4",
+      "extruder": "1",
+      "null": null
+    },
+    {
+      "name": "thumb_screw-5",
+      "extruder": "1",
+      "null": null
+    },
+    {
+      "name": "thumb_nut-6",
+      "extruder": "1",
+      "null": null
+    },
+    {
+      "name": "thumb_nut-7",
+      "extruder": "1",
+      "null": null
+    },
+    {
+      "name": "thumb_nut-8",
+      "extruder": "1",
+      "null": null
+    },
+    {
+      "name": "thumb_nut-9",
+      "extruder": "1",
+      "null": null
+    },
+    {
+      "name": "rocker-10",
+      "enable_support": "1",
+      "extruder": "1",
+      "sparse_infill_pattern": "gyroid",
+      "wall_loops": "3",
+      "null": null
+    },
+    {
+      "name": "pivot_key-11",
+      "enable_support": "1",
+      "extruder": "1",
+      "sparse_infill_pattern": "gyroid",
+      "wall_loops": "3",
+      "null": null
+    }
+  ],
+  "sha256": "60c876b76a8646ae7542e0ec5d2b4e849c881761f746013b15865c45887754c0"
+}

@@ -1,0 +1,120 @@
+{
+  "passed": true,
+  "shoe_rotation_degrees_about_local_x": 90,
+  "shoe_y_width_mm": 4,
+  "shoe_z_height_mm": 16,
+  "shoe_z_bounds_mm": [
+    0,
+    16
+  ],
+  "shoe_additional_z_translation_mm": 2,
+  "bracket_mount_holes": {
+    "diameter_mm": 8.8,
+    "centers_yz_mm": [
+      [
+        -9.5,
+        -14
+      ],
+      [
+        9.5,
+        -14
+      ]
+    ],
+    "spacing_mm": 19
+  },
+  "configurations": {
+    "wallet-near": {
+      "button_z_bounds_mm": [
+        4.7,
+        7.3
+      ],
+      "module_depth_offset_mm": 0,
+      "screw_bracket_intersection_mm3": {
+        "1": 0.0,
+        "2": 0.0
+      }
+    },
+    "wallet-far": {
+      "button_z_bounds_mm": [
+        4.7,
+        7.3
+      ],
+      "module_depth_offset_mm": 0,
+      "screw_bracket_intersection_mm3": {
+        "1": 0.0,
+        "2": 0.0
+      }
+    },
+    "bare-near": {
+      "button_z_bounds_mm": [
+        12.7,
+        15.3
+      ],
+      "module_depth_offset_mm": 0,
+      "screw_bracket_intersection_mm3": {
+        "1": 0.0,
+        "2": 0.0
+      }
+    },
+    "bare-far": {
+      "button_z_bounds_mm": [
+        12.7,
+        15.3
+      ],
+      "module_depth_offset_mm": 0,
+      "screw_bracket_intersection_mm3": {
+        "1": 0.0,
+        "2": 0.0
+      }
+    },
+    "small-near": {
+      "button_z_bounds_mm": [
+        12.7,
+        15.3
+      ],
+      "module_depth_offset_mm": 0,
+      "screw_bracket_intersection_mm3": {
+        "1": 0.0,
+        "2": 0.0
+      }
+    },
+    "small-far": {
+      "button_z_bounds_mm": [
+        12.7,
+        15.3
+      ],
+      "module_depth_offset_mm": 0,
+      "screw_bracket_intersection_mm3": {
+        "1": 0.0,
+        "2": 0.0
+      }
+    },
+    "large-near": {
+      "button_z_bounds_mm": [
+        2.7,
+        5.3
+      ],
+      "module_depth_offset_mm": 0,
+      "screw_bracket_intersection_mm3": {
+        "1": 0.0,
+        "2": 0.0
+      }
+    },
+    "large-far": {
+      "button_z_bounds_mm": [
+        2.7,
+        5.3
+      ],
+      "module_depth_offset_mm": 0,
+      "screw_bracket_intersection_mm3": {
+        "1": 0.0,
+        "2": 0.0
+      }
+    }
+  },
+  "limitations": [
+    "Nominal depth coverage only: rotation changes the contact trajectory; case geometry, button force and released clearance need physical tests.",
+    "Existing 14 mm pocket conflict for recorded 18/20 mm phones remains.",
+    "Remaining plate windows are lightening openings, not fastener adjustment slots."
+  ]
+}

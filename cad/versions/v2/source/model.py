@@ -214,16 +214,16 @@ def stock(p):
 
 
 def flexible_paths(p):
-    trigger=(-42,0,-417);last=(-18,0,p.guide_stations[-1])
+    trigger=(-42,0,-417);last=(-18,0,p.guide_stations[-1]+GUIDE_EYE_Z)
     v=cq.Vector(*trigger).sub(cq.Vector(*last));tail=v.Length-p.series_span_rest
     knot=cq.Vector(*last).add(v.normalized().multiply(tail)).toTuple()
     guide_side=1 if p.side=='near' else -1
-    string=[p.string_eye,p.first_guide]+[(0,guide_side*20,p.guide_stations[0])]+[(-18,0,z) for z in p.guide_stations[1:]]+[knot]
+    string=[p.string_eye,p.first_guide]+[(0,guide_side*20,p.guide_stations[0]+GUIDE_EYE_Z)]+[(-18,0,z+GUIDE_EYE_Z) for z in p.guide_stations[1:]]+[knot]
     bands={'band_return':loop_between(p.point((33,8,18)),p.point((38,14,28)),2),
         'band_overtravel':loop_between(knot,trigger,5)}
     for i,y in enumerate(JAW_BAND_Y):bands[f'band_jaw_{i+1}']=jaw_band(p.phone_left-1,-27,y)
     for i,z in enumerate(p.guide_stations):
-        bands[f'band_guide_{i+1}']=shaft_guide_band(z) if i==0 else rounded_band_xy(z,left=-28)
+        bands[f'band_guide_{i+1}']=rounded_band_xy(z)
     return string,bands,{'trigger_pivot':(-4,0,-416),'trigger_attach':trigger,'trigger_angle':-.48,'tail_length':tail,'series_span_rest':p.series_span_rest}
 
 
@@ -351,21 +351,26 @@ def sliding_jaw(p):
     for y in JAW_BAND_Y:s=s.union(hook(-1,y,38.3))
     return s
 
+# Eye thickness stays 6 mm; translating -4 mm aligns its lower face
+# with the saddle's Z=-7 edge. Bore axes and XY positions are unchanged.
+GUIDE_EYE_Z = -4
+
+def guide_saddle(p):
+    lane=box(-12,8,-15,15,-2,2).cut(box(-10.4,6.4,-12.9,12.9,-3,3))
+    return saddle(-7,7,p).cut(lane)
+
 def guide(p):
-    s=saddle(-7,7,p).union(box(-17,-10,-5,5,-3,3)).union(guide_lug((-18,0,0),p))
-    lane=box(-12,8,-15,15,-2,2).cut(box(-10.4,6.4,-12.9,12.9,-3,3)).cut(box(-30,-10,-6,6,-3,3))
-    return s.cut(lane).cut(guide_hole((-18,0,0),p))
+    center=(-18,0,GUIDE_EYE_Z)
+    root=box(-17,-10,-5,5,GUIDE_EYE_Z-3,GUIDE_EYE_Z+3)
+    return guide_saddle(p).union(root).union(guide_lug(center,p)).cut(guide_hole(center,p))
 
 def dual_guide(p):
-    s=saddle(-7,7,p)
+    s=guide_saddle(p)
     for y in (-20,20):
-        center=(0,y,0)
-        # Flat D faces point toward the saddle on opposite broad faces.
-        lug=guide_lug(center,p).rotate(center,(0,y,1),-90 if y>0 else 90)
-        s=s.union(lug)
-    lane=box(-12,10,-31,31,-2,2).cut(box(-10.4,8.4,-27.6,27.6,-3,3))
-    s=s.cut(lane)
-    for y in (-20,20):s=s.cut(guide_hole((0,y,0),p))
+        center=(0,y,GUIDE_EYE_Z)
+        # Preserve the existing opposite-facing D orientation; only translate Z.
+        lug=guide_lug(center,p).rotate(center,(0,y,GUIDE_EYE_Z+1),-90 if y>0 else 90)
+        s=s.union(lug).cut(guide_hole(center,p))
     return s
 
 

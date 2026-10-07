@@ -1,0 +1,19 @@
+{
+  "scope": "Twelve post-boundary requests are V3; earlier edge-guide translation stays in V2.",
+  "v2_baseline_commit": "352701632e5bbab9dcba2a093a95a2bbce5b9255",
+  "v2_changed_existing_model_functions_vs_commit": [
+    "flexible_paths",
+    "guide",
+    "dual_guide"
+  ],
+  "v2_other_model_functions_identical": true,
+  "v3_model_functions_identical_to_pre_split_latest": true,
+  "v2_print_job_files_preserved_byte_identically": 66,
+  "v1_modified": false,
+  "versions": [
+    "v1",
+    "v2",
+    "v3"
+  ],
+  "scope_of_comparison": "Historical checkpoint at V3 creation, before subsequent V3-only refinements."
+}

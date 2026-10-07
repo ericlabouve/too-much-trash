@@ -1,0 +1,63 @@
+[
+  {
+    "name": "thumb_screw-2",
+    "extruder": "1",
+    "null": null
+  },
+  {
+    "name": "thumb_screw-3",
+    "extruder": "1",
+    "null": null
+  },
+  {
+    "name": "thumb_screw-1",
+    "extruder": "1",
+    "null": null
+  },
+  {
+    "name": "thumb_screw-4",
+    "extruder": "1",
+    "null": null
+  },
+  {
+    "name": "thumb_screw-5",
+    "extruder": "1",
+    "null": null
+  },
+  {
+    "name": "thumb_nut-6",
+    "extruder": "1",
+    "null": null
+  },
+  {
+    "name": "thumb_nut-7",
+    "extruder": "1",
+    "null": null
+  },
+  {
+    "name": "thumb_nut-8",
+    "extruder": "1",
+    "null": null
+  },
+  {
+    "name": "thumb_nut-9",
+    "extruder": "1",
+    "null": null
+  },
+  {
+    "name": "rocker-10",
+    "enable_support": "1",
+    "extruder": "1",
+    "sparse_infill_pattern": "gyroid",
+    "wall_loops": "3",
+    "null": null
+  },
+  {
+    "name": "pivot_key-11",
+    "enable_support": "1",
+    "extruder": "1",
+    "sparse_infill_pattern": "gyroid",
+    "wall_loops": "3",
+    "null": null
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "central_projection_below_crossbar_removed": true,
+  "pad_width_mm": 8,
+  "previous_pad_width_mm": 12,
+  "contact_wall_thickness_mm": 6,
+  "previous_contact_wall_thickness_mm": 10,
+  "contact_center_spacing_mm": 100,
+  "overall_crossbar_width_mm": 108,
+  "lip_projection_mm": 4,
+  "pocket_depth_mm": 14,
+  "previous_volume_mm3": 20123.699999999997,
+  "new_volume_mm3": 17304.499999999993,
+  "solid_volume_reduction_percent": 14.00935215690954,
+  "limitations": [
+    "CAD volume is not sliced filament consumption.",
+    "Printed stiffness, fit and grip need physical validation."
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "time": "2026-10-05T01:08:18.566325+00:00",
+  "user_confirmed": "PEI sheet installed; ready.",
+  "remote_file": "tmt-v2-combined45-60c876b7.gcode.3mf",
+  "gcode_md5": "61dfe2440ddc27df7957c5637ee8dd55",
+  "state": "RUNNING",
+  "print_error": 0,
+  "result": "pending"
+}

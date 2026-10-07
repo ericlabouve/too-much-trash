@@ -1,0 +1,48 @@
+{
+  "revision": "t-jaw-compact-actuator-v3",
+  "configurations": {
+    "wallet": {
+      "band_levels_z_mm": [
+        40.5,
+        43.0
+      ],
+      "symmetric_force_center_y_mm": 0,
+      "post_span_x_mm": 70,
+      "collisions": {}
+    },
+    "bare": {
+      "band_levels_z_mm": [
+        40.5,
+        43.0
+      ],
+      "symmetric_force_center_y_mm": 0,
+      "post_span_x_mm": 70,
+      "collisions": {}
+    },
+    "small": {
+      "band_levels_z_mm": [
+        40.5,
+        43.0
+      ],
+      "symmetric_force_center_y_mm": 0,
+      "post_span_x_mm": 60,
+      "collisions": {}
+    },
+    "large": {
+      "band_levels_z_mm": [
+        40.5,
+        43.0
+      ],
+      "symmetric_force_center_y_mm": 0,
+      "post_span_x_mm": 80,
+      "collisions": {}
+    }
+  },
+  "passed": true,
+  "limitations": [
+    "1.4 mm circular band visualization is provisional; real width/thickness and stretched cross-section unknown.",
+    "Equal band tension is an assumption, not a measured force balance.",
+    "No claim of preload, jaw friction, fatigue or loaded retention.",
+    "Rounded rectangular paths wrap broad single cleats below retaining crossbars; actual band stacking and preload need physical validation."
+  ]
+}

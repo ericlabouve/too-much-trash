@@ -1,0 +1,36 @@
+{
+  "revision": "t-jaw-compact-actuator-v3",
+  "tabs": "Retained: press travel stop and return travel stop, not unused guide remnants.",
+  "nominal_stroke_degrees": [
+    0,
+    9.744994488713534
+  ],
+  "stop_intersections_mm3": [
+    {
+      "angle_degrees": -1,
+      "press_stop": 0.0,
+      "return_stop": 0.42728243868721405
+    },
+    {
+      "angle_degrees": 0,
+      "press_stop": 0.0,
+      "return_stop": 0.0
+    },
+    {
+      "angle_degrees": 9.744994488713534,
+      "press_stop": 0.0,
+      "return_stop": 0.0
+    },
+    {
+      "angle_degrees": 10.744994488713534,
+      "press_stop": 0.7818281614838277,
+      "return_stop": 0.0
+    }
+  ],
+  "stop_material_in_bracket_mm3": {
+    "press_stop": 28.799999999999983,
+    "return_stop": 17.99999999999999
+  },
+  "passed": true,
+  "limitations": "Geometric contact only; printed strength, deformation, wear and actual button force remain unvalidated."
+}

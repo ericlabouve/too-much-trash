@@ -1,0 +1,192 @@
+{
+  "solids": {
+    "shaft_cap": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "carrier": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "sliding_jaw": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "actuator_bracket": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "rocker": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "pivot_key": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "thumb_screw": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "thumb_nut": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "string_guide": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "dual_string_guide": {
+      "valid": true,
+      "solid_count": 1
+    }
+  },
+  "configurations": {
+    "wallet-near": {
+      "phone_overlap": {
+        "carrier": 192.0,
+        "sliding_jaw": 128.0
+      },
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "fastener_shaft_overlap_mm3": {},
+      "clamp_screen_obstruction_mm3": {},
+      "passed": false,
+      "mechanical_passed": true,
+      "pocket_fit": {
+        "pocket_mm": 14,
+        "phone_thickness_mm": 18,
+        "compatible": false
+      }
+    },
+    "wallet-far": {
+      "phone_overlap": {
+        "carrier": 192.0,
+        "sliding_jaw": 128.0
+      },
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "fastener_shaft_overlap_mm3": {},
+      "clamp_screen_obstruction_mm3": {},
+      "passed": false,
+      "mechanical_passed": true,
+      "pocket_fit": {
+        "pocket_mm": 14,
+        "phone_thickness_mm": 18,
+        "compatible": false
+      }
+    },
+    "bare-near": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "fastener_shaft_overlap_mm3": {},
+      "clamp_screen_obstruction_mm3": {},
+      "passed": true,
+      "mechanical_passed": true,
+      "pocket_fit": {
+        "pocket_mm": 14,
+        "phone_thickness_mm": 8,
+        "compatible": true
+      }
+    },
+    "bare-far": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "fastener_shaft_overlap_mm3": {},
+      "clamp_screen_obstruction_mm3": {},
+      "passed": true,
+      "mechanical_passed": true,
+      "pocket_fit": {
+        "pocket_mm": 14,
+        "phone_thickness_mm": 8,
+        "compatible": true
+      }
+    },
+    "small-near": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "fastener_shaft_overlap_mm3": {},
+      "clamp_screen_obstruction_mm3": {},
+      "passed": true,
+      "mechanical_passed": true,
+      "pocket_fit": {
+        "pocket_mm": 14,
+        "phone_thickness_mm": 7.5,
+        "compatible": true
+      }
+    },
+    "small-far": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "fastener_shaft_overlap_mm3": {},
+      "clamp_screen_obstruction_mm3": {},
+      "passed": true,
+      "mechanical_passed": true,
+      "pocket_fit": {
+        "pocket_mm": 14,
+        "phone_thickness_mm": 7.5,
+        "compatible": true
+      }
+    },
+    "large-near": {
+      "phone_overlap": {
+        "carrier": 192.0,
+        "sliding_jaw": 128.0
+      },
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "fastener_shaft_overlap_mm3": {},
+      "clamp_screen_obstruction_mm3": {},
+      "passed": false,
+      "mechanical_passed": true,
+      "pocket_fit": {
+        "pocket_mm": 14,
+        "phone_thickness_mm": 20,
+        "compatible": false
+      }
+    },
+    "large-far": {
+      "phone_overlap": {
+        "carrier": 192.0,
+        "sliding_jaw": 128.0
+      },
+      "camera_overlap": {},
+      "rigid_overlap": {},
+      "sweep": [],
+      "pivot_turn": [],
+      "fastener_shaft_overlap_mm3": {},
+      "clamp_screen_obstruction_mm3": {},
+      "passed": false,
+      "mechanical_passed": true,
+      "pocket_fit": {
+        "pocket_mm": 14,
+        "phone_thickness_mm": 20,
+        "compatible": false
+      }
+    }
+  },
+  "excluded": [
+    "Historical stock shaft overlaps accepted smaller collar opening",
+    "Intentional nominal button travel",
+    "Band force, twine friction/stretch, retention, real phone tolerances and physical rocker-to-screw fit; isolated screw/nut success does not validate the loaded assembly"
+  ],
+  "checks_passed": false
+}

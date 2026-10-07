@@ -31,3 +31,5 @@ Indexing-ledge refinement: the bracket now has a 4 mm-wide outer support joining
 Plate 01 orientation update: prioritize the fixed jaw’s sliding track finish. The current `01-carrier-neck-contact` job places support against the static neck-contact face and prints the track vertically. It supersedes `01-carrier`; remove support residue from the neck face before checking seating. Other plates are unchanged.
 
 Plate 02 now contains only the flat shaft cap, with all four fastener ears on the bed. Sliding jaw moved to plate 03 beside the bracket and three guides. Exact sliced files and complete per-plate profiles are preserved in the linked job record for reproducibility.
+
+Current guide STL/STEP exports now have edge-aligned eyes (2026-10-04); auto-support validation generates no supports. Saved plate 03 job files remain the historical printed geometry. Do not reuse those jobs to manufacture the revised guides. No new print is scheduled.

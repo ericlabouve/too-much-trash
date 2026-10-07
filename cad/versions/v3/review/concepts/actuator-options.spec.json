@@ -1,0 +1,16 @@
+{
+  "purpose": "Low-fidelity comparison of four proposed actuator mechanisms; no CAD change",
+  "orientation": "Phone button at bottom; output toward button shown downward in each panel",
+  "mechanisms": [
+    "Twine-driven sliding plunger with fixed pulley",
+    "Sliding wedge and guided follower",
+    "Parallel-flexure guided shoe",
+    "Rocker driving a separate guided plunger"
+  ],
+  "constraints": [
+    "Preserve PLA/twine/rubber-band concept",
+    "Exaggerated clearances; not dimensioned or strength validated",
+    "Simplified cord and return routing; off-axis forces need design attention",
+    "Travel stop and excess-pull accommodation needed"
+  ]
+}

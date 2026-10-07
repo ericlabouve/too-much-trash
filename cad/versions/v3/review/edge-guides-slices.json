@@ -1,0 +1,23 @@
+{
+  "slicer": "Bambu Studio 02.07.01.62",
+  "recipe": "03-jaw-bracket-and-guides-process.json; normal(auto) snug, 0.2 mm, 3 walls, 10% gyroid",
+  "results": [
+    {
+      "part": "string_guide",
+      "auto_support_enabled": true,
+      "support_feature_count": 0,
+      "warnings": "",
+      "grams": 4.1815667152404785,
+      "source_sha256": "d6e91eac5a7c7824691db9af505a2aa45caa3474c6fa5aa81ed3ad7e826d9605"
+    },
+    {
+      "part": "dual_string_guide",
+      "auto_support_enabled": true,
+      "support_feature_count": 0,
+      "warnings": "",
+      "grams": 5.0223307609558105,
+      "source_sha256": "fe328b2319373bc5d411ebe58bb1d6b2dfbf4477c6da736d4b971e50662b7e56"
+    }
+  ],
+  "status": "Local validation only; not uploaded or printed."
+}

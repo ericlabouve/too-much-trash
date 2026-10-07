@@ -1,0 +1,159 @@
+{
+  "revision": "t-jaw-compact-actuator-v3",
+  "assumptions": {
+    "twine_diameter_mm": 3,
+    "camera_lens_plane_z_mm": 22,
+    "camera": "Illustrative rectangle, not measured lenses; expanding square envelopes at 40/50/60 degree half angles",
+    "limitations": "Segmented route clearance only, not a contact, friction, force, wear or physical threading simulation"
+  },
+  "configurations": {
+    "wallet-near": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {
+          "carrier": 67.309,
+          "sliding_jaw": 140.406
+        },
+        "60": {
+          "carrier": 1037.2,
+          "sliding_jaw": 726.718,
+          "band_jaw_1": 2.416,
+          "band_jaw_2": 136.144
+        }
+      }
+    },
+    "wallet-far": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {
+          "carrier": 140.406
+        },
+        "60": {
+          "carrier": 1067.789,
+          "sliding_jaw": 512.927,
+          "band_jaw_1": 106.348,
+          "band_jaw_2": 113.067
+        }
+      }
+    },
+    "bare-near": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {
+          "carrier": 67.309,
+          "sliding_jaw": 140.406
+        },
+        "60": {
+          "carrier": 1037.2,
+          "sliding_jaw": 726.718,
+          "band_jaw_1": 2.416,
+          "band_jaw_2": 136.144
+        }
+      }
+    },
+    "bare-far": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {},
+        "50": {
+          "carrier": 140.406
+        },
+        "60": {
+          "carrier": 1067.789,
+          "sliding_jaw": 512.927,
+          "band_jaw_1": 106.348,
+          "band_jaw_2": 113.067
+        }
+      }
+    },
+    "small-near": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {
+          "carrier": 49.868,
+          "sliding_jaw": 75.334
+        },
+        "50": {
+          "carrier": 706.509,
+          "sliding_jaw": 399.014,
+          "band_jaw_1": 2.718,
+          "band_jaw_2": 112.512
+        },
+        "60": {
+          "carrier": 3202.411,
+          "sliding_jaw": 1099.85,
+          "band_jaw_1": 123.308,
+          "band_jaw_2": 103.986
+        }
+      }
+    },
+    "small-far": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {
+          "carrier": 75.334
+        },
+        "50": {
+          "carrier": 699.384,
+          "sliding_jaw": 216.913,
+          "band_jaw_1": 91.008,
+          "band_jaw_2": 95.584
+        },
+        "60": {
+          "carrier": 2963.241,
+          "sliding_jaw": 964.773,
+          "band_jaw_1": 104.589,
+          "band_jaw_2": 104.288
+        }
+      }
+    },
+    "large-near": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {
+          "carrier": 835.263,
+          "sliding_jaw": 310.442,
+          "band_jaw_1": 93.278,
+          "band_jaw_2": 96.511
+        },
+        "50": {
+          "carrier": 2087.013,
+          "sliding_jaw": 864.05,
+          "band_jaw_1": 103.334,
+          "band_jaw_2": 107.908
+        },
+        "60": {
+          "carrier": 3602.731,
+          "sliding_jaw": 1759.205,
+          "band_jaw_1": 236.219,
+          "band_jaw_2": 249.511
+        }
+      }
+    },
+    "large-far": {
+      "twine_intersections_mm3": {},
+      "view_envelope_intersections_mm3": {
+        "40": {
+          "carrier": 1185.717,
+          "band_jaw_1": 80.958,
+          "band_jaw_2": 84.195
+        },
+        "50": {
+          "carrier": 3058.1,
+          "band_jaw_1": 91.002,
+          "band_jaw_2": 95.585
+        },
+        "60": {
+          "carrier": 4832.956,
+          "sliding_jaw": 73.746,
+          "band_jaw_1": 211.756,
+          "band_jaw_2": 225.388
+        }
+      }
+    }
+  },
+  "twine_passed": true
+}

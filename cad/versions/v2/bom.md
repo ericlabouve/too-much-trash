@@ -1,6 +1,6 @@
 # V2 adjustable-clamp BOM
 
-Generated from `source/build.py`. 9 designs, 22 printed pieces; zero metal hardware.
+Generated from `source/build.py`. 10 designs, 22 printed pieces; zero metal hardware.
 
 | Component | Quantity | Material | Role |
 | --- | ---: | --- | --- |

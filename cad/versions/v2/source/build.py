@@ -132,7 +132,7 @@ def build():
  save(OUT/'validation.json',report)
  if not report['checks_passed']:raise SystemExit('Interferences: see review/validation.json')
  manufacturing(solids)
- lines=['# V2 adjustable-clamp BOM','','Generated from `source/build.py`. 9 designs, 22 printed pieces; zero metal hardware.','', '| Component | Quantity | Material | Role |','| --- | ---: | --- | --- |']
+ lines=['# V2 adjustable-clamp BOM','','Generated from `source/build.py`. 10 designs, 22 printed pieces; zero metal hardware.','', '| Component | Quantity | Material | Role |','| --- | ---: | --- | --- |']
  for r in BOM:lines.append(f"| {r['name']} | {r['quantity']} | {r['material']} | {r['note']} |")
  (ROOT/'bom.md').write_text('\n'.join(lines)+'\n')
  print('Manufacturing exports complete',flush=True)
