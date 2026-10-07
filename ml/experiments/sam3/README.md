@@ -1,6 +1,6 @@
 # SAM 3 litter segmentation lab
 
-This is an image experiment for testing whether text-prompted [Meta SAM 3](https://github.com/facebookresearch/sam3) can find litter in phone frames. It uses the [Transformers SAM 3 integration](https://huggingface.co/docs/transformers/model_doc/sam3) for one shared inference path in the notebook and viewer. Keep every miss and uncertain prediction in later evaluations; a mask is only a proposed label.
+This is an image experiment for testing whether text-prompted [Meta SAM 3](https://github.com/facebookresearch/sam3) can find litter in phone frames. It uses the [Transformers SAM 3 integration](https://huggingface.co/docs/transformers/model_doc/sam3) in a browser viewer. Keep every miss and uncertain prediction in later evaluations; a mask is only a proposed label.
 
 ## Access and hardware
 
@@ -11,16 +11,12 @@ The official [`facebook/sam3` checkpoint](https://huggingface.co/facebook/sam3) 
 From this directory:
 
 ```sh
-uv sync --extra notebook
+uv sync
 uv run sam3-download
 uv run sam3-viewer
 ```
 
-Open <http://127.0.0.1:7860>. The model loads on the first segmentation request. To use the notebook:
-
-```sh
-uv run jupyter lab notebooks/sam3_litter.ipynb
-```
+Open <http://127.0.0.1:7860>. The model loads on the first segmentation request.
 
 Try focused phrases such as `plastic bottle`, `aluminum can`, `paper cup`, and `food wrapper`; compare false positives, misses, timing, and score thresholds on the same frame. Generic `trash` may not correspond to the visible material or object type. Save source frame IDs and human review notes outside Git in `ml/data/`.
 

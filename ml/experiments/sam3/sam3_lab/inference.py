@@ -1,4 +1,4 @@
-"""One image inference path shared by the notebook and viewer."""
+"""One image inference path for the browser viewer."""
 
 from dataclasses import dataclass
 from functools import lru_cache
