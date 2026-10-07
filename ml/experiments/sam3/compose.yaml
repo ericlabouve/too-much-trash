@@ -1,0 +1,15 @@
+services:
+  viewer:
+    build: .
+    ports:
+      - "127.0.0.1:${SAM3_PORT:-7860}:7860"
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      SAM3_MODEL_ID: ${SAM3_MODEL_ID:-facebook/sam3}
+      SAM3_DEVICE: ${SAM3_DEVICE:-auto}
+    volumes:
+      - sam3-cache:/model-cache
+    restart: unless-stopped
+
+volumes:
+  sam3-cache:
