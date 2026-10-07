@@ -8,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY sam3_lab ./sam3_lab
-RUN pip install --no-cache-dir 'torch==2.10.0+cpu' --index-url https://download.pytorch.org/whl/cpu \
+RUN pip install --no-cache-dir 'torch==2.10.0+cpu' torchvision --index-url https://download.pytorch.org/whl/cpu \
     && pip install --no-cache-dir .
 
 EXPOSE 7860
