@@ -61,3 +61,55 @@ SAM 3.1's [official model card](https://huggingface.co/facebook/sam3.1) explicit
 Using the published SAM 3.1 runtime requires a compatible CUDA host, or a separately validated port of its CUDA/Triton dependencies and device handling to MPS. Its advertised Object Multiplex speedups concern multi-object video tracking on NVIDIA hardware, not the current single-frame Mac viewer.
 
 The current inference stack is direct PyTorch through Transformers, with a model/processor cache and `torch.inference_mode()`. It does not use vLLM, Ollama, quantization, or `torch.compile`. Establish a working SAM 3.1 baseline on the chosen runtime before benchmarking additional optimizations.
+
+## Public video datasets
+
+These datasets are free to obtain for the stated research/evaluation uses; they are not unrestricted commercial training data. Start with small subsets, and retain the source license alongside local media.
+
+| Dataset | Fit for this lab | Access and terms |
+| --- | --- | --- |
+| [Charades-Ego](https://prior.allenai.org/projects/charades-ego) | Paired first-/third-person indoor activities, including timestamped object-taking actions. Selected first-person action windows make a small throughput test. | Direct downloads; non-commercial license explicitly permits evaluation elsewhere. No redistribution of downloaded media. |
+| [Something-Something V2](https://www.qualcomm.com/developer/software/something-something-v-2-dataset) | Short, isolated hand-object actions; useful pickup, placement, drop, and lookalike tests. | Qualcomm account/download flow; research-use license. Full archive is about 19.4 GB. |
+| [EPIC-KITCHENS / VISOR](https://epic-kitchens.github.io/VISOR/site) | Egocentric kitchen interactions with hand/active-object masks; better for measuring mask quality under clutter and occlusion. Trim action windows from longer recordings. | Public downloads; CC BY-NC 4.0. |
+| [Ego4D](https://ego4d-data.org/docs/start-here/) | Broad real-world first-person interactions and narrated actions; later expansion beyond indoor scripted clips. | License agreement and approved download credentials; choose a subset rather than the multi-terabyte corpus. |
+
+None of these establishes performance on outdoor litter pickup with the reacher-mounted phone. Charades-Ego footage can be blurry, include other people, and contain objects outside the field of view; temporal labels do not establish that an object is visible in every frame.
+
+## Sampled video throughput benchmark — 2026-10-07
+
+Hardware: Apple M1 Pro, 16 GB memory. Native MPS, float32, SAM 3 via Transformers 5.18.0, PyTorch 2.14.1, torchvision 0.29.1, PyAV 18.1.0. The existing viewer remained resident. These are small-run measurements, not a sustained-load or concurrency benchmark.
+
+The helper retrieved three official Charades-Ego videos using tar byte ranges, avoiding the full 11 GB download. It selected 8 evenly spaced frames per annotated pickup interval, with 0.5-second context on either side. Source videos were 480 × 270; SAM 3 still uses its standard internal preprocessing resolution. Frames were segmented independently, without temporal tracking or propagation. Model loading and one warm-up prediction were excluded from FPS. Input decoding and saving predictions were measured separately. All source frames, overlays, scores, boxes, masks, zero-detection results, and the dataset license are retained under Git-ignored `ml/data/sam3-evaluation/2026-10-07/`.
+
+| Video / annotated action | Prompt | Frames | Inference FPS | Frames with masks |
+| --- | --- | ---: | ---: | ---: |
+| `JCF0TEGO` / taking a towel | `towel` | 8 | 0.222 | 1/8 |
+| `63NKEEGO` / taking a cup/glass/bottle | `cup or glass or bottle` | 8 | 0.224 | 0/8 |
+| `Q808NEGO` / taking a book | `book` | 8 | 0.219 | 0/8 |
+| `63NKEEGO` / focused-prompt repeat | `cup` | 8 | 0.232 | 3/8 |
+
+The first three runs totalled 24 frames in 108.29 seconds: **0.222 FPS**, median **4.48 seconds/frame**, p95 **4.76 seconds/frame**. Decoding totalled 0.79 seconds and artifact writes 0.56 seconds; sampled pipeline throughput was approximately 0.219 FPS. Model/processor loading took 11.69 seconds, followed by an 8.27-second warm-up. An inspected focused-cup overlay followed the visible cup, but this is not an annotated mask-accuracy evaluation. Zero detections may reflect absence, occlusion, blur, threshold, or a miss. The initial aggregate record has a null revision because Transformers did not populate its config commit hash; the CLI now falls back to the cached config snapshot to record it.
+
+Projected processing time for one minute of video, using that measured mean frame cost:
+
+| Sampling policy | Predictions/minute | Projected inference time |
+| --- | ---: | ---: |
+| Every frame of a 30 FPS video | 1,800 | 135.4 minutes |
+| 1 FPS | 60 | 4.51 minutes |
+| 0.25 FPS (one frame every 4 seconds) | 15 | 67.7 seconds |
+
+These are projections from sampled frames, not measurements of an entire video processed at all source frames. Full-frame real-time inference is not feasible with this baseline. Sparse offline proposals are feasible; near-real-time video-duration throughput requires sampling roughly one frame every 4.5–5 seconds, which can miss fast pickup transitions. For this project, prefer a small burst of selected frames around each recorded grasp event, preserving uncertain and failed outcomes. Several prompts per frame multiply work in the current implementation. Before deciding the production sampling rate, test original phone resolution, outdoor litter, motion blur, and a longer sustained run.
+
+Reproduce the focused-prompt workflow from this directory:
+
+```sh
+uv sync --extra video
+uv run python scripts/download_charades_samples.py ../../data/sam3-evaluation/new-run
+uv run --extra video sam3-benchmark ../../data/sam3-evaluation/new-run/manifest.json \
+  --output ../../data/sam3-evaluation/new-run/predictions --frames 8
+uv run --extra video sam3-benchmark ../../data/sam3-evaluation/new-run/manifest.json \
+  --output ../../data/sam3-evaluation/new-run/cup-focused \
+  --video-id 63NKEEGO --prompt cup --frames 8
+```
+
+The downloader now chooses a focused object phrase by default; the initial compound cup prompt is recorded in the original benchmark results. `sam3-benchmark` accepts `--threshold`, `--prompt`, and repeatable `--video-id` selections, and writes per-frame timing and prediction data plus `results.json`. Keep outputs in ignored data storage. It is a throughput/review tool, not a pickup-success classifier.

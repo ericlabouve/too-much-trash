@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
   "gradio>=5,<7",
   "huggingface-hub>=0.34,<2",
+  "httpx>=0.28,<1",
   "numpy>=1.26,<3",
   "pillow>=10,<13",
   "torch>=2.7,<3",
@@ -16,6 +17,10 @@ dependencies = [
 [project.scripts]
 sam3-viewer = "sam3_lab.viewer:main"
 sam3-download = "sam3_lab.download:main"
+sam3-benchmark = "sam3_lab.benchmark:main"
+
+[project.optional-dependencies]
+video = ["av>=14,<19"]
 
 [build-system]
 requires = ["hatchling"]
