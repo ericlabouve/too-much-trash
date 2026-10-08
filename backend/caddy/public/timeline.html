@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A staged research plan for iPhone-based litter capture: data priorities, validation without a robot, simulation experiments, and affordable sensor upgrades.">
+  <meta name="theme-color" content="#080a0d">
+  <title>Project Timeline — Too Much Trash</title>
+  <link rel="icon" href="assets/robot-arm.png" type="image/png">
+  <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./" aria-label="Too Much Trash home"><img class="brand-arm" src="assets/robot-arm.png" width="36" height="36" alt=""> Too Much Trash</a>
+      <nav aria-label="Main navigation">
+        <a href="timeline.html" aria-current="page">Project Timeline</a>
+        <a href="participation.html">People &amp; participation</a>
+      </nav>
+      <a class="github-link" href="https://github.com/ericlabouve/too-much-trash">Explore on GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="main" class="wrap research-page">
+    <section class="research-intro">
+      <p class="eyebrow">PROJECT 001 / TRASH COLLECTION</p>
+      <h1>Project Plan</h1>
+      <p class="research-lead">A path from phone-mounted capture to useful manipulation data.</p>
+      <nav class="research-nav" aria-label="Page sections"><a href="#capture">Capture &amp; value</a><a href="#formats">Formats</a><a href="#simulation">Simulation setup</a><a href="#proof">Proof</a><a href="#upgrades">Upgrades</a><a href="#plan">Next steps</a></nav>
+    </section>
+    <section class="research-section" id="capture">
+      <p class="eyebrow">01 / CAPTURE &amp; POTENTIAL VALUE</p><h2>What we collect. Why it matters.</h2>
+      <p>Ranked by potential value for manipulation research</p>
+      <div class="research-table-wrap" role="region" aria-label="iPhone capture capabilities and market value" tabindex="0"><table class="research-table capture-value-table">
+        <thead><tr><th scope="col">Signal or Product</th><th scope="col">Capture route</th><th scope="col">Benefits &amp; limits</th><th scope="col">Demand &amp; public benchmarks</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><span class="signal-title">01 / Reviewed task episodes &amp; outcomes</span><span class="phone-support">✓ iPhone 18 · source video</span><span class="capture-status">Not Started</span></th><td><ul><li>Video + human review</li><li>Outcome must be visible / confirmed</li></ul></td><td><span class="signal-label benefit">Benefits</span><ul><li>Failure detection and evaluation</li></ul><span class="signal-label limit">Limits</span><ul><li>Occlusion; uncertain labels</li></ul></td><td><ul><li>Target: recovery / evaluation teams</li><li><a href="https://www.appen.com/case-studies/physical-ai-robotics-annotation-eval">Appen reports 50,000+ client data units</a>; price / buyer undisclosed</li><li><a href="https://dexset.ai/blogs/robot-training-data-costs-pricing-complete-2026/">Annotation: +$8–25 / data hour / pass</a></li></ul></td></tr>
+          <tr><th scope="row"><span class="signal-title">02 / Calibrated interaction episodes</span><span class="phone-support">✓ iPhone 18 · estimated pose</span><span class="capture-status">Not Started</span></th><td><ul><li>RGB + <a href="https://developer.apple.com/documentation/arkit/arcamera/">ARKit pose / intrinsics</a></li><li>Jaw state needs measurement</li></ul></td><td><span class="signal-label benefit">Benefits</span><ul><li>Tool trajectories for retargeting</li></ul><span class="signal-label limit">Limits</span><ul><li>Tracking drift; calibration required</li><li>Not executable robot actions</li></ul></td><td><ul><li><a href="https://umi-gripper.github.io/">UMI</a>: policy-learning evidence</li><li>Target: manipulation labs</li><li>No comparable public rate found</li></ul></td></tr>
+          <tr><th scope="row"><span class="signal-title">03 / Object masks &amp; tracks</span><span class="phone-support">✓ iPhone 18 · source video only</span><span class="capture-status in-progress">In Progress</span><small class="status-detail">Planning · SAM3</small></th><td><ul><li><a href="https://github.com/facebookresearch/sam3">SAM3 video masks + tracks</a></li><li>Backend processing + human review</li></ul></td><td><span class="signal-label benefit">Benefits</span><ul><li>Recognition / segmentation labels</li></ul><span class="signal-label limit">Limits</span><ul><li>Review cost; diversity required</li></ul></td><td><ul><li>Compare against free <a href="https://zenodo.org/records/3354286">TACO</a></li><li><a href="https://dexset.ai/blogs/robot-training-data-costs-pricing-complete-2026/">Dense masks: +$18–25 / data hour / pass</a></li></ul></td></tr>
+          <tr><th scope="row"><span class="signal-title">04 / Depth &amp; geometry</span><span class="phone-support">✓ iPhone 18 Pro · LiDAR</span><span class="capture-status">Not Started</span></th><td><ul><li><a href="https://developer.apple.com/documentation/arkit/ardepthdata">ARKit depth + confidence</a></li><li>LiDAR required</li></ul></td><td><span class="signal-label benefit">Benefits</span><ul><li>Object distance / coarse geometry</li></ul><span class="signal-label limit">Limits</span><ul><li>Small, shiny, clear objects</li></ul></td><td><ul><li><a href="https://aurova.ua.es/jint-vision-tactile/">Outdoor grasping research</a></li><li>No standalone rate found</li></ul></td></tr>
+          <tr><th scope="row"><span class="signal-title">05 / Inertial motion</span><span class="phone-support">✓ iPhone 18</span><span class="capture-status">Not Started</span></th><td><ul><li><a href="https://developer.apple.com/documentation/coremotion/cmdevicemotion">Core Motion gyro / acceleration</a></li><li>Native motion streams</li></ul></td><td><span class="signal-label benefit">Benefits</span><ul><li>Motion and tracking diagnostics</li></ul><span class="signal-label limit">Limits</span><ul><li>Not force or reliable position alone</li></ul></td><td><ul><li>Alignment / QA bundle</li><li>No standalone buying evidence or rate found</li></ul></td></tr>
+          <tr><th scope="row"><span class="signal-title">05 / Trigger squeeze events</span><span class="phone-support">✓ iPhone 18 · active capture</span><span class="capture-status in-progress">In Progress</span><small class="status-detail">Planning</small></th><td><ul><li>Cable lever presses volume button</li><li><a href="https://developer.apple.com/documentation/avkit/avcaptureeventinteraction">Supported capture events</a></li></ul></td><td><span class="signal-label benefit">Benefits</span><ul><li>Candidate grasp timestamps</li></ul><span class="signal-label limit">Limits</span><ul><li>Active capture; test missed presses / delay</li><li>Not continuous jaw opening</li></ul></td><td><ul><li>Alignment / QA bundle</li><li>No standalone rate found</li></ul></td></tr>
+          <tr><th scope="row"><span class="signal-title">06 / RGB video &amp; timing</span><span class="phone-support">✓ iPhone 18</span><span class="capture-status in-progress">In Progress</span><small class="status-detail">Planning</small></th><td><ul><li><a href="https://developer.apple.com/documentation/arkit/arframe">Camera frames + timestamps</a></li><li>Imaging metadata</li></ul></td><td><span class="signal-label benefit">Benefits</span><ul><li>Objects, interactions, outcomes</li></ul><span class="signal-label limit">Limits</span><ul><li>Blur, occlusion, frame loss</li></ul></td><td><ul><li><a href="https://research.nvidia.com/publication/2025-03_nvidia-isaac-gr00t-n1-open-foundation-model-humanoid-robots">GR00T</a> uses human video</li><li><a href="https://dexset.ai/blogs/robot-training-data-costs-pricing-complete-2026/">Capture: $15–40 / hour</a></li><li><a href="https://aws.amazon.com/marketplace/pp/prodview-fgslbtpcwiz56">InfoBay sample access: $0</a>; full scope separate</li></ul></td></tr>
+          <tr><th scope="row"><span class="signal-title">06 / Context</span><span class="phone-support">✓ iPhone 18 · with permission</span><span class="capture-status">Not Started</span></th><td><ul><li>Optional <a href="https://developer.apple.com/documentation/corelocation/cllocation">GPS</a> / microphone</li><li>Permission required</li></ul></td><td><span class="signal-label benefit">Benefits</span><ul><li>Collection conditions</li></ul><span class="signal-label limit">Limits</span><ul><li>Privacy / consent; not contact ground truth</li></ul></td><td><ul><li>Episode context only</li><li>No standalone rate found</li></ul></td></tr>
+        </tbody>
+      </table></div>
+      <aside class="research-callout"><h3>Start with video + squeeze events.</h3><p>Retain full episodes, timing, quality flags, and uncertainty. Validate reviewed outdoor outcomes before scaling; agree a prospective buyer’s acceptance spec and paid sample trial.</p><p class="research-note">A named commercial training-data license: <a href="https://investor.shutterstock.com/news-releases/news-release-details/shutterstock-expands-partnership-openai-signs-new-six-year">Shutterstock / OpenAI’s six-year agreement</a> includes video and metadata. It confirms general licensing demand—not a robotics or litter-data price.</p></aside>
+    </section>
+    <section class="research-section" id="formats">
+      <p class="eyebrow">02 / INTEROPERABILITY</p><h2>Reuse the ecosystem’s formats.</h2>
+      <div class="research-table-wrap" role="region" aria-label="Dataset format design plan" tabindex="0"><table class="research-table">
+        <thead><tr><th scope="col">Format</th><th scope="col">Best fit</th><th scope="col">Backend design choice</th></tr></thead><tbody>
+          <tr class="format-first"><th scope="row">01 / <a href="https://huggingface.co/docs/lerobot/en/lerobot-dataset-v3">LeRobot v3 ↗</a><span class="first-choice">INITIAL SUPPORT · EPISODES</span></th><td>MP4 + Parquet + episode metadata</td><td>First export target: aligned video / events with explicit observations. Never invent robot actions.</td></tr>
+          <tr class="format-first"><th scope="row">02 / <a href="https://cocodataset.org/#format-data">COCO ↗</a><span class="first-choice">INITIAL SUPPORT · MASKS</span></th><td>Per-frame instance masks in lossless RLE</td><td>Save SAM3-generated masks now; preserve object IDs and frame timing separately.</td></tr>
+          <tr><th scope="row">03 / <a href="https://www.asam.net/standards/detail/openlabel/">ASAM OpenLABEL ↗</a></th><td>Temporal / multimodal JSON</td><td>Add when richer event / object annotation is needed.</td></tr>
+          <tr><th scope="row">04 / <a href="https://github.com/google-research/rlds">RLDS ↗</a></th><td>Episodes / steps; TFDS ecosystem</td><td>Consumer-requested research adapter.</td></tr>
+          <tr><th scope="row">05 / <a href="https://robomimic.github.io/docs/datasets/overview.html">robomimic ↗</a></th><td>HDF5 demonstrations</td><td>Consumer-requested imitation-learning export.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="research-note">Initial plan: LeRobot for episodes + COCO for SAM3 masks. OpenLABEL / RLDS / HDF5 remain optional adapters. Processing and exports are planned—not implemented.</p>
+      <aside class="research-callout"><h3>Store masks—not just colored overlays.</h3><ul><li>Lossless <a href="https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/mask.py">COCO RLE</a> or PNG; source frame index, timestamp, dimensions, and object ID.</li><li>Keep model version, prompts, available scores, and review state. Generated masks are not ground truth.</li><li>COCO is per-frame; preserve temporal IDs and offer <a href="https://youtube-vos.org/dataset/vis/">YouTube-VIS</a> export if a video-tracking consumer needs it.</li></ul><p class="research-note"><a href="https://github.com/facebookresearch/sam3">Official SAM3</a> requires CUDA. Plan separate backend compute; iPhone checks indicate capture support, not on-device SAM3 inference.</p></aside>
+      <aside class="research-callout"><h3>UMI-inspired, not “UMI compliant.”</h3><ul><li>Adopt the principles: tool-relative video, measured jaw width, synchronized pose, and latency checks.</li><li>Study the <a href="https://umi-gripper.github.io/">hardware / 3D-printing guides</a> and <a href="https://fastumi.com/FastUMI/">FastUMI</a> mounts as CAD references—not drop-in reacher parts.</li><li>Keep our stock reacher, removable iPhone mount, and cable trigger. Add continuous jaw measurement before claiming action-ready data.</li></ul><p class="research-note">UMI is an open research framework, not a formal standard. <a href="https://github.com/real-stanford/umi-on-legs">UMI on Legs</a> and FastUMI demonstrate adoption; market-wide usage is unmeasured. The original <a href="https://github.com/real-stanford/universal_manipulation_interface">pipeline</a> is tested on Ubuntu, not our M1 Mac.</p></aside>
+    </section>
+    <section class="research-section" id="simulation">
+      <p class="eyebrow">03 / SIMULATION SETUP</p><h2>Start small. Start with MuJoCo.</h2>
+      <p>Build the simulation harness before testing policy value. Start with a small CPU-based task on the M1 Pro—not foundation-model training.</p>
+      <div class="sim-choice"><article><span class="research-tag">LOCAL / START HERE</span><h3><a href="https://github.com/google-deepmind/mujoco">MuJoCo ↗</a></h3><ul><li>Free, open source; macOS universal build.</li><li>Simple arm, gripper, rigid objects.</li><li>Replay / retarget first; small policies next.</li></ul></article>
+      <article><span class="research-tag">REMOTE / LATER</span><h3><a href="https://docs.isaacsim.omniverse.nvidia.com/latest/installation/requirements.html">NVIDIA Isaac Sim / Isaac Lab ↗</a></h3><ul><li>Robotics simulation + learning workflows.</li><li>Supported NVIDIA RTX host required; not local M1.</li><li>Consider a compatible rented host only if needed.</li></ul></article></div>
+      <ol class="compact-steps"><li>Check trajectory reach, timing, and collisions.</li><li>Establish robomimic BC on the public Lift PH dataset.</li><li>Randomize objects, friction, lighting, and noise.</li></ol>
+      <p class="research-note">Simulation validates the tested model only. A borrowed robot or partner lab must confirm real-world transfer. Grass, flexible litter, and contact are especially hard to model.</p>
+    </section>
+    <section class="research-section" id="proof">
+      <p class="eyebrow">04 / SPECIFIC BASELINE</p><h2>Start with BC on robosuite Lift.</h2>
+      <p><strong>Baseline:</strong> robomimic feed-forward behavioral cloning (BC), trained on the public Lift proficient-human low-dimensional dataset; evaluate in its matching MuJoCo / robosuite environment.</p>
+      <div class="proof-grid">
+        <article><h3>Available today</h3><ul><li><a href="https://robomimic.github.io/docs/datasets/robomimic_v0.1.html">Public Lift PH dataset</a> and <a href="https://github.com/ARISE-Initiative/robomimic/blob/master/robomimic/algo/bc.py">BC implementation</a>.</li><li><a href="https://robosuite.ai/docs/modules/environments.html">Lift simulation</a>: randomized cube pickup.</li><li>Small CPU experiment first; pin matching versions and smoke-test on M1.</li></ul></article>
+        <article><h3>Then test our data</h3><ul><li>Lift validates the pipeline—not litter-data value.</li><li>Next: public Can pick-and-place baseline, then a matched litter task.</li><li>Compare the same BC model with / without task-matched, retargeted demonstrations.</li></ul></article>
+        <article><h3>Success gate</h3><ul><li>Held-out task success, drops, collisions.</li><li>Same compute, splits, seeds; confidence intervals.</li><li>Video + squeeze events alone do not supply BC actions.</li></ul></article>
+      </div>
+      <aside class="research-callout"><p>Before reliable pose / jaw labels exist, test outcome prediction on real video instead. Do not add unmatched phone recordings to the Lift dataset or interpret a simulator smoke test as proof of commercial value.</p></aside>
+    </section>
+    <section class="research-section" id="upgrades">
+      <p class="eyebrow">05 / LOW-EXPENSE UPGRADES</p><h2>Add only what improves the result.</h2>
+      <div class="research-table-wrap" role="region" aria-label="Prioritized device upgrades" tabindex="0"><table class="research-table"><thead><tr><th scope="col">Priority</th><th scope="col">Added signal</th><th scope="col">Validation</th></tr></thead><tbody>
+        <tr><th scope="row">1 / Printed calibration + jaw markers</th><td>Scale, camera-to-tool alignment, visible jaw opening.<br>Very low materials cost.</td><td>Compare to measured motion / calipers.</td></tr>
+        <tr><th scope="row">2 / Potentiometer or Hall sensor + logger</th><td>Continuous opening proxy.<br><a href="https://www.adafruit.com/product/3395">Example component</a>; electronics / assembly extra.</td><td>Measure actual jaw opening, hysteresis, clock offset.</td></tr>
+        <tr><th scope="row">3 / Contact or load sensor</th><td>Contact / load evidence.<br>Low-cost parts; integration uncertain.</td><td>Repeat known-load tests; not full tactile sensing.</td></tr>
+        <tr><th scope="row">4 / Borrowed second phone</th><td>Outcome visibility + reference view.</td><td>Synchronize views; measure review benefit.</td></tr>
+      </tbody></table></div>
+      <p class="research-note">Cost bands are planning judgments, not kit quotes. Use paired before / after tests; keep only useful additions.</p>
+    </section>
+    <section class="research-section" id="plan">
+      <p class="eyebrow">06 / PROJECT TRAIL</p><h2>Follow the evidence.<br>Repeat where it matters.</h2>
+      <p>Hover, focus, or tap a node for details and its feedback path. Progress depends on passing each gate—not a calendar.</p>
+      <div class="trail" data-active="scope">
+        <div class="trail-map">
+          <svg class="trail-lines" viewBox="0 0 900 300" preserveAspectRatio="none" aria-hidden="true">
+            <defs><marker id="trail-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 6 3 0 6" fill="none" stroke="currentColor"/></marker></defs>
+            <path class="trail-forward" d="M280 70H330 M580 70H630 M750 110V185 M630 230H580 M330 230H280"/>
+            <path class="trail-loop loop-review" d="M450 40V12H150V40"/>
+            <path class="trail-loop loop-model" d="M450 265V292H20V140H450V110"/>
+            <path class="trail-loop loop-sim" d="M750 265V292H880V140H450V110"/>
+            <path class="trail-loop loop-trial" d="M150 265V282H750V265"/>
+          </svg>
+          <button class="trail-node" data-node="scope" aria-pressed="true" aria-controls="detail-scope"><span>01 / DEFINE</span>Capture contract</button>
+          <button class="trail-node" data-node="capture" aria-pressed="false" aria-controls="detail-capture"><span>02 / RECORD</span>Collect &amp; review</button>
+          <button class="trail-node" data-node="export" aria-pressed="false" aria-controls="detail-export"><span>03 / PACKAGE</span>LeRobot export</button>
+          <button class="trail-node" data-node="sim" aria-pressed="false" aria-controls="detail-sim"><span>04 / BUILD</span>Simulation harness</button>
+          <button class="trail-node" data-node="model" aria-pressed="false" aria-controls="detail-model"><span>05 / MEASURE</span>Prove data value</button>
+          <button class="trail-node" data-node="trial" aria-pressed="false" aria-controls="detail-trial"><span>06 / DECIDE</span>Partner trial</button>
+        </div>
+        <div class="trail-detail">
+          <article id="detail-scope"><h3>Define the acceptance spec</h3><ul><li>Choose task, target user, and success metric.</li><li>Measure phone capabilities and calibration.</li><li>Agree consent, license, and quality gates.</li></ul><p class="trail-feedback">Gate → observable signals and testable requirements.</p></article>
+          <article id="detail-capture"><h3>Build recording. Review a small pilot.</h3><ul><li>Synchronize streams; retain originals and failures.</li><li>Check drift, missing frames, and label agreement.</li><li>Freeze an independent held-out split.</li></ul><p class="trail-feedback">Loop ↺ Capture fails QA → revise the contract and recollect.</p></article>
+          <article id="detail-model"><h3>Prove model and policy benefit</h3><ul><li>Compare perception and simulated policies with / without our data.</li><li>Report held-out improvement and uncertainty.</li><li>Count accepted episodes and review cost.</li></ul><p class="trail-feedback">Loop ↺ No improvement → refine collection / labels before adding volume.</p></article>
+          <article id="detail-export"><h3>Package for existing tools</h3><ul><li>Version episodes, labels, units, and frames.</li><li>Validate LeRobot episodes and COCO SAM3 masks together.</li><li>Round-trip a sample in a consumer loader.</li></ul><p class="trail-feedback">Gate → a partner can load the data without bespoke tooling.</p></article>
+          <article id="detail-sim"><h3>Build a small MuJoCo harness</h3><ul><li>Validate retargeting and jaw-state assumptions.</li><li>Smoke-test BC / Lift PH; freeze randomized test scenes.</li><li>Add a sensor only for a measured gap.</li></ul><p class="trail-feedback">Loop ↺ Weak action signal → instrument, recalibrate, and repeat the pilot.</p></article>
+          <article id="detail-trial"><h3>Validate transfer and demand</h3><ul><li>Borrow robot access through a lab / partner.</li><li>Agree sample acceptance and paid-pilot terms.</li><li>Scale, refine, or pivot based on evidence.</li></ul><p class="trail-feedback">Loop ↺ Transfer fails → revisit benchmarks and simulation; do not scale yet.</p></article>
+        </div>
+      </div>
+      <noscript><p>Trail: define → collect / review → LeRobot export → simulation setup → prove value → partner trial. Return to collection if quality or benefit fails; return to simulation if transfer fails.</p></noscript>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="wrap footer-inner"><a class="brand" href="./"><img class="brand-arm" src="assets/robot-arm.png" width="36" height="36" alt=""> Too Much Trash</a><span>Egocentric capture. Manipulation. Robot learning.</span><div><a href="https://github.com/ericlabouve/too-much-trash">GitHub ↗</a></div></div></footer>
+  <script src="timeline.js" defer></script>
+</body>
+</html>

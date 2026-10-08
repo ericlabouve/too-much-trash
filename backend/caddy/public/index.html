@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Too Much Trash is exploring how real litter pickups can help teach robots to care for shared spaces.">
-  <meta name="theme-color" content="#f4f1e9">
-  <title>Too Much Trash — Every pickup teaches us something</title>
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <meta name="description" content="Too Much Trash is an egocentric data capture and manipulation lab, developing practical tools for robot learning. Our first project captures litter collection with a phone-equipped reacher.">
+  <meta name="theme-color" content="#080a0d">
+  <title>Too Much Trash — Egocentric data capture &amp; manipulation lab</title>
+  <link rel="icon" href="assets/robot-arm.png" type="image/png">
   <link rel="stylesheet" href="landing.css">
   <script defer src="landing.js"></script>
 </head>
@@ -14,12 +14,10 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap header-inner">
-      <a class="brand" href="./" aria-label="Too Much Trash home"><span class="brand-symbol" aria-hidden="true">✳</span> Too Much Trash</a>
+      <a class="brand" href="./" aria-label="Too Much Trash home"><img class="brand-arm" src="assets/robot-arm.png" width="36" height="36" alt=""> Too Much Trash</a>
       <nav aria-label="Main navigation">
-        <a href="#idea">The idea</a>
-        <a href="#how">How it works</a>
-        <a href="#project">The project</a>
-        <a href="https://ericlabouve.github.io/too-much-trash/">Docs <span aria-hidden="true">↗</span></a>
+        <a href="timeline.html">Project Timeline</a>
+        <a href="participation.html">People &amp; participation</a>
       </nav>
       <a class="github-link" href="https://github.com/ericlabouve/too-much-trash">Explore on GitHub <span aria-hidden="true">↗</span></a>
     </div>
@@ -27,11 +25,11 @@
 
   <main id="main">
     <section class="hero wrap" aria-labelledby="hero-title">
-      <div class="hero-topline"><span class="live-dot" aria-hidden="true"></span> A RESEARCH PROJECT ABOUT ROBOTS AND LITTER <span class="topline-rule"></span> 001 / AN INTRODUCTION</div>
-      <h1 id="hero-title">Every pickup<br>teaches us <span>something.</span></h1>
+      <canvas class="capture-cloud" aria-hidden="true"></canvas>
+      <div class="hero-topline"><span class="live-dot" aria-hidden="true"></span> EGOCENTRIC DATA CAPTURE &amp; MANIPULATION LAB</div>
+      <h1 id="hero-title">The world,<br>from the<br><span>point of action.</span></h1>
       <div class="hero-bottom">
-        <p>What if the everyday act of picking up litter could help teach robots to care for the places we share?</p>
-        <a class="round-link" href="#idea" aria-label="Discover the idea"><span aria-hidden="true">↘</span></a>
+        <p>Practical tools to capture real-world interactions from the task’s point of view, and turn them into data for robot learning.</p>
       </div>
     </section>
 
@@ -39,7 +37,7 @@
       <div class="field-grid" aria-hidden="true"></div>
       <div class="field-glow" aria-hidden="true"></div>
       <div class="field-inner wrap">
-        <div class="field-label"><span class="field-led"></span> A SMALL ACTION, A BIGGER POSSIBILITY</div>
+        <div class="field-label"><span class="field-led"></span> PROJECT 001 / TRASH COLLECTION</div>
         <div class="field-scene" aria-hidden="true">
           <svg class="path-lines" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid meet">
             <path class="path-one" d="M88 415 C230 405 312 285 446 300 S690 442 816 316 S1055 188 1156 206"/>
@@ -58,42 +56,30 @@
       </div>
     </section>
 
-    <div class="marquee" aria-hidden="true"><div class="marquee-track">SEE MORE <span>✳</span> PICK UP MORE <span>✳</span> LEARN MORE <span>✳</span> SEE MORE <span>✳</span> PICK UP MORE <span>✳</span> LEARN MORE <span>✳</span></div></div>
-
     <section class="idea section wrap reveal" id="idea" aria-labelledby="idea-title">
-      <p class="eyebrow">01 / THE IDEA</p>
+      <p class="eyebrow">01 / THE LAB</p>
       <div class="idea-layout">
-        <h2 id="idea-title">A cleaner world needs more than <em>clean examples.</em></h2>
-        <div class="idea-copy"><p>Sidewalks, parks, and streets are unpredictable. Litter comes in every shape, in every setting. A robot that might someday help clean them needs to learn from the real thing.</p><p>We’re starting with people. Each attempt to pick something up can become an example of what was seen, what was tried, and what happened next.</p><a class="inline-link" href="#how">See how we’re starting <span aria-hidden="true">↘</span></a></div>
+        <h2 id="idea-title">Real interactions.<br><em>A closer view.</em></h2>
+        <div class="idea-copy"><p>We explore how to record physical tasks from the point of action: what a tool sees, how it moves, and what happens when it meets an object.</p><p>Our work connects low-cost capture hardware with video review and dataset development for perception and robotic manipulation research.</p><a class="inline-link" href="#how">Explore our first project <span aria-hidden="true">↘</span></a></div>
       </div>
     </section>
 
-    <section class="attempts" aria-labelledby="attempts-title">
-      <div class="wrap attempts-head reveal"><p class="eyebrow">THE WHOLE STORY MATTERS</p><h2 id="attempts-title">The misses count, too.</h2><p>A useful dataset should include the moments that are easy to overlook.</p></div>
-      <div class="attempt-word word-one">THE APPROACH <span>01</span></div>
-      <div class="attempt-word word-two">THE GRASP <span>02</span></div>
-      <div class="attempt-word word-three">THE MISS <span>03</span></div>
-      <div class="attempt-word word-four">THE OUTCOME <span>04</span></div>
-    </section>
-
     <section class="how section wrap" id="how" aria-labelledby="how-title">
-      <div class="section-intro reveal"><p class="eyebrow">02 / HOW IT WORKS</p><h2 id="how-title">Begin with a familiar tool.</h2><p>A person uses an ordinary reacher grabber and a separate collection bucket. A phone near the claw records the approach; a simple mechanical link marks each squeeze.</p></div>
+      <div class="section-intro reveal"><p class="eyebrow">02 / FIRST PROJECT: TRASH COLLECTION</p><h2 id="how-title">A grabber. A phone.<br>A view of every pickup.</h2><p>We’re developing an inexpensive, 3D-printable phone harness and trigger system for a reacher grabber. An iPhone near the claw is intended to record litter collection while a person uses the grabber and a separate bucket.</p></div>
       <div class="process-grid">
-        <article class="process-card reveal"><span class="process-number">01 / SEE</span><div class="process-art camera-art" aria-hidden="true"><div class="camera-lens"><div></div></div><span class="camera-ray ray-one"></span><span class="camera-ray ray-two"></span></div><h3>See the moment</h3><p>Video from the grabber’s point of view preserves the approach to a piece of litter.</p></article>
-        <article class="process-card reveal"><span class="process-number">02 / MARK</span><div class="process-art mark-art" aria-hidden="true"><span class="mark-ring ring-a"></span><span class="mark-ring ring-b"></span><span class="mark-dot"></span></div><h3>Mark the attempt</h3><p>The grabber’s squeeze creates a marker so the pickup attempt can be found again.</p></article>
+        <article class="process-card reveal"><span class="process-number">01 / SEE</span><div class="process-art camera-art" aria-hidden="true"><div class="camera-lens"><div></div></div><span class="camera-ray ray-one"></span><span class="camera-ray ray-two"></span></div><h3>See the moment</h3><p>A removable phone harness is designed to capture video from the grabber’s point of view, including the approach to the litter.</p></article>
+        <article class="process-card reveal"><span class="process-number">02 / MARK</span><div class="process-art mark-art" aria-hidden="true"><span class="mark-ring ring-a"></span><span class="mark-ring ring-b"></span><span class="mark-dot"></span></div><h3>Mark the attempt</h3><p>A mechanical cable is designed to link the squeeze trigger to the phone’s volume button, marking the attempt for later review.</p></article>
         <article class="process-card reveal"><span class="process-number">03 / LEARN</span><div class="process-art learn-art" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><h3>Learn from the result</h3><p>Deposits, misses, drops, and uncertainty can all inform careful human review.</p></article>
       </div>
     </section>
 
     <section class="project" id="project" aria-labelledby="project-title">
-      <div class="wrap project-layout">
-        <div class="project-copy reveal"><p class="eyebrow">03 / THE PROJECT</p><h2 id="project-title">A first step toward robots that can help.</h2><p>This is an early research and product project. We’re designing a practical way to collect real pickup examples, then exploring how those examples could support perception and learning.</p><p>Our current reacher retrofit is a CAD fit prototype. Its grip, cable motion, and field performance still need physical validation.</p><a class="pill-link" href="https://ericlabouve.github.io/too-much-trash/">Explore the documentation <span aria-hidden="true">↗</span></a></div>
-        <figure class="project-visual reveal"><img src="assets/reacher-prototype.png" alt="CAD fit prototype of the reacher grabber with an orange phone carrier" width="1160" height="1002"><figcaption>THE CURRENT CAD FIT PROTOTYPE <span>↗</span></figcaption></figure>
+      <div class="wrap project-summary">
+        <div class="project-copy reveal"><p class="eyebrow">CURRENT STAGE / PROTOTYPE DEVELOPMENT</p><h2 id="project-title">From field capture<br>to training data.</h2><p>The first project aims to connect pickup video and attempt markers with review, segmentation, classification, and imitation-learning research.</p><p>The reacher retrofit is currently a CAD fit prototype. Grip, cable motion, and field performance still need physical validation.</p><a class="pill-link" href="https://github.com/ericlabouve/too-much-trash">Explore the project <span aria-hidden="true">↗</span></a></div>
       </div>
     </section>
 
-    <section class="closing section wrap reveal" aria-labelledby="closing-title"><p class="eyebrow">EVERY ATTEMPT IS A DATA POINT</p><h2 id="closing-title">Imagine what we<br>could learn <em>together.</em></h2><div class="closing-bottom"><p>We’re building the tools to make real-world cleanup examples useful for future robots.</p><a class="round-link round-link-dark" href="https://github.com/ericlabouve/too-much-trash" aria-label="Explore the project on GitHub"><span aria-hidden="true">↗</span></a></div></section>
   </main>
-  <footer class="site-footer"><div class="wrap footer-inner"><a class="brand" href="./"><span class="brand-symbol" aria-hidden="true">✳</span> Too Much Trash</a><span>Real attempts. Better evidence. Cleaner places.</span><div><a href="https://ericlabouve.github.io/too-much-trash/">Documentation</a><a href="https://github.com/ericlabouve/too-much-trash">GitHub ↗</a></div></div></footer>
+  <footer class="site-footer"><div class="wrap footer-inner"><a class="brand" href="./"><img class="brand-arm" src="assets/robot-arm.png" width="36" height="36" alt=""> Too Much Trash</a><span>Egocentric capture. Manipulation. Robot learning.</span><div><a href="https://github.com/ericlabouve/too-much-trash">GitHub ↗</a></div></div></footer>
 </body>
 </html>

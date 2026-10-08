@@ -1,5 +1,9 @@
 # Backend stack
 
+The proposed sensor-ingestion and dataset interoperability plan is in
+[data-contract.md](data-contract.md). It is a design proposal, not the current
+upload API contract.
+
 From this directory, mint a local admin token and start the stack:
 
 ```sh
