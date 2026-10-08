@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-10-04T17:55:44.186949+00:00",
+  "remote_file": "tmt-v2-plate3-jaw-bracket-guides-29fa716b.gcode.3mf",
+  "gcode_md5": "29fa716bf24b2d5f549f74ff03ac6b68",
+  "authorization": "User: Proceed, after plate 3 readiness summary.",
+  "preflight": "Printer idle, PLA external spool, 0.4 mm nozzle; camera shows cleared bed.",
+  "start_outcome": "verified",
+  "observed_state": {
+    "gcode_state": "PREPARE",
+    "stage": "no_stage",
+    "print_error": 0,
+    "remaining_time_min": 0
+  },
+  "physical_result": "pending"
+}

@@ -1,0 +1,41 @@
+{
+  "revision": "compact-rails-r12",
+  "trial_symmetric_difference_mm3": {
+    "thumb_screw": 0,
+    "thumb_nut": 0
+  },
+  "nut_sweep_intersection_mm3": {
+    "0": 0,
+    "45": 0,
+    "90": 0,
+    "135": 0,
+    "180": 0,
+    "225": 0,
+    "270": 0,
+    "315": 0,
+    "360": 0
+  },
+  "rocker_sweep_intersection_mm3": {
+    "-2": 0,
+    "-1.5": 0,
+    "-0.75": 0,
+    "0": 0,
+    "0.75": 0,
+    "1.5": 0,
+    "2": 0
+  },
+  "thread": {
+    "major_mm": 8,
+    "pitch_mm": 3,
+    "radial_depth_mm": 0.8,
+    "female_radial_clearance_mm": 0.3,
+    "included_angle_degrees": 90,
+    "standard_ACME": false
+  },
+  "rocker_min_nominal_radial_wall_mm": 1.8,
+  "limitations": [
+    "Rocker fit, strength and loaded assembly remain physically unvalidated.",
+    "Adjustment sweep is off-phone clearance, not safe button travel."
+  ],
+  "passed": true
+}

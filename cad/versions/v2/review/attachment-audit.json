@@ -1,0 +1,35 @@
+{
+  "revision": "compact-rails-r12",
+  "attachment": "Loop through the 8 mm eye and around its front ligament; tie the end back to the standing string. No stopper knot bears against the hole. Actual knot security remains untested.",
+  "assumed_knot_envelopes_mm": [
+    [
+      8,
+      4
+    ],
+    [
+      10,
+      6
+    ]
+  ],
+  "samples": {
+    "wallet-near": [],
+    "wallet-far": [],
+    "bare-near": [],
+    "bare-far": [],
+    "small-near": [],
+    "small-far": [],
+    "large-near": [],
+    "large-far": []
+  },
+  "limitations": [
+    "Illustrative cylindrical envelopes, not actual knots or finger-access simulation",
+    "Printed knot retention, twine friction and strength remain unmeasured"
+  ],
+  "return_band_free_span": {
+    "fixed_hook_exclusion_radius_mm": 4,
+    "proxy_diameter_mm": 1.4,
+    "intersections": [],
+    "scope": "Canonical module; both-side placements are rigid transforms. Contact/wrapping at hooks is not simulated."
+  },
+  "passed": true
+}

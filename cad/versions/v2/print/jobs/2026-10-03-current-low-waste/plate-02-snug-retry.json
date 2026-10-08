@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-10-04T06:49:25.835585+00:00",
+  "remote_file": "tmt-v2-plate2-snug-retry.gcode.3mf",
+  "gcode_md5": "53e6c6f5429a22d9016f4113fe9bc48f",
+  "user_confirmed": "Bed clear; restart with Normal Snug.",
+  "start_outcome": "verified",
+  "observed_state": {
+    "gcode_state": "PREPARE",
+    "stage": "no_stage",
+    "print_error": 0,
+    "remaining_time_min": 99
+  },
+  "physical_result": "User confirms plate 2 success.",
+  "completion_verified": true
+}

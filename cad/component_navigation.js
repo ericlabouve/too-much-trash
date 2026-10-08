@@ -14,7 +14,7 @@ export function assemblyNames(row, names){
     ['Trigger strap',['trigger_strap_envelope']]];
   return (rules.find(([prefix])=>name.startsWith(prefix))?.[1]||[]).filter(n=>names.has(n));
 }
-export function installNavigation({THREE,scene,camera,controls,canvas,bomMeshes,meshByName,rows,getMode,setMode,allowed}){
+export function installNavigation({THREE,scene,camera,getRenderCamera=()=>camera,controls,canvas,bomMeshes,meshByName,rows,getMode,setMode,allowed}){
   const menu=document.querySelector('#component-menu'),info=document.querySelector('#selection-info');
   let selected=-1,targets=[],outline=null,pointerStart=null;
   const rowNames=rows.map(row=>assemblyNames(row,meshByName));
@@ -40,7 +40,7 @@ export function installNavigation({THREE,scene,camera,controls,canvas,bomMeshes,
   inventory.addEventListener('contextmenu',e=>{const tr=e.target.closest('tr[data-row-id]');if(tr){e.preventDefault();context(Number(tr.dataset.rowId),e.clientX,e.clientY);}});
   inventory.addEventListener('keydown',e=>{const tr=e.target.closest('tr[data-row-id]');if(!tr)return;const id=Number(tr.dataset.rowId);if(e.key==='Enter'||e.key===' '){e.preventDefault();select(id);}if(e.key==='ContextMenu'||(e.shiftKey&&e.key==='F10')){e.preventDefault();const rect=tr.getBoundingClientRect();context(id,rect.left+30,rect.top+20);}});
   const raycaster=new THREE.Raycaster();
-  function pick(e){const rect=canvas.getBoundingClientRect();const mouse=new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);scene.updateMatrixWorld(true);raycaster.setFromCamera(mouse,camera);const candidates=getMode()==='bom'?bomMeshes.map(e=>e.mesh):[...meshByName.values()].filter(m=>m.visible);return raycaster.intersectObjects(candidates,false).find(hit=>hit.object.userData.rowId>=0)?.object;}
+  function pick(e){const rect=canvas.getBoundingClientRect();const mouse=new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);scene.updateMatrixWorld(true);raycaster.setFromCamera(mouse,getRenderCamera());const candidates=getMode()==='bom'?bomMeshes.map(e=>e.mesh):[...meshByName.values()].filter(m=>m.visible);return raycaster.intersectObjects(candidates,false).find(hit=>hit.object.userData.rowId>=0)?.object;}
   canvas.addEventListener('pointerdown',e=>{pointerStart=[e.clientX,e.clientY];});
   canvas.addEventListener('click',e=>{if(!pointerStart||Math.hypot(e.clientX-pointerStart[0],e.clientY-pointerStart[1])>5)return;const mesh=pick(e);if(mesh)select(mesh.userData.rowId,[mesh]);});
   canvas.addEventListener('contextmenu',e=>{e.preventDefault();const mesh=pick(e);if(mesh)context(mesh.userData.rowId,e.clientX,e.clientY,getMode()==='bom'?null:[mesh.name]);else closeMenu();});

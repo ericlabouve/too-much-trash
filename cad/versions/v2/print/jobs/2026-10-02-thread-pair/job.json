@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-02",
+  "status": "user_reported_print_success",
+  "printer": "Bambu Lab A1 mini",
+  "profile": "tmt-a1-mini",
+  "remote_file": "/tmt-8x3-cli-20261002.gcode.3mf",
+  "gcode_md5": "95137bc7cfe343b2ef81f0822c80cef3",
+  "files": [
+    {
+      "name": "trial_screw_8x3.stl",
+      "quantity": 1,
+      "sha256": "dd9df4eb63d102adff7b7a59b1f76ff9da6a245e69254b20afe082bbfe257241"
+    },
+    {
+      "name": "trial_nut_8x3.stl",
+      "quantity": 1,
+      "sha256": "309212ff451c03d90509c5494fd0f1d915c39bc5050fb4549ea3730dda0c2c0d"
+    }
+  ],
+  "settings": {
+    "nozzle_mm": 0.4,
+    "layer_mm": 0.12,
+    "first_layer_mm": 0.2,
+    "walls": 2,
+    "infill_percent": 15,
+    "outer_wall_mm_s": 30,
+    "inner_wall_mm_s": 60,
+    "solid_infill_mm_s": 80,
+    "nozzle_c": 220,
+    "bed_c": 65,
+    "bed_type": "Textured PEI Plate",
+    "min_max_cooling_percent": [
+      100,
+      100
+    ],
+    "material": "off-brand PLA+ using Generic PLA starting profile",
+    "spool": "external"
+  },
+  "slicer": "Bambu Studio 02.07.01.62",
+  "estimated_minutes": 30.43,
+  "estimated_part_mass_g": 1.94,
+  "camera_bed_check": "clear before start",
+  "printer_completion_verified": true,
+  "physical_fit_verified": false,
+  "notes": [
+    "Official CLI sliced source STLs with resolved machine/process/filament profiles and effective settings from prior successful sliced job.",
+    "Separate FTPS upload, remote dry run and plate-G-code MD5 verification preceded guarded start.",
+    "Two walls / 15% infill reflects the saved successful job; does not establish assembly strength."
+  ],
+  "interventions": [
+    {
+      "error": "0x07FF8007",
+      "stage": "external spool loading before layer 1",
+      "screen_prompt": "Confirm whether filament extruded",
+      "physical_observation": "User confirmed extrusion",
+      "action": "bambu job resume --confirm",
+      "result": "Briefly RUNNING with print_error 0, then loading confirmation returned; remote acknowledgement not established. Touchscreen confirmation requested."
+    }
+  ],
+  "latest_status": {
+    "gcode_state": "FINISH",
+    "mc_percent": 100,
+    "layer_num": 199,
+    "total_layer_num": 199,
+    "remaining_time_min": 0,
+    "print_error": 0,
+    "error": null,
+    "subtask_name": "tmt-8x3-cli-20261002.gcode.3mf",
+    "nozzle_temper": 88.03125,
+    "bed_temper": 52.5,
+    "time_utc": "2026-10-02T21:11:02.465156+00:00"
+  },
+  "user_reported_print_success": true,
+  "bed_cleared": true,
+  "feedback": "User reported print success and cleared bed on 2026-10-02. Thread fit of this reprint was not separately stated.",
+  "automation_result": "CLI connection, slicing, upload, start and completion verified; touchscreen extrusion confirmation required."
+}

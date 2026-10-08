@@ -1,0 +1,113 @@
+{
+  "name": "02-shaft-cap-tree-organic",
+  "parts": [
+    [
+      "shaft_cap",
+      "export-tree-organic",
+      1
+    ]
+  ],
+  "grams": 36.9000244140625,
+  "minutes": 163.67799479166666,
+  "warning": "",
+  "objects": [
+    {
+      "area": 2300.808837890625,
+      "bbox": [
+        39.0,
+        55.00439000000001,
+        141.0,
+        124.99561000000001
+      ],
+      "id": 26,
+      "layer_height": 0.20000000298023224,
+      "name": "shaft_cap-1.stl"
+    }
+  ],
+  "command": [
+    "/Applications/BambuStudio.app/Contents/MacOS/BambuStudio",
+    "--load-settings",
+    "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/machine.json;/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/02-shaft-cap-tree-organic/process.json",
+    "--load-filaments",
+    "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/filament.json",
+    "--arrange",
+    "0",
+    "--orient",
+    "0",
+    "--avoid-extrusion-cali-region",
+    "--slice",
+    "0",
+    "--export-3mf",
+    "02-shaft-cap-tree-organic.gcode.3mf",
+    "--outputdir",
+    "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/02-shaft-cap-tree-organic",
+    "/Users/ericlabouve/Desktop/code/github/upstream/too-much-trash/main/too-much-trash/cad/exports/2026-10-03-v2-low-waste/02-shaft-cap-tree-organic/shaft_cap-1.stl"
+  ],
+  "file_sha256": "3b8ad86abd264f78ec3810ba72e2f741d4e55a382e0e8bcd91079727b8a46a18",
+  "feature_grams": {
+    "Support": 7.0648154064922695,
+    "Inner wall": 8.833563313209615,
+    "Outer wall": 4.253011741165629,
+    "Bottom surface": 0.3401813968675434,
+    "Internal solid infill": 7.317103604009613,
+    "Sparse infill": 3.5157498360657606,
+    "Floating vertical shell": 0.6963713598837559,
+    "Bridge": 2.4575910133438694,
+    "Top surface": 1.343834246312964,
+    "Gap infill": 0.01180531875337451,
+    "Support interface": 0.7915726406845706,
+    "Overhang wall": 0.20361116990669936
+  },
+  "support_grams": 7.85638804717684,
+  "model_grams": 28.972822999518826,
+  "gcode_md5": "42d4df792859cd0e852972c820a5c14d",
+  "object_extrusion_bounds_xy": {},
+  "extrusion_xy_bounds": [
+    [
+      35.352,
+      6.676
+    ],
+    [
+      144.916,
+      173.78
+    ]
+  ],
+  "within_bed_with_0_25mm_line_margin": true,
+  "gaps": [],
+  "actual_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "printer_variant": "0.4",
+    "nozzle_diameter": "0.4",
+    "layer_height": "0.2",
+    "wall_loops": "3",
+    "sparse_infill_density": "10%",
+    "sparse_infill_pattern": "gyroid",
+    "curr_bed_type": "Textured PEI Plate",
+    "outer_wall_speed": "30",
+    "inner_wall_speed": "60",
+    "nozzle_temperature": "220",
+    "nozzle_temperature_initial_layer": "220",
+    "textured_plate_temp": "65",
+    "textured_plate_temp_initial_layer": "65",
+    "enable_support": "1",
+    "support_type": "tree(auto)",
+    "support_on_build_plate_only": "1",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_spacing": "0.5",
+    "support_interface_top_layers": "2",
+    "brim_type": "no_brim",
+    "brim_width": "0",
+    "raft_layers": "0",
+    "print_sequence": "by layer",
+    "enable_arc_fitting": "0",
+    "fan_min_speed": "100",
+    "fan_max_speed": "100",
+    "support_style": "tree_organic"
+  },
+  "max_z": 21.6,
+  "status": "experiment_prepared_not_started",
+  "input_stl_sha256": "4d74ebe970cb948867df4d2b808677bb092148c6dbc37b09a02052e170c5dd2f",
+  "placement_note": "Automatic arrangement rejected the tree footprint; explicit centered placement succeeded. Flat orientation retained, all four ears on bed. Actual support extrusion bounds verified within bed."
+}

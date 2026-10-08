@@ -1,0 +1,17 @@
+{
+  "default": "v2",
+  "versions": [
+    {
+      "id": "v1",
+      "label": "Version 1 \u00b7 printed prototype",
+      "viewer": "viewer-v1.html",
+      "note": "Checkpoint ade5b54 \u00b7 accepted collar fit \u00b7 full hardware BOM. Physical mechanism remains unvalidated."
+    },
+    {
+      "id": "v2",
+      "label": "Version 2 \u00b7 compact shaft-side rails",
+      "viewer": "versions/v2/viewer.html",
+      "note": "Rotate phone end-for-end for outer-edge buttons. Both actuator positions now near shaft; rotated camera framing unresolved."
+    }
+  ]
+}

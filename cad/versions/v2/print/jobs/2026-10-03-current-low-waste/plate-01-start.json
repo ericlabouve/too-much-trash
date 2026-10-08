@@ -1,0 +1,23 @@
+{
+  "recorded_at": "2026-10-04T01:33:55.186249+00:00",
+  "remote_file": "tmt-v2-plate1-neck-contact-258fbbe0.gcode.3mf",
+  "gcode_md5": "66deb8a6bc62ca0f38442e5d52126a06",
+  "plate": 1,
+  "bed_type": "textured_plate",
+  "user_confirmed": "Bed clear; same spool loaded.",
+  "start_outcome": "verified",
+  "observed_state": {
+    "gcode_state": "RUNNING",
+    "subtask_name": "tmt-v2-plate1-neck-contact-258fbbe0.gcode.3mf",
+    "stage": "heatbed_preheating",
+    "print_error": 0,
+    "mc_percent": 0,
+    "remaining_time_min": 239
+  },
+  "completion_verified": true,
+  "physical_result": "Print and support removal successful; full assembly fit/load not yet established.",
+  "follow_up": "If support removal is difficult, explore alternate support-generation algorithms and compare access, contact area and interface gaps.",
+  "completion_evidence": "User reports fixed jaw finished and supports peeled off easily.",
+  "successful_file": "01-carrier-neck-contact.gcode.3mf",
+  "file_sha256": "258fbbe022e33cb00061d3cf041ae07d394f80575738aa4eaacdd09ff768f6f9"
+}

@@ -27,14 +27,22 @@ def slot_z_x(x0,x1,y,z0,z1,d):
             .union(bore((x0,y,z1),(1,0,0),x1-x0,d)))
 
 
-def collar(p,cap=False):
+def collar(p,cap=False,opening_reduction=None):
     cx,cy=p.neck_cx,p.neck_cy
     gx,gy=(p.neck_x+p.neck_clearance)/2,(p.neck_y+p.neck_clearance)/2
     outer_x=gx+4
     outer_y=gy+4
     x0,x1=(-outer_x,-0.3) if cap else (0.3,outer_x)
     s=box(x0,x1,-outer_y,outer_y,-12,12)
-    s=s.cut(box(-gx,gx,-gy,gy,-13,13))
+    # Fit trials thicken the inner walls without moving the ears or outside faces.
+    if opening_reduction is None:
+        opening_reduction=(p.collar_reduction_x,p.collar_reduction_y)
+    rx,ry=(opening_reduction if isinstance(opening_reduction,tuple)
+           else (opening_reduction,opening_reduction))
+    ix,iy=gx-rx/2,gy-ry/2
+    if min(ix,iy)<=0:
+        raise ValueError("Collar opening reduction leaves no opening")
+    s=s.cut(box(-ix,ix,-iy,iy,-13,13))
     for yy in (-outer_y-5,outer_y+5):
         ear=box(x0,x1,yy-5.5,yy+5.5,-4.5,4.5).edges('|X').fillet(1.5)
         s=s.union(ear).cut(bore((x0-1,yy,0),(1,0,0),x1-x0+2,p.m4))
@@ -145,9 +153,9 @@ def rocker(p):
     return s
 
 
-def handle_anchor(p):
+def handle_anchor(p,opening_reduction=None):
     # Trigger-facing -X neck face; housing centered across its Y width.
-    s=collar(p,True)
+    s=collar(p,True,opening_reduction=opening_reduction)
     x,y=p.cable_face_x,p.neck_cy
     s=s.union(box(x-6,x+6,y-7,y+7,-12,12))
     s=s.cut(bore((x,y,3),(0,0,1),10,p.ferrule))

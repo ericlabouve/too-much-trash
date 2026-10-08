@@ -1,0 +1,31 @@
+{
+  "retention_obstructions": {
+    "straight_withdrawal_mm3": 1.8876008882396023,
+    "seated_turn_plus15_mm3": 1.8136289952943776,
+    "seated_turn_minus15_mm3": 1.813628995294402
+  },
+  "head_across_flats_mm": 7.4,
+  "index_stop_clearance_mm": 0.2,
+  "revision": "compact-rails-r12",
+  "pivot_tab_mm": [
+    8.4,
+    1.6
+  ],
+  "rocker_keyway_mm": [
+    9,
+    2.2
+  ],
+  "rocker_boss_diameter_mm": 12,
+  "boss_lower_relief_z_mm": 13.3,
+  "nominal_slot_end_wall_mm": 1.5,
+  "old_round_bore_mm": 6.5,
+  "old_tab_outside_bore_mm3": 5.033602368638933,
+  "sequence": "Assemble loose module: align tab with horizontal slots, insert to +3.4 mm beyond seated position, rotate 90 degrees, pull back to seated position. Reverse for removal.",
+  "samples": 131,
+  "intersections": [],
+  "passed": true,
+  "limitations": [
+    "Finite geometric samples; print tolerances, key strength, tactile indexing and retention require physical checks.",
+    "Insertion is checked in the loose actuator module, before mounting to the cap rail."
+  ]
+}
