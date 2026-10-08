@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin access · Too Much Trash</title>
+  <style>
+    body { min-height: 100vh; margin: 0; display: grid; place-items: center; background: #eef3e9; color: #18332c; font: 16px system-ui, sans-serif; }
+    main { width: min(28rem, calc(100% - 3rem)); padding: 2rem; background: white; border-radius: 1rem; box-shadow: 0 1rem 3rem #18332c18; }
+    h1 { margin-top: 0; }
+    label, input, button { display: block; width: 100%; box-sizing: border-box; }
+    input { margin: .5rem 0 1rem; padding: .75rem; border: 1px solid #9eb7a4; border-radius: .4rem; }
+    button { padding: .75rem; border: 0; border-radius: .4rem; background: #245943; color: white; font: inherit; cursor: pointer; }
+    p { line-height: 1.5; }
+    #message { min-height: 1.5em; color: #a1322b; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Admin access</h1>
+    <p>Enter the token minted on the backend host. This temporary gate will be replaced by account sign-in.</p>
+    <form id="unlock-form">
+      <label for="token">Admin token</label>
+      <input id="token" type="password" autocomplete="off" required>
+      <button type="submit">Open portal</button>
+    </form>
+    <p id="message" role="alert"></p>
+  </main>
+  <script>
+    document.querySelector('#unlock-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const input = document.querySelector('#token');
+      const message = document.querySelector('#message');
+      message.textContent = '';
+      const response = await fetch('/api/v1/admin/session', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({token: input.value})
+      });
+      input.value = '';
+      if (response.ok) location.replace('/');
+      else message.textContent = 'Invalid token. Check the local token file.';
+    });
+  </script>
+</body>
+</html>

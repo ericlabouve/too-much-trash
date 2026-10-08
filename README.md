@@ -8,7 +8,7 @@ The collection tool starts with an ordinary reacher grabber. A lightweight, 3D-p
 
 The person collecting litter holds a separate bucket in their other hand. A successful deposit into that bucket provides a useful signal that the object was picked up and accepted as trash; misses, drops, and rejected objects are valuable examples too. Those signals are starting points for labeling, not a claim that every outcome can be inferred perfectly without review.
 
-This repository brings the whole effort together: a hosted service for collecting and processing media, desktop and browser experiences for reviewing it, a dedicated iOS experience for capture and review, a workspace for segmentation and classification experiments, and an editable CAD design for the grabber retrofit.
+This repository brings the whole effort together: a hosted service for collecting and processing media, an admin portal for reviewing it, a dedicated iOS experience for capture and review, a workspace for segmentation and classification experiments, and an editable CAD design for the grabber retrofit.
 
 ## The current prototype
 
@@ -21,5 +21,7 @@ These selected views show the 3D CAD assembly. The adjustable holder keeps the p
 Orange marks printable retrofit parts; blue marks the stock handle and brace. This is a **fit prototype**: the printable parts are modeled, while the stock tool, phone and purchased hardware remain illustrative references. Physical grip, button force and spring behavior still need verification.
 
 The [CAD guide](cad/README.md) includes editable models, printable files, a bill of materials and assembly instructions. The [original concept drawings](cad/renders/README.md) are preserved as the project's design history.
+
+The [developer documentation](https://ericlabouve.github.io/too-much-trash/) covers the repository and local setup. The public project website is served by the hosted backend stack.
 
 The aspiration is simple: make it easier to gather honest examples of litter pickup at scale, learn from the awkward attempts as well as the clean ones, and help future robots do more of the work of keeping shared spaces clean.
