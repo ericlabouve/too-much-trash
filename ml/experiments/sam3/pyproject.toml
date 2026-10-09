@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "SAM 3 image segmentation experiments for egocentric litter footage"
 requires-python = ">=3.12"
 dependencies = [
+  "av>=14,<19",
   "gradio>=5,<7",
   "huggingface-hub>=0.34,<2",
   "httpx>=0.28,<1",

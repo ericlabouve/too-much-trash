@@ -1502,6 +1502,7 @@ name = "too-much-trash-sam3-lab"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "av" },
     { name = "gradio" },
     { name = "httpx" },
     { name = "huggingface-hub" },
@@ -1519,6 +1520,7 @@ video = [
 
 [package.metadata]
 requires-dist = [
+    { name = "av", specifier = ">=14,<19" },
     { name = "av", marker = "extra == 'video'", specifier = ">=14,<19" },
     { name = "gradio", specifier = ">=5,<7" },
     { name = "httpx", specifier = ">=0.28,<1" },
