@@ -49,3 +49,7 @@ Select your signing team in Xcode, connect an iPhone, and run the app. Configure
 - Without tailnet connectivity, Admin login stays hidden. With authorized connectivity, it opens only the private browser portal.
 
 Simulator checks and injected API contract tests do not establish live backend integration, deployment exposure, physical capture, or hardware button behavior. No signing/distribution or live Funnel activation is performed by this implementation.
+
+### Private HTTPS integration checkpoint — 2026-10-10
+
+The Simulator app accepted the private pilot's configurable collector/admin HTTPS origins. Its native private-admin identity probe passed using normal TLS, revealed **Admin login**, and handed off to Safari, where the private admin gate rendered without a certificate warning. No admin sign-in was attempted. With an approved short-lived, low-quota invite, a temporary native XCTest passed real `AccountSession.register`, `LiveCollectorAPI`, Keychain storage, and fresh-session `/me` validation. Normal app relaunch reached capture using saved credentials; after backend revocation, another relaunch showed rejected/revoked access and did not open capture. The temporary harness and Simulator invite file were removed; credentials were not printed. Live app upload and physical camera/button behavior remain unverified. The private pilot requires authorized tailnet connectivity on test devices; Funnel remains disabled. A future server migration must use explicit configuration and preserve existing queues' origin/installation ownership.

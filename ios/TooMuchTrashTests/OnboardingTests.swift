@@ -101,6 +101,25 @@ final class OnboardingTests: XCTestCase {
         XCTAssertEqual(session.phase, .home)
     }
 
+    func testConfiguringFirstServerUpdatesHomeInstructions() async throws {
+        let keys = ["collectorPublicOrigin", "privateAdminOrigin"]
+        let previous = keys.map { UserDefaults.standard.object(forKey: $0) }
+        defer {
+            for (key, value) in zip(keys, previous) {
+                if let value { UserDefaults.standard.set(value, forKey: key) }
+                else { UserDefaults.standard.removeObject(forKey: key) }
+            }
+        }
+        let api = StubAPI(), vault = MemoryVault()
+        let session = AccountSession(configuration: nil, vault: vault,
+                                     queue: CaptureQueue(directory: queueDirectory()), apiFactory: { _ in api })
+        XCTAssertEqual(session.message, "Set the collector server address to get started.")
+        await session.configure(try configuration())
+        XCTAssertEqual(session.message, "Register with an invite to begin collecting.")
+        XCTAssertEqual(session.phase, .home)
+        XCTAssertEqual(api.meCalls, 0)
+    }
+
     func testSavedCredentialMustBeValidated() async throws {
         let api = StubAPI(), vault = MemoryVault()
         try seed(api, vault)
