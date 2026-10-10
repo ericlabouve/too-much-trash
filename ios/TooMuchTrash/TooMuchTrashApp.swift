@@ -4,7 +4,7 @@ import SwiftUI
 struct TooMuchTrashApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRootView()
         }
     }
 }
