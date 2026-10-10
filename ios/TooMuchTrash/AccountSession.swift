@@ -39,6 +39,7 @@ final class AccountSession: ObservableObject {
         credential = nil
         installation = nil
         phase = .home
+        message = "Register with an invite to begin collecting."
         await bootstrap()
     }
 
