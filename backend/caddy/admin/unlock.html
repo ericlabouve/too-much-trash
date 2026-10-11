@@ -57,7 +57,8 @@
       const response = await fetch('/api/v1/admin/session', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({token: input.value})
+        // Generated tokens have no whitespace; Safari autofill may add padding.
+        body: JSON.stringify({token: input.value.trim()})
       });
       input.value = '';
       if (response.ok) location.replace('/');
