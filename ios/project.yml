@@ -2,7 +2,7 @@ name: TooMuchTrash
 options:
   bundleIdPrefix: org.toomuchtrash
   deploymentTarget:
-    iOS: "17.2"
+    iOS: "17.0"
 targets:
   TooMuchTrash:
     type: application
@@ -14,39 +14,3 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: org.toomuchtrash.app
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: 5.9
-        TARGETED_DEVICE_FAMILY: "1"
-        INFOPLIST_KEY_NSCameraUsageDescription: Record litter pickup attempts for review and research.
-        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
-        INFOPLIST_KEY_UIFileSharingEnabled: YES
-        INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace: YES
-  TooMuchTrashTests:
-    type: bundle.unit-test
-    platform: iOS
-    sources:
-      - TooMuchTrashTests
-    dependencies:
-      - target: TooMuchTrash
-    settings:
-      base:
-        GENERATE_INFOPLIST_FILE: YES
-  TooMuchTrashUITests:
-    type: bundle.ui-testing
-    platform: iOS
-    sources:
-      - TooMuchTrashUITests
-    dependencies:
-      - target: TooMuchTrash
-    settings:
-      base:
-        GENERATE_INFOPLIST_FILE: YES
-schemes:
-  TooMuchTrash:
-    build:
-      targets:
-        TooMuchTrash: all
-    test:
-      targets:
-        - TooMuchTrashTests
-        - TooMuchTrashUITests
