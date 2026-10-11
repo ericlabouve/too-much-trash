@@ -105,12 +105,12 @@ struct RegistrationView: View {
         NavigationStack {
             Form {
                 Section("Register with invite") {
-                    SecureField("Invite code", text: $invite)
+                    TextField("Invite words", text: $invite)
                         .textInputAutocapitalization(.never).autocorrectionDisabled()
                         .accessibilityIdentifier("inviteCode")
                     TextField("Installation name (optional)", text: $name)
                         .accessibilityIdentifier("installationName")
-                    Text("Enter the single-use invite your administrator shared with you.")
+                    Text("Enter the two invite words your administrator shared, separated by a space. Capitalization does not matter. Older invite codes still work.")
                         .font(.footnote)
                 }
                 Section {
@@ -123,7 +123,7 @@ struct RegistrationView: View {
                             }
                         }
                     }
-                    .disabled(account.busy || invite.isEmpty)
+                    .disabled(account.busy || invite.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
             .navigationTitle("Registration")

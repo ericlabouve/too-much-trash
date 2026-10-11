@@ -30,6 +30,7 @@ private final class StubAPI: CollectorAPI {
     var meCalls = 0
     var refreshCalls = 0
     var enrollCalls = 0
+    var invitesSeen: [String] = []
     var uploadCalls = 0
     var reachable = false
     var confirmedID: UUID?
@@ -43,6 +44,7 @@ private final class StubAPI: CollectorAPI {
     }
     func enroll(invite: String, name: String?) async throws -> Enrollment {
         enrollCalls += 1
+        invitesSeen.append(invite)
         if let enrollError { throw enrollError }
         return enrollment
     }
@@ -206,6 +208,29 @@ final class OnboardingTests: XCTestCase {
         XCTAssertEqual(vault.saves, 1)
         XCTAssertEqual(api.meCalls, 1)
         XCTAssertEqual(session.phase, .authorized)
+    }
+
+    func testInviteWordsArePassedToBackendWithoutChangingLegacyCase() async throws {
+        let api = StubAPI(), vault = MemoryVault()
+        let session = try account(api, vault)
+        let result = await session.register(invite: "  Abandon\t  ABILITY\n", name: "")
+        XCTAssertTrue(result)
+        XCTAssertEqual(api.invitesSeen, ["Abandon\t  ABILITY"])
+        // Word normalization is backend-authoritative; opaque legacy codes stay case-sensitive.
+        let legacyAPI = StubAPI()
+        let legacySession = try account(legacyAPI, MemoryVault())
+        let legacyResult = await legacySession.register(invite: "  Legacy_Case-Sensitive123  ", name: "")
+        XCTAssertTrue(legacyResult)
+        XCTAssertEqual(legacyAPI.invitesSeen, ["Legacy_Case-Sensitive123"])
+    }
+
+    func testWhitespaceOnlyInviteDoesNotEnroll() async throws {
+        let api = StubAPI(), vault = MemoryVault()
+        let session = try account(api, vault)
+        let result = await session.register(invite: " \t\n", name: "")
+        XCTAssertFalse(result)
+        XCTAssertEqual(api.enrollCalls, 0)
+        XCTAssertEqual(vault.saves, 0)
     }
 
     func testInvalidInviteDoesNotStore() async throws {

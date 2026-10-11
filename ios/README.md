@@ -10,6 +10,8 @@ Successful recordings enter a disk-backed upload queue bound to the original pub
 
 Uploads are manual and occur in the foreground. If a response is lost after the server accepts an upload, explicit retry may create a duplicate; V1 has no upload idempotency contract. Unreadable queue metadata is preserved without overwriting it. Keep `upload-queue.json` intact when browsing the Captures folder.
 
+New invitations use two randomly selected BIP-39 English words. Enter them separated by whitespace; the backend accepts capitalization and repeated whitespace. The native app trims surrounding whitespace but leaves word normalization to the backend, preserving case-sensitive older opaque invite codes. The invite field is readable while typing; keep live invite words out of screenshots and logs. Two words are an explicitly accepted private-pilot guessability tradeoff, not a replacement for strong installation credentials.
+
 ## Access and private admin behavior
 
 Access/refresh credentials are stored only in origin-scoped Keychain items using `WhenUnlockedThisDeviceOnly`, without iCloud synchronization. No shared secret, App Attest, native passkey registration, or credential logging is used. Only non-secret server origins are stored in preferences. Credential-bearing requests refuse redirects and use normal system TLS validation. Collector and optional private admin settings accept HTTPS root origins only, with no embedded username/password, path, query, or fragment; the two origins must differ, including by port when sharing a hostname.

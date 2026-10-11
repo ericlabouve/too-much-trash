@@ -1,6 +1,24 @@
 import XCTest
 
 final class CameraLaunchTests: XCTestCase {
+    func testRegistrationAcceptsReadableInviteWordsWithoutSubmitting() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-collectorPublicOrigin", "http://localhost:18082",
+                               "-privateAdminOrigin", "http://localhost:18081", "-simulatorLocalBackend", "YES",
+                               "-adminNetworkCollectorOrigin", "", "-adminNetworkPrivateOrigin", ""]
+        app.launch()
+        XCTAssertTrue(app.buttons["registerButton"].waitForExistence(timeout: 10))
+        app.buttons["registerButton"].tap()
+        let words = app.textFields["inviteCode"]
+        XCTAssertTrue(words.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Register this iPhone"].isEnabled)
+        words.tap()
+        words.typeText("abandon ability")
+        XCTAssertEqual(words.value as? String, "abandon ability")
+        XCTAssertTrue(app.buttons["Register this iPhone"].isEnabled)
+        // Dummy words only. Never consume a live invite in a UI test.
+    }
+
     func testConnectedAdminLocalToggleKeepsMenuAndBothAddresses() throws {
         let app = XCUIApplication()
         app.launch()

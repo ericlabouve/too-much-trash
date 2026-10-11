@@ -36,6 +36,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Capture durability and backend coordination
 
+- On 2026-10-11 the user accepted two randomly selected BIP-39 English words for new pilot invites after discussion of 22-bit guessability. Keep strong installation credentials, hashed invite storage, single-use redemption, expiry, quotas, and throttling. The native readable invite field accepts two words; the backend owns case/whitespace normalization and preserves case-sensitive legacy opaque codes. Do not lowercase arbitrary codes on the client, show live words in screenshots/logs, or claim revocation prevents first-use guessing.
+
 - Preserve originals in `Documents/Captures`, including successful uploads, network/auth/quota failures, and uncertain outcomes. Never uninstall/reset the app or erase local captures as routine debugging.
 - Queue entries belong to the original collector origin and installation UUID. Changing hosts or re-enrolling must not silently reassign old clips. Corrupt queue metadata is preserved, not overwritten with an empty queue. Files app access is enabled; users should not edit the manifest.
 - Uploads are manual foreground multipart requests, field `file`, with a 200 MiB content limit. Persist receipts before treating uploads as sent; poll status using authenticated, trusted endpoints. Backend processing currently creates previews/poster frames, not validated segmentation labels.
@@ -54,6 +56,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 - When reporting completion, lead with outcome and validation evidence. Distinguish automated tests, native live integration, deployed backend checks, and physical validation. Print a high-level remaining-work summary to stdout when requested, and concisely identify user-only steps.
 
 ## Evidence and remaining work
+
+- 2026-10-11 two-word invite form: full 50-test Simulator suite passed with no skips, including readable dummy-word UI entry (without redemption), backend-authoritative normalization, legacy-case preservation, and whitespace-only rejection. Reinstalled/relaunched the normal app and visually verified local Simulator Home. Real local word-pair redemption remains the next user walkthrough step.
 
 - 2026-10-11 local-admin selection refinement: 45-test suite plus two new regressions passed. Connected-admin UI test verified local toggle keeps settings open and displays both localhost origins. Local browser handoff requires network and local identity checks; deployed Home visibly retains admin menus while Tailscale is connected.
 - 2026-10-11 user/admin view update: all 45 automated Simulator tests passed, including network-loss fallback, retained HTTPS probe/reconnection, and hidden admin controls despite localhost admin reachability. Redeployed and visually verified localhost collector Home with both admin menus absent. This is historical evidence, not a guarantee about subsequent changes.
