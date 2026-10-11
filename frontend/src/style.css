@@ -16,6 +16,7 @@ button:disabled { opacity: .55; cursor: wait; }
 .panel p { color: #5e7064; line-height: 1.4; margin: 0 0 12px; }
 .onboarding form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
 .onboarding label { display: grid; gap: 6px; font-size: 14px; }
+.onboarding small { color: #5e7064; font-size: 12px; line-height: 1.35; }
 .onboarding input { width: 100%; min-width: 0; }
 .onboarding ul { padding-left: 20px; }
 .onboarding li { overflow-wrap: anywhere; line-height: 1.4; margin-bottom: 12px; }

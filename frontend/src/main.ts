@@ -17,7 +17,10 @@ root.innerHTML = `
       <form id="invite-form">
         <label>Tester label <input name="label" maxlength="80" required></label>
         <label>Expires in hours <input name="hours" type="number" min="1" max="168" value="24" required></label>
-        <label>Upload quota (MiB) <input name="mib" type="number" min="1" max="102400" value="1024" required></label>
+        <label>Upload quota (MiB)
+          <input id="quota-mib" name="mib" type="number" min="1" max="102400" value="1024" aria-describedby="video-estimate" required>
+          <small id="video-estimate" aria-live="polite"></small>
+        </label>
         <label>Upload count <input name="uploads" type="number" min="1" max="10000" value="100" required></label>
         <button type="submit">Create invite</button>
       </form>
@@ -43,6 +46,22 @@ const feedback = document.querySelector<HTMLParagraphElement>("#invite-feedback"
 const form = document.querySelector<HTMLFormElement>("#invite-form")!;
 const codePanel = document.querySelector<HTMLDivElement>("#new-code")!;
 const codeElement = document.querySelector<HTMLElement>("#invite-code")!;
+
+const quotaInput = document.querySelector<HTMLInputElement>("#quota-mib")!;
+const videoEstimate = document.querySelector<HTMLElement>("#video-estimate")!;
+function updateVideoEstimate(): void {
+  const mib = quotaInput.valueAsNumber;
+  if (!quotaInput.value || !quotaInput.validity.valid || !Number.isFinite(mib)) {
+    videoEstimate.textContent = "Enter a valid quota to estimate videos.";
+    return;
+  }
+  // The quota is binary MiB; the assumed video size is decimal MB.
+  const videos = Math.floor(mib * 1048576 / 5_000_000);
+  videoEstimate.textContent = `≈ ${videos.toLocaleString()} videos at 5 MB each; upload count also applies.`;
+}
+quotaInput.addEventListener("input", updateVideoEstimate);
+quotaInput.addEventListener("change", updateVideoEstimate);
+updateVideoEstimate();
 
 const logoutButton = document.querySelector<HTMLButtonElement>("#logout")!;
 const logoutFeedback = document.querySelector<HTMLParagraphElement>("#logout-feedback")!;

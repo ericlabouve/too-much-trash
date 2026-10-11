@@ -43,6 +43,9 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 - Keep the admin dashboard compact: only "Admin dashboard", Logout, and the
   "Invitations & installations" card with its controls. No promotional hero,
   workspace, footer or frontend health polling. Public website is separate.
+- Show a live storage-only video estimate beside quota, assuming decimal 5 MB
+  per video: floor(quotaMiB * 1048576 / 5000000). Upload count remains its own
+  limit; do not imply storage estimate grants more uploads.
 - Unlock token visibility stays hidden by default, uses an accessible eye toggle,
   preserves autofilled text and re-masks on submit. Test with dummy values only;
   never reveal real secrets in screenshots/logs. Dev and pilot tokens differ;

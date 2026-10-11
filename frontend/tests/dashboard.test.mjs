@@ -10,8 +10,9 @@ const element = () => ({ innerHTML: '', textContent: '', hidden: false, children
 });
 const ids = ['app', 'invite-feedback', 'invite-form', 'new-code', 'invite-code',
   'logout', 'logout-feedback', 'dismiss-code', 'copy-code', 'refresh-access',
-  'invites-list', 'installations-list'];
+  'invites-list', 'installations-list', 'quota-mib', 'video-estimate'];
 const nodes = Object.fromEntries(ids.map(id => ['#' + id, element()]));
+Object.assign(nodes['#quota-mib'], { value: '1024', valueAsNumber: 1024, validity: { valid: true } });
 const calls = [];
 const source = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 const script = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022,
@@ -39,9 +40,25 @@ for (const selector of ['#logout', '#refresh-access', '#copy-code', '#dismiss-co
   assert.equal(typeof nodes[selector].handlers.click, 'function');
 }
 assert.equal(typeof nodes['#invite-form'].handlers.submit, 'function');
+assert.match(nodes['#video-estimate'].textContent, /≈ 214 videos at 5 MB each; upload count also applies/);
+for (const [value, number, valid, expected] of [
+  ['10', 10, true, '≈ 2 videos'],
+  ['1', 1, true, '≈ 0 videos'],
+  ['', NaN, false, 'Enter a valid quota'],
+  ['-10', -10, false, 'Enter a valid quota'],
+  ['1.5', 1.5, false, 'Enter a valid quota'],
+  ['102401', 102401, false, 'Enter a valid quota'],
+  ['Infinity', Infinity, true, 'Enter a valid quota'],
+]) {
+  Object.assign(nodes['#quota-mib'], { value, valueAsNumber: number, validity: { valid } });
+  nodes['#quota-mib'].handlers.input();
+  assert.ok(nodes['#video-estimate'].textContent.startsWith(expected));
+  assert.doesNotMatch(nodes['#video-estimate'].textContent, /NaN|Infinity|≈ -/);
+}
+assert.match(nodes['#app'].innerHTML, /aria-describedby="video-estimate"/);
 for (const selector of ['#invites-list', '#installations-list']) {
   assert.equal(nodes[selector].children.length, 1);
   assert.equal(nodes[selector].children[0].children[0].textContent, 'Revoke');
   assert.equal(typeof nodes[selector].children[0].children[0].handlers.click, 'function');
 }
-console.log('Compact dashboard renders dummy access lists and retains all controls; startup makes no health request or mutation.');
+console.log('Dashboard controls and live video estimates passed with default, changed and invalid quotas; no health request or mutation.');
