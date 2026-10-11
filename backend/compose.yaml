@@ -50,11 +50,9 @@ services:
 
   migrate:
     build: ./api
-    command: ["uv", "run", "--no-sync", "python", "tools/migrate.py"]
+    command: ["uv", "run", "--no-sync", "alembic", "upgrade", "head"]
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-trash}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-trash}
-    volumes:
-      - ./postgres/migrations:/migrations:ro
     depends_on:
       postgres:
         condition: service_healthy

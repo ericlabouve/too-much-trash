@@ -1,4 +1,33 @@
-BEGIN;
+"""Invite-only onboarding; adopt the previously deployed pilot schema safely.
+
+The captures baseline is created by postgres/init/02-captures.sql. IF NOT EXISTS
+allows this first Alembic revision to adopt the pre-Alembic pilot without deleting
+invitations, credentials, ownership, or captures. Subsequent revisions should use
+normal explicit operations rather than rerunning an untracked SQL directory.
+"""
+from alembic import op
+
+revision = "003_onboarding"
+down_revision = None
+branch_labels = None
+depends_on = None
+
+
+def upgrade():
+    for statement in SCHEMA.split(";"):
+        if statement.strip():
+            op.execute(statement)
+
+
+def downgrade():
+    # Explicit downgrade destroys access/ownership records; back up first.
+    op.execute("DROP INDEX captures_owner_idx")
+    op.execute("ALTER TABLE captures DROP COLUMN installation_id")
+    for table in ("access_tokens", "auth_rate_limits", "installations", "invitations"):
+        op.drop_table(table)
+
+
+SCHEMA = """
 CREATE TABLE IF NOT EXISTS invitations (
     id uuid PRIMARY KEY,
     code_hash text NOT NULL UNIQUE,
@@ -37,4 +66,4 @@ CREATE TABLE IF NOT EXISTS auth_rate_limits (
 );
 ALTER TABLE captures ADD COLUMN IF NOT EXISTS installation_id uuid REFERENCES installations(id);
 CREATE INDEX IF NOT EXISTS captures_owner_idx ON captures(installation_id, created_at);
-COMMIT;
+"""

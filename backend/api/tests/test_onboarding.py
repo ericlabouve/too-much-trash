@@ -10,6 +10,8 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
+from alembic import command
+from alembic.config import Config
 
 from app import admin_auth
 from app.db import database
@@ -44,10 +46,9 @@ class OnboardingTests(unittest.TestCase):
             raise RuntimeError("Tests truncate tables: use an isolated database and TMT_TEST_ISOLATED=1")
         with database() as connection:
             connection.execute(Path("/sql/init/02-captures.sql").read_text())
-        # Migrations are idempotent on both fresh and existing capture tables.
+        # Alembic records the revision; repeated upgrades must be no-ops.
         for _ in range(2):
-            with database() as connection:
-                connection.execute(Path("/sql/migrations/003-onboarding.sql").read_text())
+            command.upgrade(Config("alembic.ini"), "head")
 
     def setUp(self):
         with database() as connection:

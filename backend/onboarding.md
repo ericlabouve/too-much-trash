@@ -135,10 +135,21 @@ docker compose -f compose.yaml -f compose.tailscale.yaml config --quiet
 ```
 
 Back up existing Postgres data before deploying schema changes. The `migrate`
-service applies ordered, idempotent SQL under a database advisory lock and runs
+service runs `uv run --no-sync alembic upgrade head` under a database advisory lock and runs
 before the API starts, including for an existing volume. Initialization scripts
 alone do not update an existing database. Rebuild/redeploy to activate these
 changes; editing source does not secure an already-running old container.
+
+Alembic tracks applied revisions in `alembic_version`; repeated upgrades are
+no-ops. Keep at most one new revision file per PR. This PR has one revision,
+`backend/api/migrations/versions/003_onboarding.py`, adopting the existing pilot
+schema without discarding records. The two `postgres/init` SQL files are initial
+database setup, not Alembic revisions. Do not stamp a live database without schema
+verification. Downgrade removes authentication/ownership records and requires an
+explicit recovery plan and backup; it is never part of normal deployment.
+
+Eric will review and test the Simulator app first. Personal iPhone installation
+and physical camera/volume-button validation follow that review, not before it.
 
 Backend regression tests use an isolated disposable Postgres database with
 `TMT_TEST_ISOLATED=1`, `DATABASE_URL`, and `S3_BUCKET` set. Blob storage is mocked;
@@ -220,3 +231,15 @@ enter capture. Disposable invite fixtures and the temporary live test harness
 were removed; the small Home configuration fix and permanent regression test
 were integrated locally. Live iOS upload and physical camera/volume-button
 validation remain outstanding.
+
+### Alembic adoption — October 11, 2026
+
+Replaced the custom SQL runner with Alembic 1.20.0, one onboarding revision and
+standard `alembic_version` bookkeeping. Twelve disposable-Postgres migration/API
+tests passed, covering initialized fresh databases, adoption of the legacy pilot,
+preserved invite/installation/capture records, repeat upgrade, and disposable-only
+downgrade/re-upgrade. Three private HTTPS proxy checks passed after deployment.
+The local database was backed up before adoption; the revision is `003_onboarding`
+and counts remained four captures, five invites, five installations and one access
+token. A second live upgrade was a successful no-op. No live downgrade or new
+invitation was performed; test-container removal did not affect live volumes.
