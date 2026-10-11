@@ -6,6 +6,7 @@
 
 {$ADMIN_SITE_ADDRESS} {
     encode zstd gzip
+    header Cache-Control "no-store"
 
     handle /api/* {
         reverse_proxy api:8000
@@ -28,7 +29,26 @@
 }
 
 {$API_SITE_ADDRESS} {
+    request_body {
+        max_size 201MiB
+    }
+    @auth path /api/v1/auth/*
+    request_body @auth {
+        max_size 16KiB
+    }
+    handle /api/v1/admin/* {
+        respond "Not found" 404
+    }
+    handle /docs* {
+        respond "Not found" 404
+    }
+    handle /openapi.json {
+        respond "Not found" 404
+    }
     handle /api/* {
         reverse_proxy api:8000
+    }
+    handle {
+        respond "Not found" 404
     }
 }

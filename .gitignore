@@ -1,5 +1,7 @@
 # Byte-compiled / optimized / DLL files
 .env
+backend/.backups/
+backend/.secrets/
 .venv/
 node_modules/
 .DS_Store

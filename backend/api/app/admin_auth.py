@@ -46,6 +46,8 @@ def require_admin(request: Request) -> None:
 
 @router.post("/session", status_code=204)
 def create_session(payload: TokenExchange, response: Response):
+    from app.onboarding import throttle
+    throttle("admin_login", 20)
     received = hashlib.sha256(payload.token.encode()).hexdigest()
     if not secrets.compare_digest(received, token_hash()):
         raise HTTPException(401, "Invalid admin token")
@@ -60,6 +62,7 @@ def create_session(payload: TokenExchange, response: Response):
         samesite="strict",
         path="/",
     )
+    response.headers["Cache-Control"] = "no-store"
 
 
 @router.delete("/session", status_code=204)

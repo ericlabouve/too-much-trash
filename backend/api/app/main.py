@@ -2,20 +2,21 @@
 
 import os
 import tempfile
-from contextlib import contextmanager
 from pathlib import Path
 from uuid import UUID, uuid4
 
 import boto3
-import psycopg
-from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import StreamingResponse
-from psycopg.rows import dict_row
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
+from fastapi.responses import JSONResponse, StreamingResponse
+from starlette.concurrency import run_in_threadpool
 
 from app.admin_auth import router as admin_router
+from app.db import database
+from app.onboarding import fail, require_installation, router as onboarding_router
 
 app = FastAPI(title="Too Much Trash API", version="0.2.0")
 app.include_router(admin_router)
+app.include_router(onboarding_router)
 BUCKET = os.environ["S3_BUCKET"]
 MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 MEDIA_TYPES = {
@@ -39,10 +40,21 @@ def storage():
     )
 
 
-@contextmanager
-def database():
-    with psycopg.connect(os.environ["DATABASE_URL"], row_factory=dict_row) as connection:
-        yield connection
+@app.middleware("http")
+async def guard_media_body(request: Request, call_next):
+    # Reject unauthorized uploads before FastAPI parses/spools multipart content.
+    if request.method == "POST" and request.url.path == "/api/v1/media":
+        try:
+            request.state.installation = await run_in_threadpool(require_installation, request)
+        except HTTPException as exc:
+            return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers={**(exc.headers or {}), "Cache-Control": "no-store"})
+        length = request.headers.get("Content-Length")
+        if length and (not length.isdigit() or int(length) > MAX_UPLOAD_BYTES + 1024 * 1024):
+            return JSONResponse({"detail": {"code": "upload_too_large", "message": "Upload exceeds request limit"}}, status_code=413, headers={"Cache-Control": "no-store"})
+    response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.get("/api/v1/health")
@@ -51,11 +63,11 @@ def health() -> dict[str, str]:
 
 
 @app.post("/api/v1/media", status_code=202)
-def upload_media(file: UploadFile = File(...)):
+def upload_media(file: UploadFile = File(...), installation=Depends(require_installation)):
     content_type = (file.content_type or "").lower()
     kind = MEDIA_TYPES.get(content_type)
     if kind is None:
-        raise HTTPException(415, "Supported types: JPEG, PNG, WebP, HEIC, MP4, MOV, WebM")
+        fail(415, "media_type_unsupported", "Supported types: JPEG, PNG, WebP, HEIC, MP4, MOV, WebM")
 
     capture_id = uuid4()
     filename = Path(file.filename or "upload").name
@@ -65,32 +77,41 @@ def upload_media(file: UploadFile = File(...)):
         while chunk := file.file.read(1024 * 1024):
             size += len(chunk)
             if size > MAX_UPLOAD_BYTES:
-                raise HTTPException(413, "Upload exceeds 200 MiB")
+                fail(413, "upload_too_large", "Upload exceeds 200 MiB")
             staged.write(chunk)
         if size == 0:
-            raise HTTPException(400, "Upload is empty")
+            fail(400, "upload_empty", "Upload is empty")
         staged.seek(0)
         client = storage()
-        client.upload_fileobj(staged, BUCKET, key, ExtraArgs={"ContentType": content_type})
+        uploaded = False
+        try:
+            with database() as connection:
+                # Lock the owner for quota checks, reservation, and revocation ordering.
+                owner = connection.execute("SELECT * FROM installations WHERE id = %s FOR UPDATE", (installation["id"],)).fetchone()
+                if owner["revoked_at"]:
+                    fail(401, "access_revoked", "Installation access has been revoked")
+                if owner["used_bytes"] + size > owner["quota_bytes"] or owner["used_uploads"] >= owner["quota_uploads"]:
+                    fail(429, "quota_exceeded", "Installation upload quota reached")
+                client.upload_fileobj(staged, BUCKET, key, ExtraArgs={"ContentType": content_type})
+                uploaded = True
+                connection.execute(
+                    """INSERT INTO captures (id, filename, content_type, media_kind, original_key, size_bytes, installation_id)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                    (capture_id, filename, content_type, kind, key, size, installation["id"]),
+                )
+                connection.execute("UPDATE installations SET used_bytes = used_bytes + %s, used_uploads = used_uploads + 1 WHERE id = %s", (size, installation["id"]))
+        except Exception:
+            if uploaded:
+                client.delete_object(Bucket=BUCKET, Key=key)
+            raise
+    return capture_response(capture_id, installation["id"])
 
-    try:
-        with database() as connection:
-            connection.execute(
-                """INSERT INTO captures (id, filename, content_type, media_kind, original_key, size_bytes)
-                   VALUES (%s, %s, %s, %s, %s, %s)""",
-                (capture_id, filename, content_type, kind, key, size),
-            )
-    except Exception:
-        client.delete_object(Bucket=BUCKET, Key=key)
-        raise
-    return capture_response(capture_id)
 
-
-def capture_response(capture_id: UUID):
+def capture_response(capture_id: UUID, installation_id: UUID):
     with database() as connection:
-        row = connection.execute("SELECT * FROM captures WHERE id = %s", (capture_id,)).fetchone()
+        row = connection.execute("SELECT * FROM captures WHERE id = %s AND installation_id = %s", (capture_id, installation_id)).fetchone()
     if row is None:
-        raise HTTPException(404, "Media capture not found")
+        fail(404, "media_not_found", "Media capture not found")
     base = f"/api/v1/media/{capture_id}"
     return {
         "id": str(capture_id),
@@ -107,24 +128,24 @@ def capture_response(capture_id: UUID):
 
 
 @app.get("/api/v1/media/{capture_id}")
-def get_media(capture_id: UUID):
-    return capture_response(capture_id)
+def get_media(capture_id: UUID, installation=Depends(require_installation)):
+    return capture_response(capture_id, installation["id"])
 
 
 @app.get("/api/v1/media/{capture_id}/{variant}")
-def download_media(capture_id: UUID, variant: str):
+def download_media(capture_id: UUID, variant: str, installation=Depends(require_installation)):
     if variant not in ("original", "processed"):
-        raise HTTPException(404, "Unknown asset variant")
+        fail(404, "media_not_found", "Media capture not found")
     with database() as connection:
         row = connection.execute(
-            "SELECT original_key, content_type, processed_key, processed_content_type FROM captures WHERE id = %s",
-            (capture_id,),
+            "SELECT original_key, content_type, processed_key, processed_content_type FROM captures WHERE id = %s AND installation_id = %s",
+            (capture_id, installation["id"]),
         ).fetchone()
     if row is None:
-        raise HTTPException(404, "Media capture not found")
+        fail(404, "media_not_found", "Media capture not found")
     key = row["original_key"] if variant == "original" else row["processed_key"]
     if key is None:
-        raise HTTPException(404, "Processed asset is not ready")
+        fail(404, "media_not_ready", "Processed asset is not ready")
     content_type = row["content_type"] if variant == "original" else row["processed_content_type"]
     body = storage().get_object(Bucket=BUCKET, Key=key)["Body"]
 

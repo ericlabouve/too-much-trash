@@ -40,8 +40,11 @@ evidence of a purchase. The backend interoperability proposal is recorded in
 `backend/data-contract.md`; exporters are not implemented yet.
 
 The same Caddy instance serves the token-gated admin portal from `frontend/`
-on a separate site address and proxies `/api/*` to FastAPI on the admin and
-API addresses. See `backend/README.md` for the local ports and token setup.
+on a separate, private site address and proxies `/api/*` to FastAPI. The public
+API listener rejects all admin routes, including the iPhone reachability probe,
+and applies request-size limits. Local ports bind to localhost; the optional
+Tailscale overlay removes host publishing and defaults to private Serve only.
+See `backend/onboarding.md` for invite authorization and deployment boundaries.
 
 For a standalone preview of just this page from the repository root:
 

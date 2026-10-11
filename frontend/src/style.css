@@ -20,4 +20,13 @@ h2 { font-size: 1.7rem; letter-spacing: -.035em; margin: 14px 0 12px; }
 .status-dot { display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; background: #b58f64; }
 .status-dot.online { background: #4f9b5a; }
 footer { color: #758a78; font-size: 13px; margin-top: auto; padding-top: 38px; }
+.onboarding { display: block; }
+.onboarding form { display: grid; gap: 14px; margin: 24px 0; }
+.onboarding label { display: grid; gap: 6px; }
+.onboarding input, .onboarding button { font: inherit; padding: 10px 12px; border: 1px solid #748e79; border-radius: 6px; }
+.onboarding button { cursor: pointer; background: #dfe9df; color: #243b2b; }
+.onboarding button:disabled { opacity: .55; cursor: wait; }
+.onboarding li { overflow-wrap: anywhere; margin-bottom: 14px; }
+#invite-code { display: block; padding: 14px; overflow-wrap: anywhere; background: #e8eee8; }
+#new-code[hidden] { display: none; }
 @media (max-width: 680px) { .shell { padding: 28px 20px; } header { padding: 65px 0; } .panel { padding: 24px; display: block; } .status { display: inline-block; margin-top: 24px; } }
