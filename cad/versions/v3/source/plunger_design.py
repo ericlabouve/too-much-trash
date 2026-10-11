@@ -1,0 +1,170 @@
+"""Active V3 plunger cassette. Concept coordinates (u,v,w), mm.
+Rigid transform: local X=v+8.35, Y=5.4-w, Z=8-u.
+The shoe alone turns 90 degrees about the press axis to keep its broad face
+across phone thickness after integration. No independent export side effects.
+"""
+import math
+from functools import lru_cache
+import cadquery as cq
+PULLEY_U=13.5
+PULLEY_V=8
+GROOVE_W=8.6
+MOUNT_Y=-4.4
+BACK_Y=5.4
+def box(x0,x1,y0,y1,z0,z1):
+    return cq.Workplane('XY').box(x1-x0,y1-y0,z1-z0).translate(((x0+x1)/2,(y0+y1)/2,(z0+z1)/2))
+def cyl(x,y,z,h,r):
+    return cq.Workplane('XY').circle(r).extrude(h).translate((x,y,z))
+def compound(shapes):
+    return cq.Workplane('XY').newObject([cq.Compound.makeCompound([s.val() for s in shapes])])
+def tube(points,r):
+    pieces=[]
+    for a,b in zip(points,points[1:]):
+        va,vb=cq.Vector(*a),cq.Vector(*b);d=vb.sub(va)
+        if d.Length>1e-8:pieces.append(cq.Workplane('XY').newObject([cq.Solid.makeCylinder(r,d.Length,va,d.normalized())]))
+    for a in points:pieces.append(cq.Workplane('XY').sphere(r).translate(a))
+    return compound(pieces)
+
+
+def local_point(q):
+    u,v,w=q
+    return (v+8.35,5.4-w,8-u)
+
+def local_shape(s):
+    return s.rotate((0,0,0),(0,0,1),-90).rotate((0,0,0),(1,0,0),90).translate((8.35,5.4,8))
+
+@lru_cache(None)
+def cassette():
+    # Open spine replaces deep tray and full cover. Pulley moves to button end.
+    body=box(-9,9,0,66,0,3).union(box(0,24,0,18,0,3)).edges('|Z').fillet(1.2).edges('not |Z').fillet(.35)
+    body=body.union(box(-8.5,8.5,59,63,2.3,8).edges().fillet(.6))
+    # Broad front flange traps the return loop between it and the back spine.
+    band_lip=box(-10.5,10.5,58.5,65,7.6,9.6).edges('|Z').fillet(.8).edges('not |Z').fillet(.35)
+    body=body.union(band_lip)
+    # A two-cheek fork supports a separate smooth axle at both ends.
+    body=body.union(cyl(PULLEY_U,8,2.6,3.6,6).edges().fillet(.25))
+    front=cyl(PULLEY_U,8,11,3,6.5).union(box(18,25,4,12,11,14)).edges('|Z').fillet(.4)
+    body=body.union(front).union(box(23,26,4,12,2.6,14).edges('|Z').fillet(.4))
+    # Recess the shorter axle head and cross-key; retain two bearing cheeks.
+    body=body.union(cyl(PULLEY_U,8,11,4,8).edges().fillet(.2))
+    body=body.union(box(4.4,24.5,2,14,2.6,4.2).edges('|Z').fillet(.4))
+    body=body.cut(cyl(PULLEY_U,8,-4,20,4.3))
+    body=body.cut(cyl(PULLEY_U,8,13,3,5.8))
+    body=body.cut(box(4.4,27,2.4,13.6,-2.1,2.2))
+    # Local relief for the rotated broad shoe root below the spine.
+    body=body.cut(box(-3.6,3.6,-1,2.5,-1,3.3))
+    # Retain one guide/stop pair immediately before pulley (wheel ends at Y17).
+    # Open center lets the raised twine eye pass; shallow lips retain slider edges.
+    for a,b,c,d in [(-8,-4.3,-5.5,-3.3),(4.3,8,3.3,5.5)]:
+        guide=box(a,b,18,25.5,2.6,9.5).union(box(c,d,18,25.5,7.8,9.5)).edges().fillet(.25)
+        body=body.union(guide)
+    # Shared cleat removes the unused separate band yoke.
+    slider=box(-4,4,10,49,3.4,7.4)
+    # Rounded rectangular shoe replaces thin-ended trapezoid. Contact width grows
+    # 4 -> 6 mm; perpendicular Z span stays 16 mm. Four mm depth supports its ends.
+    # Curved haunches extend below the frame, avoiding its back and the low pulley.
+    slider=slider.union(box(-3,3,0,10,3.4,7.4))
+    shoe=box(-3,3,-8,-4,-2.6,13.4).edges('|Y').fillet(1.5)
+    root=(cq.Workplane('YZ').moveTo(2,3.4).lineTo(2,7.4).lineTo(0,7.4)
+          .threePointArc((-2.8,8.8),(-4,11.4)).lineTo(-4,-.6)
+          .threePointArc((-2.8,2),(0,3.4)).close().extrude(6).translate((-3,0,0)))
+    root=root.rotate((0,0,5.4),(0,1,5.4),90)
+    shoe=shoe.rotate((0,0,5.4),(0,1,5.4),90)
+    slider=slider.union(root).union(shoe)
+    slider=slider.edges().fillet(.3)
+    # Solid wrap cleat near the T: broad root, rounded cap, no through-hole.
+    cleat_stem=box(-2.5,2.5,44,48,7.1,13.1).edges('|Z').fillet(.7).edges('not |Z').fillet(.25)
+    cleat_cap=box(-4.5,4.5,42,50,12.8,15.3).edges('|Z').fillet(1).edges('not |Z').fillet(.35)
+    slider=slider.union(cleat_stem).union(cleat_cap)
+    # Chamfered pulley, with generous bore clearance: illustrative, unqualified.
+    pulley=cq.Workplane('XZ').polyline([(4.3,6.6),(9,6.6),(9,7.1),(7.9,7.7),(7.9,9.5),(9,10.1),(9,10.6),(4.3,10.6)]).close().revolve(360,(0,0),(0,1)).edges().fillet(.18).translate((PULLEY_U,8,0))
+    axle=cyl(PULLEY_U,8,-3.6,16.8,4).union(cyl(PULLEY_U,8,13.2,1.6,5.5).edges().fillet(.2))
+    axle=axle.cut(box(3,23,6.3,9.7,-1.4,2))
+    # Broad removable cross-key carries axial retention; no snap fingers/threads.
+    key=box(7,19,6.5,9.5,-1.2,1.8).edges().fillet(.2)
+    key=key.union(box(18,21,4.5,11.5,-1.8,2).edges().fillet(.35))
+    # Shallow seats hold a small keeper band around the key and axle.
+    key=key.cut(box(8,9,6.4,7.1,-1.3,1.9)).cut(box(8,9,8.9,9.6,-1.3,1.9))
+    
+    # Flush-T cap: move mount bar 10 mm inward; keep the mechanism/shoe fixed.
+    # One closed screw bore and two integral locating lugs engage the rail slot.
+    # Clamp preload resists sliding; lug walls limit rotation, with printed play.
+    # Offset the mount, not the mechanism, to put the plate and spine on one
+    # flat Y5.4 print face. Keep 5.4 mm beside the 8.8 mm bore on this side.
+    plate=box(32,38,MOUNT_Y-10,BACK_Y,17,35).edges('|X').fillet(1.2)
+    plate=plate.union(box(32,48,2.4,5.4,12,17.8).edges('|X').fillet(.6))
+    plate=plate.union(box(28,32.2,MOUNT_Y-8,MOUNT_Y+8,21.9,30.1).edges('|X').fillet(1.2))
+    bracket=local_shape(body).union(plate)
+    # Broad tapered haunch replaces the narrow mounting-foot load path.
+    # Its end eases into the spine in height and width, rather than ending in
+    # a raised lip. The blend ends below the existing rounded spine edge.
+    haunch=(cq.Workplane('XY').moveTo(32.2,-6.2).lineTo(38,-6.2)
+             .bezier([(48,-6.2),(56,2.4),(64,2.4)],includeCurrent=True)
+             .lineTo(64,5.4).lineTo(32.2,5.4).close().extrude(8)
+             .translate((0,0,12.5)).edges('|Z').fillet(1.2)
+             .edges('not |Z').fillet(.6))
+    easing=(cq.Workplane('XZ').moveTo(30,0).lineTo(66,0)
+            .lineTo(66,16.65).lineTo(64,16.65)
+            .bezier([(58,16.65),(52,20.5),(46,20.5)],includeCurrent=True)
+            .lineTo(30,20.5).close().extrude(30,both=True))
+    haunch=haunch.intersect(easing)
+    bracket=bracket.union(haunch)
+    # Small edge relief where the flush wing passes the back spine. Retain the
+    # guide lips and full plunger channel; 0.2 mm nominal clearance to the wing.
+    bracket=bracket.cut(box(21.5,32.2,2.2,5.6,15.8,17.1))
+    # Preserve the full 18 mm nut turning/withdrawal envelope with 0.3 mm
+    # radial margin. Its curved relief removes less support than a deep box.
+    bracket=bracket.cut(cq.Workplane('XY').newObject([
+        cq.Solid.makeCylinder(9.3,35,cq.Vector(38,MOUNT_Y,26),cq.Vector(1,0,0))]))
+    # No bracket fairleads, no lower tray: cord leaves directly for the shaft guide.
+    # Open travel channel through the mounting plate; rail bearing lands stay
+    # below it. Cut holes last so added support never refills their bores.
+    bracket=bracket.cut(box(31,49,-7.4,2.4,1.6,11))
+    bracket=bracket.cut(cq.Workplane('XY').newObject([cq.Solid.makeCylinder(4.4,12,cq.Vector(27,MOUNT_Y,26),cq.Vector(1,0,0))]))
+    return {'actuator_bracket':bracket,'plunger':local_shape(slider),'pulley':local_shape(pulley),'pulley_axle':local_shape(axle),'pulley_key':local_shape(key)}
+
+def return_path(d=0):
+    points=[(0,64,5.4),(7.8,64,5.4),(9.214,63.414,5.4),(9.8,62,5.4),(9.8,56,7),
+       (3.6,48-d,10.1),(3.6,44.5-d,10.1),(2,43-d,10.1),(-2,43-d,10.1),
+       (-3.6,44.5-d,10.1),(-3.6,48-d,10.1),(-9.8,56,7),(-9.8,62,5.4),
+       (-9.214,63.414,5.4),(-7.8,64,5.4),(0,64,5.4)]
+    return [local_point(q) for q in points]
+
+def attachment_path(d=0):
+    points=[(0,42.9,11.65),(3.1,42.9,11.65),(3.6,43.4,11.65),(3.6,48.6,11.65),
+       (3.1,49.1,11.65),(-3.1,49.1,11.65),(-3.6,48.6,11.65),(-3.6,43.4,11.65),
+       (-3.1,42.9,11.65),(-4.5,42.4,11.65),(-4.5,41.4,11.4)]
+    return [local_point((u,v-d,w)) for u,v,w in points]
+
+def pulley_path(d=0, target=None):
+    # Tangent from cleat (u=0, v=41.4-d) to radius-8 groove around (9.5,8).
+    # Exact tangent avoids a kink/intersection at the entry to the wheel.
+    a=(-4.5,41.4-d);c=(PULLEY_U,8);r=9.05
+    dx,dy=a[0]-c[0],a[1]-c[1]
+    angle=math.atan2(dy,dx)+math.acos(r/math.hypot(dx,dy))
+    # Pick the outgoing tangent to the first shaft guide, not an air-bend waypoint.
+    end=1.5*math.pi
+    if target is not None:
+        tx,ty,tz=target;u,v=8-tz,tx-8.35
+        end=math.atan2(v-c[1],u-c[0])-math.acos(r/math.hypot(u-c[0],v-c[1]))
+        while end<angle:end+=2*math.pi
+    pts=[(a[0],a[1],11.4)]
+    for i in range(33):
+        t=angle+(end-angle)*i/32
+        pts.append((c[0]+r*math.cos(t),c[1]+r*math.sin(t),GROOVE_W))
+    return [local_point(q) for q in pts]
+
+def keeper_path():
+    # Convex taut-loop envelope around key ends and axle, not unsupported bends.
+    points=[(17.2,3.7),(17.2,12.3),(21.8,3.7),(21.8,12.3),(6.2,5.7),(6.2,10.3)]
+    points += [(PULLEY_U+4.8*math.cos(i*math.pi/32),8+4.8*math.sin(i*math.pi/32)) for i in range(64)]
+    points=sorted(set(points))
+    def cross(a,b,c):return (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
+    halves=[]
+    for ordered in (points,points[::-1]):
+        half=[]
+        for q in ordered:
+            while len(half)>1 and cross(half[-2],half[-1],q)<=0:half.pop()
+            half.append(q)
+        halves.extend(half[:-1])
+    return [local_point((u,v,.3)) for u,v in halves+[halves[0]]]

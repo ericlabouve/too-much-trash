@@ -1,4 +1,4 @@
-// Timing only: actual rocker angle and twine geometry still come from pose().
+// Timing only: actual plunger translation and twine geometry still come from pose().
 export const CYCLE_MS=8600;
 export function cycleStroke(elapsed,stopFraction){
  const t=((elapsed%CYCLE_MS)+CYCLE_MS)%CYCLE_MS;

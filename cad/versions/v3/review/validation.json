@@ -16,15 +16,27 @@
       "valid": true,
       "solid_count": 1
     },
-    "rocker": {
+    "plunger": {
       "valid": true,
       "solid_count": 1
     },
-    "pivot_key": {
+    "pulley": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "pulley_axle": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "pulley_key": {
       "valid": true,
       "solid_count": 1
     },
     "thumb_screw": {
+      "valid": true,
+      "solid_count": 1
+    },
+    "collar_screw": {
       "valid": true,
       "solid_count": 1
     },
@@ -186,7 +198,7 @@
   "excluded": [
     "Historical stock shaft overlaps accepted smaller collar opening",
     "Intentional nominal button travel",
-    "Band force, twine friction/stretch, retention, real phone tolerances and physical rocker-to-screw fit; isolated screw/nut success does not validate the loaded assembly"
+    "Band force, twine friction/stretch, retention, real phone tolerances and physical pulley fit and safe phone-button travel; isolated screw/nut success does not validate the loaded assembly"
   ],
   "checks_passed": false
 }

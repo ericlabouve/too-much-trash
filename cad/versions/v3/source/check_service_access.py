@@ -1,96 +1,63 @@
-"""Near-side actuator service path for the extended collar.
-Sampled rigid clearance, not finger access, friction or a force simulation.
-Remove phone and release twine tension before following this sequence.
-"""
+"""Single-fastener module disengage/lower/withdraw and axle/key audit."""
 import json
-from functools import lru_cache
-from dataclasses import replace
-from itertools import product
 from pathlib import Path
-from build import SAMPLES
-import model as m
-p=m.Parameters();s=m.parts(p)
-def vol(v):return sum(t.Volume() for t in v.solids().vals())
-@lru_cache(maxsize=4096)
-def bounds(a):return a.val().BoundingBox()
+from dataclasses import replace
+from build import SAMPLES,shape_bounds
+from types import SimpleNamespace
+translated_bounds={}
+def shifted(s,delta):
+ result=s.translate(delta);b=shape_bounds(s)
+ translated_bounds[result]=SimpleNamespace(**{k+end:getattr(b,k+end)+delta[i] for i,k in enumerate('xyz') for end in ('min','max')})
+ return result
 def overlap(a,b):
- aa=bounds(a);bb=bounds(b)
+ aa=translated_bounds.get(a) or shape_bounds(a);bb=translated_bounds.get(b) or shape_bounds(b)
  if any(getattr(aa,k+'max')<=getattr(bb,k+'min')+1e-7 or getattr(bb,k+'max')<=getattr(aa,k+'min')+1e-7 for k in 'xyz'):return 0.
- return vol(a.intersect(b))
-module=['actuator_bracket','rocker','pivot_key','rail_screw_1','rail_screw_2','rail_nut_1','rail_nut_2']
-fixed=['carrier','shaft_cap','sliding_jaw','clamp_screw_1','clamp_screw_2','clamp_screw_3','clamp_screw_4','clamp_nut_1','clamp_nut_2','clamp_nut_3','clamp_nut_4']
-report={}
-for (sample,base),side in product(SAMPLES.items(),('near','far')):
- name=sample+'-'+side;p=replace(base,side=side)
- a=m.assembly_parts(p,s)
- # Conservative crest/rotation envelopes avoid expensive repeated helix Booleans.
- # Mating thread engagement is not tested by this service-path audit.
- for j,y in enumerate((p.button_y-9.5,p.button_y+9.5),1):
-  a[f'rail_screw_{j}']=m.cylinder((12,y,-14),(1,0,0),4,14).union(m.cylinder((16,y,-14),(1,0,0),20,8))
-  a[f'rail_nut_{j}']=m.cylinder((28,y,-14),(1,0,0),6,18)
- for j,(y,z) in enumerate(m.CLAMP_STATIONS,1):
-  a[f'clamp_screw_{j}']=m.cylinder((-16,y,z),(1,0,0),4,14).union(m.cylinder((-12,y,z),(1,0,0),20,8))
-  a[f'clamp_nut_{j}']=m.cylinder((-14,y,z),(1,0,0),6,18)
- # Move the inner screw at least 25 mm from the rail center before withdrawal.
- dy=max(0,25-(p.button_y-9.5)) if side=='near' else min(0,-25-(p.button_y+9.5));hits=[]
- for step in range(int(abs(dy))+1):
-  i=step if dy>=0 else -step
-  for n in module:
-   part=a[n].translate((0,i,0))
-   for o in fixed:
-    v=overlap(part,a[o])
-    if v>.01:hits.append(['module-slide',i,n,o,round(v,4)])
- # Remove rail nuts toward +X, then lift the actuator module off the screws.
- for dx in range(25):
-  for n in ('rail_nut_1','rail_nut_2'):
-   y=p.button_y+(-9.5 if n.endswith('_1') else 9.5)+dy
-   # Cylinder bounds every nut rotation. Mating thread engagement is excluded;
-   # a real nut unscrews helically, not by straight translation through threads.
-   moving=m.cylinder((28+dx,y,-14),(1,0,0),6,18)
-   mate='rail_screw_'+n[-1]
-   for o in fixed+[k for k in module if not k.startswith('rail_nut_') and k!=mate]:
-    target=a[o].translate((0,dy,0)) if o in module else a[o]
-    v=overlap(moving,target)
-    if v>.01:hits.append(['rail-nut-removal',dx,n,o,round(v,4)])
- for dx in range(31):
-  for n in ('actuator_bracket','rocker','pivot_key'):
-   moving=a[n].translate((dx,dy,0))
-   for o in fixed+['rail_screw_1','rail_screw_2']:
-    target=a[o].translate((0,dy,0)) if o.startswith('rail_screw_') else a[o]
-    v=overlap(moving,target)
-    if v>.01:hits.append(['module-removal',dx,n,o,round(v,4)])
- # Nuts/module removed: move each screw independently beyond the upper ear.
- # The continuous rail slot allows this without disassembling the shaft clamp.
- withdrawal_y=50 if side=='near' else -50
- screw_ys=(p.button_y-9.5+dy,p.button_y+9.5+dy)
- order=sorted(range(2),key=lambda j:abs(screw_ys[j]),reverse=True)
- for index,j in enumerate(order):
-  y=screw_ys[j]
-  screw=m.cylinder((12,y,-14),(1,0,0),4,14).union(m.cylinder((16,y,-14),(1,0,0),20,8))
-  shift=withdrawal_y-y
-  for step in range(int(abs(shift))+1):
-   moved_y=step if shift>=0 else -step
-   moving=screw.translate((0,moved_y,0))
-   targets={o:a[o] for o in fixed}
-   if index==0:
-    remaining_y=screw_ys[order[1]]
-    targets['remaining_rail_screw']=m.cylinder((12,remaining_y,-14),(1,0,0),4,14).union(m.cylinder((16,remaining_y,-14),(1,0,0),20,8))
-   for o,target in targets.items():
-    v=overlap(moving,target)
-    if v>.01:hits.append(['individual-rail-screw-slide',moved_y,j+1,o,round(v,4)])
-  screw=screw.translate((0,shift,0))
-  for dx in range(25):
-   moving=screw.translate((-dx,0,0))
-   for o in fixed:
-    v=overlap(moving,a[o])
-    if v>.01:hits.append(['rail-screw-withdrawal',-dx,j+1,o,round(v,4)])
- report[name]={'near_service_dy_mm':dy,'rail_screw_centers_after_service_shift_y_mm':list(screw_ys),'individual_screw_withdrawal_y_mm':withdrawal_y,'collisions':hits}
- print(name,json.dumps(report[name]),flush=True)
-# Reproduce the straight-withdrawal defect: screw head meets cap after 2.7mm.
-head=m.cylinder((12,5,-14),(1,0,0),4,14)
-blocked_head=overlap(head.translate((-3,0,0)),s['shaft_cap'])
-blocked_cap=overlap(s['shaft_cap'].translate((6,0,0)),head)
-result={'revision':'t-jaw-compact-actuator-v3','configurations':report,'unshifted_defect_mm3':{'rail_head_withdrawal':blocked_head,'cap_with_rail_screw_installed':blocked_cap},'limits':['Both orientations, sampled rigid path with conservative screw-crest and rotating-nut envelopes; remove phone and release twine tension first.','Human finger access, support residue and print tolerances require physical checking.','Both phone orientations use shaft-side actuator positions and require module removal for cap service.'],'passed':all(not r['collisions'] for r in report.values())}
+ return sum(s.Volume() for s in a.intersect(b).vals())
+import model as m
+s=m.parts(m.Parameters());report={}
+module=['actuator_bracket','plunger','pulley','pulley_axle','pulley_key']
+fixed=['carrier','shaft_cap','sliding_jaw']+[f'clamp_{kind}_{i}' for kind in ('screw','nut') for i in range(1,5)]
+samples={**SAMPLES,'inward-28.5':m.Parameters(phone_thickness=8,button_from_end=104.5)}
+for name,base in samples.items():
+ for side in ('near','far'):
+  p=replace(base,side=side);a=m.assembly_parts(p,s);hits=[]
+  # Remove nut and screw completely before disengaging the locating lugs.
+  # A cylindrical nut envelope includes its full rotation; exclude mating thread.
+  for dx in range(21):
+   nut=m.cylinder((18+dx,p.button_y+m.MOUNT_Y,26),(1,0,0),6,18)
+   for n in module+fixed:
+    v=overlap(nut,a[n])
+    if v>.01:hits.append(['nut-loosen',dx,n,round(v,5)])
+  for dx in range(35):
+   screw=shifted(a['rail_screw_1'],(-dx,0,0))
+   for n in module+fixed:
+    v=overlap(screw,a[n])
+    if v>.01:hits.append(['screw-withdraw',dx,n,round(v,5)])
+  targets={n:a[n] for n in fixed}
+  moves=[('disengage',i/2,0) for i in range(10)]+[('lower',4.5,-i/5) for i in range(1,11)]+[('withdraw',4.5+dx,-2) for dx in range(1,41)]
+  for stage,dx,dz in moves:
+   for n in module:
+    moving=shifted(a[n],(dx,0,dz))
+    for other,part in targets.items():
+     v=overlap(moving,part)
+     if v>.01:hits.append([stage,dx,dz,n,other,round(v,5)])
+  report[name+'-'+side]={'collisions':hits}
+  print(name+'-'+side,'collisions',len(hits),hits[:3],flush=True)
+# Off the grabber, remove keeper band, withdraw cross-key -Z, then axle -Y.
+axle_hits=[]
+for dz in range(23):
+ key=shifted(s['pulley_key'],(0,0,-dz))
+ for n in ('actuator_bracket','pulley','pulley_axle','plunger'):
+  v=overlap(key,s[n])
+  if v>.01:axle_hits.append(['key',dz,n,round(v,5)])
+for dy in range(23):
+ axle=shifted(s['pulley_axle'],(0,-dy,0))
+ for n in ('actuator_bracket','pulley','plunger'):
+  v=overlap(axle,s[n])
+  if v>.01:axle_hits.append(['axle',dy,n,round(v,5)])
+retention={'head_obstruction_mm3':overlap(s['pulley_axle'].translate((0,1,0)),s['actuator_bracket']),'key_obstruction_mm3':overlap(s['pulley_key'].translate((0,-2,0)),s['actuator_bracket'])}
+assert all(v>.01 for v in retention.values()),retention
+result={'axial_retention':retention,'revision':'flat-back-mount-v3','configurations':report,'off_tool_axle_key_collisions':axle_hits,'passed':not axle_hits and all(not x['collisions'] for x in report.values()),'sequence':['Remove phone and release twine tension.','Fully remove the rail nut toward +X, then withdraw the screw toward -X.','Pull complete module +X 4.5 mm to disengage the locating lugs.','Lower module 2 mm along -Z, then continue withdrawal toward +X.','Off tool, remove keeper band, slide cross-key -Z, then pull axle -Y. Reverse for assembly.'],'limits':['Sampled rigid clearance only. Nut rotation uses a cylindrical envelope; thread engagement excluded.','Human access, handling, friction, print tolerance and band retention need physical tests.']}
 (Path(__file__).resolve().parents[1]/'review/service-access.json').write_text(json.dumps(result,indent=2)+'\n')
 assert result['passed'],result
-print('Service sequence passed',flush=True)
+print('Service and axle/key insertion paths passed',flush=True)

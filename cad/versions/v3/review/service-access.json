@@ -1,87 +1,52 @@
 {
-  "revision": "t-jaw-compact-actuator-v3",
+  "axial_retention": {
+    "head_obstruction_mm3": 29.261868885956737,
+    "key_obstruction_mm3": 47.48820235285684
+  },
+  "revision": "flat-back-mount-v3",
   "configurations": {
     "wallet-near": {
-      "near_service_dy_mm": 5.5,
-      "rail_screw_centers_after_service_shift_y_mm": [
-        25.0,
-        44.0
-      ],
-      "individual_screw_withdrawal_y_mm": 50,
       "collisions": []
     },
     "wallet-far": {
-      "near_service_dy_mm": -5.5,
-      "rail_screw_centers_after_service_shift_y_mm": [
-        -44.0,
-        -25.0
-      ],
-      "individual_screw_withdrawal_y_mm": -50,
       "collisions": []
     },
     "bare-near": {
-      "near_service_dy_mm": 5.5,
-      "rail_screw_centers_after_service_shift_y_mm": [
-        25.0,
-        44.0
-      ],
-      "individual_screw_withdrawal_y_mm": 50,
       "collisions": []
     },
     "bare-far": {
-      "near_service_dy_mm": -5.5,
-      "rail_screw_centers_after_service_shift_y_mm": [
-        -44.0,
-        -25.0
-      ],
-      "individual_screw_withdrawal_y_mm": -50,
       "collisions": []
     },
     "small-near": {
-      "near_service_dy_mm": 5.5,
-      "rail_screw_centers_after_service_shift_y_mm": [
-        25.0,
-        44.0
-      ],
-      "individual_screw_withdrawal_y_mm": 50,
       "collisions": []
     },
     "small-far": {
-      "near_service_dy_mm": -5.5,
-      "rail_screw_centers_after_service_shift_y_mm": [
-        -44.0,
-        -25.0
-      ],
-      "individual_screw_withdrawal_y_mm": -50,
       "collisions": []
     },
     "large-near": {
-      "near_service_dy_mm": 0,
-      "rail_screw_centers_after_service_shift_y_mm": [
-        34.5,
-        53.5
-      ],
-      "individual_screw_withdrawal_y_mm": 50,
       "collisions": []
     },
     "large-far": {
-      "near_service_dy_mm": 0,
-      "rail_screw_centers_after_service_shift_y_mm": [
-        -53.5,
-        -34.5
-      ],
-      "individual_screw_withdrawal_y_mm": -50,
+      "collisions": []
+    },
+    "inward-28.5-near": {
+      "collisions": []
+    },
+    "inward-28.5-far": {
       "collisions": []
     }
   },
-  "unshifted_defect_mm3": {
-    "rail_head_withdrawal": 46.18141200777008,
-    "cap_with_rail_screw_installed": 507.9955320854697
-  },
-  "limits": [
-    "Both orientations, sampled rigid path with conservative screw-crest and rotating-nut envelopes; remove phone and release twine tension first.",
-    "Human finger access, support residue and print tolerances require physical checking.",
-    "Both phone orientations use shaft-side actuator positions and require module removal for cap service."
+  "off_tool_axle_key_collisions": [],
+  "passed": true,
+  "sequence": [
+    "Remove phone and release twine tension.",
+    "Fully remove the rail nut toward +X, then withdraw the screw toward -X.",
+    "Pull complete module +X 4.5 mm to disengage the locating lugs.",
+    "Lower module 2 mm along -Z, then continue withdrawal toward +X.",
+    "Off tool, remove keeper band, slide cross-key -Z, then pull axle -Y. Reverse for assembly."
   ],
-  "passed": true
+  "limits": [
+    "Sampled rigid clearance only. Nut rotation uses a cylindrical envelope; thread engagement excluded.",
+    "Human access, handling, friction, print tolerance and band retention need physical tests."
+  ]
 }

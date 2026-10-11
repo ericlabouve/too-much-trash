@@ -1,0 +1,65 @@
+[
+  {
+    "name": "body",
+    "file": "body.stl",
+    "color": [
+      0.92,
+      0.3,
+      0.045
+    ]
+  },
+  {
+    "name": "plunger",
+    "file": "plunger.stl",
+    "color": [
+      1,
+      0.57,
+      0.16
+    ]
+  },
+  {
+    "name": "pulley",
+    "file": "pulley.stl",
+    "color": [
+      1,
+      0.43,
+      0.065
+    ]
+  },
+  {
+    "name": "return_band",
+    "file": "return_band.stl",
+    "color": [
+      0.08,
+      0.64,
+      0.48
+    ]
+  },
+  {
+    "name": "twine",
+    "file": "twine.stl",
+    "color": [
+      0.43,
+      0.23,
+      0.67
+    ]
+  },
+  {
+    "name": "phone_reference",
+    "file": "phone_reference.stl",
+    "color": [
+      0.3,
+      0.36,
+      0.42
+    ]
+  },
+  {
+    "name": "button_reference",
+    "file": "button_reference.stl",
+    "color": [
+      0.62,
+      0.69,
+      0.73
+    ]
+  }
+]

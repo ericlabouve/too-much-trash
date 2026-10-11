@@ -17,6 +17,12 @@ let marking=false,featureOverlay=null,featureHit=null,stepIndex=-1,painting=fals
 const featureLabel=document.createElement('div');featureLabel.className='feature-label';featureLabel.hidden=true;$('#stage').append(featureLabel);
 const root=new THREE.Group();root.rotation.x=-Math.PI/2;scene.add(root);
 const assembly=new THREE.Group(),inventory=new THREE.Group();root.add(assembly,inventory);
+const bomLabels=new THREE.Group();inventory.add(bomLabels);
+const labelControl=document.createElement('label');labelControl.hidden=true;
+const labelToggle=document.createElement('input');labelToggle.type='checkbox';labelToggle.id='bom-labels';labelToggle.checked=true;
+labelControl.append(labelToggle,' Floating labels');document.querySelector('nav .toggles').prepend(labelControl);
+labelToggle.onchange=()=>{bomLabels.visible=labelToggle.checked;canvas.dataset.bomLabels=String(bomLabels.visible);};
+canvas.dataset.bomLabels='true';
 const meshes=new Map(),bomMeshes=new Map();let manifest,mode='phone',selected=null,outline,flipped=false,selectionTargets=[];
 let playing=false,elapsedMs=0,lastFrame=null,lastPoseTime=0,strokeFraction=0,stopFraction=.05;
 let previewRenderer,previewScene,previewCamera,previewRoot,previewControls,previewCube;const previewMeshes=new Map();
@@ -24,11 +30,12 @@ const assetLoad=Date.now();
 const freshAsset=path=>{const url=new URL(path,location.href);url.searchParams.set('load',assetLoad);return url.href;};
 const loader=new STLLoader(),raycaster=new THREE.Raycaster();let pointerStart;
 const details={
- phone:['COMPACT SHAFT-SIDE RAILS','Two positions. One actuator.','The paired rail is integral with the removable shaft cap, with a broad central web. Both clamp halves install sideways. Centered bands close the jaws and the twine runs directly from one integrated actuator guide to a selectable dual-eye guide and two centered shaft guides. For originally far-side buttons, turn the phone 180° in its screen plane and move the same actuator to the other end of the rail. The outer jaw has no long rail. The 120 mm rail fits within the A1 mini build envelope; the large example phone slides 21 mm along the jaws. Four collar fasteners form pairs 52 mm apart. Camera framing and loaded retention remain unvalidated.'],
- full:['ONE CONTINUOUS LINE','Keep the twine captive.','Supported D-shaped guides have 8 mm holes with 11 mm flared entrances. The line passes through the inset actuator guide, the selected eye of the dual guide, then the two original centered guides. The lower end ties to an overtravel band around the moving trigger. Fixed guides are the first hypothesis; no pulleys or gears yet.'],
- actuator:['STRING ATTACHMENT','Tie to the moving rocker.','The string loops through the 8 mm rocker eye and around its front edge, then ties back to itself. The loop grips the printed eye directly. Tie it before mounting the actuator. The visible loop is schematic; actual knot security is untested. The two small bracket tabs are functional press and return travel stops. One band returns the rocker. A separate band at the trigger absorbs continued squeeze after the printed stop engages. Band selection and end knots allow preload adjustment; forces are not simulated. Move the bracket along either rail, seat its two round mounting holes, check the integral broad shoe against the target button. Threefold free travel is not a validated button stroke.'],
- bom:['TEN PRINTED DESIGNS','Twenty-one pieces. No metal hardware.','Two jaws, rigid shaft cap, windowed bracket, rocker, pivot, six screws, six nuts and three guides. One continuous twine length and seven rubber bands are the starting assembly. Loaded retention remains unvalidated.']
+ phone:['V3 PLUNGER HARNESS','Shared-cleat linear actuator.','The rounded plunger presses straight toward the button. Its rubber band and twine share one capped cleat. Jaw geometry and neck opening are preserved; both collar halves now use compact ears and longer screws. The 14 mm pocket still excludes the recorded wallet and large-phone cases.'],
+ full:['INLINE COMPLIANCE','Two twine sections, joined by a band.','The pulley redirects the pull. Run directly to the selected eye of the nearest shaft guide, then through the two lower guides, then join two twine sections with an inline rubber band near the trigger. Return and inline bands have separate functions; forces and maximum extension are not validated.'],
+ actuator:['FLAT-BACK KEYED MOUNT','Blended support. Flat print face.','The reinforcement eases smoothly into the spine. Mounting plate, bore and full-length locating lugs shift 4.4 mm sideways to make the back flat without a thin hole wall. The opposite projection remains; the rail and plunger positions are unchanged. Printing is bracket-only, back down. Supports and physical strength still require review.'],
+ bom:['THIRTEEN PRINTED DESIGNS','Twenty-one pieces.','Open plunger frame, slider, pulley, recessed headed axle and cross-key; four longer collar screws, one original rail screw, five nuts and three guides. Retention, clamp preload and printed fit need physical qualification.']
 };
+
 function setDetail(label,title,text){$('#detail-label').textContent=label;$('#detail-title').textContent=title;$('#detail-text').textContent=text;}
 function material(rgb){return new THREE.MeshStandardMaterial({color:new THREE.Color(...rgb),roughness:.7});}
 function allowed(name){
@@ -36,9 +43,9 @@ function allowed(name){
  if(name==='stock_neck_context')return mode==='phone';
  if(name==='twine_phone')return mode==='phone'||mode==='actuator';
  if(mode==='full')return true;
- if(mode==='actuator')return ['twine_attachment','rocker','pivot_key','rail_screw_1','rail_screw_2','rail_nut_1','rail_nut_2','band_return','phone_volume_up'].includes(name);
+ if(mode==='actuator')return ['twine_attachment','plunger','pulley','pulley_axle','pulley_key','band_keeper','rail_screw_1','rail_nut_1','band_return','phone_volume_up'].includes(name);
  if(name==='guide_1'||name==='band_guide_1')return true;
- return !name.startsWith('stock_')&&!name.startsWith('guide_')&&!name.startsWith('band_guide_')&&!['twine','band_overtravel'].includes(name);
+ return !name.startsWith('stock_')&&!name.startsWith('guide_')&&!name.startsWith('band_guide_')&&!['twine','twine_trigger','band_overtravel'].includes(name);
 }
 function clearSelection(){
  clearFeature();
@@ -60,7 +67,7 @@ function frameObjects(objects,view=mode){
 }
 function label(text,x,y,z){
  const c=document.createElement('canvas');c.width=700;c.height=64;const ctx=c.getContext('2d');ctx.fillStyle='#243138';ctx.font='46px system-ui';ctx.textAlign='center';ctx.fillText(text,350,42);
- const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));sprite.position.set(x,y,z);sprite.scale.set(190,20,1);inventory.add(sprite);
+ const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));sprite.position.set(x,y,z);sprite.scale.set(190,20,1);bomLabels.add(sprite);
 }
 function focus(id,object){
  clearSelection();selected=id;const row=manifest.bom.find(r=>r.id===id);if(!row)return;
@@ -79,17 +86,18 @@ function setMode(next){
  if(next==='bom')setPlaying(false);
  clearSelection();mode=next;inventory.visible=mode==='bom';assembly.visible=!inventory.visible;
  document.body.classList.toggle('bom',inventory.visible);$('#inventory').hidden=!inventory.visible;
+ labelControl.hidden=!inventory.visible;
  for(const b of document.querySelectorAll('[data-view]'))b.setAttribute('aria-pressed',String(b.dataset.view===mode));
  for(const [name,m] of meshes){
   m.visible=allowed(name)&&($('#phone').checked||!name.startsWith('phone_')&&name!=='camera_keepout');
-  const transparent=(name==='carrier'&&$('#transparent').checked)||name==='actuator_context';
+  const transparent=(name==='carrier'||name==='actuator_context')&&$('#transparent').checked;
   m.material.transparent=transparent;m.material.opacity=transparent?.2:1;m.material.depthWrite=!transparent;
  }
  $('#stroke-panel').hidden=inventory.visible;$('#animate').disabled=inventory.visible;$('#release').disabled=inventory.visible;
  $('#flip').disabled=inventory.visible;$('#stroke').disabled=inventory.visible;$('#phone').disabled=inventory.visible;$('#transparent').disabled=inventory.visible;
  setDetail(...details[mode]);resize();
  // Crop actuator framing to the mechanism while retaining the integral carrier for context.
- const fit=mode==='actuator'?['rocker','pivot_key','band_return','actuator_context'].map(n=>meshes.get(n)):visibleMeshes();
+ const fit=mode==='actuator'?['plunger','pulley','pulley_axle','pulley_key','band_keeper','band_return','actuator_context'].map(n=>meshes.get(n)):visibleMeshes();
  frameObjects(fit);pose(strokeFraction);status.textContent=mode==='bom'?'Click a row or model to inspect. Right-click a model for assembly views. Review meshes, not print files.':'Drag to orbit · scroll to zoom · click a component to inspect. Prescribed motion, not a force simulation.';
 }
 function tube(points,diameter){
@@ -105,42 +113,33 @@ function replaceTube(name,points,diameter){const mesh=meshes.get(name);mesh.geom
 function pose(fraction){
  const previous=strokeFraction;strokeFraction=Math.max(0,Math.min(1,fraction));fraction=strokeFraction;
  $('#stroke').value=String(fraction*100);$('#stroke-value').value=`${Math.round(fraction*100)}%`;
- const m=manifest.motion,axis=new THREE.Vector3(0,1,0),pivot=new THREE.Vector3(...m.pivot),tp=new THREE.Vector3(...m.trigger_pivot),restAttach=new THREE.Vector3(...m.trigger_attach);
+ const m=manifest.motion,axis=new THREE.Vector3(0,1,0),tp=new THREE.Vector3(...m.trigger_pivot),restAttach=new THREE.Vector3(...m.trigger_attach);
  const angle=m.trigger_angle*fraction;
  const attach=restAttach.clone().sub(tp).applyAxisAngle(axis,angle).add(tp),last=new THREE.Vector3(...m.string_points.at(-2));
  const takeup=attach.distanceTo(last)-restAttach.distanceTo(last);
- const rockerAngle=m.angle*Math.min(1,Math.max(0,takeup)/m.twine_to_stop);
- // Transform around the CAD pivot without changing the source mesh.
- for(const name of ['rocker','twine_attachment']){const rocker=meshes.get(name);rocker.rotation.y=rockerAngle;rocker.position.copy(pivot).sub(pivot.clone().applyAxisAngle(axis,rockerAngle));}
+ const f=Math.min(1,Math.max(0,takeup)/m.twine_to_stop),advance=m.stroke_mm*f;
+ for(const name of ['plunger','twine_attachment'])meshes.get(name).position.x=-advance;
  const trigger=meshes.get('stock_black_trigger');trigger.rotation.y=angle;trigger.position.copy(tp).sub(tp.clone().applyAxisAngle(axis,angle));
- const eye=new THREE.Vector3(...m.string_eye).sub(pivot).applyAxisAngle(axis,rockerAngle).add(pivot);
- const first=new THREE.Vector3(...m.string_points[1]);
- const shortening=new THREE.Vector3(...m.string_eye).distanceTo(first)-eye.distanceTo(first);
- // Constant modeled twine length: shortening at the rocker adds to the tail.
- const tail=m.tail_length+shortening;
- const knot=last.clone().addScaledVector(attach.clone().sub(last).normalize(),tail);
- const points=[eye.toArray(),...m.string_points.slice(1,-1),knot.toArray()];
+ const sample=f*(m.head_paths.length-1),low=Math.floor(sample),high=Math.min(low+1,m.head_paths.length-1),t=sample-low;
+ const head=m.head_paths[low].map((p,i)=>p.map((v,j)=>v+(m.head_paths[high][i][j]-v)*t));
+ const length=pts=>pts.slice(1).reduce((sum,p,i)=>sum+new THREE.Vector3(...p).distanceTo(new THREE.Vector3(...pts[i])),0);
+ const shortening=length(m.head_paths[0])-length(head);
+ const knot=last.clone().addScaledVector(attach.clone().sub(last).normalize(),m.tail_length+shortening);
+ const points=[...head,...m.string_points.slice(m.head_point_count,-1),knot.toArray()];
  replaceTube('twine',points,manifest.parameters.twine_diameter);
- replaceTube('twine_phone',points.slice(0,manifest.motion.phone_point_count||4),manifest.parameters.twine_diameter);
- replaceTube('band_overtravel',bandPoints(knot,attach,5),1.4);
- const returnEye=new THREE.Vector3(...m.return_moving).sub(pivot).applyAxisAngle(axis,rockerAngle).add(pivot);
- replaceTube('band_return',bandPoints(returnEye,new THREE.Vector3(...m.return_fixed),2),1.4);
- const extension=knot.distanceTo(attach)-m.series_span_rest;
- const p=manifest.parameters,dx=m.contact[0]-m.pivot[0],dz=m.contact[2]-m.pivot[2];
- const advance=m.side_sign*(dx*(1-Math.cos(rockerAngle))-dz*Math.sin(rockerAngle));
+ replaceTube('twine_phone',points.slice(0,m.phone_point_count),manifest.parameters.twine_diameter);
+ const bandEnd=attach.clone().addScaledVector(attach.clone().sub(last).normalize(),-m.lower_twine_length);
+ replaceTube('twine_trigger',[bandEnd.toArray(),attach.toArray()],manifest.parameters.twine_diameter);
+ replaceTube('band_overtravel',bandPoints(knot,bandEnd,5),1.4);
+ replaceTube('band_return',m.band_paths.band_return.map((p,i)=>[p[0]-(m.return_moving_indices.includes(i)?advance:0),p[1],p[2]]),1.2);
+ const extension=knot.distanceTo(bandEnd)-m.series_span_rest,p=manifest.parameters;
  const buttonTravel=Math.min(p.button_stroke,Math.max(0,advance-p.rest_gap));
- const button=meshes.get('phone_volume_up');button.position.x=-m.side_sign*buttonTravel;
- button.material.emissive.setHex(buttonTravel>1e-5?0x227744:0);
- const releasing=fraction<previous-1e-6;
- const phase=fraction<1e-5?'Released · button free':Math.abs(rockerAngle)>=Math.abs(m.angle)-1e-6
-  ?(releasing?'Releasing handle · button still held':'Free-travel stop · verify button overtravel physically')
-  :releasing?'Return band releases the rocker':buttonTravel>1e-5?'Rocker presses volume up':'Twine pulls the rocker toward the button';
- if($('#stroke-phase').textContent!==phase)$('#stroke-phase').textContent=phase;
- canvas.dataset.buttonTravel=String(buttonTravel);canvas.dataset.stroke=String(fraction);
- $('#motion-info').textContent=`Illustrated band extension: ${Math.max(0,extension).toFixed(1)} mm. Rocker: ${(rockerAngle*180/Math.PI).toFixed(1)}°. Free travel only; shoe overtravel and button force need physical verification.`;
- // Exposed read-only diagnostics for regression checks, not a force calculation.
- canvas.dataset.twineLength=String(points.slice(1).reduce((sum,p,i)=>sum+new THREE.Vector3(...p).distanceTo(new THREE.Vector3(...points[i])),0));
- canvas.dataset.bandExtension=String(extension);canvas.dataset.rockerAngle=String(rockerAngle);
+ const button=meshes.get('phone_volume_up');button.position.x=-buttonTravel;button.material.emissive.setHex(buttonTravel>1e-5?0x227744:0);
+ const phase=fraction<1e-5?'Released · illustrative gap':f>=1-1e-6?'Nominal button press · inline band stretches (schematic)':fraction<previous?'Return band retracts plunger':'Twine advances plunger';
+ $('#stroke-phase').textContent=phase;
+ canvas.dataset.buttonTravel=String(buttonTravel);canvas.dataset.stroke=String(fraction);canvas.dataset.plungerTravel=String(advance);
+ $('#motion-info').textContent=`Plunger: ${advance.toFixed(2)} mm. Illustrated inline-band extension: ${Math.max(0,extension).toFixed(1)} mm. Nominal motion only; this is not a mechanical stroke stop or a force prediction.`;
+ canvas.dataset.twineLength=String(length(points));canvas.dataset.bandExtension=String(extension);
  if(outline){root.updateWorldMatrix(true,true);outline.box.makeEmpty();for(const mesh of selectionTargets)outline.box.expandByObject(mesh);}
 }
 function setPlaying(value){
@@ -158,10 +157,10 @@ function setupPreview(){
  previewScene=new THREE.Scene();previewScene.add(new THREE.HemisphereLight(0xffffff,0x8d9698,2.6));
  const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-30,60,100);previewScene.add(light);
  previewRoot=new THREE.Group();previewRoot.rotation.copy(root.rotation);previewScene.add(previewRoot);
- for(const name of ['actuator_context','twine_attachment','rocker','pivot_key','twine_phone','band_return','phone_volume_up']){
+ for(const name of ['actuator_context','twine_attachment','plunger','pulley','pulley_axle','pulley_key','band_keeper','twine_phone','band_return','phone_volume_up']){
   const original=meshes.get(name);const clone=new THREE.Mesh(original.geometry,original.material.clone());previewRoot.add(clone);previewMeshes.set(name,clone);
  }
- const ghost=new THREE.LineSegments(new THREE.EdgesGeometry(meshes.get('rocker').geometry),new THREE.LineBasicMaterial({color:0x77868b,transparent:true,opacity:.6,depthTest:false}));ghost.renderOrder=2;previewRoot.add(ghost);
+ const ghost=new THREE.LineSegments(new THREE.EdgesGeometry(meshes.get('plunger').geometry),new THREE.LineBasicMaterial({color:0x77868b,transparent:true,opacity:.6,depthTest:false}));ghost.renderOrder=2;previewRoot.add(ghost);
  previewCamera=new THREE.PerspectiveCamera(35,1,.1,500);
  const target=new THREE.Vector3(...manifest.motion.pivot).applyAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2);target.y-=10;
  previewCamera.position.copy(target).add(new THREE.Vector3(5,3,82));previewCamera.lookAt(target);
@@ -277,14 +276,14 @@ try{
   geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);geometry.scale(...Array(3).fill(105/Math.max(extent.x,extent.y,extent.z)));
   const rgb=row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
   const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=105/Math.max(extent.x,extent.y,extent.z);inventory.add(mesh);bomMeshes.set(row.id,mesh);
-  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',rocker:'Rocker',pivot_key:'Printed pivot',thumb_screw:'Thumb screw',thumb_nut:'Printed nut',string_guide:'Captive guide',dual_string_guide:'Duel captive guide',twine:'Continuous twine',rubber_bands:'Rubber bands'};
+  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'Axle cross-key',collar_screw:'Long collar screw',thumb_screw:'Thumb screw',thumb_nut:'Printed nut',string_guide:'Captive guide',dual_string_guide:'Duel captive guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
   label(`${titles[row.id]||row.name||row.id} ×${row.quantity}`,mesh.position.x,mesh.position.y-65,0);
  }
  for(const [i,step] of steps.entries()){const option=document.createElement('option');option.value=i;option.textContent=`${i+1}. ${step.title}`;$('#assembly-step').append(option);}
  $('#assembly-toggle').onclick=()=>stepIndex<0?showStep(0):exitSteps();$('#assembly-exit').onclick=()=>exitSteps();$('#step-back').onclick=()=>showStep(stepIndex-1);$('#step-next').onclick=()=>showStep(stepIndex+1);$('#assembly-step').onchange=e=>showStep(Number(e.target.value));
  $('#mark-feature').onclick=()=>{marking=!marking;setPlaying(false);$('#mark-feature').setAttribute('aria-pressed',String(marking));status.textContent=marking?'Choose a color and tool; drag on a part to paint or draw a shape. Alt + drag or use the cube to orbit.':'Click a component to inspect.';};$('#clear-feature').onclick=()=>clearFeature();$('#feature-radius').oninput=()=>{status.textContent=`Brush radius: ${$('#feature-radius').value} mm. Drag to extend the highlight.`;};
  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setMode(b.dataset.view));
- $('#string-attachment').disabled=false;$('#string-attachment').onclick=()=>{setPlaying(false);pose(0);setMode('actuator');focus('rocker',meshes.get('rocker'));setDetail('STRING ENDS HERE','Loop around the rocker eye','Pass the free end through the 8 mm eye, around its front edge, and tie it back to the standing string. The brown loop shows the attachment path. Tie before mounting the actuator; check the knot with your actual twine. No stopper knot is needed.');};
+ $('#string-attachment').disabled=false;$('#string-attachment').onclick=()=>{setPlaying(false);pose(0);setMode('actuator');focus('plunger',meshes.get('plunger'));setDetail('SHARED CAPPED CLEAT','Wrap and tie beneath the cap','The return band and twine share the solid cleat. Keep the band behind the twine and tie back to the standing line. The shown wrap is schematic; verify actual knot and band retention.');};
  $('#flip').onclick=()=>{flipped=!flipped;frameObjects(visibleMeshes());};
  $('#reset').onclick=()=>setMode(mode);$('#phone').onchange=()=>setMode(mode);$('#transparent').onchange=()=>setMode(mode);$('#stroke').oninput=e=>{setPlaying(false);elapsedMs=0;pose(Number(e.target.value)/100);};
  $('#animate').onclick=()=>{if(!playing&&mode==='phone')setMode('full');setPlaying(!playing);};

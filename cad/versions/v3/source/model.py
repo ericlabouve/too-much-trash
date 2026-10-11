@@ -151,9 +151,9 @@ class Parameters:
     @property
     def pivot(self): return self.point((19,0,18))
     @property
-    def string_eye(self): return self.point((33,1.5,24))
+    def string_eye(self): return self.point(plunger_attachment_path()[-1])
     @property
-    def first_guide(self): return self.point((34,0,-43))
+    def first_guide(self): return (0,(1 if self.side=='near' else -1)*28,self.guide_stations[0]+GUIDE_EYE_Z)
     @property
     def contact(self): return self.point((self.rest_gap,0,6))
 
@@ -176,6 +176,13 @@ def thumb_screw(p):
 def thumb_nut(p):
     return _fasteners()['thumb_nut']
 
+@lru_cache(None)
+def collar_screw():
+    # Same successful 8×3 profile/head/nose, longer grip for external bearing faces.
+    s=successful_thread(False,length=42).intersect(cylinder((0,0,2),(0,0,1),32,9))
+    # Flush threaded tip stays outside the screen boundary; no projecting nose.
+    return s.union(cylinder((0,0,34),(0,0,1),4,14))
+
 
 def placed(s,p):
     return s.translate((p.phone_right,p.button_y,p.height))
@@ -183,17 +190,18 @@ def placed(s,p):
 
 def assembly_parts(p,solids):
     out={'shaft_cap':solids['shaft_cap'],'carrier':solids['carrier'],'sliding_jaw':solids['sliding_jaw'].translate((p.phone_left,0,0))}
-    for n in ('actuator_bracket','rocker','pivot_key'):out[n]=placed(solids[n],p)
-    for i,y in enumerate((-9.5,9.5)):
-        # Fixed round bracket holes and rail screw centers both stay at Z−14.
-        s=solids['thumb_screw'].rotate((0,0,0),(0,1,0),-90).translate((56,y,-14-p.height))
+    for n in ('actuator_bracket','plunger','pulley','pulley_axle','pulley_key'):out[n]=placed(solids[n],p)
+    for i,y in enumerate((MOUNT_Y,)):
+        # Flush-T rail moves only the mounting interface 10 mm inward / 40 mm up.
+        # The plunger, pulley and phone alignment stay in their original positions.
+        s=solids['thumb_screw'].rotate((0,0,0),(0,1,0),-90).translate((46,y,26-p.height))
         out[f'rail_screw_{i+1}']=placed(s,p)
         # Match thread phase: the nut occupies screw-local Z2..8.
-        nut=solids['thumb_nut'].rotate((0,0,0),(0,1,0),-90).translate((54,y,-14-p.height))
+        nut=solids['thumb_nut'].rotate((0,0,0),(0,1,0),-90).translate((44,y,26-p.height))
         out[f'rail_nut_{i+1}']=placed(nut,p)
     for i,(y,z) in enumerate(CLAMP_STATIONS):
-        out[f'clamp_screw_{i+1}']=solids['thumb_screw'].rotate((0,0,0),(0,1,0),90).translate((-16,y,z))
-        out[f'clamp_nut_{i+1}']=solids['thumb_nut'].rotate((0,0,0),(0,1,0),90).translate((-14,y,z))
+        out[f'clamp_screw_{i+1}']=solids['collar_screw'].rotate((0,0,0),(0,1,0),90).translate((-22,y,z))
+        out[f'clamp_nut_{i+1}']=solids['thumb_nut'].rotate((0,0,0),(0,1,0),90).translate((-20,y,z))
     for i,z in enumerate(p.guide_stations):
         guide=solids['dual_string_guide'] if i==0 else solids['string_guide']
         out[f'guide_{i+1}']=guide.translate((0,0,z))
@@ -223,28 +231,30 @@ def stock(p):
 
 def flexible_paths(p):
     trigger=(-42,0,-417);last=(-18,0,p.guide_stations[-1]+GUIDE_EYE_Z)
-    v=cq.Vector(*trigger).sub(cq.Vector(*last));tail=v.Length-p.series_span_rest
+    v=cq.Vector(*trigger).sub(cq.Vector(*last));lower_tail=25
+    tail=v.Length-p.series_span_rest-lower_tail
     knot=cq.Vector(*last).add(v.normalized().multiply(tail)).toTuple()
+    band_end=cq.Vector(*trigger).sub(v.normalized().multiply(lower_tail)).toTuple()
     guide_side=1 if p.side=='near' else -1
-    string=[p.string_eye,p.first_guide]+[(0,guide_side*20,p.guide_stations[0]+GUIDE_EYE_Z)]+[(-18,0,z+GUIDE_EYE_Z) for z in p.guide_stations[1:]]+[knot]
-    bands={'band_return':loop_between(p.point((33,8,18)),p.point((38,14,28)),2),
-        'band_overtravel':loop_between(knot,trigger,5)}
+    target=(p.first_guide[0]-p.phone_right,p.first_guide[1]-p.button_y,p.first_guide[2]-p.height)
+    string=[p.point(q) for q in plunger_pulley_path(target=target)]+[p.first_guide]+[(-18,0,z+GUIDE_EYE_Z) for z in p.guide_stations[1:]]+[knot]
+    bands={'band_return':[p.point(q) for q in plunger_return_path()],
+        'band_keeper':[p.point(q) for q in plunger_keeper_path()],
+        'band_overtravel':loop_between(knot,band_end,5)}
     for i,z in enumerate(JAW_BAND_LEVELS):bands[f'band_jaw_{i+1}']=jaw_band(p.phone_left-1,-27,z)
     for i,z in enumerate(p.guide_stations):
         bands[f'band_guide_{i+1}']=rounded_band_xy(z)
-    return string,bands,{'trigger_pivot':(-4,0,-416),'trigger_attach':trigger,'trigger_angle':-.48,'tail_length':tail,'series_span_rest':p.series_span_rest}
+    return string,bands,{'trigger_pivot':(-4,0,-416),'trigger_attach':trigger,'trigger_angle':-.48,'tail_length':tail,'lower_twine_length':lower_tail,'band_end':band_end,'series_span_rest':p.series_span_rest}
 
 
 def attachment_loop(p):
-    # Closed loop through the eye and around its front ligament. Knot topology
-    # is schematic; the actual end is tied back onto the standing string.
-    return [p.point(q) for q in [(33,1.5,24),(33,-9,24),(33,-9,13),(31.5,-1.7,13),(31.5,-1.7,24),(33,1.5,24)]]
+    return [p.point(q) for q in plunger_attachment_path()]
 
 
 def rows(p,solids):
     out=[('twine_attachment',polyline(attachment_loop(p),p.twine_diameter),TWINE,'twine')]
     for n,s in assembly_parts(p,solids).items():
-        bid='thumb_screw' if 'screw' in n else 'thumb_nut' if 'nut' in n else 'dual_string_guide' if n=='guide_1' else 'string_guide' if n.startswith('guide_') else n
+        bid='collar_screw' if n.startswith('clamp_screw') else 'thumb_screw' if 'screw' in n else 'thumb_nut' if 'nut' in n else 'dual_string_guide' if n=='guide_1' else 'string_guide' if n.startswith('guide_') else n
         out.append((n,s,ORANGE,bid))
     for n,s in stock(p).items():
         color=(.035,.27,.75) if 'blue' in n else (.12,.14,.17) if any(x in n for x in ('black','camera','volume')) else (.6,.65,.69)
@@ -252,8 +262,9 @@ def rows(p,solids):
     out.append(('actuator_context',placed(solids['actuator_bracket'],p),ORANGE,'actuator_bracket'))
     out.append(('stock_neck_context',box(-7,7,-9.5,9.5,-105,85),(.6,.65,.69),None))
     string,bands,motion=flexible_paths(p)
+    out.append(('twine_trigger',polyline([motion['band_end'],motion['trigger_attach']],p.twine_diameter),TWINE,'twine'))
     out.extend([('twine_phone',polyline(string[:len(string)-len(p.guide_stations)],p.twine_diameter),TWINE,'twine'),('twine',polyline(string,p.twine_diameter),TWINE,'twine')])
-    for n,path in bands.items():out.append((n,polyline(path,1.4),BAND,'rubber_bands'))
+    for n,path in bands.items():out.append((n,polyline(path,1.2 if n in ('band_return','band_keeper') else 1.4),BAND,'rubber_bands'))
     return out
 
 
@@ -297,36 +308,36 @@ def low_rail(sign=1,post_top=26):
     return s if sign==1 else s.mirror('YZ')
 
 def paired_neck_rail():
-    # Continuous slot avoids a blocked screw passage where the two rails meet.
-    s=box(36,42,-60,60,-24,-4).union(box(36,42,-12,12,-4,16))
-    cut=box(35,43,-54,54,-18.4,-9.6)
-    for y in (-54,54):cut=cut.union(cylinder((35,y,-14),(1,0,0),8,8.8))
-    return s.cut(cut).cut(box(35,43,-12,-7,17,28)).translate((-20,0,0))
+    # Option A: same Y/Z rail orientation, flush with the cap's X12 outer face.
+    # Separate wing slots leave the middle solid; no offset bridge or center slot.
+    # End-mounted at Z16..36 to clear the unchanged pulley and frame below.
+    s=box(6,12,-60,60,16,36).edges('|X').fillet(1.2)
+    for y0,y1 in ((-54,-18.5),(18.5,54)):
+        cut=box(5,13,y0,y1,21.6,30.4)
+        for y in (y0,y1):cut=cut.union(cylinder((5,y,26),(1,0,0),8,8.8))
+        s=s.cut(cut)
+    return s
 
 # Split opens toward +X after actuator removal; both fasteners stay off the screen.
 # Four fasteners: paired on both sides, below either actuator position.
 # Upper station lowered for the second actuator position; pairs span 52 mm.
-CLAMP_STATIONS=((-25,-24),(25,-76),(25,-24),(-25,-76))
+CLAMP_STATIONS=((-15.5,-30),(15.5,-76),(15.5,-30),(-15.5,-76))
 CLAMP_BOTTOM=-86
 CLAMP_TOP=16
 def shaft_clamp_half(p,cap=False):
-    x0,x1=(.5,11.3) if cap else (-11.3,-.5)
+    x0,x1=(.5,12) if cap else (-11.3,-.5)
     s=box(x0,x1,-13.8,13.8,CLAMP_BOTTOM,CLAMP_TOP)
-    if cap:
-        # Local relief clears the rail screw heads.
-        # Retain the thicker shell elsewhere; minimum relieved wall is 3.5 mm.
-        s=s.cut(box(9.3,12,-14,14,-25,-6))  # Clearance behind rail screw heads.
     s=s.cut(box(-p.collar_opening_x/2,p.collar_opening_x/2,-p.collar_opening_y/2,p.collar_opening_y/2,CLAMP_BOTTOM-1,CLAMP_TOP+1))
-    ex0,ex1=(.5,4) if cap else (-8,-.5)
+    ex0,ex1=(.5,12) if cap else (-14,-.5)
     for y,z in CLAMP_STATIONS:
-        s=s.union(cylinder((ex0,y,z),(1,0,0),ex1-ex0,20))
-        s=s.union(box(ex0,ex1,min(y,11),max(y,-11),z-10,z+10))
+        s=s.union(cylinder((ex0,y,z),(1,0,0),ex1-ex0,18))
+        s=s.union(box(ex0,ex1,min(y,11),max(y,-11),z-9,z+9))
         s=s.cut(cylinder((-15,y,z),(1,0,0),30,8.8))
     return s
 
 def shaft_cap(p):
-    # Rail loads enter the cap directly through a broad central web.
-    return shaft_clamp_half(p,True).union(paired_neck_rail()).union(box(9.3,22,-12,12,-6,16))
+    # Coplanar wings connect directly to the cap. No projecting bridge/ribs.
+    return shaft_clamp_half(p,True).union(paired_neck_rail())
 
 def carrier(p):
     s=box(-20,-14,-12,12,3.6,26).union(box(-28,-14,-12,12,18,26))
@@ -348,6 +359,12 @@ def carrier(p):
     s=s.union(jaw_cleat(-27))
     s=s.cut(box(-16,-7,12,17,21,39)).cut(box(-119,CLOSED_JAW_X,-10.2,10.2,21.9,26.1)).cut(box(-5.8,5.8,-8.8,8.8,21,61))
     s=s.cut(box(-5.8,5.8,-8.8,8.8,-39,65))
+
+    # Re-cut after the supporting webs: no web material may refill bolt passages
+    # or occupy the relocated external nut bearing faces.
+    for y,z in CLAMP_STATIONS:
+        s=s.cut(cylinder((-23,y,z),(1,0,0),40,8.8))
+        s=s.cut(cylinder((-21,y,z),(1,0,0),7,18.6))
 
     return s
 
@@ -378,8 +395,9 @@ def guide(p):
 
 def dual_guide(p):
     s=guide_saddle(p)
-    for y in (-20,20):
+    for y in (-28,28):
         center=(0,y,GUIDE_EYE_Z)
+        s=s.union(box(-5,5,min(y,12),max(y,-12),GUIDE_EYE_Z-3,GUIDE_EYE_Z+3).edges('|Z').fillet(.6))
         # Preserve the existing opposite-facing D orientation; only translate Z.
         lug=guide_lug(center,p).rotate(center,(0,y,GUIDE_EYE_Z+1),-90 if y>0 else 90)
         s=s.union(lug).cut(guide_hole(center,p))
@@ -448,4 +466,7 @@ def axle(p):
     return s.union(head).union(box(18.2,19.8,8.4,10,13.8,22.2))
 
 def parts(p):
-    return dict(shaft_cap=shaft_cap(p),carrier=carrier(p),sliding_jaw=sliding_jaw(p),actuator_bracket=actuator_bracket(p),rocker=rocker(p),pivot_key=axle(p),thumb_screw=thumb_screw(p),thumb_nut=thumb_nut(p),string_guide=guide(p),dual_string_guide=dual_guide(p))
+    return dict(shaft_cap=shaft_cap(p),carrier=carrier(p),sliding_jaw=sliding_jaw(p),**plunger_cassette(),thumb_screw=thumb_screw(p),collar_screw=collar_screw(),thumb_nut=thumb_nut(p),string_guide=guide(p),dual_string_guide=dual_guide(p))
+
+# Active V3 actuator (legacy rocker helpers above are historical check support).
+from plunger_design import MOUNT_Y, cassette as plunger_cassette, return_path as plunger_return_path, attachment_path as plunger_attachment_path, pulley_path as plunger_pulley_path, keeper_path as plunger_keeper_path

@@ -3,22 +3,22 @@
   "scale_percent": 100,
   "nozzle_mm": 0.4,
   "layer_mm": 0.2,
-  "revision": "t-jaw-compact-actuator-v3",
-  "status": "Recessed fit prototype; camera-view clearance and physical validation pending",
+  "revision": "flat-back-mount-v3",
+  "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
   "parts": [
     {
       "name": "shaft_cap",
       "file": "shaft_cap.stl",
       "quantity": 1,
       "bounds_mm": [
-        102.0,
+        122.0,
         120.0,
-        21.5
+        11.5
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": 7.789109577460837e-16,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Cap with integral rail; export orientation provisional. Compare end-on-bed and side orientations in fresh low-waste slice review; keep supports off the neck mating surface."
+      "supports": "Option A flush-T: common X12 exterior face down (+90 degrees about Y); wings and collar face share the bed plane. Slicer/support review still required; no support-free claim."
     },
     {
       "name": "carrier",
@@ -26,10 +26,10 @@
       "quantity": 1,
       "bounds_mm": [
         133.5,
-        69.991,
+        48.992,
         112.5
       ],
-      "bed_z_min_mm": 2.220446049250313e-16,
+      "bed_z_min_mm": 0.0,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal."
@@ -53,61 +53,103 @@
       "file": "actuator_bracket.stl",
       "quantity": 1,
       "bounds_mm": [
-        80.0,
-        40.0,
-        35.5
+        66.0,
+        53.0,
+        19.8
       ],
-      "bed_z_min_mm": -3.3250341871938604e-16,
+      "bed_z_min_mm": 1.0000000116860974e-07,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Broad outside plate toward bed. Support first fairlead, pivot ears and return hooks; remove through open sides."
+      "supports": "Flat Y5.4 back face down (-90 degrees about X); offset mount and eased reinforcement. Bracket only, not assembled. Reference slicing does not qualify strength, support removal or loaded fit."
     },
     {
-      "name": "rocker",
-      "file": "rocker.stl",
+      "name": "plunger",
+      "file": "plunger.stl",
       "quantity": 1,
       "bounds_mm": [
-        23.997,
-        17.499,
-        39.65
+        58.0,
+        16.0,
+        12.9
       ],
       "bed_z_min_mm": 0.0,
       "watertight": true,
-      "layer_mm": 0.12,
-      "supports": "Integral shoe has no contact thread. Reslice and review support access around shoe, tie eye and pivot keyway."
+      "layer_mm": 0.2,
+      "supports": "Rounded shoe and cleat need slice review; keep supports off guide surfaces."
     },
     {
-      "name": "pivot_key",
-      "file": "pivot_key.stl",
+      "name": "pulley",
+      "file": "pulley.stl",
       "quantity": 1,
       "bounds_mm": [
-        7.4,
-        8.4,
-        25.0
+        17.999,
+        17.999,
+        4.0
       ],
-      "bed_z_min_mm": -3.9424468256615646e-16,
+      "bed_z_min_mm": -1.7857123447724538e-16,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Large head toward bed; support cross-lug. Check layer adhesion and quarter-turn retention."
+      "supports": "Axis vertical, flange on bed. Keep bore and cord groove clean; running clearance unvalidated."
+    },
+    {
+      "name": "pulley_axle",
+      "file": "pulley_axle.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        10.999,
+        10.998,
+        18.4
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "No thread. Head-down orientation provisional; cross-key slot needs slice review."
+    },
+    {
+      "name": "pulley_key",
+      "file": "pulley_key.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        7.0,
+        14.0,
+        3.8
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Flat cross-key; preserve square load faces and band seats. Orientation provisional."
     },
     {
       "name": "thumb_screw",
       "file": "thumb_screw.stl",
-      "quantity": 6,
+      "quantity": 1,
       "bounds_mm": [
-        14.0,
-        13.996,
+        13.997,
+        13.998,
         24.0
       ],
-      "bed_z_min_mm": -8.569863255383672e-16,
+      "bed_z_min_mm": -8.571568438585613e-16,
       "watertight": true,
       "layer_mm": 0.12,
       "supports": "Head on bed; no support in threads. Fit trial first; do not force."
     },
     {
+      "name": "collar_screw",
+      "file": "collar_screw.stl",
+      "quantity": 4,
+      "bounds_mm": [
+        13.997,
+        13.998,
+        36.0
+      ],
+      "bed_z_min_mm": -8.571568438585613e-16,
+      "watertight": true,
+      "layer_mm": 0.12,
+      "supports": "Head on bed; longer 8\u00d73 profile, flush tip. New grip length requires fit and loaded tests."
+    },
+    {
       "name": "thumb_nut",
       "file": "thumb_nut.stl",
-      "quantity": 6,
+      "quantity": 5,
       "bounds_mm": [
         18.0,
         15.588,
@@ -138,10 +180,10 @@
       "quantity": 1,
       "bounds_mm": [
         20.3,
-        57.992,
+        73.992,
         14.0
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": 1.0000000116860974e-07,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Both eyes translated to saddle edge without rotation; lower faces coplanar on bed, central band lane clear. Verify support-free slice."

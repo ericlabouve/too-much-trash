@@ -1,0 +1,94 @@
+{
+  "status": "retained-band wrap-cleat rounded-shoe review prototype",
+  "units": "mm",
+  "provisional_body_envelope_mm": [
+    29.5,
+    66,
+    18
+  ],
+  "nominal_demo_stroke_mm": 0.65,
+  "nominal_demo_gap_mm": 0.35,
+  "free_clearance_checked_mm": 18,
+  "shoe_face_mm": {
+    "X": 6,
+    "Z": 16,
+    "corner_radius": 1.5,
+    "axial_depth": 4
+  },
+  "root_comparison": {
+    "previous_nominal_area_mm2": 16,
+    "new_nominal_area_mm2": 24,
+    "area_increase_percent": 50,
+    "interpretation": "Geometric root-section comparison, not a strength or fatigue prediction. Curved supports replace abrupt narrowed junction."
+  },
+  "contact_plane_shift_mm": -2,
+  "phone_proxy_change": "Rigid translation only; unchanged dimensions",
+  "body_volume_reduction_percent": 72.9751585252405,
+  "checks": {
+    "body": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 5444.776905992714,
+      "removed_degenerate_or_duplicate_faces": 14,
+      "watertight": true
+    },
+    "plunger": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 2286.310355932318,
+      "removed_degenerate_or_duplicate_faces": 8,
+      "watertight": true
+    },
+    "pulley": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 1568.6235254344626,
+      "removed_degenerate_or_duplicate_faces": 0,
+      "watertight": true
+    }
+  },
+  "intersections": [],
+  "flexible_clearance": [
+    {
+      "stroke": 0,
+      "illustrative_wrap_body_overlap_mm3": 0,
+      "shared_band_body_overlap_mm3": 0,
+      "shared_band_plunger_overlap_mm3": 0,
+      "shared_band_pulley_overlap_mm3": 0
+    },
+    {
+      "stroke": 9,
+      "illustrative_wrap_body_overlap_mm3": 0,
+      "shared_band_body_overlap_mm3": 0,
+      "shared_band_plunger_overlap_mm3": 0,
+      "shared_band_pulley_overlap_mm3": 0
+    },
+    {
+      "stroke": 18,
+      "illustrative_wrap_body_overlap_mm3": 0,
+      "shared_band_body_overlap_mm3": 0,
+      "shared_band_plunger_overlap_mm3": 0,
+      "shared_band_pulley_overlap_mm3": 0
+    }
+  ],
+  "full_harness_fit_checked": false,
+  "unresolved": [
+    "Pulley axial retention without cover",
+    "Full harness mounting",
+    "Safe button travel after removal of lower stops",
+    "Actual knot and band dimensions/retention",
+    "Print orientation and strength",
+    "Wider shoe adjacent-button/case clearance"
+  ],
+  "neck_compliance": "Two twine lengths joined by a rubber band along neck; separate from return band.",
+  "revision": "shared-cleat-softened-edges",
+  "edge_radii_mm": {
+    "frame_outline": 1.2,
+    "frame_rim": 0.35,
+    "guides": 0.25,
+    "plunger_edges": 0.3,
+    "pulley_edges": 0.25,
+    "cleat_cap_rim": 0.35
+  },
+  "return_attachment": "Same capped cleat as string; band behind twine, old band yoke removed. Flexible sizes remain illustrative."
+}
