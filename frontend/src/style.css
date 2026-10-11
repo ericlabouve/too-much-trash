@@ -1,37 +1,26 @@
-:root {
-  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #17332b;
-  background: #eef2e9;
-  font-synthesis: none;
-}
-
+:root { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #17332b; background: #eef2e9; font-synthesis: none; }
 * { box-sizing: border-box; }
 body { margin: 0; }
-.shell { max-width: 1100px; margin: 0 auto; padding: 48px 32px 24px; min-height: 100vh; display: flex; flex-direction: column; }
-.eyebrow, .section-label { font-size: 12px; font-weight: 800; letter-spacing: .14em; color: #587c67; }
-.admin-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-#logout { font: inherit; padding: 10px 16px; border: 1px solid #748e79; border-radius: 6px; background: #fffdf7; color: #243b2b; cursor: pointer; }
-#logout:disabled { opacity: .55; cursor: wait; }
-#logout-feedback { color: #a1322b; margin: 12px 0 0; }
+.shell { max-width: 840px; margin: 0 auto; padding: 24px; }
+.admin-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+h1 { font-size: 1.5rem; line-height: 1.2; margin: 0; }
+h2 { font-size: 1.2rem; margin: 0 0 10px; }
+h3 { font-size: 1rem; margin: 20px 0 10px; }
+button, input { font: inherit; font-size: 16px; min-height: 44px; padding: 8px 12px; border: 1px solid #748e79; border-radius: 6px; }
+button { background: #dfe9df; color: #243b2b; cursor: pointer; }
+button:disabled { opacity: .55; cursor: wait; }
+#logout { background: #fffdf7; }
+#logout-feedback { color: #a1322b; margin: 0 0 12px; }
 #logout-feedback:empty { display: none; }
-header { padding: 90px 0 76px; max-width: 800px; }
-.mark { width: 54px; height: 54px; border-radius: 18px; display: grid; place-items: center; background: #c6dfbd; color: #1e5c3b; font-size: 34px; margin-bottom: 30px; }
-h1 { font-size: clamp(3rem, 7vw, 5.8rem); letter-spacing: -.065em; line-height: 1.02; margin: 0 0 28px; }
-header p { font-size: clamp(1.1rem, 2vw, 1.35rem); line-height: 1.55; max-width: 610px; margin: 0; color: #4e6559; }
-.panel { background: #fffdf7; border: 1px solid #dce5d7; border-radius: 24px; padding: 34px; display: flex; gap: 32px; align-items: end; justify-content: space-between; box-shadow: 0 12px 35px #345a3920; }
-h2 { font-size: 1.7rem; letter-spacing: -.035em; margin: 14px 0 12px; }
-.panel p { color: #5e7064; line-height: 1.5; max-width: 560px; margin: 0; }
-.status { white-space: nowrap; padding: 12px 16px; background: #f0f3ec; border-radius: 999px; color: #435e4d; font-size: 13px; font-weight: 700; }
-.status-dot { display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; background: #b58f64; }
-.status-dot.online { background: #4f9b5a; }
-footer { color: #758a78; font-size: 13px; margin-top: auto; padding-top: 38px; }
-.onboarding { display: block; }
-.onboarding form { display: grid; gap: 14px; margin: 24px 0; }
-.onboarding label { display: grid; gap: 6px; }
-.onboarding input, .onboarding button { font: inherit; padding: 10px 12px; border: 1px solid #748e79; border-radius: 6px; }
-.onboarding button { cursor: pointer; background: #dfe9df; color: #243b2b; }
-.onboarding button:disabled { opacity: .55; cursor: wait; }
-.onboarding li { overflow-wrap: anywhere; margin-bottom: 14px; }
-#invite-code { display: block; padding: 14px; overflow-wrap: anywhere; background: #e8eee8; }
+.panel { background: #fffdf7; border: 1px solid #dce5d7; border-radius: 12px; padding: 20px; }
+.panel p { color: #5e7064; line-height: 1.4; margin: 0 0 12px; }
+.onboarding form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+.onboarding label { display: grid; gap: 6px; font-size: 14px; }
+.onboarding input { width: 100%; min-width: 0; }
+.onboarding ul { padding-left: 20px; }
+.onboarding li { overflow-wrap: anywhere; line-height: 1.4; margin-bottom: 12px; }
+.onboarding li button { margin: 6px 0; }
+#invite-code { display: block; padding: 12px; overflow-wrap: anywhere; background: #e8eee8; margin-bottom: 10px; }
 #new-code[hidden] { display: none; }
-@media (max-width: 680px) { .shell { padding: 28px 20px; } header { padding: 65px 0; } .panel { padding: 24px; display: block; } .status { display: inline-block; margin-top: 24px; } }
+@media (max-width: 480px) { .shell { padding: 16px 12px; } .panel { padding: 16px; } }
+@media (max-width: 340px) { .onboarding form { grid-template-columns: minmax(0, 1fr); } }

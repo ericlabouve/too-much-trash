@@ -7,26 +7,10 @@ if (!root) throw new Error("App root missing");
 root.innerHTML = `
   <main class="shell">
     <div class="admin-toolbar">
-      <div class="eyebrow">TOO MUCH TRASH / FIELD STUDIO</div>
+      <h1>Admin dashboard</h1>
       <button id="logout" type="button">Logout</button>
     </div>
     <p id="logout-feedback" role="alert"></p>
-    <header>
-      <div class="mark" aria-hidden="true">↗</div>
-      <h1>Teach robots to pick up what we leave behind.</h1>
-      <p>Collect real grasp attempts, learn from each outcome, and build toward cleaner shared spaces.</p>
-    </header>
-    <section class="panel" aria-labelledby="workspace-title">
-      <div>
-        <span class="section-label">WORKSPACE</span>
-        <h2 id="workspace-title">A place for every pickup attempt</h2>
-        <p>Capture, review, and learning tools will grow here as the first hardware prototypes take shape.</p>
-      </div>
-      <div class="status" role="status" aria-live="polite">
-        <span class="status-dot"></span>
-        <span id="api-status">Checking service…</span>
-      </div>
-    </section>
     <section class="panel onboarding" aria-labelledby="invites-title">
       <h2 id="invites-title">Invitations & installations</h2>
       <p>Create a single-use code and share it privately. Credentials are unique per installation.</p>
@@ -48,27 +32,10 @@ root.innerHTML = `
       <h3>Recent invitations</h3><ul id="invites-list"></ul>
       <h3>Recent installations</h3><ul id="installations-list"></ul>
       <p>Revoke an unused invite to stop enrollment. Revoke an installation to stop its access.
-      Passkey enrollment/recovery is planned; this development portal still uses the temporary admin gate.</p>
+      </p>
     </section>
-    <footer>Observe the approach. Mark the grasp. Learn from the outcome.</footer>
   </main>
 `;
-
-const status = document.querySelector<HTMLSpanElement>("#api-status");
-const statusDot = document.querySelector<HTMLSpanElement>(".status-dot");
-
-async function checkService(): Promise<void> {
-  try {
-    const response = await fetch("/api/v1/health", { cache: "no-store" });
-    if (!response.ok) throw new Error("Service unavailable");
-    if (status) status.textContent = "Service connected";
-    statusDot?.classList.add("online");
-  } catch {
-    if (status) status.textContent = "Service offline";
-  }
-}
-
-void checkService();
 
 type Invite = { id: string; label: string; expires_at: string; redeemed_at: string | null; revoked_at: string | null };
 type Installation = { id: string; installation_name: string; revoked_at: string | null; used_bytes: number; quota_bytes: number; used_uploads: number; quota_uploads: number };

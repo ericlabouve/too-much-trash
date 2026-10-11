@@ -40,6 +40,9 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   to `/unlock` only after204, and reports failure without claiming success.
   This clears that browser's cookie; it does not revoke copied stateless cookies
   or implement per-admin offboarding. Eric deferred authn/authz redesign.
+- Keep the admin dashboard compact: only "Admin dashboard", Logout, and the
+  "Invitations & installations" card with its controls. No promotional hero,
+  workspace, footer or frontend health polling. Public website is separate.
 - Unlock token visibility stays hidden by default, uses an accessible eye toggle,
   preserves autofilled text and re-masks on submit. Test with dummy values only;
   never reveal real secrets in screenshots/logs. Dev and pilot tokens differ;
