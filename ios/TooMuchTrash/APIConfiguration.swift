@@ -3,26 +3,43 @@ import Foundation
 struct APIConfiguration: Equatable {
     let publicOrigin: URL
     let privateAdminOrigin: URL?
+    let simulatorLocal: Bool
 
-    init(publicURL: String, privateAdminURL: String = "") throws {
-        publicOrigin = try Self.origin(publicURL)
+    static var supportsSimulatorLocal: Bool {
+        #if DEBUG && targetEnvironment(simulator)
+        return true
+        #else
+        return false
+        #endif
+    }
+
+    init(publicURL: String, privateAdminURL: String = "", simulatorLocal: Bool = false) throws {
+        guard !simulatorLocal || Self.supportsSimulatorLocal else { throw ClientError.configuration }
+        self.simulatorLocal = simulatorLocal
+        publicOrigin = try Self.origin(publicURL, simulatorLocal: simulatorLocal)
         privateAdminOrigin = privateAdminURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            ? nil : try Self.origin(privateAdminURL)
+            ? nil : try Self.origin(privateAdminURL, simulatorLocal: simulatorLocal)
         guard privateAdminOrigin != publicOrigin else { throw ClientError.configuration }
     }
 
-    private static func origin(_ string: String) throws -> URL {
+    private static func origin(_ string: String, simulatorLocal: Bool) throws -> URL {
         guard var parts = URLComponents(string: string.trimmingCharacters(in: .whitespacesAndNewlines)),
-              parts.scheme?.lowercased() == "https", let host = parts.host, !host.isEmpty,
+              let host = parts.host, !host.isEmpty,
               parts.user == nil, parts.password == nil, parts.query == nil, parts.fragment == nil,
               parts.path.isEmpty || parts.path == "/",
               parts.port == nil || (1...65535).contains(parts.port!) else {
             throw ClientError.configuration
         }
-        parts.scheme = "https"
+        let scheme = parts.scheme?.lowercased()
+        if simulatorLocal {
+            guard scheme == "http", host.lowercased() == "localhost" else { throw ClientError.configuration }
+        } else {
+            guard scheme == "https" else { throw ClientError.configuration }
+        }
+        parts.scheme = scheme
         parts.host = host.lowercased()
         parts.path = ""
-        if parts.port == 443 { parts.port = nil }
+        if parts.port == (simulatorLocal ? 80 : 443) { parts.port = nil }
         guard let url = parts.url else { throw ClientError.configuration }
         return url
     }
@@ -32,13 +49,36 @@ struct APIConfiguration: Equatable {
     static func saved(defaults: UserDefaults = .standard) -> APIConfiguration? {
         guard let publicURL = defaults.string(forKey: "collectorPublicOrigin") else { return nil }
         return try? APIConfiguration(publicURL: publicURL,
-                                     privateAdminURL: defaults.string(forKey: "privateAdminOrigin") ?? "")
+                                     privateAdminURL: defaults.string(forKey: "privateAdminOrigin") ?? "",
+                                     simulatorLocal: defaults.bool(forKey: "simulatorLocalBackend"))
     }
 
     func save(defaults: UserDefaults = .standard) {
         // Only non-secret origins go into preferences. Tokens and invites never do.
         defaults.set(publicOrigin.absoluteString, forKey: "collectorPublicOrigin")
         defaults.set(privateAdminOrigin?.absoluteString, forKey: "privateAdminOrigin")
+        defaults.set(simulatorLocal, forKey: "simulatorLocalBackend")
+        // Retain the designated HTTPS network probe when collector mode changes.
+        rememberAdminNetwork(defaults: defaults)
+    }
+
+    func rememberAdminNetwork(defaults: UserDefaults = .standard) {
+        if !simulatorLocal, let privateAdminOrigin {
+            defaults.set(publicOrigin.absoluteString, forKey: "adminNetworkCollectorOrigin")
+            defaults.set(privateAdminOrigin.absoluteString, forKey: "adminNetworkPrivateOrigin")
+        }
+    }
+
+    static func savedAdminNetwork(defaults: UserDefaults = .standard) -> APIConfiguration? {
+        guard let collector = defaults.string(forKey: "adminNetworkCollectorOrigin"),
+              let admin = defaults.string(forKey: "adminNetworkPrivateOrigin") else { return nil }
+        return try? APIConfiguration(publicURL: collector, privateAdminURL: admin)
+    }
+
+    static var localCollector: APIConfiguration? {
+        guard supportsSimulatorLocal else { return nil }
+        return try? APIConfiguration(publicURL: "http://localhost:18082",
+                                     privateAdminURL: "http://localhost:18081", simulatorLocal: true)
     }
 }
 

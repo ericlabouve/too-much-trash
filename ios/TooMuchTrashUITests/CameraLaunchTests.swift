@@ -1,29 +1,50 @@
 import XCTest
 
 final class CameraLaunchTests: XCTestCase {
-    func testNoCredentialOpensHomeAndSurvivesRelaunch() {
+    func testConnectedAdminLocalToggleKeepsMenuAndBothAddresses() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-collectorPublicOrigin", "", "-privateAdminOrigin", ""]
+        app.launch()
+        guard app.buttons["serverAddresses"].waitForExistence(timeout: 10) else {
+            throw XCTSkip("Requires the configured private Tailscale admin endpoint to be reachable.")
+        }
+        app.buttons["serverAddresses"].tap()
+        let toggle = app.switches["simulatorLocalBackend"]
+        if toggle.value as? String == "1" { toggle.tap() }
+        toggle.tap()
+        let collector = app.descendants(matching: .any).matching(identifier: "publicServerURL").firstMatch
+        let admin = app.descendants(matching: .any).matching(identifier: "privateAdminURL").firstMatch
+        XCTAssertEqual(collector.value as? String, "http://localhost:18082")
+        XCTAssertEqual(admin.value as? String, "http://localhost:18081")
+        XCTAssertTrue(app.navigationBars["Server addresses"].exists)
+        app.buttons["Cancel"].tap()
+    }
+
+    func testDisconnectedUserViewHidesAdminMenusAndSurvivesRelaunch() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-collectorPublicOrigin", "", "-privateAdminOrigin", "",
+                               "-simulatorLocalBackend", "NO", "-adminNetworkCollectorOrigin", "",
+                               "-adminNetworkPrivateOrigin", ""]
         app.launch()
         XCTAssertTrue(app.buttons["continueButton"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["registerButton"].exists)
         XCTAssertFalse(app.buttons["adminLogin"].exists)
+        XCTAssertFalse(app.buttons["serverAddresses"].exists)
         XCTAssertFalse(app.buttons["recordButton"].exists)
+        XCTAssertTrue(app.staticTexts["collectorViewStatus"].exists)
         app.terminate()
         app.launch()
         XCTAssertTrue(app.buttons["continueButton"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["serverAddresses"].exists)
     }
 
-    func testUnsafeServerAddressIsRejected() {
+    func testLocalAdminDoesNotExposeNetworkAdminMenus() {
         let app = XCUIApplication()
-        app.launchArguments = ["-collectorPublicOrigin", "", "-privateAdminOrigin", ""]
+        app.launchArguments = ["-collectorPublicOrigin", "http://localhost:18082",
+                               "-privateAdminOrigin", "http://localhost:18081", "-simulatorLocalBackend", "YES",
+                               "-adminNetworkCollectorOrigin", "", "-adminNetworkPrivateOrigin", ""]
         app.launch()
-        app.buttons["serverAddresses"].tap()
-        let input = app.textFields["publicServerURL"]
-        XCTAssertTrue(input.waitForExistence(timeout: 5))
-        input.tap()
-        input.typeText("http://example.test")
-        app.buttons["Save addresses"].tap()
-        XCTAssertTrue(app.staticTexts["configurationError"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["registerButton"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["adminLogin"].exists)
+        XCTAssertFalse(app.buttons["serverAddresses"].exists)
     }
 }

@@ -41,6 +41,39 @@ final class APIContractTests: XCTestCase {
                                                              privateAdminURL: privateURL), transport: transport)
     }
 
+    func testSimulatorLocalModeIsExplicitAndLocalhostOnly() throws {
+        XCTAssertThrowsError(try APIConfiguration(publicURL: "http://localhost:8082"))
+        #if DEBUG && targetEnvironment(simulator)
+        XCTAssertTrue(APIConfiguration.supportsSimulatorLocal)
+        let local = try APIConfiguration(publicURL: "http://LOCALHOST:8082/",
+                                         privateAdminURL: "http://localhost:8081", simulatorLocal: true)
+        XCTAssertEqual(local.publicOrigin.absoluteString, "http://localhost:8082")
+        XCTAssertTrue(local.simulatorLocal)
+        for origin in ["http://192.168.1.2:8082", "http://example.test", "http://localhost.example.test",
+                       "http://user:secret@localhost:8082", "http://localhost:8082/api",
+                       "http://localhost:8082?secret=x", "https://localhost:8082"] {
+            XCTAssertThrowsError(try APIConfiguration(publicURL: origin, simulatorLocal: true))
+        }
+        XCTAssertThrowsError(try APIConfiguration(publicURL: "http://localhost:8082",
+                                                  privateAdminURL: "http://example.test", simulatorLocal: true))
+        #else
+        XCTAssertFalse(APIConfiguration.supportsSimulatorLocal)
+        XCTAssertThrowsError(try APIConfiguration(publicURL: "http://localhost:8082", simulatorLocal: true))
+        #endif
+    }
+
+    func testSimulatorATSExceptionIsNarrowlyScoped() throws {
+        let ats = Bundle.main.object(forInfoDictionaryKey: "NSAppTransportSecurity") as? [String: Any]
+        #if DEBUG && targetEnvironment(simulator)
+        XCTAssertEqual(ats?["NSAllowsLocalNetworking"] as? Bool, true)
+        let domains = try XCTUnwrap(ats?["NSExceptionDomains"] as? [String: Any])
+        XCTAssertEqual(Set(domains.keys), ["localhost"])
+        XCTAssertNil(ats?["NSAllowsArbitraryLoads"])
+        #else
+        XCTAssertNil(ats)
+        #endif
+    }
+
     func testAdminRequiresExactIdentityAndJSONAndDoesNotUsePublicHealth() async throws {
         let transport = ScriptedTransport()
         transport.replies = [

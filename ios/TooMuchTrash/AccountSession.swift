@@ -11,6 +11,7 @@ final class AccountSession: ObservableObject {
     @Published private(set) var busy = false
     @Published private(set) var retryNotBefore: Date?
     @Published private(set) var configuration: APIConfiguration?
+    private(set) var adminNetworkConfiguration: APIConfiguration?
     @Published private(set) var uploadMessage = "Videos stay on this iPhone until you upload them."
     let queue: CaptureQueue
     private let vault: CredentialVault
@@ -19,21 +20,30 @@ final class AccountSession: ObservableObject {
     private var credential: InstallationCredential?
     private var probeGeneration = UUID()
     private var foreground = true
+    private let automaticallyUseLocalCollector: Bool
 
     init(configuration: APIConfiguration? = APIConfiguration.saved(),
          vault: CredentialVault? = nil, queue: CaptureQueue? = nil,
+         automaticallyUseLocalCollector: Bool = false,
+         adminNetworkConfiguration: APIConfiguration? = nil,
          apiFactory: @escaping @MainActor (APIConfiguration) -> CollectorAPI = { LiveCollectorAPI(configuration: $0) }) {
-        self.configuration = configuration
+        self.automaticallyUseLocalCollector = automaticallyUseLocalCollector
+        self.adminNetworkConfiguration = adminNetworkConfiguration ??
+            (configuration?.simulatorLocal == false ? configuration : nil) ??
+            (automaticallyUseLocalCollector ? APIConfiguration.savedAdminNetwork() : nil)
+        if automaticallyUseLocalCollector { self.adminNetworkConfiguration?.rememberAdminNetwork() }
+        self.configuration = configuration ?? (automaticallyUseLocalCollector ? APIConfiguration.localCollector : nil)
         self.vault = vault ?? KeychainCredentialVault()
         self.queue = queue ?? CaptureQueue()
         self.apiFactory = apiFactory
-        api = configuration.map(apiFactory)
-        if configuration == nil { message = "Set the collector server address to get started." }
+        api = self.configuration.map(apiFactory)
+        if self.configuration == nil { message = "Collector server is not configured. Contact your administrator." }
     }
 
     func configure(_ value: APIConfiguration) async {
         guard !busy else { return }
         configuration = value
+        if !value.simulatorLocal, value.privateAdminOrigin != nil { adminNetworkConfiguration = value }
         value.save()
         api = apiFactory(value)
         credential = nil
@@ -217,17 +227,35 @@ final class AccountSession: ObservableObject {
     func resume() { foreground = true }
 
     func probeAdmin() async {
-        hideAdmin()
+        probeGeneration = UUID()
         let generation = probeGeneration
-        guard foreground, let api, configuration?.privateAdminOrigin != nil else { return }
-        let reachable = await api.adminReachable()
+        guard foreground else { return }
+        let network = adminNetworkConfiguration
+        let reachable: Bool
+        if let network, !network.simulatorLocal, network.privateAdminOrigin?.scheme == "https" {
+            reachable = await apiFactory(network).adminReachable()
+        } else { reachable = false }
         guard foreground, !Task.isCancelled, probeGeneration == generation else { return }
         adminVisible = reachable
+        if !reachable, automaticallyUseLocalCollector { await useLocalCollector() }
+    }
+
+    func useLocalCollector() async {
+        hideAdmin()
+        guard !busy, let local = APIConfiguration.localCollector, configuration != local else { return }
+        // Never switch origins while an enrollment/upload is in flight.
+        await configure(local)
     }
 
     func verifiedAdminURL() async -> URL? {
         await probeAdmin()
-        return adminVisible ? configuration?.privateAdminOrigin : nil
+        guard adminVisible else { return nil }
+        if configuration?.simulatorLocal == true {
+            guard let api, let origin = configuration?.privateAdminOrigin else { return nil }
+            let reachable = await api.adminReachable()
+            return foreground && adminVisible && reachable ? origin : nil
+        }
+        return adminNetworkConfiguration?.privateAdminOrigin
     }
 
     private func handle(_ error: Error) {

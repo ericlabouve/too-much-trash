@@ -102,7 +102,8 @@ final class OnboardingTests: XCTestCase {
     }
 
     func testConfiguringFirstServerUpdatesHomeInstructions() async throws {
-        let keys = ["collectorPublicOrigin", "privateAdminOrigin"]
+        let keys = ["collectorPublicOrigin", "privateAdminOrigin", "simulatorLocalBackend",
+                    "adminNetworkCollectorOrigin", "adminNetworkPrivateOrigin"]
         let previous = keys.map { UserDefaults.standard.object(forKey: $0) }
         defer {
             for (key, value) in zip(keys, previous) {
@@ -113,7 +114,7 @@ final class OnboardingTests: XCTestCase {
         let api = StubAPI(), vault = MemoryVault()
         let session = AccountSession(configuration: nil, vault: vault,
                                      queue: CaptureQueue(directory: queueDirectory()), apiFactory: { _ in api })
-        XCTAssertEqual(session.message, "Set the collector server address to get started.")
+        XCTAssertEqual(session.message, "Collector server is not configured. Contact your administrator.")
         await session.configure(try configuration())
         XCTAssertEqual(session.message, "Register with an invite to begin collecting.")
         XCTAssertEqual(session.phase, .home)
@@ -273,6 +274,77 @@ final class OnboardingTests: XCTestCase {
         api.reachable = false
         let destination = await session.verifiedAdminURL()
         XCTAssertNil(destination)
+    }
+
+    func testLocalAdminReachabilityCannotGrantNetworkAdminView() async throws {
+        guard let local = APIConfiguration.localCollector else { throw XCTSkip("Debug Simulator only") }
+        let api = StubAPI(), vault = MemoryVault()
+        api.reachable = true
+        let session = AccountSession(configuration: local,
+                                     vault: vault, queue: CaptureQueue(directory: queueDirectory()),
+                                     apiFactory: { _ in api })
+        await session.probeAdmin()
+        XCTAssertFalse(session.adminVisible)
+        let destination = await session.verifiedAdminURL()
+        XCTAssertNil(destination)
+    }
+
+    func testNetworkLossFallsBackWithoutReassigningCredentialsAndRecoversMenus() async throws {
+        guard APIConfiguration.supportsSimulatorLocal else { throw XCTSkip("Debug Simulator only") }
+        let keys = ["collectorPublicOrigin", "privateAdminOrigin", "simulatorLocalBackend",
+                    "adminNetworkCollectorOrigin", "adminNetworkPrivateOrigin"]
+        let previous = keys.map { UserDefaults.standard.object(forKey: $0) }
+        defer {
+            for (key, value) in zip(keys, previous) {
+                if let value { UserDefaults.standard.set(value, forKey: key) }
+                else { UserDefaults.standard.removeObject(forKey: key) }
+            }
+        }
+        let api = StubAPI(), vault = MemoryVault()
+        try seed(api, vault)
+        api.reachable = true
+        let remote = try configuration()
+        let session = AccountSession(configuration: remote, vault: vault,
+                                     queue: CaptureQueue(directory: queueDirectory()),
+                                     automaticallyUseLocalCollector: true, apiFactory: { _ in api })
+        await session.bootstrap()
+        XCTAssertTrue(session.adminVisible)
+        api.reachable = false
+        await session.probeAdmin()
+        XCTAssertFalse(session.adminVisible)
+        XCTAssertEqual(session.configuration, APIConfiguration.localCollector)
+        XCTAssertEqual(session.phase, .home)
+        XCTAssertNil(session.captureOwner)
+        XCTAssertNotNil(vault.values[origin])
+        XCTAssertEqual(session.adminNetworkConfiguration, remote)
+        XCTAssertEqual(APIConfiguration.savedAdminNetwork(), remote)
+        api.reachable = true
+        await session.probeAdmin()
+        XCTAssertTrue(session.adminVisible)
+        let destination = await session.verifiedAdminURL()
+        XCTAssertEqual(destination, APIConfiguration.localCollector?.privateAdminOrigin)
+        XCTAssertEqual(session.configuration, APIConfiguration.localCollector)
+    }
+
+    func testLocalAdminHandoffRequiresNetworkAndLocalIdentity() async throws {
+        guard let local = APIConfiguration.localCollector else { throw XCTSkip("Debug Simulator only") }
+        let networkAPI = StubAPI(), localAPI = StubAPI()
+        networkAPI.reachable = true
+        let session = AccountSession(configuration: local, vault: MemoryVault(),
+                                     queue: CaptureQueue(directory: queueDirectory()),
+                                     adminNetworkConfiguration: try configuration(),
+                                     apiFactory: { $0.simulatorLocal ? localAPI : networkAPI })
+        await session.probeAdmin()
+        XCTAssertTrue(session.adminVisible)
+        let unavailable = await session.verifiedAdminURL()
+        XCTAssertNil(unavailable)
+        localAPI.reachable = true
+        let destination = await session.verifiedAdminURL()
+        XCTAssertEqual(destination, local.privateAdminOrigin)
+        XCTAssertTrue(session.adminVisible)
+        networkAPI.reachable = false
+        let denied = await session.verifiedAdminURL()
+        XCTAssertNil(denied)
     }
 
     func testOfflineUploadRetainsQueueFileAndCredentials() async throws {
