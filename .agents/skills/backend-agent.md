@@ -43,6 +43,9 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 - Keep the admin dashboard compact: only "Admin dashboard", Logout, and the
   "Invitations & installations" card with its controls. No promotional hero,
   workspace, footer or frontend health polling. Public website is separate.
+- Hide revoked invitations/installations by default with separate counted
+  Show revoked toggles. Preserve visibility choices during refresh/revoke;
+  expired/redeemed without revoked_at stay visible. Never delete history.
 - Show a live storage-only video estimate beside quota, assuming decimal 5 MB
   per video: floor(quotaMiB * 1048576 / 5000000). Upload count remains its own
   limit; do not imply storage estimate grants more uploads.

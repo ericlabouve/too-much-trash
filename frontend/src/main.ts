@@ -32,8 +32,14 @@ root.innerHTML = `
       </div>
       <p id="invite-feedback" role="status" aria-live="polite"></p>
       <button id="refresh-access" type="button">Refresh access lists</button>
-      <h3>Recent invitations</h3><ul id="invites-list"></ul>
-      <h3>Recent installations</h3><ul id="installations-list"></ul>
+      <div class="access-heading"><h3>Recent invitations</h3>
+        <button id="toggle-revoked-invites" type="button" aria-pressed="false" aria-controls="invites-list invites-empty">Show revoked (0)</button>
+      </div>
+      <ul id="invites-list"></ul><p id="invites-empty" role="status" hidden></p>
+      <div class="access-heading"><h3>Recent installations</h3>
+        <button id="toggle-revoked-installations" type="button" aria-pressed="false" aria-controls="installations-list installations-empty">Show revoked (0)</button>
+      </div>
+      <ul id="installations-list"></ul><p id="installations-empty" role="status" hidden></p>
       <p>Revoke an unused invite to stop enrollment. Revoke an installation to stop its access.
       </p>
     </section>
@@ -104,26 +110,56 @@ function revokeButton(path: string, refresh: () => Promise<void>): HTMLButtonEle
   return button;
 }
 
-async function refreshLists(): Promise<void> {
-  const [invites, installations] = await Promise.all([
-    adminApi<Invite[]>("invites"), adminApi<Installation[]>("installations"),
-  ]);
+let invites: Invite[] = [];
+let installations: Installation[] = [];
+let showRevokedInvites = false;
+let showRevokedInstallations = false;
+const inviteToggle = document.querySelector<HTMLButtonElement>("#toggle-revoked-invites")!;
+const installationToggle = document.querySelector<HTMLButtonElement>("#toggle-revoked-installations")!;
+
+function renderLists(): void {
   const inviteList = document.querySelector<HTMLUListElement>("#invites-list")!;
   const installationList = document.querySelector<HTMLUListElement>("#installations-list")!;
+  const visibleInvites = invites.filter(invite => showRevokedInvites || !invite.revoked_at);
+  const visibleInstallations = installations.filter(installation => showRevokedInstallations || !installation.revoked_at);
+  for (const [button, showing, count] of [
+    [inviteToggle, showRevokedInvites, invites.filter(invite => invite.revoked_at).length],
+    [installationToggle, showRevokedInstallations, installations.filter(installation => installation.revoked_at).length],
+  ] as const) {
+    button.textContent = `${showing ? "Hide" : "Show"} revoked (${count})`;
+    button.setAttribute("aria-pressed", String(showing));
+    button.disabled = count === 0;
+  }
+  const inviteEmpty = document.querySelector<HTMLParagraphElement>("#invites-empty")!;
+  const installationEmpty = document.querySelector<HTMLParagraphElement>("#installations-empty")!;
+  inviteEmpty.hidden = visibleInvites.length > 0;
+  inviteEmpty.textContent = invites.length ? "No non-revoked invitations. Use Show revoked to view history." : "No invitations yet.";
+  installationEmpty.hidden = visibleInstallations.length > 0;
+  installationEmpty.textContent = installations.length ? "No non-revoked installations. Use Show revoked to view history." : "No installations yet.";
   inviteList.replaceChildren(); installationList.replaceChildren();
-  for (const invite of invites) {
+  for (const invite of visibleInvites) {
     const item = document.createElement("li");
     const state = invite.revoked_at ? "Revoked" : invite.redeemed_at ? "Redeemed" : Date.parse(invite.expires_at) <= Date.now() ? "Expired" : "Available";
     item.textContent = `${invite.label} · ${state} · expires ${new Date(invite.expires_at).toLocaleString()} `;
     if (state === "Available") item.append(revokeButton(`invites/${invite.id}/revoke`, refreshLists));
     inviteList.append(item);
   }
-  for (const installation of installations) {
+  for (const installation of visibleInstallations) {
     const item = document.createElement("li");
     item.textContent = `${installation.installation_name} · ${installation.id} · ${installation.revoked_at ? "Revoked" : "Active"} · ${installation.used_uploads}/${installation.quota_uploads} uploads · ${(installation.used_bytes / 1048576).toFixed(1)}/${(installation.quota_bytes / 1048576).toFixed(1)} MiB `;
     if (!installation.revoked_at) item.append(revokeButton(`installations/${installation.id}/revoke`, refreshLists));
     installationList.append(item);
   }
+}
+
+inviteToggle.addEventListener("click", () => { showRevokedInvites = !showRevokedInvites; renderLists(); });
+installationToggle.addEventListener("click", () => { showRevokedInstallations = !showRevokedInstallations; renderLists(); });
+
+async function refreshLists(): Promise<void> {
+  [invites, installations] = await Promise.all([
+    adminApi<Invite[]>("invites"), adminApi<Installation[]>("installations"),
+  ]);
+  renderLists();
 }
 
 form.addEventListener("submit", async (event) => {
