@@ -40,6 +40,10 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   to `/unlock` only after204, and reports failure without claiming success.
   This clears that browser's cookie; it does not revoke copied stateless cookies
   or implement per-admin offboarding. Eric deferred authn/authz redesign.
+- Unlock token visibility stays hidden by default, uses an accessible eye toggle,
+  preserves autofilled text and re-masks on submit. Test with dummy values only;
+  never reveal real secrets in screenshots/logs. Dev and pilot tokens differ;
+  wrong saved token or trailing newline can cause invalid-token responses.
 - Private pilot uses existing macOS Tailscale Serve: HTTPS 10000 to localhost8082
   collector, HTTPS8443 to localhost8081 admin. MagicDNS suffix is not a service
   hostname. Funnel is off; public collector exposure requires explicit approval.
