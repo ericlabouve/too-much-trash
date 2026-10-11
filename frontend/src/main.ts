@@ -13,7 +13,7 @@ root.innerHTML = `
     <p id="logout-feedback" role="alert"></p>
     <section class="panel onboarding" aria-labelledby="invites-title">
       <h2 id="invites-title">Invitations & installations</h2>
-      <p>Create a single-use code and share it privately. Credentials are unique per installation.</p>
+      <p>Create two single-use invite words and share them privately. Case and extra spaces do not matter. Existing long codes still work.</p>
       <form id="invite-form">
         <label>Tester label <input name="label" maxlength="80" required></label>
         <label>Expires in hours <input name="hours" type="number" min="1" max="168" value="24" required></label>
@@ -22,13 +22,13 @@ root.innerHTML = `
           <small id="video-estimate" aria-live="polite"></small>
         </label>
         <label>Upload count <input name="uploads" type="number" min="1" max="10000" value="100" required></label>
-        <button type="submit">Create invite</button>
+        <button type="submit">Create invite words</button>
       </form>
       <div id="new-code" hidden>
-        <p>Copy now: this code is shown only once. Closing or reloading this page hides it.</p>
+        <p>Copy both words now: they are shown only once. Closing or reloading hides them.</p>
         <code id="invite-code"></code>
-        <button id="copy-code" type="button">Copy code</button>
-        <button id="dismiss-code" type="button">Hide code</button>
+        <button id="copy-code" type="button">Copy words</button>
+        <button id="dismiss-code" type="button">Hide words</button>
       </div>
       <p id="invite-feedback" role="status" aria-live="polite"></p>
       <button id="refresh-access" type="button">Refresh access lists</button>
@@ -94,6 +94,7 @@ async function adminApi<T>(path: string, body?: unknown): Promise<T> {
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (response.status === 401) throw new Error("Admin session expired. Open /unlock to sign in again.");
+  if (response.status === 503) throw new Error("Could not allocate invite words. Please try again later.");
   if (!response.ok) throw new Error(`Request failed (${response.status}). Check the form or retry.`);
   return response.status === 204 ? undefined as T : await response.json() as T;
 }
@@ -174,7 +175,7 @@ form.addEventListener("submit", async (event) => {
       quota_bytes: Number(data.get("mib")) * 1048576, quota_uploads: Number(data.get("uploads")),
     });
     codeElement.textContent = invite.invite_code; codePanel.hidden = false;
-    feedback.textContent = "Invite created. Share privately with the intended tester.";
+    feedback.textContent = "Invite words created. Share both privately with the intended tester.";
     await refreshLists();
   } catch (error) { feedback.textContent = `${String(error)} If the response was lost, an invite may have been created; check the list before retrying.`; }
   finally { button.disabled = false; }

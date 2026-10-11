@@ -31,8 +31,24 @@ appear in URLs, analytics, logs, UserDefaults, or committed configuration.
 | `GET /api/v1/media/{id}/{original,processed}` | Bearer access token | Owner-only asset; processed asset available after processing |
 
 Invite redemption is transactional and single-use, including concurrent
-requests. Codes and tokens contain at least 256 bits of randomness; only hashes
-are stored. Access expires after 15 minutes. Refresh credentials have a fixed
+requests. New invites use two independently random words from the pinned official
+BIP-39 English list (2048 words, 22 bits); repeats and word order matter. These
+are not wallet mnemonics and contain no checksum. Eric explicitly accepted this
+small-pilot guessing risk on October 11, 2026. More outstanding invites increase
+the probability that a guess matches any valid invite; revocation cannot prevent
+first redemption by a guesser. Reassess before public rollout. Global enrollment
+throttling remains 60 attempts/minute, not per-device protection.
+
+Only hashes are stored. Word pairs accept case-insensitive ASCII words and
+surrounding/repeated whitespace (including tabs/newlines), normalized to lowercase
+`word word`. No typo, punctuation, prefix, hyphen or word-order correction is
+performed. Legacy opaque invites retain exact case with outer whitespace trimmed.
+Collisions against all historic invite hashes are retried at most16 times using
+the DB unique constraint; no historic pair is reused. Exhaustion returns503
+`invite_generation_unavailable`, not an invite.
+
+Access/refresh credentials still contain at least256 random bits, and admin tokens
+remain unchanged. Access expires after 15 minutes. Refresh credentials have a fixed
 30-day lifetime and are reusable rather than rotated on each refresh. Revoking
 an installation disables both immediately. A stolen refresh credential remains
 usable until expiry or revocation; this scheme does not attest app identity.
@@ -84,6 +100,7 @@ administrators' sessions. Authn/authz redesign remains explicitly deferred.
 * `POST /api/v1/admin/invites`: label, `expires_in_hours` (1–168, default 24),
   `quota_bytes` (default 1 GiB), and `quota_uploads` (default 100). Returns the
   invite code **once**. Losing it requires another invite.
+  New codes are the two-word format above; keep short expiry and low quotas.
 * `GET /api/v1/admin/invites` and `/installations`: most recent 200 records;
   never return credential hashes or secrets.
 * `POST /api/v1/admin/invites/{id}/revoke`: prevents future redemption. Does
@@ -265,3 +282,14 @@ unlock page was verified separately. Full native registration/upload testing
 requires approval for a fresh bounded dev invite. Local mode is for Debug
 Simulator builds only, never physical iPhone or Release; normal enrollment and
 credential/ownership checks are unchanged.
+
+### Two-word pilot invites — October 11, 2026
+
+New invitations use the two-word contract above; no migration or token rotation
+is required. The vendored list includes its pinned source/checksum and MIT notice
+under `backend/api/app/data/`. Seventeen disposable-Postgres migration/API tests
+passed, including independent word draws/repeats, normalization/invalid input,
+legacy opaque compatibility, bounded historical/concurrent collisions, atomic
+normalized redemption, token strength, expiry, revocation, quotas and throttling.
+No invitations were generated in the actual local-dev or pilot databases during
+this verification. Frontend build and dashboard/unlock/logout regressions passed.

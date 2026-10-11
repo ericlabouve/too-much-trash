@@ -36,6 +36,13 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   creates short-lived single-use codes; enrollment issues installation-bound
   credentials; refresh, revocation, ownership checks and quotas protect media.
   A shared admin token gate is temporary; passkey enrollment/login remains work.
+- Eric accepted two-word invites (22 bits) for the pilot on October11. Draw two
+  independent uniform words with replacement from pinned official BIP39 English;
+  repeats valid. Normalize only valid ASCII word pairs for case/whitespace; legacy
+  opaque codes remain exact-case/outer-trim. Keep hashed storage, atomic one-time
+  redemption, quotas, expiry, throttles and strong installation/admin secrets.
+  Bound collision retries across all historical hashes; never reuse a pair.
+  This risk acceptance is not permission for public exposure or minting live codes.
 - Admin dashboard Logout uses existing DELETE `/api/v1/admin/session`, returns
   to `/unlock` only after204, and reports failure without claiming success.
   This clears that browser's cookie; it does not revoke copied stateless cookies

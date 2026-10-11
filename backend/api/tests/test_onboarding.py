@@ -17,6 +17,7 @@ from app import admin_auth
 from app.db import database
 from app.main import app
 from app.onboarding import digest
+from app.invite_words import WORDS, generate_invite_code, normalize_invite_code
 
 
 class Body(io.BytesIO):
@@ -123,11 +124,66 @@ class OnboardingTests(unittest.TestCase):
             self.assertEqual(connection.execute("SELECT token_hash FROM access_tokens").fetchone()["token_hash"], digest(result["access_token"]))
         self.assertNotIn("invite_code", self.client.get("/api/v1/admin/invites").text)
         self.assertNotIn("refresh_hash", self.client.get("/api/v1/admin/installations").text)
+        self.assertEqual(len(invite["invite_code"].split()), 2)
+        self.assertTrue(all(word in WORDS for word in invite["invite_code"].split()))
+        self.assertGreaterEqual(len(result["refresh_token"]), 43)
+        self.assertGreaterEqual(len(result["access_token"]), 43)
+
+    def test_word_list_and_independent_generation(self):
+        self.assertEqual(len(WORDS), 2048)
+        self.assertEqual(len(set(WORDS)), 2048)
+        with patch("app.invite_words.secrets.choice", side_effect=["abandon", "abandon"]) as choice:
+            self.assertEqual(generate_invite_code(), "abandon abandon")
+            self.assertEqual(choice.call_count, 2)
+            self.assertTrue(all(call.args == (WORDS,) for call in choice.call_args_list))
+
+    def test_pair_normalization_and_invalid_input(self):
+        with patch("app.onboarding.generate_invite_code", return_value="abandon ability"):
+            self.invite()
+        for invalid in ("abandon", "abandon ability able", "abandon-ability", "abandon, ability", "abandn ability", "ability abandon", "abandon unknownword", "ａｂａｎｄｏｎ ability", "   "):
+            self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": invalid}).json()["detail"]["code"], "invite_invalid")
+        value = " \tABANDON\n\r  Ability\u00a0 "
+        self.assertEqual(normalize_invite_code(value), "abandon ability")
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": value}).status_code, 201)
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "abandon ability"}).status_code, 400)
+
+    def test_legacy_invite_keeps_case_and_outer_trim(self):
+        legacy = "Legacy_ExactCase-Dummy9"
+        with database() as connection:
+            connection.execute("INSERT INTO invitations(id,code_hash,label,expires_at,quota_bytes,quota_uploads) VALUES (%s,%s,'Legacy dummy',now()+interval '1 hour',1024,1)", (uuid4(), digest(legacy)))
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": legacy.lower()}).status_code, 400)
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": " \n" + legacy + "\t "}).status_code, 201)
+
+    def test_collision_retry_includes_history_and_is_bounded(self):
+        with patch("app.onboarding.generate_invite_code", return_value="abandon ability"):
+            old = self.invite()
+        with database() as connection:
+            connection.execute("UPDATE invitations SET revoked_at=now(),expires_at=now()-interval '1 day' WHERE id=%s", (old["id"],))
+        with patch("app.onboarding.generate_invite_code", side_effect=["abandon ability", "able about"]) as generate:
+            new = self.invite()
+            self.assertEqual(generate.call_count, 2)
+            self.assertEqual(new["invite_code"], "able about")
+            self.assertNotEqual(new["id"], old["id"])
+        with patch("app.onboarding.generate_invite_code", return_value="abandon ability") as generate:
+            result = self.client.post("/api/v1/admin/invites", headers=self.admin_headers, json={"label": "Collision test"})
+            self.assertEqual(result.status_code, 503)
+            self.assertEqual(result.json()["detail"]["code"], "invite_generation_unavailable")
+            self.assertEqual(generate.call_count, 16)
+        with database() as connection:
+            self.assertEqual(connection.execute("SELECT count(*) AS n FROM invitations").fetchone()["n"], 2)
+
+    def test_concurrent_generation_collision(self):
+        # Constant dummy pair deliberately races: one succeeds, the other exhausts.
+        with patch("app.onboarding.generate_invite_code", return_value="abandon ability"):
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                statuses = list(pool.map(lambda _: self.client.post("/api/v1/admin/invites", headers=self.admin_headers, json={"label": "Concurrent dummy"}).status_code, range(2)))
+        self.assertEqual(sorted(statuses), [201, 503])
 
     def test_concurrent_redemption(self):
         invite = self.invite()
+        variants = [invite["invite_code"], "\t" + invite["invite_code"].upper().replace(" ", " \n ") + "\t"]
         with ThreadPoolExecutor(max_workers=2) as pool:
-            statuses = list(pool.map(lambda _: self.client.post("/api/v1/auth/enroll", json={"invite_code": invite["invite_code"]}).status_code, range(2)))
+            statuses = list(pool.map(lambda code: self.client.post("/api/v1/auth/enroll", json={"invite_code": code}).status_code, variants))
         self.assertEqual(sorted(statuses), [201, 400])
 
     def test_expired_revoked_and_unknown_invites(self):

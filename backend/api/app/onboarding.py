@@ -10,10 +10,12 @@ from pydantic import BaseModel, Field
 
 from app.admin_auth import require_admin
 from app.db import database
+from app.invite_words import generate_invite_code, normalize_invite_code
 
 router = APIRouter(prefix="/api/v1")
 ACCESS_SECONDS = 900
 REFRESH_SECONDS = 2592000
+INVITE_GENERATION_ATTEMPTS = 16
 
 
 def fail(status: int, code: str, message: str, headers=None):
@@ -78,16 +80,20 @@ def mint_access(connection, installation_id):
 @router.post("/admin/invites", status_code=201, dependencies=[Depends(require_admin_write)])
 def create_invite(payload: InviteCreate, response: Response):
     no_store(response)
-    code, invite_id = secrets.token_urlsafe(32), uuid4()
     with database() as connection:
-        row = connection.execute(
-            """INSERT INTO invitations(id, code_hash, label, expires_at, quota_bytes, quota_uploads)
-               VALUES (%s, %s, %s, now() + %s * interval '1 hour', %s, %s)
-               RETURNING id, label, expires_at, quota_bytes, quota_uploads""",
-            (invite_id, digest(code), payload.label, payload.expires_in_hours,
-             payload.quota_bytes, payload.quota_uploads),
-        ).fetchone()
-    return {**row, "invite_code": code}
+        for _ in range(INVITE_GENERATION_ATTEMPTS):
+            code = generate_invite_code()
+            row = connection.execute(
+                """INSERT INTO invitations(id, code_hash, label, expires_at, quota_bytes, quota_uploads)
+                   VALUES (%s, %s, %s, now() + %s * interval '1 hour', %s, %s)
+                   ON CONFLICT (code_hash) DO NOTHING
+                   RETURNING id, label, expires_at, quota_bytes, quota_uploads""",
+                (uuid4(), digest(code), payload.label, payload.expires_in_hours,
+                 payload.quota_bytes, payload.quota_uploads),
+            ).fetchone()
+            if row:
+                return {**row, "invite_code": code}
+    fail(503, "invite_generation_unavailable", "Could not allocate unique invite words; try again later")
 
 
 @router.get("/admin/invites", dependencies=[Depends(require_admin)])
@@ -145,7 +151,7 @@ def enroll(payload: Enrollment, response: Response):
             """UPDATE invitations SET redeemed_at = now()
                WHERE code_hash = %s AND expires_at > now() AND revoked_at IS NULL
                AND redeemed_at IS NULL RETURNING id, quota_bytes, quota_uploads""",
-            (digest(payload.invite_code.strip()),),
+            (digest(normalize_invite_code(payload.invite_code)),),
         ).fetchone()
         if not invite:
             fail(400, "invite_invalid", "Invite is invalid or no longer available")
