@@ -243,3 +243,20 @@ The local database was backed up before adoption; the revision is `003_onboardin
 and counts remained four captures, five invites, five installations and one access
 token. A second live upgrade was a successful no-op. No live downgrade or new
 invitation was performed; test-container removal did not affect live volumes.
+
+### No-Tailscale local Simulator mode — October 11, 2026
+
+The opt-in `compose.dev.yaml` overlay runs project `too-much-trash-dev` with
+separate network, Postgres/blob volumes and privately generated credentials.
+Loopback ports18082/18081/18080 serve collector/admin/website; no Tailscale service
+or public/LAN listener is involved. Use the explicit project and private env-file
+arguments in `backend/README.md` rather than the pilot `.env`.
+
+The dev API allows HTTP admin cookies, while the pilot remains Secure=true.
+Host-side configuration isolation and all three local proxy tests passed. HTTP
+token exchange, cookie reuse, gated dashboard shell and authenticated empty
+invite/installation lists passed without creating any invitation. The browser
+unlock page was verified separately. Full native registration/upload testing
+requires approval for a fresh bounded dev invite. Local mode is for Debug
+Simulator builds only, never physical iPhone or Release; normal enrollment and
+credential/ownership checks are unchanged.

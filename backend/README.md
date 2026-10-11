@@ -23,6 +23,38 @@ The public site is at `http://localhost:8080`, the gated admin portal is at `htt
 
 The token is saved at `backend/.secrets/admin-token`; only its SHA-256 hash is mounted in the API container. The directory is ignored by Git. Open the portal and paste the token on `/unlock`. To rotate it, run the tool with `--rotate` and recreate the API container with `docker compose up -d --force-recreate api`. Rotation ends existing sessions. This is a temporary shared admin gate, not passkey authentication. The portal issues single-use invites and revokes installation access. Collector uploads, status and downloads require enrollment credentials; the public API rejects admin routes.
 
+## Simulator-only local development (no Tailscale)
+
+Run from `backend/`:
+
+```sh
+python3 api/tools/init_local_dev.py
+docker compose -p too-much-trash-dev --env-file .secrets/dev/compose.env -f compose.yaml -f compose.dev.yaml up --build -d --wait
+```
+
+Use `http://localhost:18082` for the Simulator collector and
+`http://localhost:18081` for its admin browser. The website uses port 18080.
+All published ports bind loopback, with no Tailscale/Funnel dependency. Enable the
+app's explicit local-development option only in a Debug Simulator build.
+Physical iPhone and Release builds still require HTTPS.
+
+This Compose project has its own network, database/blob volumes, admin token and
+storage credentials. It does not reuse the pilot `.env` or its volumes. The local
+admin token is `backend/.secrets/dev/admin-token`; only its hash reaches the API.
+HTTP admin cookies are allowed only in this dev project; the pilot retains Secure
+HTTPS cookies. Authentication/invites/quotas remain enforced, not bypassed. A
+working reachability probe is not authenticated dashboard access.
+
+Keep the explicit project/env-file/overlay arguments for all dev commands. To
+stop it without deleting data:
+
+```sh
+docker compose -p too-much-trash-dev --env-file .secrets/dev/compose.env -f compose.yaml -f compose.dev.yaml stop
+```
+
+Do not combine dev and Tailscale overlays or expose these listeners to LAN/public
+interfaces. Creating a test invite remains a separate authorized admin action.
+
 ## Client contract
 
 Enroll using an administrator-issued invite (see the full contract above). Send

@@ -44,6 +44,13 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 - Current host is Eric's MacBook Pro; future host is his Mac mini, with a different
   service FQDN. Clients configure origins; do not silently adopt old queued media
   or credentials across origins. Preserve normal TLS verification.
+- Eric's October 11 testing order: co-test no-Tailscale local development, then
+  Tailscale mode, then personal iPhone. Local mode is Debug+Simulator-only.
+  `compose.dev.yaml` uses project `too-much-trash-dev`, loopback18082 collector,
+  18081 admin and18080 website, independent volumes/network/credentials from
+  `.secrets/dev/compose.env`. Only the isolated dev API allows HTTP admin cookies;
+  never change the pilot's Secure cookies to make local login work. Auth/invites
+  remain required. Do not issue new native-test invites without approval.
 
 ## Verification and operational memory
 
