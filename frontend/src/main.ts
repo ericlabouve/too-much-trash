@@ -1,11 +1,16 @@
 import "./style.css";
+import { logoutAdmin } from "./admin-session";
 
 const root = document.querySelector<HTMLDivElement>("#app");
 if (!root) throw new Error("App root missing");
 
 root.innerHTML = `
   <main class="shell">
-    <div class="eyebrow">TOO MUCH TRASH / FIELD STUDIO</div>
+    <div class="admin-toolbar">
+      <div class="eyebrow">TOO MUCH TRASH / FIELD STUDIO</div>
+      <button id="logout" type="button">Logout</button>
+    </div>
+    <p id="logout-feedback" role="alert"></p>
     <header>
       <div class="mark" aria-hidden="true">↗</div>
       <h1>Teach robots to pick up what we leave behind.</h1>
@@ -71,6 +76,23 @@ const feedback = document.querySelector<HTMLParagraphElement>("#invite-feedback"
 const form = document.querySelector<HTMLFormElement>("#invite-form")!;
 const codePanel = document.querySelector<HTMLDivElement>("#new-code")!;
 const codeElement = document.querySelector<HTMLElement>("#invite-code")!;
+
+const logoutButton = document.querySelector<HTMLButtonElement>("#logout")!;
+const logoutFeedback = document.querySelector<HTMLParagraphElement>("#logout-feedback")!;
+logoutButton.addEventListener("click", async () => {
+  logoutButton.disabled = true;
+  logoutFeedback.textContent = "Logging out…";
+  try {
+    await logoutAdmin(fetch, path => {
+      codeElement.textContent = "";
+      codePanel.hidden = true;
+      window.location.replace(path);
+    });
+  } catch {
+    logoutFeedback.textContent = "Could not confirm logout. Check your connection and retry.";
+    logoutButton.disabled = false;
+  }
+});
 
 async function adminApi<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(`/api/v1/admin/${path}`, {

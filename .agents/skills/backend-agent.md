@@ -36,6 +36,10 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   creates short-lived single-use codes; enrollment issues installation-bound
   credentials; refresh, revocation, ownership checks and quotas protect media.
   A shared admin token gate is temporary; passkey enrollment/login remains work.
+- Admin dashboard Logout uses existing DELETE `/api/v1/admin/session`, returns
+  to `/unlock` only after204, and reports failure without claiming success.
+  This clears that browser's cookie; it does not revoke copied stateless cookies
+  or implement per-admin offboarding. Eric deferred authn/authz redesign.
 - Private pilot uses existing macOS Tailscale Serve: HTTPS 10000 to localhost8082
   collector, HTTPS8443 to localhost8081 admin. MagicDNS suffix is not a service
   hostname. Funnel is off; public collector exposure requires explicit approval.

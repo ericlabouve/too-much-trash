@@ -76,6 +76,11 @@ new server or identity. Refuse redirects on credential-bearing requests.
 The portal unlocks using the development admin token. Mutations require the
 session cookie plus `X-TMT-Admin: 1`; no cross-origin API access is enabled.
 
+The visible Logout button calls `DELETE /api/v1/admin/session` and navigates to
+`/unlock` only on204; failures keep the page open with an error and allow retry.
+This clears the current browser cookie, not copied stateless cookies or other
+administrators' sessions. Authn/authz redesign remains explicitly deferred.
+
 * `POST /api/v1/admin/invites`: label, `expires_in_hours` (1–168, default 24),
   `quota_bytes` (default 1 GiB), and `quota_uploads` (default 100). Returns the
   invite code **once**. Losing it requires another invite.
