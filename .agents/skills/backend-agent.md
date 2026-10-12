@@ -96,5 +96,9 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 - Verified pilot: backend ownership/quota/media processing over HTTPS; Simulator
   registration, Keychain reuse, private admin reachability and revoked-access
   rejection. Native iOS uploads and physical capture remain unverified.
+- October11 user-led local Simulator two-word enrollment reached Field Camera;
+  backend logs confirmed enroll201/me200 and one active installation. Do not
+  revoke this user's installation as disposable agent-test cleanup. Capture and
+  native uploads remain unverified; no credential/request-body inspection needed.
 - Read `backend/onboarding.md` for the auth contract and verification details;
   `backend/README.md` for setup and `backend/compose.yaml` for deployed services.

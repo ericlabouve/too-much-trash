@@ -302,3 +302,11 @@ the same17 disposable migration/API tests re-run successfully. They now verify
 generic rejection of retained opaque invite records, unchanged existing access
 and refresh, and default `iPhone` name when enrollment omits `installation_name`.
 Only local dev is redeployed; the private pilot remains untouched.
+
+### User-led local Simulator enrollment — October 11, 2026
+
+Eric completed two-word entry/paste and reached Field Camera. Read-only local-dev
+API status metadata confirmed enrollment201 and account validation200, with one
+redeemed invite and one active installation. No codes, credentials or request
+bodies were inspected or printed. This confirms local native enrollment, not
+camera capture or media uploads; those remain separate validation steps.
