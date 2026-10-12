@@ -164,4 +164,53 @@ final class APIContractTests: XCTestCase {
         XCTAssertTrue(body.contains("test-video"))
         XCTAssertFalse(body.contains("test-access"))
     }
+
+    func testKeyedUploadsReuseStableBodyAndHeaderAndDecodeEcho() async throws {
+        let transport = ScriptedTransport(), id = UUID()
+        let json = "{\"id\":\"00000000-0000-0000-0000-000000000002\",\"status\":\"queued\",\"filename\":\"pickup.mov\",\"size_bytes\":5,\"client_capture_id\":\"\(id.uuidString)\"}"
+        transport.replies = [.init(status: 202, json: json), .init(status: 202, json: json)]
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID()).mov")
+        try Data("video".utf8).write(to: file)
+        defer { try? FileManager.default.removeItem(at: file) }
+        let client = try api(transport)
+        let first = try await client.upload(file: file, captureID: id, token: "test-access", progress: { _, _ in })
+        let body = transport.stagedUpload
+        let repeated = try await client.upload(file: file, captureID: id, token: "test-access", progress: { _, _ in })
+        XCTAssertEqual(first.clientCaptureID, id)
+        XCTAssertEqual(first.id, repeated.id)
+        XCTAssertEqual(body, transport.stagedUpload)
+        XCTAssertTrue(transport.requests.allSatisfy { $0.value(forHTTPHeaderField: "Idempotency-Key") == id.uuidString })
+    }
+
+    func testEndSessionUsesRefreshProofNotAdminOrBearerAndChecksJSON() async throws {
+        let transport = ScriptedTransport(), id = UUID()
+        transport.replies = [.init(status: 200, json: "{\"installation_id\":\"\(id)\",\"revoked\":true}")]
+        let result = try await api(transport).endSession(refreshToken: "test-refresh")
+        XCTAssertEqual(result.installationID, id)
+        XCTAssertTrue(result.revoked)
+        let request = try XCTUnwrap(transport.requests.first)
+        XCTAssertEqual(request.url?.path, "/api/v1/auth/end-session")
+        XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
+        XCTAssertNil(request.value(forHTTPHeaderField: "X-TMT-Admin"))
+        let body = try JSONDecoder().decode([String: String].self, from: XCTUnwrap(request.httpBody))
+        XCTAssertEqual(body, ["refresh_token": "test-refresh"])
+        XCTAssertFalse(request.url!.absoluteString.contains("test-refresh"))
+    }
+
+    func testLookupAndConflictContracts() async throws {
+        let transport = ScriptedTransport(), id = UUID()
+        transport.replies = [.init(status: 200, json: "{\"id\":\"\(UUID())\",\"status\":\"failed\",\"filename\":\"pickup.mov\",\"size_bytes\":5,\"client_capture_id\":\"\(id)\"}"),
+                             .init(status: 409, json: "{\"detail\":{\"code\":\"idempotency_conflict\"}}")]
+        let client = try api(transport)
+        let receipt = try await client.uploaded(captureID: id, token: "test-access")
+        XCTAssertEqual(receipt.clientCaptureID, id)
+        XCTAssertEqual(transport.requests[0].url?.path, "/api/v1/media/by-client/\(id.uuidString)")
+        do { _ = try await client.uploaded(captureID: id, token: "test-access"); XCTFail("Expected conflict") }
+        catch { XCTAssertEqual(error as? ClientError, .idempotencyConflict) }
+    }
+
+    func testOlderBackendCapabilityIsNotAssumed() throws {
+        let json = "{\"installation_id\":\"\(UUID())\",\"quota_bytes\":1,\"quota_uploads\":1,\"used_bytes\":0,\"used_uploads\":0}"
+        XCTAssertNil(try JSONDecoder().decode(Installation.self, from: Data(json.utf8)).mediaContractVersion)
+    }
 }

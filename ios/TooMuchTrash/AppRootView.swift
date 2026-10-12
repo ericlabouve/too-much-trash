@@ -1,8 +1,16 @@
 import SwiftUI
 
 struct AppRootView: View {
-    @StateObject private var account = AccountSession(automaticallyUseLocalCollector: true)
+    @StateObject private var account = AccountSession(automaticallyUseLocalCollector: AppRootView.useLocalFallback, automaticUploads: true)
     @Environment(\.scenePhase) private var scenePhase
+
+    private static var useLocalFallback: Bool {
+        #if DEBUG && targetEnvironment(simulator)
+        return !UserDefaults.standard.bool(forKey: "disableLocalFallback")
+        #else
+        return true
+        #endif
+    }
 
     var body: some View {
         Group {
@@ -16,6 +24,7 @@ struct AppRootView: View {
             await account.bootstrap()
             while !Task.isCancelled {
                 await account.probeAdmin()
+                account.syncTick()
                 do { try await Task.sleep(for: .seconds(3)) } catch { break }
             }
         }
@@ -24,6 +33,7 @@ struct AppRootView: View {
                 account.resume()
                 Task {
                     if account.phase == .authorized { await account.continueLogin() }
+                    else { await account.bootstrap() }
                     await account.probeAdmin()
                 }
             } else {
@@ -35,58 +45,36 @@ struct AppRootView: View {
 
 struct OnboardingView: View {
     @ObservedObject var account: AccountSession
-    @State private var showRegistration = false
     @State private var showConfiguration = false
-    @Environment(\.openURL) private var openURL
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 24) {
-                Spacer()
-                Image(systemName: "leaf.fill").font(.system(size: 44)).foregroundStyle(.green)
-                Text("Too Much Trash").font(.largeTitle.bold())
-                Text("Collect pickup attempts. Help robots learn.").font(.title3)
-                Text(account.message)
-                    .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("accessMessage")
-                if let deadline = account.retryNotBefore {
-                    HStack { Text("Retry after:"); Text(deadline, style: .timer) }.font(.caption)
-                }
-                if account.busy { ProgressView("Checking access…") }
-                Button("User login / Continue") { Task { await account.continueLogin() } }
-                    .buttonStyle(.borderedProminent)
-                    .accessibilityIdentifier("continueButton")
-                Button("Register with invite") { showRegistration = true }
-                    .buttonStyle(.bordered)
-                    .accessibilityIdentifier("registerButton")
-                if account.phase == .retry {
-                    Button("Retry connection") { Task { await account.continueLogin() } }
-                }
-                if account.adminVisible {
-                    Button("Admin login") {
-                        Task {
-                            if let url = await account.verifiedAdminURL() { openURL(url) }
-                        }
-                    }
-                    .accessibilityIdentifier("adminLogin")
-                }
-                Spacer()
-                Text("Invites come from your administrator.")
-                    .font(.footnote).foregroundStyle(.secondary)
-                if account.adminVisible {
-                    Button("Server addresses") { showConfiguration = true }
-                        .accessibilityIdentifier("serverAddresses")
-                }
-                if account.configuration?.simulatorLocal == true {
-                    Text(account.adminVisible ? "Local Simulator · Admin view" : "Local Simulator · Collector view")
-                        .font(.caption).foregroundStyle(.secondary)
-                        .accessibilityIdentifier("collectorViewStatus")
+            Group {
+                if account.busy {
+                    ProgressView(account.isEndingSession ? "Ending session…" : "Checking access…")
+                } else if account.endCleanupPending {
+                    VStack(spacing: 20) {
+                        Text("Finish ending session").font(.title2)
+                        Text(account.message).multilineTextAlignment(.center)
+                        Button("Retry End Session") { Task { _ = await account.endSession() } }
+                            .buttonStyle(.borderedProminent)
+                    }.padding(28)
+                } else if account.hasSavedCredential && account.phase != .needsInvite {
+                    VStack(spacing: 20) {
+                        Text("Can’t connect").font(.title2)
+                        Text(account.message).multilineTextAlignment(.center)
+                        Button("Retry connection") { Task { await account.continueLogin() } }
+                            .buttonStyle(.borderedProminent).accessibilityIdentifier("retryConnection")
+                    }.padding(28)
+                } else {
+                    RegistrationView(account: account)
                 }
             }
-            .padding(28)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .disabled(account.busy)
-            .sheet(isPresented: $showRegistration) { RegistrationView(account: account) }
+            .navigationTitle("Too Much Trash")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarTrailing) {
+                if account.adminVisible { AdminActions(account: account, showConfiguration: $showConfiguration) }
+            } }
             .sheet(isPresented: $showConfiguration) { ServerConfigurationView(account: account) }
             .onChange(of: account.adminVisible) { _, visible in
                 if !visible { showConfiguration = false }
@@ -104,7 +92,6 @@ struct RegistrationView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
-        NavigationStack {
             Form {
                 Section("Register with invite") {
                     if dynamicTypeSize.isAccessibilitySize {
@@ -119,6 +106,9 @@ struct RegistrationView: View {
                     if attemptedRegistration {
                         Text(account.message).accessibilityIdentifier("registrationMessage")
                     }
+                    if let deadline = account.retryNotBefore {
+                        HStack { Text("Retry after:"); Text(deadline, style: .timer) }.font(.caption)
+                    }
                     Button("Register") {
                         focusedWord = nil
                         Task {
@@ -132,10 +122,6 @@ struct RegistrationView: View {
                     .accessibilityIdentifier("submitRegistration")
                 }
             }
-            .navigationTitle("Registration")
-            .toolbar { Button("Close") { dismiss() }.disabled(account.busy) }
-            .interactiveDismissDisabled(account.busy)
-        }
     }
 
     private func wordField(_ field: InviteWordEntry.Field) -> some View {
@@ -219,7 +205,7 @@ struct ServerConfigurationView: View {
                             : ClientError.configuration.message
                     }
                 }
-                .disabled(account.busy)
+                .disabled(account.busy || account.isUploading || account.endCleanupPending)
             }
             .navigationTitle("Server addresses")
             .toolbar { Button("Cancel") { dismiss() } }
@@ -253,37 +239,5 @@ struct ServerConfigurationView: View {
         }
         simulatorLocal = enabled
         errorMessage = nil
-    }
-}
-
-struct UploadPanel: View {
-    @ObservedObject var account: AccountSession
-    @ObservedObject var queue: CaptureQueue
-
-    var body: some View {
-        let captures = account.currentCaptures
-        let pending = captures.filter { $0.receipt == nil }.count
-        let failed = captures.filter { $0.receipt?.status == "failed" }.count
-        VStack(alignment: .leading, spacing: 10) {
-            Text("\(pending) queued · \(captures.count - pending) sent").font(.caption.bold())
-            if failed > 0 { Text("\(failed) processing failed; local videos retained.").font(.caption) }
-            if queue.captures.count > captures.count {
-                Text("Other installation's videos remain on this iPhone and will not be uploaded with this login.")
-                    .font(.caption)
-            }
-            Text(queue.storageUnavailable ? "Upload queue unavailable. Local videos are retained." : account.uploadMessage)
-                .font(.caption).fixedSize(horizontal: false, vertical: true)
-            HStack {
-                Button("Upload queued videos") { Task { await account.uploadPending() } }
-                    .disabled(account.busy || pending == 0 || queue.storageUnavailable)
-                Spacer()
-                Button("Check status") { Task { await account.refreshUploadStatus() } }
-                    .disabled(account.busy || captures.count == pending)
-            }
-            .font(.caption)
-            if account.busy { ProgressView() }
-        }
-        .padding(16)
-        .background(.black.opacity(0.6), in: RoundedRectangle(cornerRadius: 16))
     }
 }

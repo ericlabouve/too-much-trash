@@ -5,6 +5,7 @@ import Security
 protocol CredentialVault {
     func load(origin: URL) throws -> InstallationCredential?
     func save(_ credential: InstallationCredential, origin: URL) throws
+    func remove(origin: URL) throws
 }
 
 @MainActor
@@ -45,5 +46,10 @@ final class KeychainCredentialVault: CredentialVault {
         guard update == errSecItemNotFound else { throw ClientError.storage }
         let insert = base.merging(attributes) { _, new in new }
         guard SecItemAdd(insert as CFDictionary, nil) == errSecSuccess else { throw ClientError.storage }
+    }
+
+    func remove(origin: URL) throws {
+        let status = SecItemDelete(query(origin: origin) as CFDictionary)
+        guard status == errSecSuccess || status == errSecItemNotFound else { throw ClientError.storage }
     }
 }

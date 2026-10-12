@@ -7,6 +7,7 @@ import Foundation
 final class CameraController: NSObject, ObservableObject, AVCaptureFileOutputRecordingDelegate, @unchecked Sendable {
     @MainActor @Published private(set) var isReady = false
     @MainActor @Published private(set) var isFinishing = false
+    @MainActor @Published private(set) var isStarting = false
     @MainActor @Published private(set) var permissionDenied = false
     @MainActor @Published private(set) var status = "Opening camera…"
     @MainActor @Published private(set) var recordingStartedAt: Date?
@@ -20,6 +21,9 @@ final class CameraController: NSObject, ObservableObject, AVCaptureFileOutputRec
     private var active = false
     private var hold = HoldRecordingState()
     private var observers: [NSObjectProtocol] = []
+    private var recordingDirectory: URL?
+
+    func setRecordingDirectory(_ directory: URL) { queue.async { self.recordingDirectory = directory } }
 
     override init() {
         super.init()
@@ -43,6 +47,11 @@ final class CameraController: NSObject, ObservableObject, AVCaptureFileOutputRec
 
     @MainActor
     func activate() async {
+        #if targetEnvironment(simulator)
+        status = "No camera available. Use an iPhone to record."
+        isReady = false
+        return
+        #else
         queue.async { self.active = true }
         let granted: Bool
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -60,6 +69,7 @@ final class CameraController: NSObject, ObservableObject, AVCaptureFileOutputRec
             guard self.active else { return }
             self.startSession()
         }
+        #endif
     }
 
     func deactivate() {
@@ -123,19 +133,16 @@ final class CameraController: NSObject, ObservableObject, AVCaptureFileOutputRec
         case .none: break
         case .start:
             do {
-                let folder = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
-                                                          appropriateFor: nil, create: true)
-                    .appendingPathComponent("Captures", isDirectory: true)
-                try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+                guard let folder = recordingDirectory else { throw CameraError.configuration }
                 let url = folder.appendingPathComponent("pickup-\(UUID().uuidString).mov")
                 if let connection = output.connection(with: .video), connection.isVideoRotationAngleSupported(90) {
                     connection.videoRotationAngle = 90
                 }
-                publish { $0.status = "Starting recording…" }
+                publish { $0.status = "Starting recording…"; $0.isStarting = true }
                 output.startRecording(to: url, recordingDelegate: self)
             } catch {
                 hold.didFinish()
-                publish { $0.status = "Could not create recording: \(error.localizedDescription)" }
+                publish { $0.status = "Could not create recording: \(error.localizedDescription)"; $0.isStarting = false }
             }
         case .stop:
             publish { $0.isFinishing = true; $0.status = "Saving recording…" }
@@ -146,14 +153,19 @@ final class CameraController: NSObject, ObservableObject, AVCaptureFileOutputRec
     private func interrupt(message: String) {
         queue.async {
             self.perform(self.hold.cancel())
-            self.publish { $0.isReady = false; $0.status = message }
+            #if targetEnvironment(simulator)
+            let displayMessage = "No camera available. Use an iPhone to record."
+            #else
+            let displayMessage = message
+            #endif
+            self.publish { $0.isReady = false; $0.status = displayMessage }
         }
     }
 
     func fileOutput(_ output: AVCaptureFileOutput, didStartRecordingTo fileURL: URL,
                     from connections: [AVCaptureConnection]) {
         queue.async {
-            self.publish { $0.recordingStartedAt = Date(); $0.status = "Recording" }
+            self.publish { $0.recordingStartedAt = Date(); $0.status = "Recording"; $0.isStarting = false }
             self.perform(self.hold.didStart())
         }
     }
@@ -167,6 +179,7 @@ final class CameraController: NSObject, ObservableObject, AVCaptureFileOutputRec
             self.publish {
                 $0.recordingStartedAt = nil
                 $0.isFinishing = false
+                $0.isStarting = false
                 if successful {
                     $0.latestClip = outputFileURL
                     $0.onClipSaved?(outputFileURL)

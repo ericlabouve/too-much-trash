@@ -4,6 +4,15 @@ import Foundation
 protocol HTTPTransport {
     func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse)
     func upload(for request: URLRequest, from file: URL) async throws -> (Data, HTTPURLResponse)
+    func upload(for request: URLRequest, from file: URL,
+                progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> (Data, HTTPURLResponse)
+}
+
+extension HTTPTransport {
+    func upload(for request: URLRequest, from file: URL,
+                progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> (Data, HTTPURLResponse) {
+        try await upload(for: request, from: file)
+    }
 }
 
 // Never forward a bearer, refresh token, or invite to a redirected destination.
@@ -34,7 +43,12 @@ final class SecureHTTPTransport: HTTPTransport {
     }
 
     func upload(for request: URLRequest, from file: URL) async throws -> (Data, HTTPURLResponse) {
-        let (data, response) = try await session.upload(for: request, fromFile: file)
+        try await upload(for: request, from: file, progress: { _, _ in })
+    }
+
+    func upload(for request: URLRequest, from file: URL,
+                progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> (Data, HTTPURLResponse) {
+        let (data, response) = try await BackgroundUploads.shared.upload(request: request, file: file, progress: progress)
         return try checked(data, response, request)
     }
 
@@ -52,8 +66,21 @@ protocol CollectorAPI {
     func refresh(token: String) async throws -> AccessToken
     func me(token: String) async throws -> Installation
     func upload(file: URL, token: String) async throws -> MediaReceipt
+    func upload(file: URL, captureID: UUID, token: String,
+                progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt
+    func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt
+    func endSession(refreshToken: String) async throws -> EndSessionReceipt
     func media(id: UUID, token: String) async throws -> MediaReceipt
     func adminReachable() async -> Bool
+}
+
+extension CollectorAPI {
+    func upload(file: URL, captureID: UUID, token: String,
+                progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
+        try await upload(file: file, token: token)
+    }
+    func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt { throw ClientError.missingMedia }
+    func endSession(refreshToken: String) async throws -> EndSessionReceipt { throw ClientError.configuration }
 }
 
 @MainActor
@@ -88,6 +115,14 @@ final class LiveCollectorAPI: CollectorAPI {
         try await json(path: "api/v1/media/\(id.uuidString)", token: token)
     }
 
+    func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt {
+        try await json(path: "api/v1/media/by-client/\(captureID.uuidString)", token: token)
+    }
+
+    func endSession(refreshToken: String) async throws -> EndSessionReceipt {
+        try await json(path: "api/v1/auth/end-session", body: ["refresh_token": refreshToken])
+    }
+
     private func json<T: Decodable>(path: String, body: [String: String]? = nil,
                                      token: String? = nil, status: Int = 200) async throws -> T {
         var request = URLRequest(url: configuration.endpoint(path))
@@ -120,35 +155,56 @@ final class LiveCollectorAPI: CollectorAPI {
     }
 
     func upload(file: URL, token: String) async throws -> MediaReceipt {
+        try await upload(file: file, captureID: UUID(), token: token, progress: { _, _ in })
+    }
+
+    func upload(file: URL, captureID: UUID, token: String,
+                progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
         let attributes = try FileManager.default.attributesOfItem(atPath: file.path)
         guard let size = attributes[.size] as? NSNumber, size.int64Value > 0 else { throw ClientError.invalidResponse }
         guard size.int64Value <= 200 * 1024 * 1024 else { throw ClientError.uploadTooLarge }
-        let boundary = "TMT-\(UUID().uuidString)"
-        let bodyURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let boundary = "TMT-\(captureID.uuidString)"
+        let directory = BackgroundUploads.stagingDirectory
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        try CaptureQueue.protect(directory)
+        let bodyURL = directory.appendingPathComponent(captureID.uuidString + ".multipart")
         // Stage on disk; don't put an entire 200 MiB video into memory.
-        guard FileManager.default.createFile(atPath: bodyURL.path, contents: nil,
-                                             attributes: [.protectionKey: FileProtectionType.complete]) else {
-            throw ClientError.storage
+        let alreadyStaged = FileManager.default.fileExists(atPath: bodyURL.path)
+        if !alreadyStaged {
+            try await Task.detached(priority: .utility) {
+                try Self.stage(file: file, bodyURL: bodyURL, boundary: boundary)
+            }.value
         }
+        var request = URLRequest(url: configuration.endpoint("api/v1/media"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue(captureID.uuidString, forHTTPHeaderField: "Idempotency-Key")
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         defer { try? FileManager.default.removeItem(at: bodyURL) }
-        let destination = try FileHandle(forWritingTo: bodyURL)
+        let (data, response) = try await transport.upload(for: request, from: bodyURL, progress: progress)
+        try? FileManager.default.removeItem(at: bodyURL)
+        guard response.url == request.url else { throw ClientError.invalidResponse }
+        return try decode(data, response, expected: 202)
+    }
+
+    private nonisolated static func stage(file: URL, bodyURL: URL, boundary: String) throws {
+        let building = bodyURL.deletingPathExtension().appendingPathExtension("building")
+        if FileManager.default.fileExists(atPath: building.path) { try FileManager.default.removeItem(at: building) }
+        defer { try? FileManager.default.removeItem(at: building) }
+        guard FileManager.default.createFile(atPath: building.path, contents: nil,
+                                            attributes: [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication]) else { throw ClientError.storage }
+        let destination = try FileHandle(forWritingTo: building)
         defer { try? destination.close() }
         let source = try FileHandle(forReadingFrom: file)
         defer { try? source.close() }
         try destination.write(contentsOf: Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"file\"; filename=\"pickup.mov\"\r\nContent-Type: video/quicktime\r\n\r\n".utf8))
-        while let chunk = try source.read(upToCount: 1024 * 1024), !chunk.isEmpty {
-            try destination.write(contentsOf: chunk)
-        }
+        while let chunk = try source.read(upToCount: 1024 * 1024), !chunk.isEmpty { try destination.write(contentsOf: chunk) }
         try destination.write(contentsOf: Data("\r\n--\(boundary)--\r\n".utf8))
         try destination.synchronize()
-        var request = URLRequest(url: configuration.endpoint("api/v1/media"))
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
-        let (data, response) = try await transport.upload(for: request, from: bodyURL)
-        guard response.url == request.url else { throw ClientError.invalidResponse }
-        return try decode(data, response, expected: 202)
+        try destination.close()
+        try source.close()
+        try FileManager.default.moveItem(at: building, to: bodyURL)
     }
 
     private func decode<T: Decodable>(_ data: Data, _ response: HTTPURLResponse, expected: Int) throws -> T {
@@ -171,6 +227,7 @@ final class LiveCollectorAPI: CollectorAPI {
             case 415: throw ClientError.unsupportedMedia
             case 422: throw ClientError.validation
             case 404: throw ClientError.missingMedia
+            case 409: throw ClientError.idempotencyConflict
             case 500...599: throw ClientError.server
             default: throw ClientError.invalidResponse
             }

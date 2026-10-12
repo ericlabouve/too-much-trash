@@ -5,6 +5,7 @@ struct ContentView: View {
     @EnvironmentObject private var account: AccountSession
     @Environment(\.scenePhase) private var scenePhase
     @State private var screenButtonHeld = false
+    @State private var showDashboard = false
 
     var body: some View {
         ZStack {
@@ -12,20 +13,16 @@ struct ContentView: View {
             CameraPreview(camera: camera).ignoresSafeArea()
             VStack(spacing: 20) {
                 HStack {
-                    Button { account.returnHome() } label: { Image(systemName: "chevron.left") }
-                        .accessibilityLabel("Home")
                     Label("FIELD CAMERA", systemImage: "viewfinder")
                         .font(.caption.weight(.semibold))
                     Spacer()
-                    if let clip = camera.latestClip {
-                        ShareLink(item: clip) { Image(systemName: "square.and.arrow.up") }
-                            .accessibilityLabel("Share last recording")
-                    }
+                    Button { showDashboard = true } label: { Image(systemName: "square.grid.2x2") }
+                        .accessibilityLabel("Dashboard").accessibilityIdentifier("openDashboard")
+                        .disabled(camera.recordingStartedAt != nil || camera.isFinishing || camera.isStarting)
                 }
                 .padding(16)
                 .background(.black.opacity(0.55), in: Capsule())
                 Spacer()
-                UploadPanel(account: account, queue: account.queue)
                 if !camera.isReady {
                     VStack(spacing: 14) {
                         Image(systemName: "camera").font(.system(size: 36))
@@ -55,17 +52,12 @@ struct ContentView: View {
                         }
                         .font(.headline)
                         .accessibilityIdentifier("recordingIndicator")
-                    } else {
-                        Text(camera.isReady ? camera.status : "Camera required to record")
-                            .font(.subheadline)
-                            .multilineTextAlignment(.center)
                     }
                     Button {} label: {
-                        Circle()
-                            .fill(camera.recordingStartedAt == nil ? Color.white : Color.red)
-                            .frame(width: 64, height: 64)
-                            .padding(7)
-                            .overlay(Circle().stroke(.white, lineWidth: 3))
+                        ZStack {
+                            Circle().stroke(lineWidth: 3).frame(width: 78, height: 78)
+                            Circle().stroke(lineWidth: 2).frame(width: 64, height: 64)
+                        }.foregroundStyle(camera.recordingStartedAt == nil ? .white : .red)
                     }
                     .buttonStyle(.plain)
                     .disabled(!camera.isReady || camera.isFinishing)
@@ -85,14 +77,9 @@ struct ContentView: View {
                                 camera.release("screen")
                             }
                     )
-                    Text("Hold either volume button to record\nRelease to save · Video only")
-                        .font(.footnote)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.white.opacity(0.8))
                 }
                 .padding(24)
                 .frame(maxWidth: .infinity)
-                .background(.black.opacity(0.6), in: RoundedRectangle(cornerRadius: 28))
             }
             .padding(20)
         }
@@ -100,10 +87,17 @@ struct ContentView: View {
         .task { [account] in
             let owner = account.captureOwner
             camera.onClipSaved = { [weak account] file in account?.queueCapture(file, owner: owner) }
+            guard let owner, let directory = try? account.queue.recordingDirectory(origin: owner.origin, installationID: owner.installationID) else { return }
+            camera.setRecordingDirectory(directory)
             await camera.activate()
         }
+        .fullScreenCover(isPresented: $showDashboard) { SessionDashboard(account: account, queue: account.queue) }
+        .onChange(of: showDashboard) { _, shown in
+            if shown { screenButtonHeld = false; camera.deactivate() }
+            else { Task { await camera.activate() } }
+        }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
+            if phase == .active && !showDashboard {
                 Task { await camera.activate() }
             } else {
                 screenButtonHeld = false

@@ -87,6 +87,7 @@ enum ClientError: Error, Equatable {
     case noCredential, invitationInvalid, unauthorized(String), uploadTooLarge
     case rateLimited(TimeInterval)
     case quotaExceeded, missingMedia, validation, unsupportedMedia, uploadEmpty
+    case idempotencyConflict
 
     var message: String {
         switch self {
@@ -105,6 +106,7 @@ enum ClientError: Error, Equatable {
         case .validation: return "The server rejected these values. Check the invite and installation name."
         case .unsupportedMedia: return "This video format is not supported. The local video is retained."
         case .uploadEmpty: return "This video is empty. The local file is retained for review."
+        case .idempotencyConflict: return "This video conflicts with a previously accepted upload. Contact your administrator."
         }
     }
 }
@@ -116,10 +118,12 @@ struct Installation: Codable, Equatable {
     let quotaUploads: Int
     let usedBytes: Int64
     let usedUploads: Int
+    var mediaContractVersion: Int?
     enum CodingKeys: String, CodingKey {
         case installationID = "installation_id", installationName = "installation_name"
         case quotaBytes = "quota_bytes", quotaUploads = "quota_uploads"
         case usedBytes = "used_bytes", usedUploads = "used_uploads"
+        case mediaContractVersion = "media_contract_version"
     }
 }
 
@@ -151,6 +155,8 @@ struct InstallationCredential: Codable, Equatable {
     let refreshToken: String
     var accessExpiresAt: Date
     let refreshExpiresAt: Date
+    var endingSession: Bool?
+    var revocationConfirmed: Bool?
 
     init(enrollment: Enrollment, now: Date = Date()) throws {
         guard enrollment.tokenType == "Bearer", !enrollment.accessToken.isEmpty,
@@ -169,7 +175,14 @@ struct MediaReceipt: Codable, Equatable {
     let status: String
     let filename: String
     let sizeBytes: Int64
+    var clientCaptureID: UUID?
     enum CodingKeys: String, CodingKey {
-        case id, status, filename, sizeBytes = "size_bytes"
+        case id, status, filename, sizeBytes = "size_bytes", clientCaptureID = "client_capture_id"
     }
+}
+
+struct EndSessionReceipt: Decodable {
+    let installationID: UUID
+    let revoked: Bool
+    enum CodingKeys: String, CodingKey { case installationID = "installation_id", revoked }
 }
