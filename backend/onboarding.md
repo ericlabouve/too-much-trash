@@ -25,8 +25,10 @@ appear in URLs, analytics, logs, UserDefaults, or committed configuration.
 | --- | --- | --- |
 | `POST /api/v1/auth/enroll` | `invite_code`, optional `installation_name` (1–80 characters; default `iPhone`) | HTTP 201: `installation_id`, `access_token`, `refresh_token`, `token_type: Bearer`, `expires_in: 900`, `refresh_expires_in: 2592000` |
 | `POST /api/v1/auth/token` | `refresh_token` | New access token, `token_type: Bearer`, `expires_in: 900` |
-| `GET /api/v1/auth/me` | Bearer access token | Installation ID/name, quota and used byte/upload counts |
-| `POST /api/v1/media` | Bearer access token; multipart field `file` | HTTP 202 upload receipt |
+| `GET /api/v1/auth/me` | Bearer access token | Installation ID/name, `media_contract_version: 1`, quota and usage |
+| `POST /api/v1/auth/end-session` | `refresh_token` | HTTP200 `{installation_id, revoked: true}`; safe repeat/lost-response retry |
+| `POST /api/v1/media` | Bearer; multipart `file`; optional `Idempotency-Key: <client capture UUID>` | HTTP202 receipt for first or identical repeat |
+| `GET /api/v1/media/by-client/{client_capture_id}` | Bearer | HTTP200 committed owner receipt, or404 |
 | `GET /api/v1/media/{id}` | Bearer access token | Owner-only status and receipt |
 | `GET /api/v1/media/{id}/{original,processed}` | Bearer access token | Owner-only asset; processed asset available after processing |
 
@@ -59,14 +61,48 @@ usable until expiry or revocation; this scheme does not attest app identity.
 
 Do not automatically retry enrollment: a lost successful response consumes the
 invite. Ask the administrator to revoke the resulting installation and issue a
-new invite. Uploads likewise have no idempotency key: a lost acceptance response
-may create a duplicate on explicit retry. Warn users rather than silently retry.
+new invite. Uploads without an idempotency key can still create duplicates on
+uncertain retries; automatic uploads must use the contract below.
 
-Receipts contain `id`, `status`, `filename`, `content_type`, `size_bytes`, `result`,
+Receipts contain `id`, `client_capture_id` (null for legacy), `status`, `filename`, `content_type`, `size_bytes`, `result`,
 `error`, `status_url`, `original_url`, and `processed_url`. URLs are relative;
 pending result/error/processed URL fields can be null. Status is `queued`,
 `processing`, `completed`, or `failed`. The current worker creates previews/poster
 frames, **not SAM3 masks**. Originals survive processing failures.
+
+### Automatic uploads and End Session
+
+Require authenticated `/auth/me` to advertise `media_contract_version: 1` before
+automatic keyed uploads; an old API may silently ignore the new header. Persist
+the capture UUID, origin, installation ID, original bytes, filename and content
+type before first upload. Keep them identical on retry. Exact repeats return202
+with the same capture identity, without another quota charge even when quota is
+full. Mutable processing status/result may have advanced since the first receipt.
+Changed bytes/name/type return409 `idempotency_conflict`; invalid UUIDs return422.
+Lookup by client UUID returns200 after original storage and DB acceptance, or404
+if not yet committed. Retry404 with the same key. Before marking synced, verify
+the receipt echoes the local UUID and matches size/type/name. Sync means accepted
+original plus committed receipt, not completed processing. Preserve already
+confirmed legacy receipts; old unkeyed uploads cannot be retroactively deduplicated.
+
+End Session authenticates solely with the current strong refresh secret. A known
+secret remains accepted after expiry/already-revoked **only for revocation**, not
+renewal. Unknown secrets return401 `refresh_invalid`. Every acknowledgement has
+the same installation ID; compare it and `revoked:true` before local deletion.
+On uncertainty retain the secret and ending journal for retry. Backend media is
+retained. End Session and acceptance share the owner row lock: an already-locked
+upload may commit before End returns; if End wins, a prevalidated upload is denied.
+No new capture is accepted after confirmed revocation. Already-running downloads
+are not forcibly terminated; previously downloaded data cannot be retracted.
+
+No migration is needed. Keyed server IDs use the frozen mapping
+`uuid5(NAMESPACE_URL, "too-much-trash:capture:<installation UUID>:<client UUID>")`;
+clients treat IDs as opaque. The existing original_key stores client UUID/SHA256
+metadata; worker keys remain opaque and old rows work unchanged. A keyed DB
+failure can leave an orphan blob: never delete its deterministic key as
+compensation, which could erase an accepted concurrent retry. Future orphan
+collection must prove no accepted record references it. Durability relies on
+configured blob/DB volumes, not an HA replication guarantee.
 
 ## Errors and client behavior
 
@@ -80,6 +116,7 @@ API errors normally use `{ "detail": { "code": "…", "message": "…" } }`.
 | 401 `refresh_invalid` | Re-enrollment required |
 | 429 `rate_limited` | Respect `Retry-After`; no retry loop |
 | 429 `quota_exceeded` | Retain local media and ask administrator for help |
+| 409 `idempotency_conflict` | Retain original; do not silently reassign capture UUID |
 | 413 `upload_too_large` | File exceeds 200 MiB or request exceeds proxy limit |
 | 415 `media_type_unsupported` / 400 `upload_empty` | Explain invalid media; keep local original |
 | 404 `media_not_found` | Missing and another installation's assets look identical |
@@ -336,3 +373,19 @@ concurrent HTTP calls with different forwarded IPs, separate Python processes
 sharing the same DB budget, and unchanged existing auth during cooldown.
 Only the isolated local-dev API is deployed. No schema/revision change, live
 invite redemption, credential rotation, user revocation or pilot change is needed.
+
+### Automatic-upload/session contract — October 12, 2026
+
+Thirty-three disposable Postgres/API tests passed with mocked blob storage,
+including self-only/repeated/expired-secret End Session, lost End acknowledgement,
+backend media retention, keyed retry/lookup/fingerprint conflicts, quota-once,
+concurrent deduplication, lost upload acknowledgement, orphan recovery and both
+upload/revocation orderings. Two selected checks also passed against a separate
+real SeaweedFS blob container: original byte roundtrip with keyed quota-once and
+media retained after End Session. These tests do not use the user's installation.
+Only local-dev API is redeployed; no schema or revision change is needed.
+The real-storage harness is `backend/api/tests/verify_real_storage.py`; run it
+only in an explicitly disposable DB/blob environment with `TMT_TEST_ISOLATED=1`,
+test dependencies, `/sql/init` fixture mount and the S3 environment configured.
+It deliberately reuses the API tests' destructive table resets; never point it
+at the pilot or user local-dev database. It is not part of default discovery.

@@ -6,6 +6,8 @@ import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 import multiprocessing
+from contextlib import contextmanager
+from threading import Event
 from pathlib import Path
 from unittest.mock import patch
 from uuid import uuid4
@@ -98,6 +100,189 @@ class OnboardingTests(unittest.TestCase):
 
     def bearer(self, credentials):
         return {"Authorization": "Bearer " + credentials["access_token"]}
+
+    def keyed_upload(self, credentials, key, data=b"data", filename="a.mov", content_type="video/quicktime"):
+        return self.client.post("/api/v1/media", headers={**self.bearer(credentials), "Idempotency-Key": str(key)},
+                                files={"file": (filename, data, content_type)})
+
+    def test_keyed_upload_retries_lookup_and_quota(self):
+        credentials = self.enrolled(quota_bytes=4, quota_uploads=1)
+        key = uuid4()
+        lookup = f"/api/v1/media/by-client/{key}"
+        self.assertEqual(self.client.get(lookup, headers=self.bearer(credentials)).status_code, 404)
+        first = self.keyed_upload(credentials, key)
+        retry = self.keyed_upload(credentials, key)
+        self.assertEqual(first.status_code, 202)
+        self.assertEqual(retry.status_code, 202)
+        self.assertEqual(first.json(), retry.json())
+        self.assertEqual(first.json()["client_capture_id"], str(key))
+        self.assertEqual(self.client.get(lookup, headers=self.bearer(credentials)).json(), first.json())
+        self.assertEqual(self.client.get(first.json()["original_url"], headers=self.bearer(credentials)).content, b"data")
+        self.assertEqual(len(self.blob.objects), 1)
+        me = self.client.get("/api/v1/auth/me", headers=self.bearer(credentials)).json()
+        self.assertEqual((me["used_bytes"], me["used_uploads"]), (4, 1))
+        self.assertEqual(me["media_contract_version"], 1)
+        self.assertEqual(self.keyed_upload(credentials, uuid4()).status_code, 429)
+        with database() as connection:
+            connection.execute("UPDATE captures SET status='failed',error='dummy processing failure' WHERE id=%s", (first.json()["id"],))
+        current = self.keyed_upload(credentials, key)
+        self.assertEqual(current.status_code, 202)
+        self.assertEqual(current.json()["id"], first.json()["id"])
+        self.assertEqual(current.json()["status"], "failed")
+        self.assertEqual(self.client.get(current.json()["original_url"], headers=self.bearer(credentials)).content, b"data")
+
+    def test_keyed_upload_conflicts_and_owner_scope(self):
+        first, second = self.enrolled(), self.enrolled()
+        key = uuid4()
+        receipt = self.keyed_upload(first, key).json()
+        for values in ({"data": b"evil"}, {"filename": "different.mov"}, {"content_type": "video/mp4"}):
+            conflict = self.keyed_upload(first, key, **values)
+            self.assertEqual(conflict.status_code, 409)
+            self.assertEqual(conflict.json()["detail"]["code"], "idempotency_conflict")
+        self.assertEqual(self.client.get(f"/api/v1/media/by-client/{key}").status_code, 401)
+        self.assertEqual(self.client.get(f"/api/v1/media/by-client/{key}", headers=self.bearer(second)).status_code, 404)
+        second_receipt = self.keyed_upload(second, key).json()
+        self.assertNotEqual(receipt["id"], second_receipt["id"])
+        self.assertEqual(self.client.get(receipt["original_url"], headers=self.bearer(second)).status_code, 404)
+        self.assertEqual(self.keyed_upload(first, "not-a-uuid").status_code, 422)
+
+    def test_concurrent_keyed_uploads_charge_once(self):
+        credentials = self.enrolled(quota_bytes=4, quota_uploads=1)
+        key = uuid4()
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            results = list(pool.map(lambda _: self.keyed_upload(credentials, key), range(4)))
+        self.assertTrue(all(result.status_code == 202 for result in results))
+        self.assertEqual(len({result.json()["id"] for result in results}), 1)
+        self.assertEqual(len(self.blob.objects), 1)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(credentials)).json()["used_uploads"], 1)
+
+    def test_keyed_upload_lost_receipt_recovers_without_duplicate(self):
+        credentials = self.enrolled(quota_bytes=4, quota_uploads=1)
+        key = uuid4()
+        with patch("app.main.capture_response", side_effect=RuntimeError("dummy lost receipt after commit")):
+            with self.assertRaises(Exception):
+                self.keyed_upload(credentials, key)
+        lookup = self.client.get(f"/api/v1/media/by-client/{key}", headers=self.bearer(credentials))
+        self.assertEqual(lookup.status_code, 200)
+        self.assertEqual(self.keyed_upload(credentials, key).json(), lookup.json())
+        self.assertEqual(len(self.blob.objects), 1)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(credentials)).json()["used_uploads"], 1)
+
+    def test_keyed_upload_db_failure_retains_recoverable_object(self):
+        credentials = self.enrolled(quota_bytes=4, quota_uploads=1)
+        key = uuid4()
+        class BrokenInsert:
+            def __init__(self, connection): self.connection = connection
+            def execute(self, query, *args):
+                if "INSERT INTO captures" in query: raise RuntimeError("dummy DB insertion failure")
+                return self.connection.execute(query, *args)
+        @contextmanager
+        def failing_database():
+            with database() as connection:
+                yield BrokenInsert(connection)
+        with patch("app.main.database", new=failing_database):
+            with self.assertRaises(Exception): self.keyed_upload(credentials, key)
+        self.assertEqual(self.client.get(f"/api/v1/media/by-client/{key}", headers=self.bearer(credentials)).status_code, 404)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(credentials)).json()["used_uploads"], 0)
+        self.assertEqual(self.keyed_upload(credentials, key).status_code, 202)
+        self.assertEqual(len(self.blob.objects), 1)
+
+    def test_end_session_is_self_only_retryable_and_retains_media(self):
+        first, second = self.enrolled(), self.enrolled()
+        receipt = self.keyed_upload(first, uuid4()).json()
+        self.client.cookies.clear()  # No admin permission or access header required.
+        unknown = self.client.post("/api/v1/auth/end-session", json={"refresh_token": "dummy-unknown"})
+        self.assertEqual(unknown.status_code, 401)
+        payload = {"refresh_token": first["refresh_token"], "installation_id": second["installation_id"]}
+        ended = self.client.post("/api/v1/auth/end-session", json=payload)
+        self.assertEqual(ended.status_code, 200)
+        self.assertEqual(ended.json(), {"installation_id": first["installation_id"], "revoked": True})
+        repeated = self.client.post("/api/v1/auth/end-session", json=payload)
+        self.assertEqual(repeated.json(), ended.json())
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(first)).status_code, 401)
+        self.assertEqual(self.client.post("/api/v1/auth/token", json={"refresh_token": first["refresh_token"]}).status_code, 401)
+        self.assertEqual(self.keyed_upload(first, uuid4()).status_code, 401)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(second)).status_code, 200)
+        with database() as connection:
+            self.assertIsNotNone(connection.execute("SELECT original_key FROM captures WHERE id=%s", (receipt["id"],)).fetchone())
+        self.assertEqual(len(self.blob.objects), 1)
+
+    def test_end_session_accepts_expired_secret_only_for_revocation(self):
+        credentials = self.enrolled()
+        with database() as connection:
+            connection.execute("UPDATE installations SET refresh_expires_at=now()-interval '1 day'")
+            connection.execute("UPDATE access_tokens SET expires_at=now()-interval '1 day'")
+        self.assertEqual(self.client.post("/api/v1/auth/token", json={"refresh_token": credentials["refresh_token"]}).status_code, 401)
+        for _ in range(2):
+            ended = self.client.post("/api/v1/auth/end-session", json={"refresh_token": credentials["refresh_token"]})
+            self.assertEqual(ended.status_code, 200)
+            self.assertEqual(ended.json()["installation_id"], credentials["installation_id"])
+
+    def test_end_session_lost_acknowledgement_retry(self):
+        credentials = self.enrolled()
+        payload = {"refresh_token": credentials["refresh_token"]}
+        # Serialization fails only after the route committed the revocation.
+        with patch("fastapi.routing.serialize_response", side_effect=RuntimeError("dummy lost End acknowledgement")):
+            with self.assertRaises(Exception):
+                self.client.post("/api/v1/auth/end-session", json=payload)
+        with database() as connection:
+            first_time = connection.execute("SELECT revoked_at FROM installations WHERE id=%s", (credentials["installation_id"],)).fetchone()["revoked_at"]
+        self.assertIsNotNone(first_time)
+        repeated = self.client.post("/api/v1/auth/end-session", json=payload)
+        self.assertEqual(repeated.status_code, 200)
+        self.assertEqual(repeated.json(), {"installation_id": credentials["installation_id"], "revoked": True})
+        with database() as connection:
+            self.assertEqual(connection.execute("SELECT revoked_at FROM installations WHERE id=%s", (credentials["installation_id"],)).fetchone()["revoked_at"], first_time)
+
+    def test_upload_and_end_session_serialize(self):
+        credentials = self.enrolled()
+        entered, release, end_started = Event(), Event(), Event()
+        actual_upload = self.blob.upload_fileobj
+        def gated_upload(*args, **kwargs):
+            entered.set()
+            if not release.wait(5): raise RuntimeError("dummy upload gate timeout")
+            return actual_upload(*args, **kwargs)
+        class WatchEnd:
+            def __init__(self, connection): self.connection = connection
+            def execute(self, query, *args):
+                if "UPDATE installations SET revoked_at" in query and "refresh_hash" in query: end_started.set()
+                return self.connection.execute(query, *args)
+        @contextmanager
+        def watched_database():
+            with database() as connection: yield WatchEnd(connection)
+        with patch.object(self.blob, "upload_fileobj", side_effect=gated_upload), patch("app.onboarding.database", new=watched_database):
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                upload = pool.submit(self.keyed_upload, credentials, uuid4())
+                self.assertTrue(entered.wait(3))
+                end = pool.submit(self.client.post, "/api/v1/auth/end-session", json={"refresh_token": credentials["refresh_token"]})
+                self.assertTrue(end_started.wait(3))
+                self.assertFalse(end.done())
+                release.set()
+                self.assertEqual(upload.result(timeout=5).status_code, 202)
+                self.assertEqual(end.result(timeout=5).status_code, 200)
+        self.assertEqual(self.keyed_upload(credentials, uuid4()).status_code, 401)
+        self.assertEqual(len(self.blob.objects), 1)
+
+    def test_end_session_wins_after_upload_prevalidation(self):
+        credentials = self.enrolled()
+        entered, release = Event(), Event()
+        def gated_storage():
+            entered.set()
+            if not release.wait(5): raise RuntimeError("dummy storage gate timeout")
+            return self.blob
+        with patch("app.main.storage", side_effect=gated_storage):
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                upload = pool.submit(self.keyed_upload, credentials, uuid4())
+                self.assertTrue(entered.wait(3))
+                ended = self.client.post("/api/v1/auth/end-session", json={"refresh_token": credentials["refresh_token"]})
+                self.assertEqual(ended.status_code, 200)
+                release.set()
+                result = upload.result(timeout=5)
+                self.assertEqual(result.status_code, 401)
+                self.assertEqual(result.json()["detail"]["code"], "access_revoked")
+        self.assertEqual(len(self.blob.objects), 0)
+        with database() as connection:
+            self.assertEqual(connection.execute("SELECT used_uploads FROM installations").fetchone()["used_uploads"], 0)
 
     def test_admin_auth_and_csrf(self):
         self.assertEqual(self.client.post("/api/v1/admin/invites", json={"label": "x"}).status_code, 403)

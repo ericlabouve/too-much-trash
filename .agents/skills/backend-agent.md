@@ -57,6 +57,18 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   to `/unlock` only after204, and reports failure without claiming success.
   This clears that browser's cookie; it does not revoke copied stateless cookies
   or implement per-admin offboarding. Eric deferred authn/authz redesign.
+- Collector End Session is separate: POST `/auth/end-session` with current
+  refresh_token ->200 {installation_id,revoked:true}. Revokes only that secret's
+  installation; accepts known expired/revoked secrets for acknowledgement retry
+  only. Native confirms identity before cleanup and retains secret/journal on
+  uncertainty. Backend originals are retained.
+- Automatic media contract1 is advertised by authenticated `/auth/me`.
+  POST `/media` uses Idempotency-Key=stable capture UUID; exact retries202,
+  lookup `/media/by-client/{UUID}`200, conflict409 on changed bytes/name/type.
+  One quota charge per installation/client UUID, serialized with End Session by
+  owner row lock. No migration: frozen uuid5 mapping and client/SHA256 metadata in
+  original_key. Never delete keyed blobs on uncertain DB failure (could erase a
+  committed retry). Missing version1 blocks native automatic retries.
 - Keep the admin dashboard compact: only "Admin dashboard", Logout, and the
   "Invitations & installations" card with its controls. No promotional hero,
   workspace, footer or frontend health polling. Public website is separate.

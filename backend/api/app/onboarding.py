@@ -185,6 +185,22 @@ def refresh_access(payload: Refresh, response: Response):
         return mint_access(connection, row["id"])
 
 
+@router.post("/auth/end-session")
+def end_session(payload: Refresh, response: Response):
+    no_store(response)
+    # Possession of this installation's strong secret authenticates ONLY
+    # revocation. Keep recognizing it after expiry/revocation for lost-response
+    # retries; this endpoint never grants access or needs an admin session.
+    with database() as connection:
+        row = connection.execute(
+            """UPDATE installations SET revoked_at=COALESCE(revoked_at,now())
+               WHERE refresh_hash=%s RETURNING id""", (digest(payload.refresh_token),),
+        ).fetchone()
+        if not row:
+            fail(401, "refresh_invalid", "Session credential is invalid")
+    return {"installation_id": str(row["id"]), "revoked": True}
+
+
 def require_installation(request: Request):
     scheme, _, token = request.headers.get("Authorization", "").partition(" ")
     if scheme.lower() != "bearer" or not token or len(token) > 256:
@@ -205,7 +221,7 @@ def require_installation(request: Request):
 @router.get("/auth/me")
 def me(response: Response, installation=Depends(require_installation)):
     no_store(response)
-    return {"installation_id": installation["id"], **{
+    return {"installation_id": installation["id"], "media_contract_version": 1, **{
         key: installation[key] for key in
         ("installation_name", "quota_bytes", "quota_uploads", "used_bytes", "used_uploads")}}
 
