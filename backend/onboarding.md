@@ -389,3 +389,19 @@ only in an explicitly disposable DB/blob environment with `TMT_TEST_ISOLATED=1`,
 test dependencies, `/sql/init` fixture mount and the S3 environment configured.
 It deliberately reuses the API tests' destructive table resets; never point it
 at the pilot or user local-dev database. It is not part of default discovery.
+
+### Real native session integration — October 12, 2026
+
+With Eric's approval, one1-hour/1MiB/2-upload local-dev invitation was created for
+`Native session sync integration`, using private mode600 fixtures and a1538-byte
+synthetic H264 MOV. Native registration, automatic background URLSession upload
+recovery after a deliberately lost acknowledgement, repeated keyed receipt,
+and End Session cleanup passed in Simulator. Recovery used a receipt lookup rather
+than another automatic POST. An explicit duplicate POST returned the same media
+ID. Native cleanup removed the test's synced video, unfinished unsynced file,
+queue and unique Keychain item only after matching revocation acknowledgement.
+Read-only backend audit confirmed one accepted capture/1538-byte quota charge,
+test installation revoked, completed processing and retained matching original.
+The prior user installation remains active. This does not validate physical
+camera/volume buttons or completion while actually OS-suspended/force-quit.
+Temporary secret/video fixtures are removed; backend test audit/media are retained.

@@ -115,10 +115,17 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   contexts and logs. Do not rotate tokens or issue live invites without authority.
 - Verified pilot: backend ownership/quota/media processing over HTTPS; Simulator
   registration, Keychain reuse, private admin reachability and revoked-access
-  rejection. Native iOS uploads and physical capture remain unverified.
+  rejection. Physical capture remains unverified; see the later native checkpoint.
 - October11 user-led local Simulator two-word enrollment reached Field Camera;
   backend logs confirmed enroll201/me200 and one active installation. Do not
-  revoke this user's installation as disposable agent-test cleanup. Capture and
-  native uploads remain unverified; no credential/request-body inspection needed.
+  revoke this user's installation as disposable agent-test cleanup. That checkpoint
+  only verified enrollment; no credential/request-body inspection was needed.
+- October12 approved real native Simulator test used one bounded temporary
+  installation and synthetic MOV. Automatic upload/lost-ack lookup recovery,
+  duplicate receipt and End Session local-file/Keychain cleanup passed. Backend
+  independently verified one1538-byte charge/capture, revoked test installation,
+  retained matching original and prior user installation still active. Physical
+  capture and actual OS-suspended/force-quit completion remain separate checks.
+  Remove private temporary fixtures after use; retain labelled backend audit/media.
 - Read `backend/onboarding.md` for the auth contract and verification details;
   `backend/README.md` for setup and `backend/compose.yaml` for deployed services.
