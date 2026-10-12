@@ -8,6 +8,7 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 - Keep component PRs separate against `main`, with high-level titles and concise bullet-point bodies. Check changed-file overlap before opening or updating coordinated PRs. The user specifically corrected duplicated iOS changes in PRs #6/#7.
 - Two-way communication with Backend Agent was explicitly authorized for this project. Discover its current chat by title when needed; do not assume a historical chat/worktree is still active. New chats or unrelated recipients need their own authorization.
 - Open Xcode's generated project from the active worktree, not the main checkout. No project linking between checkouts is needed. Xcode need not remain open for command-line builds.
+- Migration preference clarified 2026-10-12: after merging the component PRs, relaunch the iPhone chat in Backend Agent's existing worktree and retain the existing Backend chat. Preserve file ownership, but share one agreed branch/index and serialize Git operations, branch changes and disruptive integration/deployment work. Private restart notes belong in gitignored `.agents/handoff/`; copy them deliberately because Git will not transfer them. Do not archive a checkout that still supplies container bind mounts or ignored runtime configuration.
 - Commit/push/open a PR when requested; skill maintenance alone does not authorize remote writes, merges, deployment, credential provisioning, or network exposure.
 
 ## Product and architecture
