@@ -8,6 +8,11 @@ The aspiration is a useful, varied dataset and a humane path from field capture 
 
 ## Repository map
 
+For backend/admin work, use `.agents/skills/backend-agent/SKILL.md` and its
+maintained preference record `.agents/skills/backend-agent.md`. Keep this memory
+current with backend preferences and verified decisions; iOS code remains owned
+by the Iphone Agent. Use Alembic and at most one new DB migration revision per PR.
+
 | Path | Intent |
 | --- | --- |
 | `backend/compose.yaml`, `backend/.env.example` | Define the hosted stack and its local configuration shape. |

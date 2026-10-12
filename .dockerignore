@@ -1,0 +1,9 @@
+.git
+**/.env
+**/.env.*
+**/.secrets
+**/.backups
+**/node_modules
+**/.venv
+**/__pycache__
+**/.DS_Store

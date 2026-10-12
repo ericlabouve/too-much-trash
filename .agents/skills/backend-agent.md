@@ -1,0 +1,141 @@
+---
+name: backend-agent
+description: Maintain Too Much Trash backend, admin portal, database migrations and deployment decisions; use for backend work and client/server coordination, not iOS implementation or CAD.
+---
+
+# Backend Agent
+
+Update this file frequently when Eric states a preference, a decision changes, or
+verification reveals a reusable constraint. Replace stale guidance rather than
+accumulating contradictory history. Record durable facts, not secrets, temporary
+invite codes, or unverified claims. Updating memory does not grant new authority.
+
+## Ownership and workflow
+
+- Backend owns `backend/`, the admin portal in `frontend/`, and related docs/config.
+  Iphone Agent owns `ios/` in its separate worktree. Exchange contracts and test
+  results, but do not cherry-pick iOS into the backend PR. Keep PR file lists
+  disjoint; PR #6 is iOS and #7 is backend/admin as of October 11, 2026.
+- Eric authorized two-way communication with Iphone Agent. Coordinate changes to
+  API contracts and report blockers. This permission does not authorize deployment
+  exposure, signing changes, new invitations, or merging PRs on its own.
+- Use Alembic for DB versioning. At most one new revision file per PR; consolidate
+  changes while a revision is unmerged. Never rewrite an applied, merged revision.
+  Initial Postgres setup scripts are separate from application revision history.
+- Test on Simulator for Eric's own review first; only afterward move to his
+  personal iPhone. Simulator success is not camera/button/hardware validation.
+- Keep answers concise. State outcomes and distinguish implemented, verified,
+  planned and physically unvalidated behavior.
+
+## Architecture and current decisions
+
+- FastAPI/uv API, PostgreSQL, SeaweedFS blob storage, Prefect media worker, Caddy
+  reverse proxy and admin portal. API migration startup is `alembic upgrade head`;
+  credentials come from environment, not committed Alembic configuration.
+- Invite-only access is our own authentication, not Apple App Attest. Admin
+  creates short-lived single-use codes; enrollment issues installation-bound
+  credentials; refresh, revocation, ownership checks and quotas protect media.
+  A shared admin token gate is temporary; passkey enrollment/login remains work.
+- Eric accepted two-word invites (22 bits) for the pilot on October11. Draw two
+  independent uniform words with replacement from pinned official BIP39 English;
+  repeats valid. Normalize only valid ASCII word pairs for case/whitespace;
+  Eric later removed legacy-code/device-name UI: backend rejects opaque invites,
+  retains historical records/enrolled credentials, and defaults omitted name to
+  iPhone. Keep hashed storage, atomic one-time
+  redemption, quotas, expiry, throttles and strong installation/admin secrets.
+  Bound collision retries across all historical hashes; never reuse a pair.
+  This risk acceptance is not permission for public exposure or minting live codes.
+- October12: enrollment admits max3 requests per rolling60 seconds globally,
+  reserved in middleware before JSON/Pydantic validation. Invalid/expired/used
+  words and malformed requests reaching API consume permits; fourth gets429 with
+  rounded-up Retry-After until oldest permit expires. Blocked retries don't extend
+  cooldown. DB clock/advisory lock and namespaced existing rate-limit table rows
+  share state across processes without another migration. Login/refresh limits
+  unchanged. Three attempts can deny registration to all users temporarily;
+  do not describe this as per-device protection or bypass via forwarded IP.
+- Admin dashboard Logout uses existing DELETE `/api/v1/admin/session`, returns
+  to `/unlock` only after204, and reports failure without claiming success.
+  This clears that browser's cookie; it does not revoke copied stateless cookies
+  or implement per-admin offboarding. Eric deferred authn/authz redesign.
+- Collector End Session is separate: POST `/auth/end-session` with current
+  refresh_token ->200 {installation_id,revoked:true}. Revokes only that secret's
+  installation; accepts known expired/revoked secrets for acknowledgement retry
+  only. Native confirms identity before cleanup and retains secret/journal on
+  uncertainty. Backend originals are retained.
+- Automatic media contract1 is advertised by authenticated `/auth/me`.
+  POST `/media` uses Idempotency-Key=stable capture UUID; exact retries202,
+  lookup `/media/by-client/{UUID}`200, conflict409 on changed bytes/name/type.
+  One quota charge per installation/client UUID, serialized with End Session by
+  owner row lock. No migration: frozen uuid5 mapping and client/SHA256 metadata in
+  original_key. Never delete keyed blobs on uncertain DB failure (could erase a
+  committed retry). Missing version1 blocks native automatic retries.
+- Keep the admin dashboard compact: only "Admin dashboard", Logout, and the
+  "Invitations & installations" card with its controls. No promotional hero,
+  workspace, footer or frontend health polling. Public website is separate.
+- Hide redeemed/revoked invitations and revoked installations by default.
+  History disclosure text is exactly Expand(count), with aria-expanded state.
+  Preserve choices during refresh/revoke; expired unused invites remain visible.
+  No "Use Show revoked" helper text; installation primary label comes from the
+  invitation tester_label, not UUID. Never delete history or alter authorization.
+- Show a live storage-only video estimate beside quota, assuming decimal 5 MB
+  per video: floor(quotaMiB * 1048576 / 5000000). Upload count remains its own
+  limit; do not imply storage estimate grants more uploads.
+- Unlock token visibility stays hidden by default, uses an accessible eye toggle,
+  preserves autofilled text and re-masks on submit. Test with dummy values only;
+  never reveal real secrets in screenshots/logs. Dev and pilot tokens differ;
+  wrong saved token or trailing newline can cause invalid-token responses.
+- October12: a missing pilot eye toggle was stale Caddy content, not a token
+  mismatch within that stack. Rebuild/redeploy both API and Caddy when verifying
+  paired admin changes. Each stack's token matches its own mounted hash; never
+  share tokens across stacks. Switching native origins selects separate saved
+  credentials, not End Session; verify the original origin before re-enrolling.
+- Eric confirmed Safari autofill added trailing whitespace. Trim only outer
+  whitespace from the generated admin token on client submission; preserve all
+  internal characters. This is not a normalization rule for arbitrary passwords.
+- Private pilot uses existing macOS Tailscale Serve: HTTPS 10000 to localhost8082
+  collector, HTTPS8443 to localhost8081 admin. MagicDNS suffix is not a service
+  hostname. Funnel is off; public collector exposure requires explicit approval.
+  Admin stays private. Compose listeners bind localhost; storage/workflows are
+  not exposed. Docker Tailscale overlay is optional, not active in the pilot.
+- Current host is Eric's MacBook Pro; future host is his Mac mini, with a different
+  service FQDN. Clients configure origins; do not silently adopt old queued media
+  or credentials across origins. Preserve normal TLS verification.
+- Eric's October 11 testing order: co-test no-Tailscale local development, then
+  Tailscale mode, then personal iPhone. Local mode is Debug+Simulator-only.
+  `compose.dev.yaml` uses project `too-much-trash-dev`, loopback18082 collector,
+  18081 admin and18080 website, independent volumes/network/credentials from
+  `.secrets/dev/compose.env`. Only the isolated dev API allows HTTP admin cookies;
+  never change the pilot's Secure cookies to make local login work. Auth/invites
+  remain required. Do not issue new native-test invites without approval.
+
+## Verification and operational memory
+
+- Back up before live schema changes; test migrations on disposable databases
+  first. Verify fresh initialized DB, legacy pilot adoption, repeated upgrade,
+  version bookkeeping, and preservation of captures/invitations/ownership.
+- API integration tests truncate tables: run only with an isolated DB and
+  `TMT_TEST_ISOLATED=1`. Never run them against the live Compose database.
+- Preserve volumes on rebuild/redeploy. Confirm migration exit0, API health,
+  running image IDs and HTTPS route isolation. Do not infer worker processing
+  success merely from a running container.
+- Keep `.env`, `.secrets`, backups, invitations and credentials out of Git, build
+  contexts and logs. Do not rotate tokens or issue live invites without authority.
+- Verified pilot: backend ownership/quota/media processing over HTTPS; Simulator
+  registration, Keychain reuse, private admin reachability and revoked-access
+  rejection. Physical capture remains unverified; see the later native checkpoint.
+- October11 user-led local Simulator two-word enrollment reached Field Camera;
+  backend logs confirmed enroll201/me200 and one active installation. Do not
+  revoke this user's installation as disposable agent-test cleanup. That checkpoint
+  only verified enrollment; no credential/request-body inspection was needed.
+- October12 approved real native Simulator test used one bounded temporary
+  installation and synthetic MOV. Automatic upload/lost-ack lookup recovery,
+  duplicate receipt and End Session local-file/Keychain cleanup passed. Backend
+  independently verified one1538-byte charge/capture, revoked test installation,
+  retained matching original and prior user installation still active. Physical
+  capture and actual OS-suspended/force-quit completion remain separate checks.
+  Remove private temporary fixtures after use; retain labelled backend audit/media.
+- October12: Eric approved the UI but has not installed the app on a physical
+  iPhone or confirmed camera functionality. Keep hardware testing pending;
+  Simulator checks do not qualify real camera capture or volume-button events.
+- Read `backend/onboarding.md` for the auth contract and verification details;
+  `backend/README.md` for setup and `backend/compose.yaml` for deployed services.
