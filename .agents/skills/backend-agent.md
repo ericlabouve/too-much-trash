@@ -38,8 +38,10 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   A shared admin token gate is temporary; passkey enrollment/login remains work.
 - Eric accepted two-word invites (22 bits) for the pilot on October11. Draw two
   independent uniform words with replacement from pinned official BIP39 English;
-  repeats valid. Normalize only valid ASCII word pairs for case/whitespace; legacy
-  opaque codes remain exact-case/outer-trim. Keep hashed storage, atomic one-time
+  repeats valid. Normalize only valid ASCII word pairs for case/whitespace;
+  Eric later removed legacy-code/device-name UI: backend rejects opaque invites,
+  retains historical records/enrolled credentials, and defaults omitted name to
+  iPhone. Keep hashed storage, atomic one-time
   redemption, quotas, expiry, throttles and strong installation/admin secrets.
   Bound collision retries across all historical hashes; never reuse a pair.
   This risk acceptance is not permission for public exposure or minting live codes.

@@ -145,13 +145,16 @@ def revoke_installation(installation_id: UUID):
 def enroll(payload: Enrollment, response: Response):
     throttle("enroll", 60)
     no_store(response)
+    code = normalize_invite_code(payload.invite_code)
+    if code is None:
+        fail(400, "invite_invalid", "Invite is invalid or no longer available")
     installation_id, refresh = uuid4(), secrets.token_urlsafe(32)
     with database() as connection:
         invite = connection.execute(
             """UPDATE invitations SET redeemed_at = now()
                WHERE code_hash = %s AND expires_at > now() AND revoked_at IS NULL
                AND redeemed_at IS NULL RETURNING id, quota_bytes, quota_uploads""",
-            (digest(normalize_invite_code(payload.invite_code)),),
+            (digest(code),),
         ).fetchone()
         if not invite:
             fail(400, "invite_invalid", "Invite is invalid or no longer available")

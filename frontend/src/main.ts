@@ -13,7 +13,7 @@ root.innerHTML = `
     <p id="logout-feedback" role="alert"></p>
     <section class="panel onboarding" aria-labelledby="invites-title">
       <h2 id="invites-title">Invitations & installations</h2>
-      <p>Create two single-use invite words and share them privately. Case and extra spaces do not matter. Existing long codes still work.</p>
+      <p>Create two single-use invite words and share them privately. Exactly two words are required; case and extra spaces do not matter.</p>
       <form id="invite-form">
         <label>Tester label <input name="label" maxlength="80" required></label>
         <label>Expires in hours <input name="hours" type="number" min="1" max="168" value="24" required></label>

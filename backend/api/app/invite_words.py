@@ -17,11 +17,10 @@ def generate_invite_code() -> str:
     return f"{secrets.choice(WORDS)} {secrets.choice(WORDS)}"
 
 
-def normalize_invite_code(value: str) -> str:
+def normalize_invite_code(value: str) -> str | None:
     stripped = value.strip()
     words = stripped.split()
     if len(words) == 2 and all(word.isascii() and word.lower() in WORD_SET for word in words):
         return " ".join(word.lower() for word in words)
-    # Legacy opaque tokens remain exact-case with outer whitespace removed.
-    # Unknown words, punctuation and misspellings are never guessed/corrected.
-    return stripped
+    # No opaque-code fallback or guessing/correction of malformed word pairs.
+    return None

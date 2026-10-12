@@ -42,7 +42,10 @@ throttling remains 60 attempts/minute, not per-device protection.
 Only hashes are stored. Word pairs accept case-insensitive ASCII words and
 surrounding/repeated whitespace (including tabs/newlines), normalized to lowercase
 `word word`. No typo, punctuation, prefix, hyphen or word-order correction is
-performed. Legacy opaque invites retain exact case with outer whitespace trimmed.
+performed. As requested later on October11, enrollment requires exactly two valid
+words: old opaque invites are no longer redeemable. Historical rows are retained,
+and already-enrolled access/refresh credentials are unaffected. The iOS form no
+longer asks for a device name; omitting `installation_name` uses default `iPhone`.
 Collisions against all historic invite hashes are retried at most16 times using
 the DB unique constraint; no historic pair is reused. Exhaustion returns503
 `invite_generation_unavailable`, not an invite.
@@ -293,3 +296,9 @@ legacy opaque compatibility, bounded historical/concurrent collisions, atomic
 normalized redemption, token strength, expiry, revocation, quotas and throttling.
 No invitations were generated in the actual local-dev or pilot databases during
 this verification. Frontend build and dashboard/unlock/logout regressions passed.
+
+The later two-word-only simplification removed opaque invite redemption, with
+the same17 disposable migration/API tests re-run successfully. They now verify
+generic rejection of retained opaque invite records, unchanged existing access
+and refresh, and default `iPhone` name when enrollment omits `installation_name`.
+Only local dev is redeployed; the private pilot remains untouched.

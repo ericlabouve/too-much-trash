@@ -147,12 +147,22 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": value}).status_code, 201)
         self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "abandon ability"}).status_code, 400)
 
-    def test_legacy_invite_keeps_case_and_outer_trim(self):
+    def test_opaque_invite_rejected_existing_credentials_unchanged(self):
+        credentials = self.enrolled()
         legacy = "Legacy_ExactCase-Dummy9"
         with database() as connection:
             connection.execute("INSERT INTO invitations(id,code_hash,label,expires_at,quota_bytes,quota_uploads) VALUES (%s,%s,'Legacy dummy',now()+interval '1 hour',1024,1)", (uuid4(), digest(legacy)))
         self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": legacy.lower()}).status_code, 400)
-        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": " \n" + legacy + "\t "}).status_code, 201)
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": " \n" + legacy + "\t "}).status_code, 400)
+        self.assertIsNone(normalize_invite_code(legacy))
+        me = self.client.get("/api/v1/auth/me", headers=self.bearer(credentials))
+        self.assertEqual(me.status_code, 200)
+        self.assertEqual(me.json()["installation_name"], "iPhone")
+        self.assertEqual(self.client.post("/api/v1/auth/token", json={"refresh_token": credentials["refresh_token"]}).status_code, 200)
+        with database() as connection:
+            row = connection.execute("SELECT redeemed_at,revoked_at FROM invitations WHERE code_hash=%s", (digest(legacy),)).fetchone()
+            self.assertIsNone(row["redeemed_at"])
+            self.assertIsNone(row["revoked_at"])
 
     def test_collision_retry_includes_history_and_is_bounded(self):
         with patch("app.onboarding.generate_invite_code", return_value="abandon ability"):
