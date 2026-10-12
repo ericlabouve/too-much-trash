@@ -405,3 +405,33 @@ test installation revoked, completed processing and retained matching original.
 The prior user installation remains active. This does not validate physical
 camera/volume buttons or completion while actually OS-suspended/force-quit.
 Temporary secret/video fixtures are removed; backend test audit/media are retained.
+
+### Admin history and dual-stack deployment — October 12, 2026
+
+Recent invitations hide both redeemed and revoked entries by default; unused
+expired entries remain visible. History controls read `Expand (<count>)` and use
+`aria-expanded` plus a chevron, without the old history helper. Recent installations
+hide only revoked entries and use the invitation's tester label as their primary
+display name, retaining UUIDs internally for authorization and routing.
+
+Thirty-four disposable DB/API tests passed (four optional host/storage checks
+skipped), along with frontend build, dashboard, unlock and logout regressions.
+Browser checks with a read-only dummy-data preview confirmed collapsed/expanded
+history, counts and tester labels; no live invites or revocations were created.
+API and Caddy were rebuilt and deployed to both localdev and the private pilot;
+running images match the latest builds. Three proxy-isolation checks passed on
+each stack. Both login pages now serve the eye toggle and outer-whitespace trim.
+Pilot Secure cookies remain enabled; HTTP cookies are limited to isolated dev.
+The pilot now includes the existing rolling enrollment and media/session contract
+described above; no schema change or additional migration was required.
+
+Localdev and pilot intentionally use separate admin tokens; each token was
+verified against its own mounted hash without printing credentials. A localdev
+token cannot unlock pilot. Origin switching selects origin-bound native credentials
+and does not call End Session: the saved local installation still validated with
+`/auth/me` and reopened Camera/Dashboard in a focused Simulator check. The End
+confirmation was cancelled; no user session was revoked or credential rotated.
+
+Eric approved the current UI on October 12 but has not installed the app on his
+physical iPhone or verified camera functionality. Simulator checks do not qualify
+real camera capture, volume-button events or field hardware; these remain pending.

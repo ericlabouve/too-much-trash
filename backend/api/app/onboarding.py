@@ -123,9 +123,11 @@ def list_installations(response: Response):
     no_store(response)
     with database() as connection:
         return connection.execute(
-            """SELECT id, invitation_id, installation_name, created_at, revoked_at,
-               refresh_expires_at, quota_bytes, quota_uploads, used_bytes, used_uploads
-               FROM installations ORDER BY created_at DESC LIMIT 200"""
+            """SELECT i.id,i.invitation_id,i.installation_name,i.created_at,i.revoked_at,
+               i.refresh_expires_at,i.quota_bytes,i.quota_uploads,i.used_bytes,i.used_uploads,
+               v.label AS tester_label FROM installations i
+               JOIN invitations v ON v.id=i.invitation_id
+               ORDER BY i.created_at DESC LIMIT 200"""
         ).fetchall()
 
 

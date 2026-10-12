@@ -9,6 +9,8 @@ h3 { font-size: 1rem; margin: 20px 0 10px; }
 .access-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin-top: 16px; }
 .access-heading h3 { margin: 0; }
 .access-heading button { font-size: 13px; padding: 6px 10px; }
+.access-heading button::before { content: "▸ "; }
+.access-heading button[aria-expanded="true"]::before { content: "▾ "; }
 .onboarding p[hidden] { display: none; }
 button, input { font: inherit; font-size: 16px; min-height: 44px; padding: 8px 12px; border: 1px solid #748e79; border-radius: 6px; }
 button { background: #dfe9df; color: #243b2b; cursor: pointer; }

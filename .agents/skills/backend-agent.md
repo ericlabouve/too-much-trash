@@ -72,9 +72,11 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 - Keep the admin dashboard compact: only "Admin dashboard", Logout, and the
   "Invitations & installations" card with its controls. No promotional hero,
   workspace, footer or frontend health polling. Public website is separate.
-- Hide revoked invitations/installations by default with separate counted
-  Show revoked toggles. Preserve visibility choices during refresh/revoke;
-  expired/redeemed without revoked_at stay visible. Never delete history.
+- Hide redeemed/revoked invitations and revoked installations by default.
+  History disclosure text is exactly Expand(count), with aria-expanded state.
+  Preserve choices during refresh/revoke; expired unused invites remain visible.
+  No "Use Show revoked" helper text; installation primary label comes from the
+  invitation tester_label, not UUID. Never delete history or alter authorization.
 - Show a live storage-only video estimate beside quota, assuming decimal 5 MB
   per video: floor(quotaMiB * 1048576 / 5000000). Upload count remains its own
   limit; do not imply storage estimate grants more uploads.
@@ -82,6 +84,11 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   preserves autofilled text and re-masks on submit. Test with dummy values only;
   never reveal real secrets in screenshots/logs. Dev and pilot tokens differ;
   wrong saved token or trailing newline can cause invalid-token responses.
+- October12: a missing pilot eye toggle was stale Caddy content, not a token
+  mismatch within that stack. Rebuild/redeploy both API and Caddy when verifying
+  paired admin changes. Each stack's token matches its own mounted hash; never
+  share tokens across stacks. Switching native origins selects separate saved
+  credentials, not End Session; verify the original origin before re-enrolling.
 - Eric confirmed Safari autofill added trailing whitespace. Trim only outer
   whitespace from the generated admin token on client submission; preserve all
   internal characters. This is not a normalization rule for arbitrary passwords.
@@ -127,5 +134,8 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   retained matching original and prior user installation still active. Physical
   capture and actual OS-suspended/force-quit completion remain separate checks.
   Remove private temporary fixtures after use; retain labelled backend audit/media.
+- October12: Eric approved the UI but has not installed the app on a physical
+  iPhone or confirmed camera functionality. Keep hardware testing pending;
+  Simulator checks do not qualify real camera capture or volume-button events.
 - Read `backend/onboarding.md` for the auth contract and verification details;
   `backend/README.md` for setup and `backend/compose.yaml` for deployed services.

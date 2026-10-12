@@ -291,6 +291,16 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(self.client.post("/api/v1/admin/invites", headers=self.admin_headers, json={"label": "x"}).status_code, 401)
         self.assertEqual(self.client.get("/api/v1/admin/reachability").json(), {"service": "too-much-trash-admin", "version": 1})
 
+    def test_admin_installation_label_comes_from_invitation(self):
+        credentials = self.enrolled(label="Field tester")
+        rows = self.client.get("/api/v1/admin/installations").json()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["tester_label"], "Field tester")
+        self.assertEqual(rows[0]["installation_name"], "iPhone")
+        self.assertEqual(rows[0]["id"], credentials["installation_id"])
+        self.assertNotIn("refresh_hash", rows[0])
+        self.assertNotIn("refresh_token", rows[0])
+
     def test_upload_rejections_and_uncacheable_errors(self):
         anonymous = self.client.post("/api/v1/media", content=b"not multipart")
         self.assertEqual(anonymous.status_code, 401)
