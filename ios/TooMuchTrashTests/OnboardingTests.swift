@@ -210,18 +210,12 @@ final class OnboardingTests: XCTestCase {
         XCTAssertEqual(session.phase, .authorized)
     }
 
-    func testInviteWordsArePassedToBackendWithoutChangingLegacyCase() async throws {
+    func testInviteWordsArePassedToBackendForNormalization() async throws {
         let api = StubAPI(), vault = MemoryVault()
         let session = try account(api, vault)
         let result = await session.register(invite: "  Abandon\t  ABILITY\n", name: "")
         XCTAssertTrue(result)
         XCTAssertEqual(api.invitesSeen, ["Abandon\t  ABILITY"])
-        // Word normalization is backend-authoritative; opaque legacy codes stay case-sensitive.
-        let legacyAPI = StubAPI()
-        let legacySession = try account(legacyAPI, MemoryVault())
-        let legacyResult = await legacySession.register(invite: "  Legacy_Case-Sensitive123  ", name: "")
-        XCTAssertTrue(legacyResult)
-        XCTAssertEqual(legacyAPI.invitesSeen, ["Legacy_Case-Sensitive123"])
     }
 
     func testWhitespaceOnlyInviteDoesNotEnroll() async throws {

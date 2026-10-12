@@ -1,6 +1,33 @@
 import XCTest
+import UIKit
 
 final class CameraLaunchTests: XCTestCase {
+    func testPastingWholeInvitePhraseIntoFirstWord() {
+        let savedClipboard = UIPasteboard.general.items
+        defer { UIPasteboard.general.items = savedClipboard }
+        UIPasteboard.general.string = "abandon ability"
+        let app = XCUIApplication()
+        app.launchArguments = ["-collectorPublicOrigin", "http://localhost:18082",
+                               "-privateAdminOrigin", "http://localhost:18081", "-simulatorLocalBackend", "YES",
+                               "-adminNetworkCollectorOrigin", "", "-adminNetworkPrivateOrigin", ""]
+        app.launch()
+        XCTAssertTrue(app.buttons["registerButton"].waitForExistence(timeout: 10))
+        app.buttons["registerButton"].tap()
+        let first = app.textFields["inviteWord1"]
+        XCTAssertTrue(first.waitForExistence(timeout: 5))
+        first.tap()
+        first.press(forDuration: 1)
+        let paste = app.descendants(matching: .any).matching(NSPredicate(format: "label == 'Paste'")).firstMatch
+        XCTAssertTrue(paste.waitForExistence(timeout: 5))
+        paste.tap()
+        let allowPaste = app.buttons["Allow Paste"]
+        if allowPaste.waitForExistence(timeout: 2) { allowPaste.tap() }
+        XCTAssertEqual(first.value as? String, "abandon")
+        XCTAssertEqual(app.textFields["inviteWord2"].value as? String, "ability")
+        XCTAssertTrue(app.buttons["submitRegistration"].isEnabled)
+        XCTAssertFalse(app.staticTexts["registrationMessage"].exists)
+    }
+
     func testRegistrationAcceptsReadableInviteWordsWithoutSubmitting() {
         let app = XCUIApplication()
         app.launchArguments = ["-collectorPublicOrigin", "http://localhost:18082",
@@ -9,13 +36,22 @@ final class CameraLaunchTests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.buttons["registerButton"].waitForExistence(timeout: 10))
         app.buttons["registerButton"].tap()
-        let words = app.textFields["inviteCode"]
-        XCTAssertTrue(words.waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["Register this iPhone"].isEnabled)
-        words.tap()
-        words.typeText("abandon ability")
-        XCTAssertEqual(words.value as? String, "abandon ability")
-        XCTAssertTrue(app.buttons["Register this iPhone"].isEnabled)
+        let first = app.textFields["inviteWord1"]
+        let second = app.textFields["inviteWord2"]
+        let register = app.buttons["submitRegistration"]
+        XCTAssertTrue(first.waitForExistence(timeout: 5))
+        XCTAssertFalse(register.isEnabled)
+        XCTAssertFalse(app.staticTexts["registrationMessage"].exists)
+        XCTAssertEqual(register.label, "Register")
+        XCTAssertTrue(app.staticTexts["Enter the two word invite phrase above"].exists)
+        XCTAssertFalse(app.textFields["installationName"].exists)
+        XCTAssertFalse(app.buttons["inviteEntryMode"].exists)
+        XCTAssertFalse(app.textFields["inviteCode"].exists)
+        first.tap()
+        first.typeText("abandon ability")
+        XCTAssertEqual(first.value as? String, "abandon")
+        XCTAssertEqual(second.value as? String, "ability")
+        XCTAssertTrue(register.isEnabled)
         // Dummy words only. Never consume a live invite in a UI test.
     }
 

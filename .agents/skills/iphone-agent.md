@@ -12,6 +12,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Product and architecture
 
+- Registration preference (2026-10-11): require two invite words only, with no legacy-code option or device-name field. Submit without an installation name; the existing backend default label applies. Two rounded word boxes auto-parse a whole pasted phrase into either box, with no auto-submit or silent truncation of extra words. Preserve backend-authoritative validation and input case. Use one **Register** button, omit the initial redundant account message on this sheet, retain failure feedback. Instruction is **Enter the two word invite phrase above**. Large accessibility text stacks boxes. This supersedes the earlier legacy compatibility and editable default-name preferences.
+
 - The authorized experience opens directly to rear-camera capture. A new installation sees collector Home with Continue and Register with invite. Server Addresses and Admin login appear only when the designated private HTTPS admin endpoint is reachable. Returning users reach capture only after backend validation; saved credentials alone are not authorization.
 - SwiftUI app, iPhone-only, portrait, iOS 17.2+. `project.yml` is the XcodeGen source of truth; generated `.xcodeproj` is ignored. Regenerate after configuration changes.
 - Default to wrapping long UI text rather than truncating it, especially editable server origins: the full hostname and port must remain readable. Server-address fields use vertically expanding multiline input.
@@ -36,7 +38,7 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Capture durability and backend coordination
 
-- On 2026-10-11 the user accepted two randomly selected BIP-39 English words for new pilot invites after discussion of 22-bit guessability. Keep strong installation credentials, hashed invite storage, single-use redemption, expiry, quotas, and throttling. The native readable invite field accepts two words; the backend owns case/whitespace normalization and preserves case-sensitive legacy opaque codes. Do not lowercase arbitrary codes on the client, show live words in screenshots/logs, or claim revocation prevents first-use guessing.
+- On 2026-10-11 the user accepted two randomly selected BIP-39 English words for pilot invites after discussion of 22-bit guessability. Keep strong installation credentials, hashed invite storage, single-use redemption, expiry, quotas, and throttling. The backend owns word-list validation and case/whitespace normalization; older opaque codes are no longer accepted for new enrollment, without changing existing installations. Do not show live words in screenshots/logs or claim revocation prevents first-use guessing.
 
 - Preserve originals in `Documents/Captures`, including successful uploads, network/auth/quota failures, and uncertain outcomes. Never uninstall/reset the app or erase local captures as routine debugging.
 - Queue entries belong to the original collector origin and installation UUID. Changing hosts or re-enrolling must not silently reassign old clips. Corrupt queue metadata is preserved, not overwritten with an empty queue. Files app access is enabled; users should not edit the manifest.
@@ -56,6 +58,12 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 - When reporting completion, lead with outcome and validation evidence. Distinguish automated tests, native live integration, deployed backend checks, and physical validation. Print a high-level remaining-work summary to stdout when requested, and concisely identify user-only steps.
 
 ## Evidence and remaining work
+
+- 2026-10-11 user confirmed live local two-word paste and registration, then showed the authorized Field Camera screen (0 queued/0 sent). Real long-press Paste UI regression passed with dummy words and restored clipboard. Empty Simulator clipboard explained the prior paste failure; Send Clipboard transfer resolved it. Simulator camera runtime-error text can show **Camera stopped** rather than **No camera available**; neither establishes capture capability. Local upload/status/retention and fresh relaunch credential reuse remain to validate.
+
+- 2026-10-11 two-word-only simplification: full 54-test Simulator suite passed without skips, including absence of legacy-code and device-name controls and retained word-entry behavior. Redeployed without resetting data. Backend separately verified strict word-only redemption, omitted-name default, and unchanged installed access/refresh credentials; real local registration remains pending.
+
+- 2026-10-11 split invite entry: full 54-test Simulator suite passed without skips; final error-timing refinement passed a targeted registration UI rerun. Parser tests cover whole-phrase input in either box, extra whitespace, repeated words, case preservation, incomplete/oversized input, and no silent truncation. UI checks cover automatic focus/typing, one Register button, no initial status, and legacy entry. App reinstalled/relaunched without resetting data; live local redemption remains pending.
 
 - 2026-10-11 two-word invite form: full 50-test Simulator suite passed with no skips, including readable dummy-word UI entry (without redemption), backend-authoritative normalization, legacy-case preservation, and whitespace-only rejection. Reinstalled/relaunched the normal app and visually verified local Simulator Home. Real local word-pair redemption remains the next user walkthrough step.
 

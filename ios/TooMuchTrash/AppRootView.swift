@@ -98,37 +98,70 @@ struct OnboardingView: View {
 struct RegistrationView: View {
     @ObservedObject var account: AccountSession
     @Environment(\.dismiss) private var dismiss
-    @State private var invite = ""
-    @State private var name = ""
+    @State private var words = InviteWordEntry()
+    @State private var attemptedRegistration = false
+    @FocusState private var focusedWord: InviteWordEntry.Field?
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Register with invite") {
-                    TextField("Invite words", text: $invite)
-                        .textInputAutocapitalization(.never).autocorrectionDisabled()
-                        .accessibilityIdentifier("inviteCode")
-                    TextField("Installation name (optional)", text: $name)
-                        .accessibilityIdentifier("installationName")
-                    Text("Enter the two invite words your administrator shared, separated by a space. Capitalization does not matter. Older invite codes still work.")
-                        .font(.footnote)
+                    if dynamicTypeSize.isAccessibilitySize {
+                        VStack(spacing: 12) { wordField(.first); wordField(.second) }
+                    } else {
+                        HStack(spacing: 12) { wordField(.first); wordField(.second) }
+                    }
+                    Text("Enter the two word invite phrase above")
+                        .font(.footnote).foregroundStyle(.secondary)
                 }
                 Section {
-                    Text(account.message).accessibilityIdentifier("registrationMessage")
-                    Button("Register this iPhone") {
+                    if attemptedRegistration {
+                        Text(account.message).accessibilityIdentifier("registrationMessage")
+                    }
+                    Button("Register") {
+                        focusedWord = nil
                         Task {
-                            if await account.register(invite: invite, name: name) {
-                                invite = ""
+                            if await account.register(invite: words.code, name: "") {
+                                words = InviteWordEntry()
                                 dismiss()
-                            }
+                            } else { attemptedRegistration = true }
                         }
                     }
-                    .disabled(account.busy || invite.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(account.busy || !words.isComplete)
+                    .accessibilityIdentifier("submitRegistration")
                 }
             }
             .navigationTitle("Registration")
             .toolbar { Button("Close") { dismiss() }.disabled(account.busy) }
             .interactiveDismissDisabled(account.busy)
+        }
+    }
+
+    private func wordField(_ field: InviteWordEntry.Field) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(field == .first ? "Word 1" : "Word 2")
+                .font(.caption).foregroundStyle(.secondary)
+            TextField(field == .first ? "First word" : "Second word", text: Binding(
+                get: { field == .first ? words.first : words.second },
+                set: { value in
+                    if words.update(value, field: field) { focusedWord = nil }
+                    else if field == .first, value.last?.isWhitespace == true,
+                            value.split(whereSeparator: { $0.isWhitespace }).count == 1 {
+                        words.first = value.trimmingCharacters(in: .whitespacesAndNewlines)
+                        focusedWord = .second
+                    }
+                }))
+                .textInputAutocapitalization(.never).autocorrectionDisabled()
+                .focused($focusedWord, equals: field)
+                .submitLabel(field == .first ? .next : .done)
+                .onSubmit { focusedWord = field == .first ? .second : nil }
+                .padding(12)
+                .background(.background, in: RoundedRectangle(cornerRadius: 12))
+                .overlay(RoundedRectangle(cornerRadius: 12)
+                    .stroke(focusedWord == field ? Color.accentColor : Color.secondary.opacity(0.3), lineWidth: 1.5))
+                .accessibilityLabel(field == .first ? "Invite word 1" : "Invite word 2")
+                .accessibilityIdentifier(field == .first ? "inviteWord1" : "inviteWord2")
         }
     }
 }
