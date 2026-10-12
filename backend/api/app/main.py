@@ -12,6 +12,7 @@ from starlette.concurrency import run_in_threadpool
 
 from app.admin_auth import router as admin_router
 from app.db import database
+from app.enrollment_limit import require_enrollment_permit
 from app.onboarding import fail, require_installation, router as onboarding_router
 
 app = FastAPI(title="Too Much Trash API", version="0.2.0")
@@ -41,7 +42,14 @@ def storage():
 
 
 @app.middleware("http")
-async def guard_media_body(request: Request, call_next):
+async def guard_sensitive_body(request: Request, call_next):
+    # Count admitted enrollment POSTs before JSON/Pydantic validation.
+    if request.method == "POST" and request.url.path == "/api/v1/auth/enroll":
+        try:
+            await run_in_threadpool(require_enrollment_permit)
+        except HTTPException as exc:
+            return JSONResponse({"detail": exc.detail}, status_code=exc.status_code,
+                                headers={**(exc.headers or {}), "Cache-Control": "no-store"})
     # Reject unauthorized uploads before FastAPI parses/spools multipart content.
     if request.method == "POST" and request.url.path == "/api/v1/media":
         try:

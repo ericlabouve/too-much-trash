@@ -5,6 +5,7 @@ import os
 import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+import multiprocessing
 from pathlib import Path
 from unittest.mock import patch
 from uuid import uuid4
@@ -18,6 +19,16 @@ from app.db import database
 from app.main import app
 from app.onboarding import digest
 from app.invite_words import WORDS, generate_invite_code, normalize_invite_code
+from app.enrollment_limit import BUCKET as ENROLL_BUCKET, require_enrollment_permit
+from fastapi import HTTPException
+
+
+def reserve_permit_in_process(_):
+    try:
+        require_enrollment_permit()
+        return 200
+    except HTTPException as error:
+        return error.status_code
 
 
 class Body(io.BytesIO):
@@ -141,6 +152,10 @@ class OnboardingTests(unittest.TestCase):
         with patch("app.onboarding.generate_invite_code", return_value="abandon ability"):
             self.invite()
         for invalid in ("abandon", "abandon ability able", "abandon-ability", "abandon, ability", "abandn ability", "ability abandon", "abandon unknownword", "ａｂａｎｄｏｎ ability", "   "):
+            # Independent malformed-code cases, not a guessing burst. Reset ONLY
+            # the disposable test DB bucket; rolling-limit tests cover the cap.
+            with database() as connection:
+                connection.execute("DELETE FROM auth_rate_limits WHERE bucket=%s", (ENROLL_BUCKET,))
             self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": invalid}).json()["detail"]["code"], "invite_invalid")
         value = " \tABANDON\n\r  Ability\u00a0 "
         self.assertEqual(normalize_invite_code(value), "abandon ability")
@@ -254,12 +269,78 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(credentials)).json()["used_bytes"], 0)
 
     def test_throttle(self):
-        with database() as connection:
-            import time
-            connection.execute("INSERT INTO auth_rate_limits VALUES ('enroll', %s, 60)", (int(time.time()) // 60,))
-        result = self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"})
+        with patch("app.enrollment_limit.database_now_us", return_value=1_800_000_000_000_000):
+            for _ in range(3):
+                self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"}).status_code, 400)
+            result = self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"})
         self.assertEqual(result.status_code, 429)
-        self.assertIn("retry-after", result.headers)
+        self.assertEqual(result.json()["detail"]["code"], "rate_limited")
+        self.assertEqual(result.headers["retry-after"], "60")
+        self.assertEqual(result.headers["cache-control"], "no-store")
+
+    def test_enrollment_limit_counts_json_and_validation_failures(self):
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", content="{", headers={"Content-Type": "application/json"}).status_code, 422)
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={}).status_code, 422)
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": ""}).status_code, 422)
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "abandon ability"}).status_code, 429)
+        with database() as connection:
+            self.assertEqual(connection.execute("SELECT sum(attempts) AS n FROM auth_rate_limits WHERE bucket=%s", (ENROLL_BUCKET,)).fetchone()["n"], 3)
+
+    def test_rolling_boundary_and_blocked_retry_do_not_extend_cooldown(self):
+        base = 1_800_000_000_000_000
+        with patch("app.enrollment_limit.database_now_us", return_value=base + 59_900_000) as clock:
+            for _ in range(3):
+                self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"}).status_code, 400)
+            # Crossing a calendar minute does not reset the rolling budget.
+            clock.return_value = base + 60_100_000
+            blocked = self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"})
+            self.assertEqual(blocked.status_code, 429)
+            self.assertEqual(blocked.headers["retry-after"], "60")
+            clock.return_value = base + 119_899_999
+            blocked = self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"})
+            self.assertEqual(blocked.headers["retry-after"], "1")
+            with database() as connection:
+                self.assertEqual(connection.execute("SELECT sum(attempts) AS n FROM auth_rate_limits WHERE bucket=%s", (ENROLL_BUCKET,)).fetchone()["n"], 3)
+            clock.return_value = base + 119_900_000
+            self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"}).status_code, 400)
+
+    def test_retry_after_tracks_oldest_staggered_permit(self):
+        base = 1_800_000_000_000_000
+        with patch("app.enrollment_limit.database_now_us", return_value=base) as clock:
+            for offset in (0, 10_000_000, 20_000_000):
+                clock.return_value = base + offset
+                self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"}).status_code, 400)
+            clock.return_value = base + 25_200_000
+            result = self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"})
+            self.assertEqual(result.headers["retry-after"], "35")
+            clock.return_value = base + 60_000_000
+            self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"}).status_code, 400)
+            self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"}).headers["retry-after"], "10")
+
+    def test_concurrent_http_attempts_share_global_budget(self):
+        def attempt(index):
+            with TestClient(app) as client:
+                return client.post("/api/v1/auth/enroll", json={"invite_code": "bad"},
+                                   headers={"X-Forwarded-For": f"192.0.2.{index}"}).status_code
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            statuses = list(pool.map(attempt, range(8)))
+        self.assertEqual(statuses.count(400), 3)
+        self.assertEqual(statuses.count(429), 5)
+
+    def test_separate_processes_share_global_budget(self):
+        with multiprocessing.get_context("spawn").Pool(4) as pool:
+            statuses = pool.map(reserve_permit_in_process, range(8))
+        self.assertEqual(statuses.count(200), 3)
+        self.assertEqual(statuses.count(429), 5)
+
+    def test_enrollment_cooldown_does_not_block_existing_auth(self):
+        credentials = self.enrolled()
+        for _ in range(2):
+            self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"}).status_code, 400)
+        self.assertEqual(self.client.post("/api/v1/auth/enroll", json={"invite_code": "bad"}).status_code, 429)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(credentials)).status_code, 200)
+        self.assertEqual(self.client.post("/api/v1/auth/token", json={"refresh_token": credentials["refresh_token"]}).status_code, 200)
+        self.assertEqual(self.client.post("/api/v1/admin/session", json={"token": "test-only-admin"}).status_code, 204)
 
 
 if __name__ == "__main__":

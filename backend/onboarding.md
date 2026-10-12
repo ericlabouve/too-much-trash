@@ -37,7 +37,8 @@ are not wallet mnemonics and contain no checksum. Eric explicitly accepted this
 small-pilot guessing risk on October 11, 2026. More outstanding invites increase
 the probability that a guess matches any valid invite; revocation cannot prevent
 first redemption by a guesser. Reassess before public rollout. Global enrollment
-throttling remains 60 attempts/minute, not per-device protection.
+throttling admits at most3 attempts in any rolling60 seconds globally, not per
+device; invalid requests consume this shared budget too.
 
 Only hashes are stored. Word pairs accept case-insensitive ASCII words and
 surrounding/repeated whitespace (including tabs/newlines), normalized to lowercase
@@ -119,14 +120,29 @@ not proof of administrator authority or a substitute for server access control.
 
 ## Abuse limits and remaining risks
 
-Database-backed global fixed-window limits: 60 enrollments, 120 refreshes, and
-20 admin login attempts per minute. Caddy caps public requests at 201 MiB and
+Enrollment uses a DB-backed global rolling60-second budget of3 admitted attempts.
+The API middleware reserves a permit before JSON/body validation and redemption,
+so invalid, expired, redeemed and malformed requests reaching the canonical
+enrollment POST all consume it. The fourth request receives429 `rate_limited`;
+`Retry-After` is the integer ceiling of seconds until the oldest permit expires.
+Rejected retries do not extend the cooldown. This is not a calendar-minute reset
+and does not trust client IP headers. A DB advisory transaction lock and DB clock
+share the budget across processes. Existing `auth_rate_limits` rows use a separate
+`enroll_rolling_us` bucket with microsecond timestamps in bigint `window_id`, so
+no new migration or modification of the existing revision is required.
+
+Requests rejected by Caddy before reaching the API (such as oversized bodies) do
+not consume API permits and cannot attempt redemption. The other DB-backed global
+limits remain fixed-minute:120 refreshes and20 admin logins. Existing installation
+validation/media access is not blocked by enrollment cooldown. Caddy caps public requests at 201 MiB and
 auth bodies at 16 KiB. Upload authorization precedes multipart parsing in the
 API. Installation quotas count lifetime original bytes and accepted uploads;
 database locks prevent concurrent overrun. Failed processing still counts.
 
 These controls are for an invite-only prototype, **not DDoS protection**. Global
-limits can be exhausted by an outsider. Before broader rollout, add trusted
+limits can be exhausted by an outsider; three enrollment attempts temporarily
+block registration for every collector, so this is a deliberate availability
+tradeoff. Before broader rollout, add trusted
 proxy-aware per-client controls, monitoring and edge protections. Derivatives,
 worker compute and retained database records are not included in storage quotas.
 Legacy captures without installation ownership remain stored but inaccessible to
@@ -310,3 +326,13 @@ API status metadata confirmed enrollment201 and account validation200, with one
 redeemed invite and one active installation. No codes, credentials or request
 bodies were inspected or printed. This confirms local native enrollment, not
 camera capture or media uploads; those remain separate validation steps.
+
+### Global rolling enrollment limit — October 12, 2026
+
+Twenty-three disposable migration/API tests passed, including three-admitted/
+fourth-blocked behavior, malformed JSON/model validation, rolling minute-boundary
+and exact expiry, rounded Retry-After, blocked retries not extending cooldown,
+concurrent HTTP calls with different forwarded IPs, separate Python processes
+sharing the same DB budget, and unchanged existing auth during cooldown.
+Only the isolated local-dev API is deployed. No schema/revision change, live
+invite redemption, credential rotation, user revocation or pilot change is needed.

@@ -45,6 +45,14 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   redemption, quotas, expiry, throttles and strong installation/admin secrets.
   Bound collision retries across all historical hashes; never reuse a pair.
   This risk acceptance is not permission for public exposure or minting live codes.
+- October12: enrollment admits max3 requests per rolling60 seconds globally,
+  reserved in middleware before JSON/Pydantic validation. Invalid/expired/used
+  words and malformed requests reaching API consume permits; fourth gets429 with
+  rounded-up Retry-After until oldest permit expires. Blocked retries don't extend
+  cooldown. DB clock/advisory lock and namespaced existing rate-limit table rows
+  share state across processes without another migration. Login/refresh limits
+  unchanged. Three attempts can deny registration to all users temporarily;
+  do not describe this as per-device protection or bypass via forwarded IP.
 - Admin dashboard Logout uses existing DELETE `/api/v1/admin/session`, returns
   to `/unlock` only after204, and reports failure without claiming success.
   This clears that browser's cookie; it does not revoke copied stateless cookies

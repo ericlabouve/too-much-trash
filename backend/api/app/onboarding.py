@@ -143,7 +143,6 @@ def revoke_installation(installation_id: UUID):
 
 @router.post("/auth/enroll", status_code=201)
 def enroll(payload: Enrollment, response: Response):
-    throttle("enroll", 60)
     no_store(response)
     code = normalize_invite_code(payload.invite_code)
     if code is None:
