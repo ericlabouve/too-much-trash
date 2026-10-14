@@ -237,6 +237,12 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   isolated DOCKER_CONFIG hides Desktop's user-installed Compose plugin. Verified
   cliPluginsExtraDirs restores v5.0.2 without copying host registry credentials;
   follow-up validation PR adds this and backup-failure recovery coverage.
+  PR10/11 merged plugin fix, safe diagnostic categories, and disposable restore
+  utility. Subsequent host login failed before any mutation: docker login auto-
+  detects the macOS credential helper, unusable from unattended SSH. Use only the
+  expiring job token in a mode-private temporary config auths entry, preserving
+  cliPluginsExtraDirs; remove config on exit and never copy host Keychain auth.
+  Ten CD unit/config checks pass; first production rollout still pending.
 - October14 Arcane retirement executed at Eric's request: removed only the
   tmt-arcane-trial manager/socket-proxy containers and management network. Retained
   two trial named volumes and ignored credentials for recovery; main backend's

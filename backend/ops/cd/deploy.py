@@ -1,4 +1,5 @@
 """One-shot Compose deployment glue, not a persistent controller or CI runner."""
+import base64
 import json
 import os
 from pathlib import Path
@@ -59,16 +60,20 @@ def deploy(root, source, request):
             Path("/Applications/Docker.app/Contents/Resources/cli-plugins"),
             Path.home() / ".docker/cli-plugins",
         ) if path.is_dir()]
-        Path(config, "config.json").write_text(json.dumps({"cliPluginsExtraDirs": plugin_dirs}))
+        # docker login auto-detects macOS credential helpers even with a fresh
+        # config; an SSH job cannot unlock the login Keychain. Write only this
+        # short-lived job credential into the private temporary config instead.
+        registry_auth = base64.b64encode(("ericlabouve:" + request["registry_token"]).encode()).decode()
+        Path(config, "config.json").write_text(json.dumps({
+            "cliPluginsExtraDirs": plugin_dirs,
+            "auths": {"ghcr.io": {"auth": registry_auth}},
+        }))
         environment["DOCKER_CONFIG"] = config
         print("Preparing isolated registry credentials and Compose configuration.", flush=True)
         # Docker Desktop stores its context outside the temporary credential dir.
         context = execute([DOCKER, "context", "inspect", "--format", "{{.Endpoints.docker.Host}}"],
                           env=dict(os.environ)).decode().strip()
         environment["DOCKER_HOST"] = context
-        print("Authenticating short-lived registry access.", flush=True)
-        execute([DOCKER, "login", "ghcr.io", "--username", "ericlabouve", "--password-stdin"],
-                input=request["registry_token"].encode(), env=environment)
         def dc(*args, **kwargs):
             return execute([DOCKER, "compose", "-p", "too-much-trash",
                             "--env-file", str(secret_env), "--env-file", str(image_env),
