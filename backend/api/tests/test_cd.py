@@ -15,6 +15,7 @@ sys.path.insert(0, str(CD))
 import deploy
 import init_production
 import receiver
+import verify_restore
 from release import validate_manifest
 
 
@@ -25,6 +26,20 @@ def release(commit="a" * 40):
 
 
 class CDSafetyTests(unittest.TestCase):
+    def test_failed_command_diagnostics_never_echo_credentials(self):
+        result = subprocess.CompletedProcess([], 1, b"", b"unauthorized secret-token")
+        with patch.object(deploy.subprocess, "run", return_value=result):
+            with self.assertRaises(RuntimeError) as error:
+                deploy.execute(["docker", "login", "secret-token"])
+        self.assertIn("unauthorized", str(error.exception))
+        self.assertNotIn("secret-token", str(error.exception))
+
+    def test_restore_requires_completed_backup_before_docker_mutation(self):
+        with tempfile.TemporaryDirectory() as temp:
+            with patch.object(verify_restore, "run") as docker, self.assertRaises(FileNotFoundError):
+                verify_restore.verify(Path(temp))
+            docker.assert_not_called()
+
     def test_isolated_registry_config_retains_plugins_not_host_credentials(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

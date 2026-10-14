@@ -19,7 +19,15 @@ DOCKER = "/usr/local/bin/docker" if Path("/usr/local/bin/docker").exists() else 
 def execute(command, **kwargs):
     result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
     if result.returncode:
-        raise RuntimeError("Deployment command failed (diagnostics withheld from public logs)")
+        # Only the fixed tool/subcommand and exit status are public, never args,
+        # credentials, environment, or captured output.
+        diagnostic = (result.stderr or b"").decode(errors="replace").lower()
+        categories = [label for label in ("unauthorized", "forbidden", "denied",
+                      "credential", "unknown command", "connection refused", "permission",
+                      "certificate", "not found") if label in diagnostic]
+        raise RuntimeError("Deployment tool %s/%s exited %s (%s); diagnostics withheld" %
+                           (Path(command[0]).name, command[1], result.returncode,
+                            ", ".join(categories) or "unclassified"))
     return result.stdout
 
 
@@ -58,6 +66,7 @@ def deploy(root, source, request):
         context = execute([DOCKER, "context", "inspect", "--format", "{{.Endpoints.docker.Host}}"],
                           env=dict(os.environ)).decode().strip()
         environment["DOCKER_HOST"] = context
+        print("Authenticating short-lived registry access.", flush=True)
         execute([DOCKER, "login", "ghcr.io", "--username", "ericlabouve", "--password-stdin"],
                 input=request["registry_token"].encode(), env=environment)
         def dc(*args, **kwargs):
@@ -65,6 +74,7 @@ def deploy(root, source, request):
                             "--env-file", str(secret_env), "--env-file", str(image_env),
                             "-f", str(source / "backend/compose.production.yaml"), *args],
                            env=environment, **kwargs)
+        print("Validating production Compose configuration.", flush=True)
         dc("config", "--quiet")
         print("Pulling complete immutable release.", flush=True)
         dc("--profile", "migration", "pull")
@@ -145,5 +155,9 @@ if __name__ == "__main__":
     try:
         deploy(Path(os.environ["TMT_PRODUCTION_ROOT"]), Path(__file__).resolve().parents[3],
                json.load(sys.stdin))
-    except Exception:
+    except RuntimeError as error:
+        print(str(error), file=sys.stderr)
+        raise SystemExit("FAIL: deployment stopped; inspect host state; no automatic DB downgrade")
+    except Exception as error:
+        print("Deployment failed with " + type(error).__name__ + "; details withheld", file=sys.stderr)
         raise SystemExit("FAIL: deployment stopped; operator recovery required; no automatic DB downgrade")
