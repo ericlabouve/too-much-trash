@@ -150,6 +150,11 @@ Preserve the failed release, backups and secrets; clear the recovery marker only
 after successful checks. An initial empty bootstrap has no previous data snapshot.
 Backups here are same-host recovery, not an off-machine disaster recovery service.
 
+`python3 backend/ops/cd/verify_worker.py` is a bounded production smoke check for
+image/video extraction, Prefect and S3 poster output. It creates no invitations
+or installation/capture records and removes only its uniquely named synthetic
+source/poster objects. This is not native SAM3/Cutie or real iPhone validation.
+
 ## Retired laptop Arcane evaluation
 
 The trial containers/network were removed on October 14. Named trial volumes and

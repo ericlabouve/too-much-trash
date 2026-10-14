@@ -17,6 +17,7 @@ import deploy
 import init_production
 import receiver
 import verify_restore
+import verify_worker
 from release import validate_manifest
 
 
@@ -27,6 +28,15 @@ def release(commit="a" * 40):
 
 
 class CDSafetyTests(unittest.TestCase):
+    def test_worker_smoke_is_bounded_and_hides_process_output(self):
+        with patch.object(verify_worker.subprocess, "run", return_value=
+                          subprocess.CompletedProcess([], 1, b"private", b"secret")) as process:
+            with self.assertRaises(RuntimeError) as error:
+                verify_worker.verify()
+        self.assertNotIn("secret", str(error.exception))
+        self.assertEqual(process.call_args.kwargs["timeout"], 180)
+        self.assertIn("too-much-trash-worker-1", process.call_args.args[0])
+
     def test_failed_command_diagnostics_never_echo_credentials(self):
         result = subprocess.CompletedProcess([], 1, b"", b"unauthorized secret-token")
         with patch.object(deploy.subprocess, "run", return_value=result):
