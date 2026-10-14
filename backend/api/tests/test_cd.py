@@ -1,4 +1,5 @@
 """CD safety checks use temp files/dummy credentials, never the live database."""
+import base64
 import io
 import json
 import os
@@ -50,10 +51,12 @@ class CDSafetyTests(unittest.TestCase):
             def execute(command, **kwargs):
                 if "context" in command:
                     return b"unix:///dummy/docker.sock\n"
-                if "login" in command:
+                if "config" in command:
                     config = json.loads(Path(kwargs["env"]["DOCKER_CONFIG"], "config.json").read_text())
-                    self.assertEqual(set(config), {"cliPluginsExtraDirs"})
+                    self.assertEqual(set(config), {"cliPluginsExtraDirs", "auths"})
                     self.assertIsInstance(config["cliPluginsExtraDirs"], list)
+                    self.assertEqual(base64.b64decode(config["auths"]["ghcr.io"]["auth"]),
+                                     b"ericlabouve:dummy-token")
                     raise RuntimeError("Stop before rollout")
                 return b""
             with patch.object(deploy, "execute", side_effect=execute), self.assertRaises(RuntimeError):
