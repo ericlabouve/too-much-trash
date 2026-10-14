@@ -100,7 +100,8 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   too-much-trash; node name isn't a second backend stack. macOS host Serve routes
   remain temporarily during the explicit client-origin transition, not as the new
   recommended phone endpoint. Admin stays private/Secure; storage/workflows have
-  no published ports. Production app name too-much-trash is reserved, not live.
+  no published ports. Production app node too-much-trash is now live on the mini
+  (October14 CD checkpoint below).
 - Current host is Eric's MacBook Pro; future host is his Mac mini, with a different
   service FQDN. Clients configure origins; do not silently adopt old queued media
   or credentials across origins. Preserve normal TLS verification.
@@ -251,6 +252,17 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   operator resume, never automatically ignore it. Public Funnel checks must run
   on a separate no-VPN hosted job: Tailscale action enables DNS by default and
   deployment tag intentionally cannot reach private app443/8443.
+  First complete hosted CD run38651734607 passed at main b5666e1: three ARM64
+  builds, GHCR release, forced SSH rollout, Alembic and independent no-VPN public
+  verification all succeeded. Production node too-much-trash.mongoose-bonito.ts.net
+  is Running/tag:tmt-prod, Funnel443 true/admin8443 false. Actual sidecar needed
+  reauthorization while online because the stopped bootstrap had not persisted
+  the authorization response; the same node/IP was retained, not duplicated.
+  All7 production containers running; sampled idle aggregate~0.69GiB (not peak,
+  excludes Docker VM/macOS/native ML). Private admin probe from laptop HTTPS8443
+  passed normal TLS. Bounded synthetic image/video Prefect/S3 poster processing
+  passed and removed only its generated source/poster objects; no invitations or
+  installation/capture records created. Native ML/iPhone validation still pending.
 - October14 Arcane retirement executed at Eric's request: removed only the
   tmt-arcane-trial manager/socket-proxy containers and management network. Retained
   two trial named volumes and ignored credentials for recovery; main backend's
