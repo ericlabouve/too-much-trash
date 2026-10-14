@@ -122,8 +122,8 @@ final class CameraLaunchTests: XCTestCase {
         toggle.tap()
         let collector = app.descendants(matching: .any).matching(identifier: "publicServerURL").firstMatch
         let admin = app.descendants(matching: .any).matching(identifier: "privateAdminURL").firstMatch
-        XCTAssertEqual(collector.value as? String, "http://localhost:18082")
-        XCTAssertEqual(admin.value as? String, "http://localhost:18081")
+        XCTAssertEqual(collector.value as? String, "http://localhost:8082")
+        XCTAssertTrue((admin.value as? String)?.hasPrefix("https://") == true)
         XCTAssertTrue(app.navigationBars["Server addresses"].exists)
         app.buttons["Cancel"].tap()
     }

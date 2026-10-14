@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct AppRootView: View {
-    @StateObject private var account = AccountSession(automaticallyUseLocalCollector: AppRootView.useLocalFallback, automaticUploads: true)
+    @StateObject private var account = AccountSession(configuration: APIConfiguration.saved() ?? APIConfiguration.developmentNetwork,
+        automaticallyUseLocalCollector: AppRootView.useLocalFallback, automaticUploads: true)
     @Environment(\.scenePhase) private var scenePhase
 
     private static var useLocalFallback: Bool {
@@ -173,10 +174,18 @@ struct ServerConfigurationView: View {
                     Button("Use localhost addresses") {
                         setLocalMode(true)
                     }
-                    Text("Debug Simulator only. Local mode accepts HTTP localhost origins; authentication is still required.")
+                    Text("Use this Mac’s collector directly. Admin access still uses Tailscale.")
                         .font(.footnote)
                 }
                 #endif
+                Button("Use development Tailscale addresses") {
+                    simulatorLocal = false
+                    publicURL = APIConfiguration.developmentCollectorURL
+                    privateURL = APIConfiguration.developmentAdminURL
+                    httpsPublicURL = publicURL
+                    httpsPrivateURL = privateURL
+                    errorMessage = nil
+                }
                 Section("Collector server") {
                     TextField("Public HTTPS origin", text: $publicURL, axis: .vertical)
                         .lineLimit(2...6)
@@ -189,7 +198,7 @@ struct ServerConfigurationView: View {
                         .lineLimit(2...6)
                         .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
                         .accessibilityIdentifier("privateAdminURL")
-                    Text(simulatorLocal ? "Use the isolated local development admin server on this Mac; no Tailscale required." : "A separate private address and authorized Tailscale connection are required for admin access.")
+                    Text("Admin access uses the private HTTPS address and an authorized Tailscale connection.")
                         .font(.footnote)
                 }
                 if let errorMessage { Text(errorMessage).foregroundStyle(.red).accessibilityIdentifier("configurationError") }
@@ -201,7 +210,7 @@ struct ServerConfigurationView: View {
                         dismiss()
                     } catch {
                         errorMessage = simulatorLocal
-                            ? "Local Simulator mode requires separate HTTP localhost origins without paths, passwords, queries, or fragments."
+                            ? "Use an HTTP localhost collector and a separate HTTPS admin address, without paths, passwords, queries, or fragments."
                             : ClientError.configuration.message
                     }
                 }
@@ -217,7 +226,7 @@ struct ServerConfigurationView: View {
                     httpsPublicURL = publicURL
                     httpsPrivateURL = privateURL
                 } else {
-                    if privateURL.isEmpty { privateURL = "http://localhost:18081" }
+                    if privateURL.isEmpty { privateURL = APIConfiguration.developmentAdminURL }
                     httpsPublicURL = account.adminNetworkConfiguration?.publicOrigin.absoluteString ?? ""
                     httpsPrivateURL = account.adminNetworkConfiguration?.privateAdminOrigin?.absoluteString ?? ""
                 }
@@ -231,8 +240,8 @@ struct ServerConfigurationView: View {
                 httpsPublicURL = publicURL
                 httpsPrivateURL = privateURL
             }
-            publicURL = "http://localhost:18082"
-            privateURL = "http://localhost:18081"
+            publicURL = "http://localhost:8082"
+            privateURL = httpsPrivateURL.hasPrefix("https://") ? httpsPrivateURL : APIConfiguration.developmentAdminURL
         } else {
             publicURL = httpsPublicURL
             privateURL = httpsPrivateURL

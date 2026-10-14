@@ -188,9 +188,27 @@ collector credentials; do not guess ownership or delete them.
 ## Optional Tailscale deployment
 
 Local listeners bind to localhost. The optional `compose.tailscale.yaml` overlay
-removes host port publishing, shares Caddy's network namespace with a userspace
-Tailscale node, persists node state, and enables secure admin cookies. Pin a
-reviewed Tailscale image version before deployment. It is not activated by default.
+preserves host loopback port publishing, shares Caddy's network namespace with a
+userspace Tailscale app node, persists node state, and enables secure admin cookies.
+The base Caddy/API do not depend on node authentication, so localhost collector
+access can remain available while Tailscale is offline. The overlay pins version
+1.102.4 and is not activated by default.
+
+Set `TAILSCALE_HOSTNAME` and `TAILSCALE_TAG` in ignored local configuration.
+Eric's development node is `too-much-trash-eric-dev` / `tag:tmt-dev-eric`;
+future production reserves `too-much-trash` / `tag:tmt-prod`. Each developer needs
+a unique hostname, explicit user-to-app-tag grants, and independent node state.
+Do not tag or rename the personal laptop/iPhone just to reach the app node.
+Do not copy a development Tailscale-state volume into production.
+
+First authentication is an interactive node login; `TS_BOOT_TIMEOUT=20m` avoids
+the default 60-second authentication restart loop. No reusable auth key is
+committed or required by this overlay. Subsequent restarts reuse private persisted
+state with `TS_AUTH_ONCE=true`. Confirm hostname, tag, grants and HTTPS routes after
+login. The healthcheck reports connected node state, not successful API access.
+Localhost collector access is Debug Simulator HTTP only. Admin login uses the
+node's HTTPS8443 address to preserve Secure cookies. Changing node origins does
+not migrate installation credentials or native pending uploads.
 
 Proposed HTTPS ports on the node's `*.ts.net` hostname:
 
@@ -200,16 +218,19 @@ Proposed HTTPS ports on the node's `*.ts.net` hostname:
 | 8443 | Admin portal | Serve / tailnet only; **never Funnel** |
 | 10000 | Collector API | Funnel, only after explicit activation |
 
-The checked-in serve configuration has **all `AllowFunnel` values false**.
-An operator must authenticate the node, configure tailnet grants/HTTPS/Funnel
-permissions, and approve activation. No account changes, login or exposure were
-performed during implementation. Only 443 and 10000 may later be made public.
+Development `serve.json` has **all `AllowFunnel` values false**. The explicitly
+authorized production-only `serve.production.json` enables website443 and
+collector10000, never admin8443. `tailscale/production.env.example` selects that
+configuration only on the separate production host. The saved tailnet policy
+grants Funnel eligibility only to `tag:tmt-prod`; it does not by itself create a
+public listener. Production has not been initialized or exposed live.
+An operator must authenticate each node and verify its hostname, tag and routes.
 Directory-mounted configuration follows [Tailscale's container parameters](https://tailscale.com/docs/features/containers/docker/docker-params).
 
 Validate configuration before using the overlay:
 
 ```sh
-docker compose -f compose.yaml -f compose.tailscale.yaml config --quiet
+docker compose -p too-much-trash --env-file .env --env-file .secrets/tailscale.env -f compose.yaml -f compose.tailscale.yaml config --quiet
 ```
 
 Back up existing Postgres data before deploying schema changes. The `migrate`
@@ -435,3 +456,34 @@ confirmation was cancelled; no user session was revoked or credential rotated.
 Eric approved the current UI on October 12 but has not installed the app on his
 physical iPhone or verified camera functionality. Simulator checks do not qualify
 real camera capture, volume-button events or field hardware; these remain pending.
+
+### App-node routing and policy — October 12, 2026
+
+One laptop project `too-much-trash` now includes a userspace Tailscale sidecar;
+localhost collector8082 and app-node HTTPS10000 route to the same existing API.
+The app node is `too-much-trash-eric-dev.mongoose-bonito.ts.net`, connected with
+`tag:tmt-dev-eric`; HTTPS8443 is its private admin route and Secure cookies remain
+required. All development Funnel flags are false. No app data/credentials were
+rotated or migrated and no invitations/installations were created or revoked.
+The earlier retired Compose project is not recreated by the app node's name.
+
+Eric manually saved the reviewed replacement tailnet policy after an automated
+Save timeout. It replaces retired tenant/Funnel and all-port ACLs with explicit
+project grants/tests. The later production-only Funnel addition was approved and
+saved separately. Only Eric's devices may reach his developer app node on
+TCP8443/10000. Future production app `tag:tmt-prod` allows admins on those ports;
+physical Mac mini `tag:tmt-prod-host` allows admin management22/3283/5900. The mini
+was tagged without renaming it or adding subnet/exit-node routes. Existing SSH
+check policy was preserved for the host tag; this does not enable an SSH server
+or qualify native-macOS Tailscale SSH support.
+
+The node's first sign-in initially raced the default containerboot timeout; its
+state volume was preserved and authentication completed after extending boot
+timeout to20m. Running-state/tag/DNS and private Serve/Funnel configuration were
+verified; no reusable auth key was created. Four read-only Compose checks and
+three proxy checks each for localhost and the new valid-TLS node passed. These
+checks also confirmed a sidecar-only restart automatically reconnects with the
+same node identity, DNS name and addresses, without another login. The proxy
+checks verify reachability/isolation, not actual physical-iPhone capture or an
+authenticated admin dashboard interaction. Client origin transition remains
+explicit: never reassign old-origin credentials or pending upload files.

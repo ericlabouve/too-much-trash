@@ -13,6 +13,12 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Product and architecture
 
+- App icon selected 2026-10-12: bright green leaf gently turning as it falls above
+  pale beach sand, turquoise ocean behind it, in an animated layered paper-cut
+  style. Use the approved image in `Assets.xcassets/AppIcon.appiconset`; keep the
+  full square artwork and let iOS apply its icon shape. Generate future design
+  exploration images in batches of three.
+
 - Registration preference (2026-10-11): require two invite words only, with no legacy-code option or device-name field. Submit without an installation name; the existing backend default label applies. Two rounded word boxes auto-parse a whole pasted phrase into either box, with no auto-submit or silent truncation of extra words. Preserve backend-authoritative validation and input case. Use one **Register** button, omit the initial redundant account message on this sheet, retain failure feedback. Instruction is **Enter the two word invite phrase above**. Large accessibility text stacks boxes. This supersedes the earlier legacy compatibility and editable default-name preferences.
 
 - New users see inline two-word registration, not a redundant Continue/Register home. Returning users open camera after backend validation; failed connection offers Retry connection. The camera has only a Dashboard navigation button, no admin menu/instruction footer, and a transparent double-ring record control. Dashboard shows two-column inline native players, per-video sync indicators, aggregate progress/ETA, Back to camera and End Session. Admin actions belong in registration/dashboard headers beside End Session, gated by designated HTTPS reachability. Saved credentials alone never authorize a fresh app launch.
@@ -25,10 +31,28 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Authentication and trust boundaries
 
+- Production routing approved 2026-10-14: collector shares the website's standard
+  HTTPS 443 origin, while private admin remains on 8443. Generic root-origin
+  configuration already supports this; explicit 443 canonicalizes to omitted
+  port. Backend CD work does not automatically change the app's development
+  preset or saved origins, nor move origin-bound credentials or queues.
+
+- Current development routing (2026-10-12) supersedes the retired separate dev
+  stack: one laptop API/DB/media serves Simulator localhost on port 8082 and the
+  development Tailscale app node over HTTPS on port 10000. Admin always uses that
+  app node's HTTPS port 8443, including with a localhost collector. Simulator local
+  mode accepts this mixed transport pair; physical/Release collector stays HTTPS.
+  Fresh app configuration uses the development network preset; existing saved
+  configuration wins. Selecting a preset requires Save and never aliases saved
+  credentials or queues between origins. Old HTTP admin config remains parseable
+  for compatibility, but its reachability alone cannot grant admin controls.
+
 - Physical iPhone and Release builds accept only configurable HTTPS root origins. Debug Simulator builds alone have an explicit local development mode accepting HTTP `localhost` origins, with a localhost-scoped ATS exception absent from device/Release bundles. Never broaden this to LAN/public HTTP or bypass certificate validation. Reject credential-bearing redirects. Private and collector origins must differ, including by port if on one hostname.
 - User's test order: manually validate local development without Tailscale first, then the Tailscale-enabled workflow. Coordinate localhost backend/admin setup with Backend Agent; do not weaken the HTTPS pilot's secure cookies for local testing.
 - Network loss hides admin actions/dismisses settings. An authorized active session never silently changes collector origin; new/unauthenticated Debug Simulator sessions may fall back to localhost after operations finish. Local discovery cannot grant network-admin UI. Retain designated HTTPS configuration so reconnecting reveals menus without reassigning credentials/queues. Physical/Release retain HTTPS. Temporary network loss within an already-validated app session does not interrupt offline capture.
-- Local-backend selection is independent of network connectivity: toggling it fills BOTH localhost collector/admin fields, keeps the menu open, and waits for Save. A connected admin can select the local admin server; browser handoff requires both the retained network probe and local service identity. Remove the UI phrase "Collectors do not need Tailscale."
+- Local-backend selection is independent of connectivity: toggling it fills the
+  localhost collector and retains the private HTTPS admin address, keeps the menu
+  open, and waits for Save. Browser handoff requires that HTTPS service identity.
 - User explicitly deferred authn/authz redesign on 2026-10-11. Implement UI separation only; leave shared-token/session permissions unchanged and do not claim that hiding menus logs a browser out.
 - Admin offboarding must distinguish centrally revoked tailnet access, locally disconnected VPN, app UI hiding, and backend session revocation. Current shared-token/stateless-cookie admin auth cannot revoke one admin independently. Do not claim network loss invalidates an existing cookie or that tailnet reachability alone authenticates an administrator. Agree on per-admin backend identity/session enforcement before promising individual session revocation.
 - Invite enrollment is backend-authoritative and single-use. Store per-installation access/refresh credentials in origin-scoped Keychain using `WhenUnlockedThisDeviceOnly`, with no iCloud synchronization. Preferences store only non-secret origins. No shared app secret, native passkey enrollment, or App Attest is currently implemented.
@@ -60,6 +84,13 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 - When reporting completion, lead with outcome and validation evidence. Distinguish automated tests, native live integration, deployed backend checks, and physical validation. Print a high-level remaining-work summary to stdout when requested, and concisely identify user-only steps.
 
 ## Evidence and remaining work
+
+- Development app-node routing passed 52 configuration/session Simulator tests
+  with no skips/failures on 2026-10-12, including mixed localhost collector/HTTPS
+  admin validation and identity gating. Debug device and Release Simulator builds
+  compiled with no ATS exceptions. Updated Simulator build installed/launched;
+  final visual inspection was blocked by the locked Mac. Saved origins were not
+  overwritten, credentials/queues not migrated, and no live enrollment occurred.
 
 - 2026-10-12 user confirmed the current UI looks good, but has not installed the app on an iPhone or confirmed any real camera functionality. Simulator UI/native synthetic upload checks and device compilation are not physical capture validation. Red End Session header styling was visually verified after rebuild/redeployment; confirmation was cancelled to preserve the installation.
 

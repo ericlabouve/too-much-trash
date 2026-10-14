@@ -46,7 +46,7 @@ final class AccountSession: ObservableObject {
         self.automaticallyUseLocalCollector = automaticallyUseLocalCollector
         self.automaticUploads = automaticUploads
         self.adminNetworkConfiguration = adminNetworkConfiguration ??
-            (configuration?.simulatorLocal == false ? configuration : nil) ??
+            (configuration?.privateAdminOrigin?.scheme == "https" ? configuration : nil) ??
             (automaticallyUseLocalCollector ? APIConfiguration.savedAdminNetwork() : nil)
         if automaticallyUseLocalCollector { self.adminNetworkConfiguration?.rememberAdminNetwork() }
         self.configuration = configuration ?? (automaticallyUseLocalCollector ? APIConfiguration.localCollector : nil)
@@ -77,7 +77,7 @@ final class AccountSession: ObservableObject {
     func configure(_ value: APIConfiguration) async {
         guard !busy, !isUploading, !isEndingSession else { return }
         configuration = value
-        if !value.simulatorLocal, value.privateAdminOrigin != nil { adminNetworkConfiguration = value }
+        if value.privateAdminOrigin?.scheme == "https" { adminNetworkConfiguration = value }
         value.save()
         api = apiFactory(value)
         credential = nil
@@ -426,7 +426,7 @@ final class AccountSession: ObservableObject {
         guard foreground else { return }
         let network = adminNetworkConfiguration
         let reachable: Bool
-        if let network, !network.simulatorLocal, network.privateAdminOrigin?.scheme == "https" {
+        if let network, network.privateAdminOrigin?.scheme == "https" {
             reachable = await apiFactory(network).adminReachable()
         } else { reachable = false }
         guard foreground, !Task.isCancelled, probeGeneration == generation else { return }

@@ -4,6 +4,10 @@
 **/.secrets
 **/.backups
 **/node_modules
-**/.venv
 **/__pycache__
+**/.venv
 **/.DS_Store
+ml/data
+ml/checkpoints
+cad
+ios

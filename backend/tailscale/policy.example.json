@@ -1,0 +1,59 @@
+{
+  "groups": {
+    "group:tmt-admins": ["elabouve@gmail.com"],
+    "group:tmt-developers": ["elabouve@gmail.com"]
+  },
+  "tagOwners": {
+    "tag:tmt-dev-eric": ["elabouve@gmail.com"],
+    "tag:tmt-prod": ["group:tmt-admins"],
+    "tag:tmt-prod-host": ["group:tmt-admins"],
+    "tag:tmt-deploy": ["group:tmt-admins"]
+  },
+  "nodeAttrs": [
+    {"target": ["tag:tmt-prod"], "attr": ["funnel"]}
+  ],
+  "grants": [
+    {"src": ["elabouve@gmail.com"], "dst": ["tag:tmt-dev-eric"], "ip": ["tcp:8443", "tcp:10000"]},
+    {"src": ["group:tmt-admins"], "dst": ["tag:tmt-prod"], "ip": ["tcp:8443", "tcp:443"]},
+    {"src": ["group:tmt-admins"], "dst": ["tag:tmt-prod-host"], "ip": ["tcp:22", "tcp:3283", "tcp:5900"]},
+    {"src": ["tag:tmt-deploy"], "dst": ["tag:tmt-prod-host"], "ip": ["tcp:22"]}
+  ],
+  "ssh": [
+    {"action": "check", "src": ["group:tmt-admins"], "dst": ["tag:tmt-prod-host"], "users": ["autogroup:nonroot", "root"]}
+  ],
+  "tests": [
+    {
+      "src": "elabouve@gmail.com",
+      "proto": "tcp",
+      "accept": ["tag:tmt-dev-eric:8443", "tag:tmt-dev-eric:10000"],
+      "deny": ["tag:tmt-dev-eric:22", "tag:tmt-dev-eric:8081", "tag:tmt-dev-eric:8082"]
+    },
+    {
+      "src": "group:tmt-admins",
+      "proto": "tcp",
+      "accept": ["tag:tmt-prod:8443", "tag:tmt-prod:443", "tag:tmt-prod-host:22", "tag:tmt-prod-host:3283", "tag:tmt-prod-host:5900"],
+      "deny": ["tag:tmt-prod:22", "tag:tmt-prod:5432", "tag:tmt-prod-host:5432"]
+    },
+    {
+      "src": "tag:tmt-prod",
+      "proto": "tcp",
+      "deny": ["tag:tmt-dev-eric:8443", "tag:tmt-dev-eric:10000", "group:tmt-admins:22", "group:tmt-admins:8443", "group:tmt-admins:10000"]
+    },
+    {
+      "src": "tag:tmt-dev-eric",
+      "proto": "tcp",
+      "deny": ["tag:tmt-prod:8443", "tag:tmt-prod:443", "tag:tmt-prod-host:22", "group:tmt-admins:8443"]
+    },
+    {
+      "src": "tag:tmt-prod-host",
+      "proto": "tcp",
+      "deny": ["tag:tmt-dev-eric:8443", "tag:tmt-dev-eric:10000", "group:tmt-admins:22", "group:tmt-admins:8443", "group:tmt-admins:10000"]
+    },
+    {
+      "src": "tag:tmt-deploy",
+      "proto": "tcp",
+      "accept": ["tag:tmt-prod-host:22"],
+      "deny": ["tag:tmt-prod-host:5900", "tag:tmt-prod-host:5432", "tag:tmt-prod:8443", "tag:tmt-dev-eric:8443", "tag:tmt-dev-eric:10000"]
+    }
+  ]
+}
