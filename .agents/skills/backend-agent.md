@@ -211,7 +211,8 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   write restricted to tag:tmt-deploy and exact backend-cd workflow on main,
   SSH-only grant to tag:tmt-prod-host TCP22, and production node/Funnel443 creation.
   Saved tested policy includes that tag/grant; production admins443 replaces10000.
-  OIDC trust uses GitHub subject repo:ericlabouve/too-much-trash:ref:refs/heads/main
+  GitHub's actual OIDC subject includes immutable IDs:
+  repo:ericlabouve@15724471/too-much-trash@1389817769:ref:refs/heads/main
   plus exact workflow_ref claim; no OAuth shared secret. Public clientID/audience
   and verified SSH host key configured as GitHub variables, dedicated private
   SSH key configured as repository secret. No secret values in memory/logs.
@@ -220,6 +221,22 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   Fixed control/ receiver verifies merged-main ancestry and locks rollout.
   Initial Docker pull over SSH failed because docker-credential-desktop was not
   on noninteractive PATH; explicitly include Docker.app Resources/bin.
+  PR9 merged as4dddf45 (commit54c5621); first hosted run38649082010 successfully
+  built all three ARM64 images and published complete478-byte release.json.
+  First deploy stopped at OIDC403 before host mutation: legacy name-only subject
+  did not match ID-bound subject above. Exact correction retained all scopes/tags
+  and workflow_ref; rerunning only failed deploy preserves release digests.
+  Tailscale /view/ page is read-only despite editable-looking AX fields; changes
+  there do not persist. Use credential Actions->Edit (/edit/), then Save, reload
+  and expand the list to verify stored subject. Second retry preceded the actual
+  edit and failed too; third retry follows verified persistence.
+  Dedicated temporary node-bootstrap container removed before Compose ownership;
+  node state volume remains. Eric explicitly approved Google sign-in for his
+  existing account; browser confirmed production too-much-trash node authorized.
+  Third hosted retry passed OIDC but stopped before pulling/host mutation:
+  isolated DOCKER_CONFIG hides Desktop's user-installed Compose plugin. Verified
+  cliPluginsExtraDirs restores v5.0.2 without copying host registry credentials;
+  follow-up validation PR adds this and backup-failure recovery coverage.
 - October14 Arcane retirement executed at Eric's request: removed only the
   tmt-arcane-trial manager/socket-proxy containers and management network. Retained
   two trial named volumes and ignored credentials for recovery; main backend's
