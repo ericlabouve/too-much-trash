@@ -25,6 +25,26 @@ def release(commit="a" * 40):
 
 
 class CDSafetyTests(unittest.TestCase):
+    def test_isolated_registry_config_retains_plugins_not_host_credentials(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            init_production.initialize(root)
+            (root / "control").mkdir()
+            source = root / "releases" / ("a" * 40)
+            source.mkdir(parents=True)
+            def execute(command, **kwargs):
+                if "context" in command:
+                    return b"unix:///dummy/docker.sock\n"
+                if "login" in command:
+                    config = json.loads(Path(kwargs["env"]["DOCKER_CONFIG"], "config.json").read_text())
+                    self.assertEqual(set(config), {"cliPluginsExtraDirs"})
+                    self.assertIsInstance(config["cliPluginsExtraDirs"], list)
+                    raise RuntimeError("Stop before rollout")
+                return b""
+            with patch.object(deploy, "execute", side_effect=execute), self.assertRaises(RuntimeError):
+                deploy.deploy(root, source, {"release": release(), "registry_token": "dummy-token"})
+            self.assertEqual(list((root / "control").iterdir()), [])
+
     def test_release_is_complete_and_repository_scoped(self):
         self.assertEqual(validate_manifest(release()), release())
         for mutation in (lambda r: r["images"].pop("worker"),
@@ -96,6 +116,36 @@ class CDSafetyTests(unittest.TestCase):
             with patch.object(receiver, "git", side_effect=git), self.assertRaises(subprocess.CalledProcessError):
                 receiver.receive(root, {"release": release(), "registry_token": "dummy-token"})
             self.assertFalse(any(c[0] == "archive" for c in calls))
+
+    def test_backup_failure_resumes_old_release_before_any_migration(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            init_production.initialize(root)
+            (root / "control").mkdir()
+            source = root / "releases" / ("a" * 40)
+            source.mkdir(parents=True)
+            previous = release("c" * 40)
+            (root / "current.json").write_text(json.dumps(previous))
+            commands = []
+            def execute(command, **kwargs):
+                commands.append(command)
+                if "context" in command:
+                    return b"unix:///dummy/docker.sock\n"
+                if "ps" in command:
+                    return b"api\nworker\npostgres\nblob\ncaddy\nworkflow\ntailscale\n"
+                return b""
+            request = {"release": release(), "registry_token": "dummy-token"}
+            failed_dump = subprocess.CompletedProcess("dummy-pg-dump", 1)
+            with patch.object(deploy, "execute", side_effect=execute), \
+                 patch.object(deploy.subprocess, "run", return_value=failed_dump), \
+                 self.assertRaises(RuntimeError):
+                deploy.deploy(root, source, request)
+            self.assertFalse((root / "recovery-required.json").exists())
+            self.assertEqual(json.loads((root / "current.json").read_text()), previous)
+            self.assertFalse(any("run" in c and "migrate" in c for c in commands))
+            resumed = commands[-1]
+            self.assertIn(str(root / "releases" / previous["commit"] / "release.env"), resumed)
+            self.assertEqual(resumed[-2:], ["up", "-d"])
 
     @unittest.skipUnless(os.getenv("TMT_COMPOSE_TEST") == "1", "Read-only host Compose check is opt-in")
     def test_production_is_image_only_and_private_by_default(self):

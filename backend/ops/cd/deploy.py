@@ -45,7 +45,15 @@ def deploy(root, source, request):
     environment = dict(os.environ)
     environment["PATH"] = "/usr/local/bin:/Applications/Docker.app/Contents/Resources/bin:/opt/homebrew/bin:" + environment.get("PATH", "")
     with tempfile.TemporaryDirectory(prefix="tmt-registry-", dir=root / "control") as config:
+        # An isolated DOCKER_CONFIG also hides ~/.docker/cli-plugins. Discover
+        # Desktop's installed plugins without copying host registry credentials.
+        plugin_dirs = [str(path) for path in (
+            Path("/Applications/Docker.app/Contents/Resources/cli-plugins"),
+            Path.home() / ".docker/cli-plugins",
+        ) if path.is_dir()]
+        Path(config, "config.json").write_text(json.dumps({"cliPluginsExtraDirs": plugin_dirs}))
         environment["DOCKER_CONFIG"] = config
+        print("Preparing isolated registry credentials and Compose configuration.", flush=True)
         # Docker Desktop stores its context outside the temporary credential dir.
         context = execute([DOCKER, "context", "inspect", "--format", "{{.Endpoints.docker.Host}}"],
                           env=dict(os.environ)).decode().strip()
