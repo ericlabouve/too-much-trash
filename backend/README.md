@@ -89,7 +89,7 @@ Its physical host keeps `erics-mac-mini.mongoose-bonito.ts.net` and is tagged
 `too-much-trash.mongoose-bonito.ts.net` / `tag:tmt-prod` independently of that host.
 Production Funnel eligibility is now authorized only for `tag:tmt-prod`.
 The explicit `tailscale/production.env.example` selects `serve.production.json`,
-which makes website443 and collector10000 public while keeping admin8443 private.
+which makes website and collector443 public while keeping admin8443 private.
 Do not select this configuration on a developer stack. Permission/configuration
 does not create a working public endpoint until the production node is initialized.
 Ordinary users target production only; environment selection is a developer/admin
@@ -125,7 +125,7 @@ Host layout: `~/too-much-trash-prod/{control,secrets,releases,backups}`.
 `current.json` records the last locally verified release. The one-shot receiver
 checks main ancestry, rejects out-of-order deployments, serializes host changes,
 and loads deployment code only from approved main commits. The job-scoped GHCR
-token is streamed over SSH, used in a temporary Docker login directory and never
+token is streamed over SSH, used in a private temporary Docker config and never
 included in manifests/backups. Production credentials stay on the host.
 
 For updates, pull all images before maintenance. Pause application writers,
@@ -133,13 +133,17 @@ dump application/Prefect databases and roles, stop blob storage and snapshot its
 volume, then mark recovery state before infrastructure/schema mutations. Run
 Alembic explicitly; only on success roll out the app and reconnect its sidecar
 to the new Caddy namespace. Validate local routes/inventory and external Funnel
-isolation. Both GitHub concurrency and a host lock prevent overlapping rollouts.
+isolation on a separate GitHub runner with no Tailscale/MagicDNS. Both GitHub
+concurrency and a host lock prevent overlapping rollouts.
 Build/pull failures leave the existing app running; pre-migration backup failure
 resumes the old release. Partial migration/rollout failures block subsequent CD.
 
 Recovery is operator-controlled, never automatic database downgrade. Inspect
 `recovery-required.json` and its backup directory; confirm `complete.json` before
 using a snapshot. Test SQL/media restore into a separate disposable stack first.
+`python3 backend/ops/cd/verify_restore.py /absolute/path/to/completed/backup`
+checks both databases and all blob bytes in new network-isolated containers,
+then removes only its uniquely named disposable containers/volumes.
 Only after verifying schema compatibility may the operator restart prior images;
 otherwise restore DB and blob together during an explicitly authorized outage.
 Preserve the failed release, backups and secrets; clear the recovery marker only

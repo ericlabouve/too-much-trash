@@ -108,10 +108,27 @@ jobs:
             | ssh -i "$HOME/.ssh/tmt_deploy" -o IdentitiesOnly=yes -o BatchMode=yes \
                 -o StrictHostKeyChecking=yes -o ServerAliveInterval=30 \
                 ericlabouve@erics-mac-mini.mongoose-bonito.ts.net deploy
-      - name: Verify public Funnel isolation
-        run: python3 backend/ops/cd/check_public.py
       - name: Report deployment result
         if: always()
         run: |
           echo "Backend release: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "Result: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+
+  verify-public:
+    needs: deploy
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    # A clean runner has no VPN/MagicDNS: this proves Internet Funnel access,
+    # not an accidentally permitted private tailnet route.
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify public Funnel isolation from outside the tailnet
+        run: python3 backend/ops/cd/check_public.py
+      - name: Report public verification result
+        if: always()
+        run: |
+          echo "Public Funnel verification: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
