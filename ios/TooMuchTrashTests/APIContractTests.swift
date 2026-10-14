@@ -49,6 +49,11 @@ final class APIContractTests: XCTestCase {
                                          privateAdminURL: "http://localhost:8081", simulatorLocal: true)
         XCTAssertEqual(local.publicOrigin.absoluteString, "http://localhost:8082")
         XCTAssertTrue(local.simulatorLocal)
+        let mixed = try APIConfiguration(publicURL: "http://localhost:8082",
+            privateAdminURL: APIConfiguration.developmentAdminURL, simulatorLocal: true)
+        XCTAssertEqual(mixed.privateAdminOrigin?.scheme, "https")
+        XCTAssertEqual(APIConfiguration.localCollector?.publicOrigin.absoluteString, "http://localhost:8082")
+        XCTAssertEqual(APIConfiguration.developmentNetwork.publicOrigin.scheme, "https")
         for origin in ["http://192.168.1.2:8082", "http://example.test", "http://localhost.example.test",
                        "http://user:secret@localhost:8082", "http://localhost:8082/api",
                        "http://localhost:8082?secret=x", "https://localhost:8082"] {

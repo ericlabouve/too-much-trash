@@ -18,11 +18,12 @@ struct APIConfiguration: Equatable {
         self.simulatorLocal = simulatorLocal
         publicOrigin = try Self.origin(publicURL, simulatorLocal: simulatorLocal)
         privateAdminOrigin = privateAdminURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            ? nil : try Self.origin(privateAdminURL, simulatorLocal: simulatorLocal)
+            ? nil : try Self.origin(privateAdminURL, simulatorLocal: simulatorLocal,
+                                    allowHTTPS: true)
         guard privateAdminOrigin != publicOrigin else { throw ClientError.configuration }
     }
 
-    private static func origin(_ string: String, simulatorLocal: Bool) throws -> URL {
+    private static func origin(_ string: String, simulatorLocal: Bool, allowHTTPS: Bool = false) throws -> URL {
         guard var parts = URLComponents(string: string.trimmingCharacters(in: .whitespacesAndNewlines)),
               let host = parts.host, !host.isEmpty,
               parts.user == nil, parts.password == nil, parts.query == nil, parts.fragment == nil,
@@ -32,14 +33,15 @@ struct APIConfiguration: Equatable {
         }
         let scheme = parts.scheme?.lowercased()
         if simulatorLocal {
-            guard scheme == "http", host.lowercased() == "localhost" else { throw ClientError.configuration }
+            guard (scheme == "http" && host.lowercased() == "localhost") ||
+                    (allowHTTPS && scheme == "https") else { throw ClientError.configuration }
         } else {
             guard scheme == "https" else { throw ClientError.configuration }
         }
         parts.scheme = scheme
         parts.host = host.lowercased()
         parts.path = ""
-        if parts.port == (simulatorLocal ? 80 : 443) { parts.port = nil }
+        if parts.port == (scheme == "http" ? 80 : 443) { parts.port = nil }
         guard let url = parts.url else { throw ClientError.configuration }
         return url
     }
@@ -77,8 +79,15 @@ struct APIConfiguration: Equatable {
 
     static var localCollector: APIConfiguration? {
         guard supportsSimulatorLocal else { return nil }
-        return try? APIConfiguration(publicURL: "http://localhost:18082",
-                                     privateAdminURL: "http://localhost:18081", simulatorLocal: true)
+        return try? APIConfiguration(publicURL: "http://localhost:8082",
+                                     privateAdminURL: developmentAdminURL, simulatorLocal: true)
+    }
+
+    static let developmentCollectorURL = "https://too-much-trash-eric-dev.mongoose-bonito.ts.net:10000"
+    static let developmentAdminURL = "https://too-much-trash-eric-dev.mongoose-bonito.ts.net:8443"
+    static var developmentNetwork: APIConfiguration {
+        // Non-secret preset for this prototype. Saved origins always take precedence.
+        try! APIConfiguration(publicURL: developmentCollectorURL, privateAdminURL: developmentAdminURL)
     }
 }
 

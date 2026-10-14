@@ -1,8 +1,8 @@
-# Opt-in overlay. No public Funnel is enabled by the committed configuration.
+# Opt-in app node. Preserve base loopback ports for Simulator access.
+# No public Funnel is enabled by the committed configuration.
 # docker compose -f compose.yaml -f compose.tailscale.yaml up --build -d
 services:
   caddy:
-    ports: !reset []
     environment:
       SITE_ADDRESS: ":80"
       ADMIN_SITE_ADDRESS: ":8081"
@@ -11,21 +11,29 @@ services:
     environment:
       ADMIN_COOKIE_SECURE: "true"
   tailscale:
-    image: ${TAILSCALE_IMAGE:-tailscale/tailscale:stable}
+    image: ${TAILSCALE_IMAGE:-tailscale/tailscale:v1.102.4}
     network_mode: service:caddy
     environment:
-      TS_HOSTNAME: ${TAILSCALE_HOSTNAME:-tmt-v1}
+      TS_HOSTNAME: ${TAILSCALE_HOSTNAME:?Set a unique app-node hostname}
+      TS_EXTRA_ARGS: --advertise-tags=${TAILSCALE_TAG:?Set the app-node access tag}
       TS_USERSPACE: "true"
       TS_ACCEPT_DNS: "false"
       TS_AUTH_ONCE: "true"
+      TS_BOOT_TIMEOUT: "20m"
       TS_STATE_DIR: /var/lib/tailscale
-      TS_SERVE_CONFIG: /config/serve.json
+      TS_SERVE_CONFIG: /config/${TAILSCALE_SERVE_CONFIG:-serve.json}
     volumes:
       - tailscale_state:/var/lib/tailscale
       - ./tailscale:/config:ro
     depends_on:
       caddy:
         condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "tailscale status --json | grep -q '\"BackendState\": \"Running\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
     restart: unless-stopped
 volumes:
   tailscale_state:

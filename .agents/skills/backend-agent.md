@@ -13,9 +13,10 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 ## Ownership and workflow
 
 - Backend owns `backend/`, the admin portal in `frontend/`, and related docs/config.
-  Iphone Agent owns `ios/` in its separate worktree. Exchange contracts and test
-  results, but do not cherry-pick iOS into the backend PR. Keep PR file lists
-  disjoint; PR #6 is iOS and #7 is backend/admin as of October 11, 2026.
+  Iphone Agent owns `ios/` and its memory. Both chats now share the96fa checkout;
+  coordinate shared-file edits and serialize Git/branch/deployment operations.
+  Exchange contracts/tests and stage explicit owned paths only. Earlier separate
+  PRs6/7 were merged; do not assume independent branches in the shared checkout.
 - Eric authorized two-way communication with Iphone Agent. Coordinate changes to
   API contracts and report blockers. This permission does not authorize deployment
   exposure, signing changes, new invitations, or merging PRs on its own.
@@ -92,11 +93,14 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 - Eric confirmed Safari autofill added trailing whitespace. Trim only outer
   whitespace from the generated admin token on client submission; preserve all
   internal characters. This is not a normalization rule for arbitrary passwords.
-- Private pilot uses existing macOS Tailscale Serve: HTTPS 10000 to localhost8082
-  collector, HTTPS8443 to localhost8081 admin. MagicDNS suffix is not a service
-  hostname. Funnel is off; public collector exposure requires explicit approval.
-  Admin stays private. Compose listeners bind localhost; storage/workflows are
-  not exposed. Docker Tailscale overlay is optional, not active in the pilot.
+- Current laptop development uses the active Compose app-node overlay, preserving
+  localhost8082 collector and serving the same backend through
+  too-much-trash-eric-dev.mongoose-bonito.ts.net HTTPS10000 collector/8443 admin.
+  Node is tagged tmt-dev-eric and all its Funnel ports are OFF. One Docker project
+  too-much-trash; node name isn't a second backend stack. macOS host Serve routes
+  remain temporarily during the explicit client-origin transition, not as the new
+  recommended phone endpoint. Admin stays private/Secure; storage/workflows have
+  no published ports. Production app name too-much-trash is reserved, not live.
 - Current host is Eric's MacBook Pro; future host is his Mac mini, with a different
   service FQDN. Clients configure origins; do not silently adopt old queued media
   or credentials across origins. Preserve normal TLS verification.
@@ -107,6 +111,75 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   `.secrets/dev/compose.env`. Only the isolated dev API allows HTTP admin cookies;
   never change the pilot's Secure cookies to make local login work. Auth/invites
   remain required. Do not issue new native-test invites without approval.
+- October12 clarification supersedes the intended two-stack laptop design above:
+  Eric wants ONE development Compose stack on the laptop, reached over localhost
+  by Simulator and private Tailscale HTTPS by his physical iPhone. Both routes
+  target the same API/database/media, not separate dev and pilot environments.
+  Production does not exist yet; it will be a separate stack on the Mac mini,
+  possibly deployed through GitHub Actions. Admins may test either environment;
+  ordinary users should reach production only. Keep development private through
+  network/access controls, not merely a hidden endpoint selector. Production admin
+  remains private; public collector exposure still needs explicit authorization.
+  The retired project's data/credentials are historical state to preserve.
+  Do not delete volumes or merge
+  credentials implicitly. Distinguish environment identity from localhost versus
+  Tailscale transport; preserve security and origin checks when designing shared
+  sessions/queues. Never weaken production HTTPS/cookie security for Simulator.
+- October12 authorized consolidation executed: keep `too-much-trash`; removed
+  `too-much-trash-dev` containers and network via explicit project down WITHOUT
+  volume deletion. All four retired volumes and ignored credentials remain for
+  recovery. Retained stack was not restarted and API/Postgres stayed healthy.
+  Simulator must support localhost8082 AND private Tailscale HTTPS10000; physical
+  iPhone always Tailscale. Admin uses private HTTPS8443 to preserve Secure cookies.
+  Old native localhost18081/18082 defaults need iPhone-owned follow-up; never
+  pretend retired credentials enroll the retained stack or move queues implicitly.
+  Each future developer runs ONE private stack on their Mac with unique Tailscale
+  endpoints, separate local secrets/data, and per-user/device network grants.
+- October12 CLI/admin-console review: laptop Serve is HTTPS10000->loopback8082,
+  HTTPS8443->loopback8081, no Funnel. Mac mini at
+  erics-mac-mini.mongoose-bonito.ts.net is online but user-owned/untagged; existing
+  policy grants group:admin (Eric) all ports to tag:mac-mini and tag:tenant, plus
+  tag:tenant Funnel capability and mac-mini SSH check rules. No developer self
+  access exists. Proposed developer group->autogroup:self tcp8443/tcp10000,
+  keeping laptops/phones user-owned, and tagging dedicated production server
+  with existing tag:mac-mini. Existing infrastructure rules are not authorization
+  to expose/deploy production; policy changes remain pending explicit approval.
+- Eric confirms Mac mini is physically on a separate router/network and that
+  current tailnet policy originated in another project. Tailscale metadata shows
+  only the mini's own overlay addresses, no advertised subnet routes; this does
+  not independently verify the physical router topology. Keep that network
+  separation: no subnet routing/site-to-site bridging needed for app access.
+  Project-specific group/tag cleanup is proposed, not yet applied. Check legacy
+  consumers before removing tenant/Funnel or management rules; coordinate any
+  machine DNS rename with client configuration and Serve/certificate routes.
+- October12 implementation supersedes the proposed user-owned self-access above:
+  Eric approved per-stack app nodes. Saved policy defines group:tmt-admins and
+  group:tmt-developers; only Eric->tag:tmt-dev-eric TCP8443/10000 for development,
+  admins->tag:tmt-prod TCP8443/10000 for future prod app, and admins->tag:tmt-prod-host
+  TCP22/3283/5900 for physical Mac mini management. Old tenant/Funnel/all-port rules
+  retired after Eric confirmed old project retired. Mini now tag:tmt-prod-host,
+  name unchanged; personal laptop/phone remain user-owned. Policy tests accepted
+  on save. Each additional developer needs their own app tag and explicit grant;
+  autogroup:self does not grant access to tagged sidecars.
+- Eric explicitly approved production Funnel prep: saved nodeAttrs permits ONLY
+  tag:tmt-prod Funnel; production.env.example selects serve.production.json with
+  website443/API10000 public and admin8443 PRIVATE. Development serve.json keeps
+  all false. No production app node/stack has been initialized; do not describe
+  eligibility/configuration as an already-live public endpoint or deploy to mini
+  under the network-configuration authorization alone.
+- Node uses pinned tailscale/tailscale:v1.102.4, separate persistent Docker node
+  state, userspace networking sharing Caddy and ignored .secrets/tailscale.env.
+  No reusable auth key created. First interactive sign-in initially raced default
+  60s containerboot deadline; TS_BOOT_TIMEOUT20m resolved it without deleting
+  state. Retain that timeout for first login; never clone node state between
+  instances. Four Compose checks and3 proxy checks eachlocalhost/newHTTPS passed;
+  sidecar-only restart verified automatic reconnect with unchanged node ID/DNS/IPs
+  and no interactive login. Docker confirms too-much-trash is the only backend
+  project; the separate sam3 project is ML tooling, not another backend stack.
+  Sidecar/API healthy. Iphone Agent completed matching localhost/app-node presets
+  and mixed localhost-collector/HTTPS-admin gating; reported52 passing tests plus
+  Debug-device/Release-Simulator builds. Saved origins/credentials/queues are not
+  migrated. Eric's Simulator review and real iPhone path/capture remain pending.
 
 ## Verification and operational memory
 

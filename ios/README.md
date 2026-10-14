@@ -30,11 +30,33 @@ The initial capture screen uses portrait orientation. Backgrounding the app or a
 
 ## Development
 
-New/unauthenticated Debug Simulator builds can fall back to the isolated `http://localhost:18082` collector when the designated HTTPS admin service is unreachable. An authorized active session retains its original collector origin, including through VPN loss; recordings/credentials are never automatically reassigned. Admin actions hide and open settings dismiss on failed designated probes. Local HTTP discovery alone cannot grant admin UI. Reachability is polled throughout the active app (three seconds plus latency). Local backend selection fills collector/admin localhost fields, keeps settings open, and waits for Save; connected admins can use the isolated local portal after both retained-network and local identity checks.
+The laptop runs one development stack. Simulator can use `http://localhost:8082`
+or `https://too-much-trash-eric-dev.mongoose-bonito.ts.net:10000` for capture.
+Admin uses `https://too-much-trash-eric-dev.mongoose-bonito.ts.net:8443` with
+either collector route; its cookies require HTTPS. Device/Release collector
+access always uses HTTPS. Fresh configuration uses the development Tailscale
+preset; saved configuration takes precedence. The settings sheet offers an
+explicit development Tailscale preset and a Simulator localhost toggle, requiring
+Save before switching. New/unauthenticated Simulator sessions can fall back to
+localhost when the designated admin is unreachable; authorized sessions retain
+their original collector through network loss. Local HTTP reachability alone
+does not grant admin controls. This is a development preset, not a deployed
+production service; the future Mac mini environment remains separate.
 
-Local mode explicitly permits HTTP `localhost` root origins only; it does not bypass enrollment, Keychain validation, quotas, or admin authentication. Its localhost ATS exception is included only in Debug Simulator builds. Physical iPhone and Release builds have neither the local-mode UI nor HTTP acceptance/ATS exceptions, and retain their HTTPS collector configuration. Credentials and queued files remain scoped to their original origin; switching servers does not call End Session, revoke an installation, or adopt earlier captures. Returning to the original origin can reuse its retained credentials after backend validation. The isolated localdev and Tailscale pilot have separate databases/admin tokens and need their own enrollment; they are not two aliases for the same installation. Authn/authz redesign is deferred: this user/admin view distinction does not revoke browser sessions or change backend permissions.
+Local mode permits HTTP only for localhost in Debug Simulator. A private HTTPS
+admin can be paired with that HTTP collector. Legacy localhost admin settings
+remain readable, but cannot establish the designated HTTPS admin identity.
+Physical/Release builds retain normal TLS and have no localhost ATS exception.
+Credentials and queued files remain origin-scoped even when two routes reach the
+same backend: selecting a new origin requires its own enrollment and never adopts
+old credentials/videos. Switching does not End Session; returning to an old
+origin can reuse its credentials after validation. Retired development volumes
+and credentials are preserved by the backend and were not migrated into the
+remaining stack. Authn/authz redesign remains separate.
 
-Validate the isolated local development backend first, then the Tailscale pilot. Backend Agent owns the separate Compose dev project/data/credentials and its HTTP development cookies; the HTTPS pilot's secure cookies remain unchanged. Start that stack using its current backend documentation. Registration/upload there still require a separately approved dev invite. No hardcoded tailnet hostname is supplied: preserve/provision the designated non-secret HTTPS network configuration before expecting admin menus on reconnection.
+Backend Agent owns the development app node, routing and Compose runtime. Use
+its current documentation; enrollment requires a separately approved invitation.
+Preserve existing Simulator Keychain/queues and saved origins during updates.
 
 Install XcodeGen (`brew install xcodegen`), run `xcodegen generate` in this directory, and open `TooMuchTrash.xcodeproj` from the same checkout. Edit `project.yml` for project configuration; generated Xcode projects are ignored by Git.
 

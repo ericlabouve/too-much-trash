@@ -321,7 +321,9 @@ final class OnboardingTests: XCTestCase {
     }
 
     func testLocalAdminReachabilityCannotGrantNetworkAdminView() async throws {
-        guard let local = APIConfiguration.localCollector else { throw XCTSkip("Debug Simulator only") }
+        guard APIConfiguration.supportsSimulatorLocal else { throw XCTSkip("Debug Simulator only") }
+        let local = try APIConfiguration(publicURL: "http://localhost:8082",
+            privateAdminURL: "http://localhost:8081", simulatorLocal: true)
         let api = StubAPI(), vault = MemoryVault()
         api.reachable = true
         let session = AccountSession(configuration: local,
@@ -331,6 +333,21 @@ final class OnboardingTests: XCTestCase {
         XCTAssertFalse(session.adminVisible)
         let destination = await session.verifiedAdminURL()
         XCTAssertNil(destination)
+    }
+
+    func testMixedLocalCollectorUsesHTTPSAdminIdentity() async throws {
+        guard let local = APIConfiguration.localCollector else { throw XCTSkip("Debug Simulator only") }
+        let api = StubAPI()
+        api.reachable = true
+        let session = AccountSession(configuration: local, vault: MemoryVault(),
+            queue: CaptureQueue(directory: queueDirectory()), apiFactory: { _ in api })
+        await session.probeAdmin()
+        XCTAssertTrue(session.adminVisible)
+        let destination = await session.verifiedAdminURL()
+        XCTAssertEqual(destination, local.privateAdminOrigin)
+        api.reachable = false
+        let denied = await session.verifiedAdminURL()
+        XCTAssertNil(denied)
     }
 
     func testNetworkLossFallsBackWithoutReassigningCredentialsAndRecoversMenus() async throws {
