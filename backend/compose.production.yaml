@@ -1,0 +1,128 @@
+# Image-only production stack. Never build on the Mac mini or clone dev volumes.
+name: too-much-trash
+services:
+  caddy:
+    image: ${RELEASE_CADDY_IMAGE:?A complete release is required}
+    ports:
+      - "127.0.0.1:8080:80"
+      - "127.0.0.1:8081:8081"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+  api:
+    image: ${RELEASE_API_IMAGE:?A complete release is required}
+    environment: &application_environment
+      DATABASE_URL: postgresql://${POSTGRES_USER:-trash}:${POSTGRES_PASSWORD:?Required}@postgres:5432/${POSTGRES_DB:-trash}
+      S3_ENDPOINT_URL: http://blob:8333
+      S3_BUCKET: ${S3_BUCKET:-captures}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?Required}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?Required}
+      ADMIN_TOKEN_HASH_FILE: /run/secrets/admin-token.sha256
+      ADMIN_COOKIE_SECURE: "true"
+    volumes:
+      - ${TMT_SECRETS_DIR:?Required}/admin-token.sha256:/run/secrets/admin-token.sha256:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      blob:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+  migrate:
+    image: ${RELEASE_API_IMAGE:?A complete release is required}
+    profiles: [migration]
+    command: ["uv", "run", "--no-sync", "alembic", "upgrade", "head"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-trash}:${POSTGRES_PASSWORD:?Required}@postgres:5432/${POSTGRES_DB:-trash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+  worker:
+    image: ${RELEASE_WORKER_IMAGE:?A complete release is required}
+    environment:
+      <<: *application_environment
+      PREFECT_API_URL: http://workflow:4200/api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      blob:
+        condition: service_started
+      workflow:
+        condition: service_started
+    restart: unless-stopped
+  postgres:
+    image: postgres:16@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-trash}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Required}
+      POSTGRES_DB: ${POSTGRES_DB:-trash}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-trash} -d ${POSTGRES_DB:-trash}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+  blob:
+    image: chrislusf/seaweedfs@sha256:4e61d15fd35994cb1e43e1e553dff106794841fd9a99ade2fc8c8bfce4d7872d
+    command: [mini, "-dir=/data"]
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:?Required}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:?Required}
+      S3_BUCKET: ${S3_BUCKET:-captures}
+    volumes:
+      - blob_data:/data
+    restart: unless-stopped
+  workflow:
+    image: prefecthq/prefect@sha256:57e02b3f63d663e02b06d4127362ea48d92d4b361fbd96c8ba8f01e5702755f4
+    command: prefect server start --host 0.0.0.0
+    environment:
+      PREFECT_SERVER_DATABASE_CONNECTION_URL: postgresql+asyncpg://${POSTGRES_USER:-trash}:${POSTGRES_PASSWORD:?Required}@postgres:5432/prefect
+      PREFECT_SERVER_API_HOST: 0.0.0.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+  tailscale:
+    image: tailscale/tailscale:v1.102.4@sha256:2667499ed87ae29218f292556ba062918402dd5e92e93637af14867e4df12dd3
+    network_mode: service:caddy
+    environment:
+      TS_HOSTNAME: too-much-trash
+      TS_EXTRA_ARGS: --advertise-tags=tag:tmt-prod
+      TS_AUTHKEY: ${TAILSCALE_AUTHKEY:-}
+      TS_USERSPACE: "true"
+      TS_ACCEPT_DNS: "false"
+      TS_AUTH_ONCE: "true"
+      TS_BOOT_TIMEOUT: "20m"
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_SERVE_CONFIG: /config/serve.production.json
+    volumes:
+      - tailscale_state:/var/lib/tailscale
+      - ./tailscale:/config:ro
+    depends_on:
+      caddy:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "tailscale status --json | grep -q '\"BackendState\": \"Running\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+volumes:
+  postgres_data:
+  blob_data:
+  caddy_data:
+  caddy_config:
+  tailscale_state:

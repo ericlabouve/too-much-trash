@@ -30,6 +30,14 @@ The initial capture screen uses portrait orientation. Backgrounding the app or a
 
 ## Development
 
+The approved production collector origin is
+`https://too-much-trash.mongoose-bonito.ts.net` on standard HTTPS 443, shared
+with the website. Its private admin origin remains the same hostname on port
+8443. The client supports this pair through its existing HTTPS configuration;
+the API paths are appended to the collector root. This deployment plan does not
+replace the current development preset or any saved configuration. Changing
+environments requires an explicit choice and separate origin-scoped enrollment.
+
 The laptop runs one development stack. Simulator can use `http://localhost:8082`
 or `https://too-much-trash-eric-dev.mongoose-bonito.ts.net:10000` for capture.
 Admin uses `https://too-much-trash-eric-dev.mongoose-bonito.ts.net:8443` with

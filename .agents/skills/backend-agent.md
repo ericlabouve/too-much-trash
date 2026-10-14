@@ -183,6 +183,111 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 
 ## Verification and operational memory
 
+- October14 selected V1 CD: GitHub-hosted ARM64 builds, GHCR digest-pinned images,
+  and an automatic hosted deployment job using ordinary SSH over Tailscale to the
+  Mac mini. No Arcane agent or self-hosted mini runner; no mini CI/build jobs.
+  Eric is sole developer and deploys while present; laptop sleep is not a V1
+  requirement. Eric said go and authorized existing/subsequent validation PRs
+  to be pushed/merged until Docker backend CD is complete. Components:
+  merge-to-main trigger with no separate deployment approval, main-only gate,
+  scoped ephemeral Tailnet job
+  identity/SSH key/host verification, serialized backup/migration/Compose rollout
+  and health checks, failure/restore procedure and initial production bootstrap.
+  Keep native SAM3/Cutie separate. Do not assume image rollback undoes a migration.
+  Production public website/collector share443 (supersedes public10000 below);
+  admin8443 remains private. Development10000 is unchanged. No success claim
+  before hosted deployment verification. Native ML is not part of CD.
+- October14 read-only main security audit: main is the public repository's default
+  branch. Active ruleset24941839 blocks deletion/non-fast-forward updates only;
+  no classic branch protection, PR/review requirement, bypass actors or CODEOWNERS
+  on main. Only ericlabouve is a collaborator, with admin/write access; ordinary
+  public visitors cannot push/merge. Direct pushes by authorized writers remain
+  allowed at audit time. Eric subsequently authorized and activated ruleset25122035:
+  PRs plus one approval, stale reviews dismissed, CODEOWNERS explicitly deferred,
+  RepositoryRole5(admin) bypass only for PR merges. Original24941839 has no bypass
+  and continues unconditional deletion/force-push blocking. Effective rules API
+  verified all three requirements. Production must never execute untrusted PR code.
+- October14 deployment bootstrap in progress: Eric separately approved auth_keys
+  write restricted to tag:tmt-deploy and exact backend-cd workflow on main,
+  SSH-only grant to tag:tmt-prod-host TCP22, and production node/Funnel443 creation.
+  Saved tested policy includes that tag/grant; production admins443 replaces10000.
+  OIDC trust uses GitHub subject repo:ericlabouve/too-much-trash:ref:refs/heads/main
+  plus exact workflow_ref claim; no OAuth shared secret. Public clientID/audience
+  and verified SSH host key configured as GitHub variables, dedicated private
+  SSH key configured as repository secret. No secret values in memory/logs.
+  Mini ~/too-much-trash-prod has fresh independent private secrets; no invitations
+  or copied dev data. Forced-command key denies shell/PTY/forwarding (tested).
+  Fixed control/ receiver verifies merged-main ancestry and locks rollout.
+  Initial Docker pull over SSH failed because docker-credential-desktop was not
+  on noninteractive PATH; explicitly include Docker.app Resources/bin.
+- October14 Arcane retirement executed at Eric's request: removed only the
+  tmt-arcane-trial manager/socket-proxy containers and management network. Retained
+  two trial named volumes and ignored credentials for recovery; main backend's
+  seven services remain running with API/Postgres/Tailscale healthy. Arcane source
+  remains historical trial tooling, not the selected deployment architecture.
+- October14 final compute decision supersedes the earlier shared-CI acceptance:
+  reserve the Mac mini for production backend and ML inference. Do not register
+  it as a GitHub Actions CI runner; CI setup/execution is deferred for now, not
+  local verification or deployment smoke checks. The selected deployment design
+  is recorded above; do not install a mini runner. Inspect combined
+  model/processing/backend/VM/OS peaks before
+  claiming enough memory. macOS SSH user is ericlabouve. No runner/production
+  deployment has been configured yet. Eric confirmed SAM2 was a typo: the models
+  are SAM3 plus Cutie. Quoted7GB is not a verified combined host peak.
+- Eric prefers portable container-based CD over a custom launchd deployment job.
+  SAM3/Cutie will run natively on macOS. GitHub Actions plus SSH is now selected;
+  implementation is authorized/in progress. Earlier comparison of existing controllers
+  led to a laptop-only Arcane read-only trial (single manager/SQLite, ARM64,
+  Git pull and failure-blocking predeploy hooks), now retired. No persistent
+  bespoke deployment daemon, Arcane agent or mini runner is planned.
+  Komodo adds Core/Periphery/database;
+  Rust alone does not prove lowest RAM. Dockhand currently uses BSL with production
+  restrictions, not an unrestricted open-source license. Reverify versions/licenses
+  when selecting. Build/publish is proposed on GitHub-hosted ARM64 Linux, not the
+  mini. CD must consume complete immutable releases, serialize backup/migration/
+  rollout/checks, preserve volumes/secrets and avoid updating its controller mid-
+  deployment. Docker still needs host startup supervision; native ML lifecycle is
+  separately managed. Domain-specific migration/backup hooks are still needed.
+- October14 laptop Arcane trial: ops/arcane uses manager:v2.16.0 and documented
+  wollomatic/socket-proxy:1.13.1, project tmt-arcane-trial. Loopback3552 only,
+  independent SQLite/project volumes, no existing backend files/volumes imported.
+  Proxy permits read methods only; tested Docker GET200/POST405. No manager direct
+  socket, no published proxy port, analytics disabled. Unique password stored in
+  ignored .secrets/arcane-trial/compose.env; default login rejected. Use session
+  auth for check_trial.py, no static admin API key configured. Four auth/inventory
+  checks and three read-only configuration tests pass; dashboard visually verified.
+  Initial manager145.7MiB/proxy10.2MiB, later dashboard sample270.7/12.1MiB;
+  these are laptop snapshots excluding VM and optional hook/scan/backup peaks.
+  Main backend and mini untouched. Git deployment/hooks/backup-restore/passkeys/
+  notifications are documented candidates, not verified by this read-only trial.
+  On Docker Desktop, shown resource limits describe Linux VM, not native host or
+  MPS jobs. Arcane infrastructure auth does not authenticate the TMT admin API.
+  Avoid auto patch/prune/heal/tag updates outside digest-pinned release workflow.
+- October14 read-only Mac mini capacity audit over operator-authenticated SSH:
+  Apple M4 / Mac16,10,16GiB unified RAM. Data volume available357.4GiB (~383.8GB).
+  Docker engine has7.65GiB usable VM memory/10 CPUs; no running containers or
+  images, ~7.73GB build cache. Docker.raw is sparse (~460GiB apparent/~9.9GiB
+  allocated), not an additional460GiB of free physical disk. Host snapshot:
+  ~13GiB used/~2.4GiB unused, including caches; zero swap. Virtualization process
+  RSS~1.13GiB; Ollama/openclaw-gateway also running, not stopped by this audit.
+  Existing laptop backend's seven containers total~0.80GiB idle, excluding VM
+  overhead; not a measured production load budget. ML agent's quoted allocations
+  are input estimates, not a simultaneous SAM3/Cutie/CI benchmark on this mini.
+  Start with one inference job at a time and measure combined production peaks.
+  CI on this host is now deferred. No resource settings were changed.
+- October14 later request supersedes keeping Ollama: Eric requested uninstalling
+  OpenClaw and stopping Ollama. OpenClaw service/app uninstaller succeeded, npm
+  removed only global openclaw with ignore-scripts, and CLI/package/launch plist
+  are verified absent. Preserved its1.7MiB state/workspace and launch plist in
+  Mac mini Trash as OpenClaw-state-20261014 / ai.openclaw.gateway-20261014.plist;
+  outside workspaces were not deleted. Ollama app/server terminated gracefully,
+  verified absent; its software/models remain installed. Docker/Tailscale intact.
+  Fresh top samples:2924/2942MiB unused (~2.87GiB), file-backed pages~6.30GiB,
+  swap0. Unused RAM is not total allocatable RAM: caches may be reclaimed, while
+  file-backed pages also include mapped files; do not label them all free.
+  Eric intends remote subscription-backed LLM use instead of local Ollama;
+  authentication/integration not verified or implemented here. SAM3/Cutie still
+  need their own local runtime and memory; Ollama isn't their serving engine.
 - Back up before live schema changes; test migrations on disposable databases
   first. Verify fresh initialized DB, legacy pilot adoption, repeated upgrade,
   version bookkeeping, and preservation of captures/invitations/ownership.

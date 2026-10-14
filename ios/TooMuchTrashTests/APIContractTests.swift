@@ -36,6 +36,19 @@ final class APIContractTests: XCTestCase {
                        "https://node.example.test:10000/api/v1/auth/me")
     }
 
+    func testProductionWebsiteOriginAlsoServesCollectorOnStandardHTTPS() throws {
+        let origin = "https://too-much-trash.mongoose-bonito.ts.net"
+        let configuration = try APIConfiguration(publicURL: origin + ":443/",
+            privateAdminURL: origin + ":8443")
+        XCTAssertEqual(configuration.publicOrigin.absoluteString, origin)
+        XCTAssertEqual(configuration.endpoint("api/v1/auth/enroll").absoluteString,
+            origin + "/api/v1/auth/enroll")
+        XCTAssertEqual(configuration.privateAdminOrigin?.absoluteString, origin + ":8443")
+        XCTAssertFalse(configuration.simulatorLocal)
+        XCTAssertThrowsError(try APIConfiguration(publicURL: origin,
+            privateAdminURL: origin + ":443/"))
+    }
+
     private func api(_ transport: ScriptedTransport, privateURL: String = "https://private.example.test:8443") throws -> LiveCollectorAPI {
         LiveCollectorAPI(configuration: try APIConfiguration(publicURL: "https://public.example.test",
                                                              privateAdminURL: privateURL), transport: transport)

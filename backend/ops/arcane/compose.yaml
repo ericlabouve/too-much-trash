@@ -1,0 +1,59 @@
+# Laptop evaluation only: Docker reads allowed; all mutation methods denied.
+name: tmt-arcane-trial
+services:
+  arcane:
+    image: ghcr.io/getarcaneapp/manager:v2.16.0
+    ports:
+      - "127.0.0.1:3552:3552"
+    environment:
+      APP_URL: http://localhost:3552
+      ENCRYPTION_KEY: ${ARCANE_ENCRYPTION_KEY:?Run init_trial.py}
+      DOCKER_HOST: tcp://socket-proxy:2375
+      PROJECTS_DIRECTORY: /app/projects
+      ANALYTICS_DISABLED: "true"
+      TZ: America/Los_Angeles
+    volumes:
+      - arcane_data:/app/data
+      - arcane_projects:/app/projects
+    networks: [management]
+    depends_on:
+      socket-proxy:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "./arcane", "health", "--timeout", "2s"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+  socket-proxy:
+    image: wollomatic/socket-proxy:1.13.1
+    user: "0:0"
+    command:
+      - '-listenip=0.0.0.0'
+      - '-allowfrom=arcane'
+      - '-allowhealthcheck'
+      - '-allowGET=(/v[\d.]+)?/(_ping|version|info|events|system/df)'
+      - '-allowGET=(/v[\d.]+)?/containers(/.*)?'
+      - '-allowGET=(/v[\d.]+)?/images(/.*)?'
+      - '-allowGET=(/v[\d.]+)?/networks(/.*)?'
+      - '-allowGET=(/v[\d.]+)?/volumes(/.*)?'
+      - '-allowGET=(/v[\d.]+)?/distribution(/.*)?'
+      - '-allowHEAD=(/v[\d.]+)?/(_ping|version)'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [management]
+    healthcheck:
+      test: ["CMD", "./healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+networks:
+  management:
+volumes:
+  arcane_data:
+  arcane_projects:

@@ -59,8 +59,8 @@ class TailscaleConfigTests(unittest.TestCase):
         self.assertEqual(serve["AllowFunnel"], {
             "${TS_CERT_DOMAIN}:443": True,
             "${TS_CERT_DOMAIN}:8443": False,
-            "${TS_CERT_DOMAIN}:10000": True,
         })
+        self.assertNotIn("10000", serve["TCP"])
         self.assertEqual(self.config()["services"]["tailscale"]["environment"]["TS_SERVE_CONFIG"], "/config/serve.json")
 
 

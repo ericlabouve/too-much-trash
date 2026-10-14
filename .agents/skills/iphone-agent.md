@@ -31,6 +31,12 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Authentication and trust boundaries
 
+- Production routing approved 2026-10-14: collector shares the website's standard
+  HTTPS 443 origin, while private admin remains on 8443. Generic root-origin
+  configuration already supports this; explicit 443 canonicalizes to omitted
+  port. Backend CD work does not automatically change the app's development
+  preset or saved origins, nor move origin-bound credentials or queues.
+
 - Current development routing (2026-10-12) supersedes the retired separate dev
   stack: one laptop API/DB/media serves Simulator localhost on port 8082 and the
   development Tailscale app node over HTTPS on port 10000. Admin always uses that

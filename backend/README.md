@@ -97,6 +97,85 @@ tool, not a substitute for backend authentication or private network restriction
 Release artifacts can be built once and promoted through a future deployment
 workflow rather than copying developer data or secrets into production.
 
+## Production CD
+
+V1 uses `.github/workflows/backend-cd.yaml`: a merge into protected `main`
+builds API/worker/Caddy on GitHub-hosted Linux ARM64, publishes digest-pinned
+GHCR images and a complete `backend-<commit>` release manifest, then deploys
+automatically. No second deployment approval, mini runner or Arcane agent.
+CI tests remain deferred; local verification and deployment smoke checks remain
+required. The API image also runs the explicit Alembic migration container.
+
+The deployment job uses Tailscale OIDC constrained to this repository, `main`
+and this exact workflow. `tag:tmt-deploy` can reach only the mini's TCP22.
+Ordinary SSH runs over the VPN; this is not macOS Tailscale SSH server mode.
+The dedicated SSH key permits only the forced deployment receiver, no arbitrary
+shell, PTY or forwarding. Host keys are pinned from the authenticated host.
+GitHub variables: `TS_DEPLOY_CLIENT_ID`, `TS_DEPLOY_AUDIENCE`,
+`TMT_DEPLOY_KNOWN_HOSTS`; secret: `TMT_DEPLOY_SSH_KEY`.
+
+Production is image-only `compose.production.yaml`, with separate secrets and
+persistent volumes at the Mac mini. Public website and collector share
+`https://too-much-trash.mongoose-bonito.ts.net` on443. Admin8443 is private;
+public admin/docs/unlock paths are denied. Native SAM3/Cutie run separately.
+First registration requires fresh node authorization; later restarts reuse
+`tailscale_state`. Do not clone developer data, credentials or node state.
+
+Host layout: `~/too-much-trash-prod/{control,secrets,releases,backups}`.
+`current.json` records the last locally verified release. The one-shot receiver
+checks main ancestry, rejects out-of-order deployments, serializes host changes,
+and loads deployment code only from approved main commits. The job-scoped GHCR
+token is streamed over SSH, used in a temporary Docker login directory and never
+included in manifests/backups. Production credentials stay on the host.
+
+For updates, pull all images before maintenance. Pause application writers,
+dump application/Prefect databases and roles, stop blob storage and snapshot its
+volume, then mark recovery state before infrastructure/schema mutations. Run
+Alembic explicitly; only on success roll out the app and reconnect its sidecar
+to the new Caddy namespace. Validate local routes/inventory and external Funnel
+isolation. Both GitHub concurrency and a host lock prevent overlapping rollouts.
+Build/pull failures leave the existing app running; pre-migration backup failure
+resumes the old release. Partial migration/rollout failures block subsequent CD.
+
+Recovery is operator-controlled, never automatic database downgrade. Inspect
+`recovery-required.json` and its backup directory; confirm `complete.json` before
+using a snapshot. Test SQL/media restore into a separate disposable stack first.
+Only after verifying schema compatibility may the operator restart prior images;
+otherwise restore DB and blob together during an explicitly authorized outage.
+Preserve the failed release, backups and secrets; clear the recovery marker only
+after successful checks. An initial empty bootstrap has no previous data snapshot.
+Backups here are same-host recovery, not an off-machine disaster recovery service.
+
+## Retired laptop Arcane evaluation
+
+The trial containers/network were removed on October 14. Named trial volumes and
+ignored credentials are retained for recovery. Do not restart it as part of normal
+development: V1 CD will use GitHub Actions, GHCR and SSH over Tailscale, with no
+Arcane agent or self-hosted runner on the Mac mini. The trial tooling below is
+historical; the CD workflow and initial production deployment are not implemented.
+
+`ops/arcane/compose.yaml` starts a separate **management trial**, not another
+backend instance. It is loopback-only at `http://localhost:3552`, uses its own
+SQLite/project volumes, disables analytics, and exposes only read methods through
+a Docker socket proxy. Stop/update/deploy/backup buttons cannot mutate Docker in
+this mode. The application stack and Mac mini are not adopted or redeployed.
+
+From the repository root:
+
+```sh
+python3 backend/ops/arcane/init_trial.py
+docker compose -p tmt-arcane-trial --env-file backend/.secrets/arcane-trial/compose.env -f backend/ops/arcane/compose.yaml up -d --wait
+python3 backend/ops/arcane/check_trial.py
+```
+
+The check bootstraps a unique password only while the new account still accepts
+the documented default. Username is `arcane`; the generated password is stored
+privately in the ignored trial env file. Never commit it or copy developer secrets
+into production. The trial checks login, inventory and denied anonymous access;
+it does not qualify Git deployment, migrations, backups/restore, passkeys or alerts.
+Do not enable Docker writes, scheduled cleanup or automatic image updates against
+the development backend as an implied part of this read-only evaluation.
+
 ## Client contract
 
 Enroll using an administrator-issued invite (see the full contract above). Send
