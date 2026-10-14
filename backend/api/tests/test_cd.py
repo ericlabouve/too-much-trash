@@ -121,6 +121,24 @@ class CDSafetyTests(unittest.TestCase):
                     deploy.deploy(root, source, request)
                 self.assertEqual(len(commands), before)
 
+    def test_bucket_probe_uses_application_virtual_environment(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            init_production.initialize(root)
+            (root / "control").mkdir()
+            source = root / "releases" / ("a" * 40)
+            source.mkdir(parents=True)
+            def execute(command, **kwargs):
+                if "context" in command:
+                    return b"unix:///dummy/docker.sock\n"
+                if "run" in command and "api" in command:
+                    self.assertEqual(command[command.index("api") + 1:][:5],
+                                     ["uv", "run", "--no-sync", "python", "-c"])
+                    raise RuntimeError("Stop after runtime verification")
+                return b""
+            with patch.object(deploy, "execute", side_effect=execute), self.assertRaises(RuntimeError):
+                deploy.deploy(root, source, {"release": release(), "registry_token": "dummy-token"})
+
     def test_receiver_never_loads_unmerged_deployment_code(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

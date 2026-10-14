@@ -123,7 +123,8 @@ def deploy(root, source, request):
             dc("run", "--rm", "--no-deps", "migrate")
             # Seaweed mini may need time before S3 is ready. Bucket creation is
             # idempotent and uses production credentials inside the API container.
-            dc("run", "--rm", "--no-deps", "api", "python", "-c",
+            print("Checking production media bucket.", flush=True)
+            dc("run", "--rm", "--no-deps", "api", "uv", "run", "--no-sync", "python", "-c",
                "import time; from app.main import storage,BUCKET; c=storage(); "
                "\nfor i in range(30):\n try:\n  c.head_bucket(Bucket=BUCKET); break"
                "\n except Exception:\n  try: c.create_bucket(Bucket=BUCKET); break"

@@ -243,6 +243,14 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   expiring job token in a mode-private temporary config auths entry, preserving
   cliPluginsExtraDirs; remove config on exit and never copy host Keychain auth.
   Ten CD unit/config checks pass; first production rollout still pending.
+  Registry workaround verified by hosted run38651246877: all images pulled,
+  Postgres/blob healthy, Alembic003_onboarding applied with0 captures/installations.
+  Rollout blocked at bucket probe: plain Python lacks uv-managed application
+  packages. `uv run --no-sync python` imports/read-only bucket check passed on
+  mini; no new revision needed. Preserve failed recovery marker before explicit
+  operator resume, never automatically ignore it. Public Funnel checks must run
+  on a separate no-VPN hosted job: Tailscale action enables DNS by default and
+  deployment tag intentionally cannot reach private app443/8443.
 - October14 Arcane retirement executed at Eric's request: removed only the
   tmt-arcane-trial manager/socket-proxy containers and management network. Retained
   two trial named volumes and ignored credentials for recovery; main backend's
