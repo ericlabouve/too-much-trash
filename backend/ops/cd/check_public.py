@@ -8,7 +8,8 @@ ORIGIN = "https://too-much-trash.mongoose-bonito.ts.net"
 
 def check(origin=ORIGIN):
     expected = {"/": 200, "/api/v1/health": 200, "/api/v1/media": 401,
-                "/api/v1/admin/reachability": 404, "/api/v1/admin/session": 404,
+                "/api/v1/admin/reachability": 404, "/api/v1/admin/servers": 404,
+                "/api/v1/admin/session": 404,
                 "/api/v1/admin": 404, "/docs": 404, "/openapi.json": 404,
                 "/unlock": 404}
     for path, status in expected.items():

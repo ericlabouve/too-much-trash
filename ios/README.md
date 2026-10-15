@@ -24,7 +24,27 @@ Registration calls `POST /api/v1/auth/enroll`, saves the returned per-installati
 
 Expired access refreshes through `POST /api/v1/auth/token`. An `access_invalid` response gets one refresh retry; `access_revoked` never refreshes, and `refresh_invalid` requires administrator help or a new invite. Network/5xx failures offer retry without deleting credentials or captures. Rate limits respect `Retry-After`. Clock estimates are advisory; the backend decides credential validity.
 
-Collectors do not need Tailscale. **Admin login** and **Server addresses** are hidden until the retained private HTTPS origin returns HTTP 200 JSON `{ "service": "too-much-trash-admin", "version": 1 }` from `/api/v1/admin/reachability`. Public health and localhost admin discovery never grant these controls. Redirects, HTML/captive portals, incorrect identity/version, unreachable hosts, and missing private configuration keep them hidden. The active app reprobes at three-second intervals; suspension hides them and a tap revalidates reachability before opening the private HTTPS root in the external system browser. This is a reachability check, not admin authentication. Authorized tailnet connectivity is required; passkeys do not provide network access. The portal retains its development admin gate; passkey enrollment/recovery and external app distribution remain separate phases.
+Production collectors do not need Tailscale. **Admin login** and **Server addresses**
+appear only after a private HTTPS endpoint returns the exact approved admin
+service/version identity. The app checks its configured/retained origins plus
+the known production and development app nodes concurrently, so a stale saved
+collector address cannot by itself hide a reachable admin menu. This never
+changes the capture server, credentials or queue owner. Public health and HTTP
+localhost discovery cannot grant admin controls. Foreground probes repeat every
+three seconds after each check; suspension hides the menu, and login revalidates
+the private endpoint. On the camera screen, open Dashboard to access Admin.
+Tailnet reachability reveals controls; the browser still requires admin sign-in.
+
+The settings sheet lists reachable Too Much Trash app servers. It requests the
+curated `/api/v1/admin/servers` catalog from a verified private HTTPS admin, accepts
+only bounded compatible same-tailnet HTTPS app-node records, and separately checks
+each node's admin identity. This is an app-server directory, not arbitrary tailnet
+peer enumeration or a Tailscale credential embedded in the client. Catalog failure
+keeps valid admin access and known-node choices available; manual addresses remain
+editable. Refresh checks again. Selecting a row only fills the fields; Save makes
+the explicit switch, preserving other origins' sessions and videos. The catalog
+requires the corresponding backend Caddy deployment and is blocked on public
+collector listeners.
 
 The initial capture screen uses portrait orientation. Backgrounding the app or a camera interruption ends the held recording. This first version does not implement the project's future rolling pre-grasp buffer or event labels.
 
@@ -34,22 +54,20 @@ The approved production collector origin is
 `https://too-much-trash.mongoose-bonito.ts.net` on standard HTTPS 443, shared
 with the website. Its private admin origin remains the same hostname on port
 8443. The client supports this pair through its existing HTTPS configuration;
-the API paths are appended to the collector root. This deployment plan does not
-replace the current development preset or any saved configuration. Changing
-environments requires an explicit choice and separate origin-scoped enrollment.
+the API paths are appended to the collector root. Fresh installations now default
+to production. Existing saved configuration wins; changing environments requires
+an explicit choice and separate origin-scoped enrollment.
 
 The laptop runs one development stack. Simulator can use `http://localhost:8082`
 or `https://too-much-trash-eric-dev.mongoose-bonito.ts.net:10000` for capture.
 Admin uses `https://too-much-trash-eric-dev.mongoose-bonito.ts.net:8443` with
 either collector route; its cookies require HTTPS. Device/Release collector
-access always uses HTTPS. Fresh configuration uses the development Tailscale
-preset; saved configuration takes precedence. The settings sheet offers an
-explicit development Tailscale preset and a Simulator localhost toggle, requiring
-Save before switching. New/unauthenticated Simulator sessions can fall back to
-localhost when the designated admin is unreachable; authorized sessions retain
-their original collector through network loss. Local HTTP reachability alone
-does not grant admin controls. This is a development preset, not a deployed
-production service; the future Mac mini environment remains separate.
+access always uses HTTPS. The server picker offers reachable development and
+production choices plus the Simulator's explicit localhost toggle, requiring
+Save before switching. The app no longer automatically falls back to localhost
+when Tailscale is unreachable; it retains the selected collector. Local HTTP
+reachability alone does not grant admin controls. Laptop development data and
+Mac mini production data remain separate.
 
 Local mode permits HTTP only for localhost in Debug Simulator. A private HTTPS
 admin can be paired with that HTTP collector. Legacy localhost admin settings

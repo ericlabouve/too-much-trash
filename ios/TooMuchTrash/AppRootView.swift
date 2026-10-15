@@ -1,17 +1,9 @@
 import SwiftUI
 
 struct AppRootView: View {
-    @StateObject private var account = AccountSession(configuration: APIConfiguration.saved() ?? APIConfiguration.developmentNetwork,
-        automaticallyUseLocalCollector: AppRootView.useLocalFallback, automaticUploads: true)
+    @StateObject private var account = AccountSession(configuration: APIConfiguration.initial(),
+        automaticUploads: true, discoverAdminServers: true)
     @Environment(\.scenePhase) private var scenePhase
-
-    private static var useLocalFallback: Bool {
-        #if DEBUG && targetEnvironment(simulator)
-        return !UserDefaults.standard.bool(forKey: "disableLocalFallback")
-        #else
-        return true
-        #endif
-    }
 
     var body: some View {
         Group {
@@ -166,6 +158,42 @@ struct ServerConfigurationView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("Available Tailscale servers") {
+                    if account.refreshingServers { ProgressView("Checking servers…") }
+                    ForEach(account.availableServers) { server in
+                        Button {
+                            simulatorLocal = false
+                            publicURL = server.collectorOrigin
+                            privateURL = server.adminOrigin
+                            httpsPublicURL = publicURL
+                            httpsPrivateURL = privateURL
+                            errorMessage = nil
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(server.name).font(.headline)
+                                    Text(server.configuration?.publicOrigin.host ?? server.collectorOrigin)
+                                        .font(.caption).foregroundStyle(.secondary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                Spacer()
+                                if publicURL == server.collectorOrigin && privateURL == server.adminOrigin {
+                                    Image(systemName: "checkmark").accessibilityLabel("Selected")
+                                }
+                            }
+                        }
+                        .accessibilityIdentifier("server-\(server.id)")
+                    }
+                    if account.availableServers.isEmpty && !account.refreshingServers {
+                        Text("No reachable servers found.").foregroundStyle(.secondary)
+                    }
+                    Button("Refresh servers") { Task { await account.refreshServers() } }
+                        .disabled(account.refreshingServers)
+                        .accessibilityIdentifier("refreshServers")
+                    Text(account.serverDiscoveryMessage).font(.footnote).foregroundStyle(.secondary)
+                    Text("Choose a server, then save. Each server address keeps its own session and videos.")
+                        .font(.footnote)
+                }
                 #if DEBUG && targetEnvironment(simulator)
                 Section("Simulator development") {
                     Toggle("Local backend (no Tailscale)", isOn: Binding(
@@ -178,22 +206,14 @@ struct ServerConfigurationView: View {
                         .font(.footnote)
                 }
                 #endif
-                Button("Use development Tailscale addresses") {
-                    simulatorLocal = false
-                    publicURL = APIConfiguration.developmentCollectorURL
-                    privateURL = APIConfiguration.developmentAdminURL
-                    httpsPublicURL = publicURL
-                    httpsPrivateURL = privateURL
-                    errorMessage = nil
-                }
-                Section("Collector server") {
+                Section("Collector address (manual)") {
                     TextField("Public HTTPS origin", text: $publicURL, axis: .vertical)
                         .lineLimit(2...6)
                         .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
                         .accessibilityIdentifier("publicServerURL")
                     Text(simulatorLocal ? "Local collector on this Mac; no Tailscale required." : "Use the public address provided by your administrator.").font(.footnote)
                 }
-                Section("Private admin server (optional)") {
+                Section("Private admin address (manual, optional)") {
                     TextField("Private HTTPS origin", text: $privateURL, axis: .vertical)
                         .lineLimit(2...6)
                         .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
@@ -218,6 +238,7 @@ struct ServerConfigurationView: View {
             }
             .navigationTitle("Server addresses")
             .toolbar { Button("Cancel") { dismiss() } }
+            .task { await account.refreshServers() }
             .onAppear {
                 publicURL = account.configuration?.publicOrigin.absoluteString ?? ""
                 privateURL = account.configuration?.privateAdminOrigin?.absoluteString ?? ""
@@ -227,8 +248,11 @@ struct ServerConfigurationView: View {
                     httpsPrivateURL = privateURL
                 } else {
                     if privateURL.isEmpty { privateURL = APIConfiguration.developmentAdminURL }
-                    httpsPublicURL = account.adminNetworkConfiguration?.publicOrigin.absoluteString ?? ""
-                    httpsPrivateURL = account.adminNetworkConfiguration?.privateAdminOrigin?.absoluteString ?? ""
+                    let network = account.adminNetworkConfiguration
+                    httpsPublicURL = network?.publicOrigin.scheme == "https"
+                        ? network!.publicOrigin.absoluteString : APIConfiguration.productionCollectorURL
+                    httpsPrivateURL = network?.privateAdminOrigin?.scheme == "https"
+                        ? network!.privateAdminOrigin!.absoluteString : APIConfiguration.productionAdminURL
                 }
             }
         }

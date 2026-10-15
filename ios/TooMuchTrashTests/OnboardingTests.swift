@@ -41,6 +41,8 @@ private final class StubAPI: CollectorAPI {
     var invitesSeen: [String] = []
     var uploadCalls = 0
     var reachable = false
+    var servers: [AvailableServer] = []
+    var catalogError: Error?
     var confirmedID: UUID?
     var delayProbe = false
     var probeContinuation: CheckedContinuation<Bool, Never>?
@@ -93,6 +95,11 @@ private final class StubAPI: CollectorAPI {
         if let endError { throw endError }
         return EndSessionReceipt(installationID: endID ?? id, revoked: true)
     }
+    func availableServers() async throws -> [AvailableServer] {
+        if let catalogError { throw catalogError }
+        return servers
+    }
+
     func adminReachable() async -> Bool {
         if delayProbe { return await withCheckedContinuation { probeContinuation = $0 } }
         return reachable
@@ -318,6 +325,76 @@ final class OnboardingTests: XCTestCase {
         api.reachable = false
         let destination = await session.verifiedAdminURL()
         XCTAssertNil(destination)
+    }
+
+    func testDiscoveryRecoversAdminFromStaleSavedOriginWithoutSwitchingSession() async throws {
+        let stale = try configuration()
+        let offline = StubAPI(), production = StubAPI(), vault = MemoryVault()
+        try seed(offline, vault)
+        let oldCredential = vault.values[origin]
+        production.reachable = true
+        production.catalogError = ClientError.network
+        let session = AccountSession(configuration: stale, vault: vault,
+            queue: CaptureQueue(directory: queueDirectory()), discoverAdminServers: true,
+            apiFactory: { $0.privateAdminOrigin == APIConfiguration.productionNetwork.privateAdminOrigin ? production : offline })
+        await session.probeAdmin()
+        XCTAssertTrue(session.adminVisible)
+        XCTAssertEqual(session.configuration, stale)
+        XCTAssertEqual(vault.values[origin], oldCredential)
+        XCTAssertEqual(vault.saves, 0)
+        XCTAssertEqual(offline.enrollCalls, 0)
+        XCTAssertEqual(production.enrollCalls, 0)
+        let admin = await session.verifiedAdminURL()
+        XCTAssertEqual(admin?.absoluteString, APIConfiguration.productionAdminURL)
+        XCTAssertEqual(session.availableServers.count, 1)
+        production.reachable = false
+        await session.probeAdmin()
+        XCTAssertFalse(session.adminVisible)
+        XCTAssertTrue(session.availableServers.isEmpty)
+        XCTAssertEqual(session.configuration, stale)
+    }
+
+    func testDiscoveredCandidatesRequireTheirOwnIdentityProbe() async throws {
+        let production = StubAPI(), development = StubAPI(), offline = StubAPI()
+        production.reachable = true
+        production.servers = [.known(.productionNetwork), .known(.developmentNetwork)]
+        let session = AccountSession(configuration: .productionNetwork, vault: MemoryVault(),
+            queue: CaptureQueue(directory: queueDirectory()), discoverAdminServers: true,
+            apiFactory: {
+                if $0.privateAdminOrigin == APIConfiguration.productionNetwork.privateAdminOrigin { return production }
+                if $0.privateAdminOrigin == APIConfiguration.developmentNetwork.privateAdminOrigin { return development }
+                return offline
+            })
+        await session.refreshServers()
+        XCTAssertEqual(session.availableServers.count, 1)
+        development.reachable = true
+        await session.refreshServers()
+        XCTAssertEqual(session.availableServers.count, 2)
+        XCTAssertEqual(session.configuration, .productionNetwork)
+        session.suspend()
+        XCTAssertFalse(session.adminVisible)
+        XCTAssertTrue(session.availableServers.isEmpty)
+    }
+
+    func testCatalogAddsAnotherCompatibleAppNodeWithoutChangingCollector() async throws {
+        let production = StubAPI(), other = StubAPI(), offline = StubAPI()
+        production.reachable = true
+        other.reachable = true
+        let additional = AvailableServer(id: "another-dev", name: "Another developer",
+            collectorOrigin: "https://too-much-trash-another-dev.mongoose-bonito.ts.net:10000",
+            adminOrigin: "https://too-much-trash-another-dev.mongoose-bonito.ts.net:8443")
+        production.servers = [.known(.productionNetwork), additional]
+        let session = AccountSession(configuration: .productionNetwork, vault: MemoryVault(),
+            queue: CaptureQueue(directory: queueDirectory()), discoverAdminServers: true,
+            apiFactory: {
+                if $0 == .productionNetwork { return production }
+                if $0 == additional.configuration { return other }
+                return offline
+            })
+        await session.refreshServers()
+        XCTAssertTrue(session.availableServers.contains(additional))
+        XCTAssertEqual(session.configuration, .productionNetwork)
+        XCTAssertEqual(other.enrollCalls, 0)
     }
 
     func testLocalAdminReachabilityCannotGrantNetworkAdminView() async throws {

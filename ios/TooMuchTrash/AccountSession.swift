@@ -9,6 +9,9 @@ final class AccountSession: ObservableObject {
     @Published private(set) var message = "Register with an invite to begin collecting."
     @Published private(set) var installation: Installation?
     @Published private(set) var adminVisible = false
+    @Published private(set) var availableServers: [AvailableServer] = []
+    @Published private(set) var refreshingServers = false
+    @Published private(set) var serverDiscoveryMessage = ""
     @Published private(set) var busy = false
     @Published private(set) var retryNotBefore: Date?
     @Published private(set) var configuration: APIConfiguration?
@@ -29,6 +32,10 @@ final class AccountSession: ObservableObject {
     private var foreground = true
     private let automaticallyUseLocalCollector: Bool
     private let automaticUploads: Bool
+    private let discoverAdminServers: Bool
+    private var verifiedAdminConfiguration: APIConfiguration?
+    private var catalogServers: [AvailableServer] = []
+    private var lastCatalogCheck: Date?
     private var uploadTask: Task<Void, Never>?
     private var retryUploadAt: Date?
     private var retryDelay: TimeInterval = 2
@@ -41,10 +48,12 @@ final class AccountSession: ObservableObject {
          vault: CredentialVault? = nil, queue: CaptureQueue? = nil,
          automaticallyUseLocalCollector: Bool = false,
          automaticUploads: Bool = false,
+         discoverAdminServers: Bool = false,
          adminNetworkConfiguration: APIConfiguration? = nil,
          apiFactory: @escaping @MainActor (APIConfiguration) -> CollectorAPI = { LiveCollectorAPI(configuration: $0) }) {
         self.automaticallyUseLocalCollector = automaticallyUseLocalCollector
         self.automaticUploads = automaticUploads
+        self.discoverAdminServers = discoverAdminServers
         self.adminNetworkConfiguration = adminNetworkConfiguration ??
             (configuration?.privateAdminOrigin?.scheme == "https" ? configuration : nil) ??
             (automaticallyUseLocalCollector ? APIConfiguration.savedAdminNetwork() : nil)
@@ -415,6 +424,8 @@ final class AccountSession: ObservableObject {
     func hideAdmin() {
         probeGeneration = UUID()
         adminVisible = false
+        verifiedAdminConfiguration = nil
+        availableServers = []
     }
 
     func suspend() { foreground = false; hideAdmin() }
@@ -424,6 +435,10 @@ final class AccountSession: ObservableObject {
         probeGeneration = UUID()
         let generation = probeGeneration
         guard foreground else { return }
+        if discoverAdminServers {
+            await probeDiscoveredAdmin(generation: generation)
+            return
+        }
         let network = adminNetworkConfiguration
         let reachable: Bool
         if let network, network.privateAdminOrigin?.scheme == "https" {
@@ -432,6 +447,70 @@ final class AccountSession: ObservableObject {
         guard foreground, !Task.isCancelled, probeGeneration == generation else { return }
         adminVisible = reachable
         if !reachable, automaticallyUseLocalCollector, phase != .authorized { await useLocalCollector() }
+    }
+
+    func refreshServers() async {
+        guard !refreshingServers else { return }
+        refreshingServers = true
+        defer { refreshingServers = false }
+        lastCatalogCheck = nil
+        await probeAdmin()
+    }
+
+    private func probeDiscoveredAdmin(generation: UUID) async {
+        let seeds = [adminNetworkConfiguration, configuration, APIConfiguration.savedAdminNetwork(),
+                     APIConfiguration.productionNetwork, APIConfiguration.developmentNetwork]
+        var candidates: [APIConfiguration] = []
+        for candidate in seeds.compactMap({ $0 }) + catalogServers.compactMap(\.configuration) {
+            guard candidate.privateAdminOrigin?.scheme == "https",
+                  !candidates.contains(where: { $0.privateAdminOrigin == candidate.privateAdminOrigin }) else { continue }
+            candidates.append(candidate)
+        }
+        // These requests contain no collector credentials. Never switch capture origin here.
+        let matches = await reachableServers(candidates)
+        guard foreground, !Task.isCancelled, probeGeneration == generation else { return }
+        let reachable = candidates.filter { matches.contains($0) }
+        verifiedAdminConfiguration = reachable.first
+        adminVisible = !reachable.isEmpty
+        if !reachable.isEmpty,
+           lastCatalogCheck.map({ Date().timeIntervalSince($0) >= 60 }) ?? true {
+            lastCatalogCheck = Date()
+            var loaded = false
+            for source in reachable {
+                do {
+                    let discovered = try await apiFactory(source).availableServers()
+                    guard foreground, !Task.isCancelled, probeGeneration == generation else { return }
+                    catalogServers = discovered
+                    loaded = true
+                    serverDiscoveryMessage = discovered.isEmpty ? "No server list published. Known servers are checked below." : "Only reachable servers are listed."
+                    break
+                } catch {
+                    guard foreground, !Task.isCancelled, probeGeneration == generation else { return }
+                }
+            }
+            if !loaded { serverDiscoveryMessage = "Couldn’t load the server list. Known servers and manual addresses remain available." }
+        }
+        let additional = catalogServers.compactMap(\.configuration).filter { item in
+            !candidates.contains(where: { $0.privateAdminOrigin == item.privateAdminOrigin })
+        }
+        let extraMatches = await reachableServers(additional)
+        guard foreground, !Task.isCancelled, probeGeneration == generation else { return }
+        availableServers = (reachable + extraMatches).map { config in
+            catalogServers.first(where: { $0.configuration?.privateAdminOrigin == config.privateAdminOrigin }) ?? .known(config)
+        }.filter { $0.isValid(inTailnetOf: APIConfiguration.productionNetwork.privateAdminOrigin!) }
+        if !adminVisible { serverDiscoveryMessage = "No private admin server is reachable. Check Tailscale connectivity and access." }
+    }
+
+    private func reachableServers(_ candidates: [APIConfiguration]) async -> [APIConfiguration] {
+        await withTaskGroup(of: (APIConfiguration, Bool).self) { group in
+            for candidate in candidates {
+                let client = apiFactory(candidate)
+                group.addTask { (candidate, await client.adminReachable()) }
+            }
+            var matches: [APIConfiguration] = []
+            for await (candidate, reachable) in group where reachable { matches.append(candidate) }
+            return matches
+        }
     }
 
     func useLocalCollector() async {
@@ -445,6 +524,7 @@ final class AccountSession: ObservableObject {
     func verifiedAdminURL() async -> URL? {
         await probeAdmin()
         guard adminVisible else { return nil }
+        if discoverAdminServers { return verifiedAdminConfiguration?.privateAdminOrigin }
         if configuration?.simulatorLocal == true {
             guard let api, let origin = configuration?.privateAdminOrigin else { return nil }
             let reachable = await api.adminReachable()
