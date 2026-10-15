@@ -1,6 +1,6 @@
 # iPhone agent memory
 
-Maintained project preferences, architectural decisions, and evidence for Too Much Trash iOS work. Last updated: 2026-10-12. Read alongside the current root `AGENTS.md` and `ios/README.md`; this file does not replace the user's current request.
+Maintained project preferences, architectural decisions, and evidence for Too Much Trash iOS work. Last updated: 2026-10-14. Read alongside the current root `AGENTS.md` and `ios/README.md`; this file does not replace the user's current request.
 
 ## Ownership and collaboration
 
@@ -34,22 +34,33 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 - Production routing approved 2026-10-14: collector shares the website's standard
   HTTPS 443 origin, while private admin remains on 8443. Generic root-origin
   configuration already supports this; explicit 443 canonicalizes to omitted
-  port. Backend CD work does not automatically change the app's development
-  preset or saved origins, nor move origin-bound credentials or queues.
+  port. Eric subsequently requested production as the fresh-install default.
+  Preserve existing saved origins and origin-bound credentials/queues.
 
 - Current development routing (2026-10-12) supersedes the retired separate dev
   stack: one laptop API/DB/media serves Simulator localhost on port 8082 and the
   development Tailscale app node over HTTPS on port 10000. Admin always uses that
   app node's HTTPS port 8443, including with a localhost collector. Simulator local
   mode accepts this mixed transport pair; physical/Release collector stays HTTPS.
-  Fresh app configuration uses the development network preset; existing saved
-  configuration wins. Selecting a preset requires Save and never aliases saved
+  Fresh app configuration uses production; existing saved configuration wins.
+  Selecting a server requires Save and never aliases saved
   credentials or queues between origins. Old HTTP admin config remains parseable
   for compatibility, but its reachability alone cannot grant admin controls.
 
 - Physical iPhone and Release builds accept only configurable HTTPS root origins. Debug Simulator builds alone have an explicit local development mode accepting HTTP `localhost` origins, with a localhost-scoped ATS exception absent from device/Release bundles. Never broaden this to LAN/public HTTP or bypass certificate validation. Reject credential-bearing redirects. Private and collector origins must differ, including by port if on one hostname.
 - User's test order: manually validate local development without Tailscale first, then the Tailscale-enabled workflow. Coordinate localhost backend/admin setup with Backend Agent; do not weaken the HTTPS pilot's secure cookies for local testing.
-- Network loss hides admin actions/dismisses settings. An authorized active session never silently changes collector origin; new/unauthenticated Debug Simulator sessions may fall back to localhost after operations finish. Local discovery cannot grant network-admin UI. Retain designated HTTPS configuration so reconnecting reveals menus without reassigning credentials/queues. Physical/Release retain HTTPS. Temporary network loss within an already-validated app session does not interrupt offline capture.
+- Network loss hides admin actions/dismisses settings. Never silently change the
+  selected collector; automatic localhost fallback is no longer used by the app.
+  Local HTTP discovery cannot grant admin UI. Temporary network loss within an
+  already-validated session does not interrupt offline capture.
+- Admin visibility checks configured/retained private origins plus production/dev
+  private HTTPS app nodes, independently of the active collector. Stale config
+  must not hide a reachable compatible admin. Server settings show the private
+  curated catalog, validate same-tailnet HTTPS app-node destinations, and probe
+  each identity before listing it. Catalog failure cannot hide valid admin access;
+  retain known-node/manual fallback. No Tailscale API secrets or arbitrary peer
+  enumeration on iPhone. Camera keeps Dashboard-only navigation; Admin is inside
+  Dashboard or registration, revealed only after the private identity probe.
 - Local-backend selection is independent of connectivity: toggling it fills the
   localhost collector and retains the private HTTPS admin address, keeps the menu
   open, and waits for Save. Browser handoff requires that HTTPS service identity.
@@ -84,6 +95,18 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 - When reporting completion, lead with outcome and validation evidence. Distinguish automated tests, native live integration, deployed backend checks, and physical validation. Print a high-level remaining-work summary to stdout when requested, and concisely identify user-only steps.
 
 ## Evidence and remaining work
+
+- 2026-10-14 admin recovery/production default/server picker: 72 native unit
+  checks passed with one opt-in integration skip; after final catalog filtering,
+  58 configuration/session/live-picker checks passed without skips, followed by
+  an additional advertised-server regression. Picker screenshot verified reachable
+  production and development options, excluding legacy physical Mac hostnames.
+  No Save/enrollment/End or real credential migration occurred in UI checks.
+  Device Debug unsigned and Release Simulator builds compiled without ATS
+  exceptions. Signed physical installation remained unverified while Mac/phone
+  were locked; existing generated-project team settings were preserved. Backend
+  catalog route requires its own rollout; until then fallback known-node choices
+  work and the UI explicitly reports directory unavailability.
 
 - Development app-node routing passed 52 configuration/session Simulator tests
   with no skips/failures on 2026-10-12, including mixed localhost collector/HTTPS

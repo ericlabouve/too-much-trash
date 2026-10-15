@@ -99,6 +99,28 @@ workflow rather than copying developer data or secrets into production.
 
 ## Production CD
 
+### Private app-server picker
+
+Admin listeners expose `GET /api/v1/admin/servers` without an admin cookie,
+like the existing identity probe. Access is gated by private Tailscale8443 grants;
+the catalog does not unlock the dashboard or grant collector access. Public
+Funnel443 and development collector10000 reject it with404.
+
+`caddy/server-catalog.json` is a curated inventory of approved application
+endpoints (currently production and Eric's development stack), not a Tailscale
+peer listing. It contains only `service`, `version` and `servers` records with
+`id`, `name`, `collector_origin`, `admin_origin`; no VPN/API secrets, user/device
+metadata or live reachability claims. Add future developers explicitly here
+and separately grant their private network access; listing never grants access.
+
+Clients validate the version/schema and same-tailnet HTTPS app origins, probe
+each private identity with normal TLS, and offer only compatible reachable
+servers. Discovery failure retains manual entry and must not hide a successful
+admin identity probe. Selection is explicit: never migrate credentials, queued
+uploads or the saved collector origin just because a server is discovered.
+
+### Deployment workflow
+
 V1 uses `.github/workflows/backend-cd.yaml`: a merge into protected `main`
 builds API/worker/Caddy on GitHub-hosted Linux ARM64, publishes digest-pinned
 GHCR images and a complete `backend-<commit>` release manifest, then deploys

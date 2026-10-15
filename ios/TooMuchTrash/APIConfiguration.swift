@@ -89,6 +89,51 @@ struct APIConfiguration: Equatable {
         // Non-secret preset for this prototype. Saved origins always take precedence.
         try! APIConfiguration(publicURL: developmentCollectorURL, privateAdminURL: developmentAdminURL)
     }
+
+    static let productionCollectorURL = "https://too-much-trash.mongoose-bonito.ts.net"
+    static let productionAdminURL = productionCollectorURL + ":8443"
+    static var productionNetwork: APIConfiguration {
+        try! APIConfiguration(publicURL: productionCollectorURL, privateAdminURL: productionAdminURL)
+    }
+
+    static func initial(defaults: UserDefaults = .standard) -> APIConfiguration {
+        saved(defaults: defaults) ?? productionNetwork
+    }
+}
+
+struct AvailableServer: Decodable, Identifiable, Equatable {
+    let id: String
+    let name: String
+    let collectorOrigin: String
+    let adminOrigin: String
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, collectorOrigin = "collector_origin", adminOrigin = "admin_origin"
+    }
+
+    var configuration: APIConfiguration? {
+        try? APIConfiguration(publicURL: collectorOrigin, privateAdminURL: adminOrigin)
+    }
+
+    func isValid(inTailnetOf source: URL) -> Bool {
+        guard let sourceHost = source.host, sourceHost.hasSuffix(".ts.net") else { return false }
+        let tailnet = sourceHost.split(separator: ".").dropFirst().joined(separator: ".")
+        guard !id.isEmpty, id.count <= 80, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              name.count <= 80, let config = configuration, let admin = config.privateAdminOrigin,
+              let host = config.publicOrigin.host, host == admin.host,
+              admin.port == 8443, [nil, 10000].contains(config.publicOrigin.port),
+              host == "too-much-trash." + tailnet || host.hasPrefix("too-much-trash-") else { return false }
+        return host.hasSuffix("." + tailnet)
+    }
+
+    static func known(_ config: APIConfiguration) -> AvailableServer {
+        AvailableServer(id: config.privateAdminOrigin?.absoluteString ?? "",
+            name: config.publicOrigin == APIConfiguration.productionNetwork.publicOrigin ? "Production" :
+                config.publicOrigin == APIConfiguration.developmentNetwork.publicOrigin ? "Eric development" :
+                config.publicOrigin.host ?? "Server",
+            collectorOrigin: config.publicOrigin.absoluteString,
+            adminOrigin: config.privateAdminOrigin?.absoluteString ?? "")
+    }
 }
 
 enum ClientError: Error, Equatable {

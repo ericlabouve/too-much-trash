@@ -184,6 +184,41 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 
 ## Verification and operational memory
 
+- October14 client-admin follow-up (Eric's request verified directly in Iphone
+  Agent chat): fresh app defaults production, recover admin discovery independently
+  of stale saved collector origin, and offer available app servers without typing.
+  Backend contract agreed with iPhone: private GET /api/v1/admin/servers on8443,
+  {service:too-much-trash-admin,version:1,servers:[{id,name,collector_origin,admin_origin}]}.
+  Curated Caddy JSON includes only production + Eric dev, no Tailscale API keys,
+  peer enumeration, credentials or availability claims. Same privacy gate as
+  identity probe; does not authenticate admin. Public443/devcollector10000 deny404.
+  Client validates same-tailnet HTTPS app origins, probes each independently,
+  shows reachable compatible servers, preserves manual fallback and requires
+  explicit selection without moving origin-scoped credentials/queues. No DB
+  migration or tailnet grant changes needed. Laptop normalTLS identity probes
+  passed both8443 routes; saved policy grants Eric's untagged devices those ports.
+  Phone registered/unexpired under same account; console showed not connected
+  at inspection, so laptop success is not phone-source validation. Five proxy/
+  contract checks passed for EACH dev and production configuration in disposable
+  loopback proxies (removed afterward), plus12 CD safety/config checks. Public
+  catalog404/private200-no-store-JSON/no-cookie/POST405; admin APIs remain401.
+  Eric explicitly approved combined commit/PR merge and local+production catalog
+  rollout, preserving data/credentials/network permissions. iOS owns its9 frozen
+  source/docs paths; reported72 unit passes/1 optional integration skip, plus58
+  config/session/UI passes and1 advertised-node regression. Backend owns Git/CD.
+  Caddy validation image built; catalog packaged only under /etc/caddy, never
+  public static root. Rollout in progress; iOS remains iPhone Agent-owned.
+  Later phone network diagnosis: console refreshed to Connected, correct Eric
+  owner/unexpired. iPhone Agent reports dev DNS-1003 and prodTLS-1200, with prod
+  resolving publicIPv6. PublicDNS resolves production to Funnel relay addresses;
+  dev has no publicDNS answer. Laptop systemDNS instead resolves both to private
+  appnode100.x and both8443 identity probes pass normalTLS. One-off curl forced
+  to the observed public relayIPv4 on8443 reproduces SSL_ERROR_SYSCALL while
+  retaining hostname/certificate verification; no DNS/config changes made.
+  This supports missing/stale phone MagicDNS/private routing, not proof of a
+  certificate/signing fault. Need phoneSafari vs app exact8443 probe to distinguish
+  device DNS settings from app DNS/session cache. Never solve with TLS bypass,
+  client hardcoded IPs, public admin Funnel, or broader tailnet grants.
 - October14 selected V1 CD: GitHub-hosted ARM64 builds, GHCR digest-pinned images,
   and an automatic hosted deployment job using ordinary SSH over Tailscale to the
   Mac mini. No Arcane agent or self-hosted mini runner; no mini CI/build jobs.
@@ -263,6 +298,11 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   passed normal TLS. Bounded synthetic image/video Prefect/S3 poster processing
   passed and removed only its generated source/poster objects; no invitations or
   installation/capture records created. Native ML/iPhone validation still pending.
+  Normal update run38652391347 passed at4e59df5, including separate public checks.
+  Application+Prefect SQL and all blob bytes restored into network-isolated
+  disposable containers, then test resources removed. Node identity/DNS/IPs
+  unchanged without login; recovery marker absent and transient registry dirs
+  cleaned. This is same-host recovery validation, not off-machine disaster recovery.
 - October14 Arcane retirement executed at Eric's request: removed only the
   tmt-arcane-trial manager/socket-proxy containers and management network. Retained
   two trial named volumes and ignored credentials for recovery; main backend's

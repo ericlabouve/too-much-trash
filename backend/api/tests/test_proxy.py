@@ -2,9 +2,34 @@
 
 import json
 import os
+from pathlib import Path
 import unittest
+from urllib.parse import urlsplit
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+
+
+class CatalogContractTests(unittest.TestCase):
+    def test_inventory_contains_only_explicit_compatible_app_origins(self):
+        path = Path(__file__).resolve().parents[2] / "caddy/server-catalog.json"
+        catalog = json.loads(path.read_text())
+        self.assertEqual(set(catalog), {"service", "version", "servers"})
+        self.assertEqual(catalog["service"], "too-much-trash-admin")
+        self.assertEqual(catalog["version"], 1)
+        self.assertEqual(len(catalog["servers"]), 2)
+        self.assertEqual(len({server["id"] for server in catalog["servers"]}), 2)
+        for server in catalog["servers"]:
+            self.assertEqual(set(server), {"id", "name", "collector_origin", "admin_origin"})
+            self.assertTrue(server["id"] and server["name"])
+            collector, admin = (urlsplit(server[key]) for key in ("collector_origin", "admin_origin"))
+            self.assertEqual(collector.hostname, admin.hostname)
+            self.assertTrue(collector.hostname.startswith("too-much-trash"))
+            self.assertTrue(collector.hostname.endswith(".mongoose-bonito.ts.net"))
+            self.assertIn(collector.port or 443, (443, 10000))
+            self.assertEqual(admin.port, 8443)
+            for origin in (collector, admin):
+                self.assertEqual(origin.scheme, "https")
+                self.assertFalse(origin.path or origin.query or origin.fragment or origin.username or origin.password)
 
 
 @unittest.skipUnless(os.environ.get("TMT_PROXY_TEST_PUBLIC"), "No isolated proxy configured")
@@ -21,7 +46,7 @@ class ProxyTests(unittest.TestCase):
 
     def test_public_admin_and_documentation_blocked(self):
         base = os.environ["TMT_PROXY_TEST_PUBLIC"]
-        for path in ("/api/v1/admin/reachability", "/api/v1/admin/invites",
+        for path in ("/api/v1/admin/reachability", "/api/v1/admin/servers", "/api/v1/admin/invites",
                      "/api/v1/admin/installations", "/docs", "/openapi.json"):
             self.assertEqual(self.request(base, path)[0], 404, path)
         self.assertEqual(self.request(base, "/api/v1/admin/session", b'{}')[0], 404)
@@ -32,6 +57,19 @@ class ProxyTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body), {"service": "too-much-trash-admin", "version": 1})
         self.assertEqual(self.request(base, "/api/v1/admin/invites")[0], 401)
+
+    def test_private_server_catalog_is_curated_and_not_admin_login(self):
+        status, body, headers = self.request(os.environ["TMT_PROXY_TEST_PRIVATE"], "/api/v1/admin/servers")
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Cache-Control"], "no-store")
+        self.assertEqual(headers.get_content_type(), "application/json")
+        catalog = json.loads(body)
+        self.assertEqual(catalog["service"], "too-much-trash-admin")
+        self.assertEqual(catalog["version"], 1)
+        self.assertEqual([server["id"] for server in catalog["servers"]], ["production", "eric-development"])
+        self.assertNotIn("Set-Cookie", headers)
+        self.assertEqual(self.request(os.environ["TMT_PROXY_TEST_PRIVATE"],
+                                      "/api/v1/admin/servers", b'{}')[0], 405)
 
     def test_public_auth_body_limit_and_upload_authentication(self):
         base = os.environ["TMT_PROXY_TEST_PUBLIC"]

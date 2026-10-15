@@ -24,6 +24,47 @@ private final class ScriptedTransport: HTTPTransport {
 
 @MainActor
 final class APIContractTests: XCTestCase {
+    func testFreshDefaultsAreProductionAndSavedOriginsStillWin() throws {
+        let suite = "test.initial.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        XCTAssertEqual(APIConfiguration.initial(defaults: defaults), .productionNetwork)
+        APIConfiguration.developmentNetwork.save(defaults: defaults)
+        XCTAssertEqual(APIConfiguration.initial(defaults: defaults), .developmentNetwork)
+    }
+
+    func testPrivateServerCatalogRejectsUntrustedAndMalformedDestinations() async throws {
+        let origin = APIConfiguration.productionCollectorURL
+        func catalog(host: String, admin: String? = nil, version: Int = 1) -> String {
+            """
+            {"service":"too-much-trash-admin","version":\(version),"servers":[{"id":"production","name":"Production","collector_origin":"\(host)","admin_origin":"\(admin ?? (host + ":8443"))"}]}
+            """
+        }
+        let transport = ScriptedTransport()
+        transport.replies = [
+            .init(status: 200, json: catalog(host: origin)),
+            .init(status: 200, json: catalog(host: "https://too-much-trash.other-tailnet.ts.net")),
+            .init(status: 200, json: catalog(host: "https://unrelated.mongoose-bonito.ts.net")),
+            .init(status: 200, json: catalog(host: origin, admin: origin + ":443")),
+            .init(status: 200, json: catalog(host: origin, admin: APIConfiguration.developmentAdminURL)),
+            .init(status: 200, json: catalog(host: origin, version: 2)),
+            .init(status: 200, json: catalog(host: origin), type: "text/html"),
+            .init(status: 302, json: catalog(host: origin)),
+            .init(status: 200, json: catalog(host: origin), url: URL(string: "https://elsewhere.test"))
+        ]
+        let client = LiveCollectorAPI(configuration: .productionNetwork, transport: transport)
+        let servers = try await client.availableServers()
+        XCTAssertEqual(servers.first?.configuration, .productionNetwork)
+        for _ in 0..<8 {
+            do { _ = try await client.availableServers(); XCTFail("Untrusted catalog was accepted") }
+            catch { }
+        }
+        XCTAssertTrue(transport.requests.allSatisfy { request in
+            request.url?.absoluteString == APIConfiguration.productionAdminURL + "/api/v1/admin/servers" &&
+            request.value(forHTTPHeaderField: "Authorization") == nil
+        })
+    }
+
     func testHTTPSOriginPolicy() throws {
         let rejected = ["http://localhost", "https://user:password@example.test", "https://example.test/api",
                         "https://example.test?token=secret", "https://example.test#token", "file:///tmp/a"]

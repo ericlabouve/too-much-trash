@@ -72,9 +72,11 @@ protocol CollectorAPI {
     func endSession(refreshToken: String) async throws -> EndSessionReceipt
     func media(id: UUID, token: String) async throws -> MediaReceipt
     func adminReachable() async -> Bool
+    func availableServers() async throws -> [AvailableServer]
 }
 
 extension CollectorAPI {
+    func availableServers() async throws -> [AvailableServer] { [] }
     func upload(file: URL, captureID: UUID, token: String,
                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
         try await upload(file: file, token: token)
@@ -152,6 +154,28 @@ final class LiveCollectorAPI: CollectorAPI {
             let identity: Identity = try decode(data, response, expected: 200)
             return identity.service == "too-much-trash-admin" && identity.version == 1
         } catch { return false }
+    }
+
+    func availableServers() async throws -> [AvailableServer] {
+        guard let origin = configuration.privateAdminOrigin, origin.scheme == "https" else {
+            throw ClientError.configuration
+        }
+        var request = URLRequest(url: origin.appendingPathComponent("api/v1/admin/servers"))
+        request.timeoutInterval = 3
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let (data, response) = try await transport.data(for: request)
+        guard response.url == request.url, data.count <= 65_536 else { throw ClientError.invalidResponse }
+        struct Catalog: Decodable { let service: String; let version: Int; let servers: [AvailableServer] }
+        let catalog: Catalog = try decode(data, response, expected: 200)
+        guard catalog.service == "too-much-trash-admin", catalog.version == 1,
+              catalog.servers.count <= 32,
+              Set(catalog.servers.map(\.id)).count == catalog.servers.count,
+              Set(catalog.servers.compactMap { $0.configuration?.privateAdminOrigin }).count == catalog.servers.count,
+              catalog.servers.allSatisfy({ $0.isValid(inTailnetOf: origin) }) else {
+            throw ClientError.invalidResponse
+        }
+        return catalog.servers
     }
 
     func upload(file: URL, token: String) async throws -> MediaReceipt {

@@ -2,6 +2,26 @@ import XCTest
 import UIKit
 
 final class CameraLaunchTests: XCTestCase {
+    func testLiveAdminServerPickerWithoutSavingOrEnrollment() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-collectorPublicOrigin", "https://too-much-trash.mongoose-bonito.ts.net",
+            "-privateAdminOrigin", "https://too-much-trash.mongoose-bonito.ts.net:8443",
+            "-simulatorLocalBackend", "NO"]
+        app.launch()
+        if app.buttons["openDashboard"].waitForExistence(timeout: 3) { app.buttons["openDashboard"].tap() }
+        guard app.buttons["adminMenu"].waitForExistence(timeout: 15) else {
+            throw XCTSkip("Requires authorized live private Tailscale admin reachability")
+        }
+        app.buttons["adminMenu"].tap()
+        app.buttons["serverAddresses"].tap()
+        XCTAssertTrue(app.navigationBars["Server addresses"].waitForExistence(timeout: 5))
+        let servers = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", "server-"))
+        XCTAssertTrue(servers.firstMatch.waitForExistence(timeout: 10))
+        saveVisual(app, name: "Private server picker")
+        app.buttons["Cancel"].tap()
+        // Never Save, enroll, or End Session on the user's installation.
+    }
+
     func testLocalSessionVisualVerificationWithoutRevocation() throws {
         let app = XCUIApplication()
         // Launch-only overrides: never persist a server switch or move credentials.
