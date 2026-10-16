@@ -1,0 +1,96 @@
+{
+    "error_string": "Success.",
+    "export_time": 368,
+    "layer_height": 0.11999999731779099,
+    "plate_index": 0,
+    "prepare_time": 187,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 90.29045867919922,
+                "Bridge": 85.08454132080078,
+                "Custom": 407.5270080566406,
+                "Flush": 28.0,
+                "Gap infill": 13.241943359375,
+                "Inner wall": 1162.0130615234375,
+                "Internal solid infill": 574.5177612304688,
+                "Outer wall": 1152.48046875,
+                "Overhang wall": 4.431512832641602,
+                "Sparse infill": 374.0683288574219,
+                "Support": 13.587773323059082,
+                "Support interface": 8.930273056030273,
+                "Support transition": 2.559366464614868,
+                "Top surface": 102.78583526611328,
+                "Travel": 697.3814086914063,
+                "Undefined": 679.6566772460938
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFL99",
+                    "id": 1,
+                    "main_used_g": 9.688642501831055,
+                    "total_used_g": 9.688642501831055
+                }
+            ],
+            "generate_support_material_time": 37,
+            "id": 1,
+            "infill_time": 108,
+            "layer_filament_change": 0,
+            "main_predication": 4253.55517578125,
+            "make_perimeters_time": 104,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 51.0,
+                        "height": 19.799999237060547,
+                        "width": 66.0,
+                        "x": 27.0,
+                        "y": 79.5,
+                        "z": 1.469725674496658e-09
+                    },
+                    "id": 5,
+                    "name": "actuator_bracket",
+                    "triangle_count": 54908
+                },
+                {
+                    "bbox": {
+                        "depth": 16.0,
+                        "height": 11.90000057220459,
+                        "width": 58.0,
+                        "x": 86.0,
+                        "y": 142.0,
+                        "z": 3.897705269650942e-09
+                    },
+                    "id": 9,
+                    "name": "plunger",
+                    "triangle_count": 32312
+                }
+            ],
+            "sliced_time": 907,
+            "sliced_time_with_cache": 601,
+            "total_predication": 4699.357421875,
+            "triangle_count": 87220,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 15.0,
+    "upward_compatible_machine": [
+        "Bambu Lab P1S 0.4 nozzle",
+        "Bambu Lab P1P 0.4 nozzle",
+        "Bambu Lab X1 0.4 nozzle",
+        "Bambu Lab X1 Carbon 0.4 nozzle",
+        "Bambu Lab X1E 0.4 nozzle",
+        "Bambu Lab A1 0.4 nozzle",
+        "Bambu Lab H2D 0.4 nozzle",
+        "Bambu Lab H2D Pro 0.4 nozzle",
+        "Bambu Lab H2S 0.4 nozzle",
+        "Bambu Lab P2S 0.4 nozzle",
+        "Bambu Lab H2C 0.4 nozzle",
+        "Bambu Lab X2D 0.4 nozzle",
+        "Bambu Lab A2L 0.4 nozzle"
+    ],
+    "wall_loops": 2
+}

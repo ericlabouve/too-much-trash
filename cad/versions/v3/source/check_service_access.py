@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 from dataclasses import replace
-from build import SAMPLES,shape_bounds
+from build import SAMPLES,shape_bounds,REVISION
 from types import SimpleNamespace
 translated_bounds={}
 def shifted(s,delta):
@@ -21,7 +21,7 @@ samples={**SAMPLES,'inward-28.5':m.Parameters(phone_thickness=8,button_from_end=
 for name,base in samples.items():
  for side in ('near','far'):
   p=replace(base,side=side);a=m.assembly_parts(p,s);hits=[]
-  # Remove nut and screw completely before disengaging the locating lugs.
+  # Remove nut and screw completely before moving the module.
   # A cylindrical nut envelope includes its full rotation; exclude mating thread.
   for dx in range(21):
    nut=m.cylinder((18+dx,p.button_y+m.MOUNT_Y,26),(1,0,0),6,18)
@@ -34,7 +34,7 @@ for name,base in samples.items():
     v=overlap(screw,a[n])
     if v>.01:hits.append(['screw-withdraw',dx,n,round(v,5)])
   targets={n:a[n] for n in fixed}
-  moves=[('disengage',i/2,0) for i in range(10)]+[('lower',4.5,-i/5) for i in range(1,11)]+[('withdraw',4.5+dx,-2) for dx in range(1,41)]
+  moves=[('clearance',i/2,0) for i in range(10)]+[('lower',4.5,-i/5) for i in range(1,11)]+[('withdraw',4.5+dx,-2) for dx in range(1,41)]
   for stage,dx,dz in moves:
    for n in module:
     moving=shifted(a[n],(dx,0,dz))
@@ -55,9 +55,9 @@ for dy in range(23):
  for n in ('actuator_bracket','pulley','plunger'):
   v=overlap(axle,s[n])
   if v>.01:axle_hits.append(['axle',dy,n,round(v,5)])
-retention={'head_obstruction_mm3':overlap(s['pulley_axle'].translate((0,1,0)),s['actuator_bracket']),'key_obstruction_mm3':overlap(s['pulley_key'].translate((0,-2,0)),s['actuator_bracket'])}
+retention={'head_obstruction_after_6mm_mm3':overlap(s['pulley_axle'].translate((0,6,0)),s['actuator_bracket']),'key_obstruction_mm3':overlap(s['pulley_key'].translate((0,-2,0)),s['actuator_bracket'])}
 assert all(v>.01 for v in retention.values()),retention
-result={'axial_retention':retention,'revision':'flat-back-mount-v3','configurations':report,'off_tool_axle_key_collisions':axle_hits,'passed':not axle_hits and all(not x['collisions'] for x in report.values()),'sequence':['Remove phone and release twine tension.','Fully remove the rail nut toward +X, then withdraw the screw toward -X.','Pull complete module +X 4.5 mm to disengage the locating lugs.','Lower module 2 mm along -Z, then continue withdrawal toward +X.','Off tool, remove keeper band, slide cross-key -Z, then pull axle -Y. Reverse for assembly.'],'limits':['Sampled rigid clearance only. Nut rotation uses a cylindrical envelope; thread engagement excluded.','Human access, handling, friction, print tolerance and band retention need physical tests.']}
+result={'axial_retention':retention,'revision':REVISION,'configurations':report,'off_tool_axle_key_collisions':axle_hits,'passed':not axle_hits and all(not x['collisions'] for x in report.values()),'sequence':['Remove phone and release twine tension.','Fully remove the rail nut toward +X, then withdraw the screw toward -X.','Pull complete module +X 4.5 mm along the conservative clearance path.','Lower module 2 mm along -Z, then continue withdrawal toward +X.','Off tool, remove keeper band, slide cross-key -Z, then pull axle -Y. Reverse for assembly.'],'limits':['Sampled rigid clearance only. Nut rotation uses a cylindrical envelope; thread engagement excluded.','Human access, handling, friction, print tolerance and band retention need physical tests.']}
 (Path(__file__).resolve().parents[1]/'review/service-access.json').write_text(json.dumps(result,indent=2)+'\n')
 assert result['passed'],result
 print('Service and axle/key insertion paths passed',flush=True)

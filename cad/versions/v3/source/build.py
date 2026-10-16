@@ -9,19 +9,20 @@ import trimesh
 from model import *
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'review'
-BRACKET_PRINT_NOTE='Flat Y5.4 back face down (-90 degrees about X); offset mount and eased reinforcement. Bracket only, not assembled. Reference slicing does not qualify strength, support removal or loaded fit.'
+REVISION='straight-corner-guide-v3'
+BRACKET_PRINT_NOTE='Common flat Y5.4 back face down (-90 degrees about X). Outer pulley cheek/arm and raised plinth removed; remaining boss raised 2 mm. Extended curved guide and independent return stop. Fresh slice required; support savings and cantilever strength unqualified.'
 BOM=[
  dict(id=n,name=label,quantity=q,material='PLA / PLA+',note=note)
  for n,label,q,note in [
  ('shaft_cap','Rigid shaft clamp cap',1,'Option A: flush-T rail wings, solid center and no offset support. Rail at cap end, Z26 screw center; X12 common outer face. Four-fastener collar fit and loaded retention unvalidated.'),
  ('carrier','Fixed jaw, sliding track and shaft saddle',1,'Hard rear datum and one broad angular band cleat; the removable cap carries the actuator rail.'),
  ('sliding_jaw','Sliding opposing jaw',1,'T-shaped jaw has two pads 100 mm apart, a midpoint-closing tongue, 4 mm retaining lips and one broad angular band cleat. Turn the phone end-for-end for originally far-side buttons; 66–86 mm width is a geometric range, not qualified.'),
- ('actuator_bracket','Flat-back plunger frame and offset rail bracket',1,'Smoothly blended reinforcement. Mount bore/lugs offset 4.4 mm for a common flat back, preserving full lugs and 5.4 mm beside the bore. One fastener; unchanged rail. Remove nut/screw, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and printed fit unqualified.'),
- ('plunger','Rounded-shoe sliding plunger',1,'Shared capped cleat for return band and twine. Smooth contact face spans phone thickness; nominal stroke is illustrative, not a physical force limit.'),
- ('pulley','Twine redirect pulley',1,'Smooth 8.6 mm bore on an 8 mm axle supported by two cheeks. No rotating contact with a retaining nut. Running clearance is unvalidated.'),
- ('pulley_axle','Headed smooth pulley axle',1,'8 mm axle, supported on both sides of wheel; removable cross-key prevents axial withdrawal. Printed strength and fit remain unvalidated.'),
- ('pulley_key','Pulley axle cross-key',1,'Broad removable key, not a snap clip. Small keeper band encircles key and axle to resist key drift; verify retention and inspect band wear.'),
- ('thumb_screw','Coarse printed rail screw',1,'One central rail clamp with locating lugs. 8 mm major / 3 mm pitch; matches successful original-size trial. Loaded clamp retention unqualified.'),
+ ('actuator_bracket','Flat-back plunger frame and offset rail bracket',1,'Smoothly blended reinforcement. Mount bore offset 4.4 mm for a common flat back, preserving 5.4 mm beside the bore. No rail locating lugs: one screw/nut clamps the flat face; friction alone resists sliding and rotation. Unchanged rail. Remove nut/screw, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and retention unqualified.'),
+ ('plunger','Rounded-shoe sliding plunger',1,'Shoe and blended root share the stem thickness of 4 mm; contact span remains 16 mm. Shared capped band/twine cleat. Nominal stroke is illustrative, not a physical force limit.'),
+ ('pulley','Twine redirect pulley',1,'User-approved wheel geometry, raised 2 mm on the remaining boss. Nominal 1 mm axial clearance between boss and axle head; 0.6 mm diametral axle clearance. New mounted behavior untested.'),
+ ('pulley_axle','Headed smooth pulley axle',1,'Unchanged 20.6 mm overall span, 8 mm shaft and outboard cross-key. Now supported by one 8.2 mm boss; head retains the wheel. Cantilever loading and new stack clearance require physical testing.'),
+ ('pulley_key','Pulley axle cross-key',1,'Uniform 3 mm head/stem thickness with transverse retaining shoulder. Small keeper band encircles key and axle to resist key drift; verify retention and inspect band wear.'),
+ ('thumb_screw','Coarse printed rail screw',1,'One central friction rail clamp, without locating lugs. Successful 8 mm major / 3 mm pitch thread and head retained; obsolete contact nose removed. Changed part and loaded clamp retention unqualified.'),
  ('collar_screw','Long-grip printed collar screw',4,'Same 8×3 profile and head, 32 mm threaded span with flush tip; new length is not physically validated.'),
  ('thumb_nut','Printed clamp nut',5,'Matches successful 8×3 trial nut, including entry lead-ins. Hand-tighten only; loaded retention remains untested.'),
  ('dual_string_guide','Duel captive guide',1,'Install nearest the harness; select the eye facing the actuator. Two 8 mm bores with flared entrances.'),
@@ -83,7 +84,7 @@ def check(p,solids):
 
 def export_scene(p,solids,out):
  out.mkdir(parents=True,exist_ok=True)
- manifest={'version':'v3','title':'Single-fastener plunger with recessed axle','revision':'flat-back-mount-v3','phone_rotation_degrees':180 if p.side=='far' else 0,'phone_center_y_mm':p.phone_center_y,'status':'Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated','parameters':asdict(p),'bom':BOM,'printed_designs':13,'printed_pieces':21,'purchased_hardware':0,'soft_padding':False,'parts':[],'assembly':[]}
+ manifest={'version':'v3','title':'Flat-back actuator with plain friction rail clamp','revision':REVISION,'phone_rotation_degrees':180 if p.side=='far' else 0,'phone_center_y_mm':p.phone_center_y,'status':'Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated','parameters':asdict(p),'bom':BOM,'printed_designs':13,'printed_pieces':21,'purchased_hardware':0,'soft_padding':False,'parts':[],'assembly':[]}
  for n,s in solids.items():
   file=n+'.stl'
   if out==OUT:export(s,out/file)
@@ -132,7 +133,7 @@ def manufacturing(solids):
    mesh=trimesh.load_mesh(out/(n+'.stl'))
   assert mesh.is_watertight and mesh.volume>0 and abs(mesh.bounds[0,2])<.001,n
   result.append(dict(name=n,file=n+'.stl',quantity=next(r['quantity'] for r in BOM if r['id']==n),bounds_mm=mesh.extents.round(3).tolist(),bed_z_min_mm=float(mesh.bounds[0,2]),watertight=True,layer_mm=.12 if n in ('thumb_screw','thumb_nut','collar_screw') else .2,supports=notes[n]))
- save(out/'manifest.json',dict(units='mm',scale_percent=100,nozzle_mm=.4,layer_mm=.2,revision='flat-back-mount-v3',status='Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated',parts=result))
+ save(out/'manifest.json',dict(units='mm',scale_percent=100,nozzle_mm=.4,layer_mm=.2,revision=REVISION,status='Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated',parts=result))
 
 def build():
  p=Parameters();solids=parts(p);OUT.mkdir(exist_ok=True)
@@ -164,9 +165,9 @@ def refresh_metadata():
  for name in SAMPLES:
   for side in ('near','far'):
    path=(OUT if name=='wallet' and side=='near' else OUT/(name+'-'+side))/'manifest.json'
-   data=json.loads(path.read_text());assert data['revision']=='flat-back-mount-v3'
-   data['bom']=BOM;data['title']='Flat-back offset mount with blended reinforcement';save(path,data)
- path=ROOT/'print/manifest.json';data=json.loads(path.read_text());assert data['revision']=='flat-back-mount-v3'
+   data=json.loads(path.read_text());assert data['revision']==REVISION
+   data['bom']=BOM;save(path,data)
+ path=ROOT/'print/manifest.json';data=json.loads(path.read_text());assert data['revision']==REVISION
  for part in data['parts']:
   if part['name']=='actuator_bracket':part['supports']=BRACKET_PRINT_NOTE
  save(path,data);write_bom()

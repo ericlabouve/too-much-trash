@@ -1,14 +1,14 @@
 {
   "passed": true,
-  "revision": "flat-back-mount-v3",
-  "shoe_y_width_mm": 6,
+  "revision": "straight-corner-guide-v3",
+  "shoe_y_width_mm": 4,
   "shoe_z_height_mm": 16,
   "shoe_z_bounds_mm": [
     0,
     16
   ],
   "bracket_mount_seats": {
-    "type": "closed bore with two locating lugs",
+    "type": "closed bore with flat friction-clamping face",
     "width_mm": 8.8,
     "centers_yz_mm": [
       [
@@ -16,11 +16,8 @@
         26
       ]
     ],
-    "lug_envelope_yz_mm": [
-      16,
-      8.2
-    ],
-    "engagement_mm": 4
+    "locating_lugs": false,
+    "former_lug_region_remaining_mm3": 0.0
   },
   "configurations": {
     "wallet-near": {
@@ -105,6 +102,7 @@
     }
   },
   "limitations": [
+    "Screw preload and friction alone resist sliding and rotation; loaded retention is untested.",
     "Nominal seated bounding-envelope coverage only: seat play, rounded edges, case geometry, button force and released clearance need physical tests.",
     "Existing 14 mm pocket conflict for recorded 18/20 mm phones remains."
   ]

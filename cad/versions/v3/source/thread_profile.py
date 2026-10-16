@@ -1,5 +1,5 @@
-"""Physically successful 8x3 fixed-envelope thread profile.
-Copied without geometric changes from build_fixed_envelope_thread_trial.py.
+"""Physically successful 8x3 thread profile with V3's unused contact nose removed.
+Thread and nut copied from build_fixed_envelope_thread_trial.py.
 The isolated trial stays preserved as the independent comparison reference.
 """
 import cadquery as cq
@@ -18,8 +18,9 @@ def thread(female=False,length=27):
 
 def make_parts():
  screw=thread().intersect(cylinder(4.5,18,2))
- # Same head, contact nose, shoulder stations and total length as active V3.
- screw=screw.union(cylinder(2,2.3)).union(cylinder(7,4,20))
+ # Keep head and thread stations unchanged; the former rocker contact nose
+ # at Z0..2 is unused by the rail clamp. Do not shift the mating thread phase.
+ screw=screw.union(cylinder(7,4,20))
  nut=cq.Workplane('XY').polygon(6,18).extrude(6).cut(thread(True).translate((0,0,-2)))
  # Internal lead-ins only: outer nut body stays exactly 18 corners / 6 high.
  for z,a,b in [(0,4.4,3.5),(5.4,3.5,4.4)]:

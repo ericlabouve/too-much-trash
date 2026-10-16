@@ -2,11 +2,11 @@
 import json
 from pathlib import Path
 from dataclasses import replace
-from build import overlap,SAMPLES
+from build import overlap,SAMPLES,REVISION
 import model as m
 from plunger_design import cassette,return_path,attachment_path,pulley_path,keeper_path,tube
 s=cassette();solids=m.parts(m.Parameters())
-report={'revision':'flat-back-mount-v3','routing':{},'stroke':{},'downstream_route':{},
+report={'revision':REVISION,'routing':{},'stroke':{},'downstream_route':{},'installed_keeper':{},
  'limitations':['Nominal 0.65 mm motion is prescribed, not a physical phone-safe stop.','Band/cord dimensions, knots, button force, fleet-angle friction and printed retention need physical testing.','The 14 mm pocket still excludes the recorded 18/20 mm phones.']}
 for d in (0,.325,.65):
  moving=s['plunger'].translate((-d,0,0))
@@ -24,16 +24,18 @@ for name,base in SAMPLES.items():
     v=overlap(cord,part)
     if v>.01:hits.append([i,n,round(v,5)])
   report['downstream_route'][name+'-'+side]=hits
+  keeper=tube([p.point(q) for q in keeper_path()],.6)
+  report['installed_keeper'][name+'-'+side]={n:round(v,5) for n,part in a.items() if (v:=overlap(keeper,part))>.01}
   print(name+'-'+side,hits,flush=True)
 report['rigid_motion_passed']=all(v<.01 for row in report['stroke'].values() for v in row.values())
 report['cassette_routing_clear']=all(v<.01 for row in report['routing'].values() for v in row.values())
-report['routing_clear']=report['cassette_routing_clear'] and not any(report['downstream_route'].values())
+report['routing_clear']=report['cassette_routing_clear'] and not any(report['downstream_route'].values()) and not any(report['installed_keeper'].values())
 report['axial_retention']={
- 'head_obstruction_mm3':round(overlap(s['pulley_axle'].translate((0,1,0)),s['actuator_bracket']),5),
+ 'head_obstruction_after_6mm_mm3':round(overlap(s['pulley_axle'].translate((0,6,0)),s['actuator_bracket']),5),
  'key_obstruction_mm3':round(overlap(s['pulley_key'].translate((0,-2,0)),s['actuator_bracket']),5),
- 'wheel_axial_clearance_mm':.8,'axle_diametral_clearance_mm':.6,
+ 'wheel_axial_clearance_mm':1.,'axle_diametral_clearance_mm':.6,
  'key_slot_clearance_per_side_mm':.2,'axle_end_ligament_mm':2.2,
- 'axle_span_mm':18.4,'head_thickness_mm':1.6,'front_bearing_length_mm':2,'rear_bearing_length_mm':4,'keeper_envelope_diameter_mm':1.2,
+ 'axle_span_mm':20.6,'head_thickness_mm':1.6,'front_bearing_length_mm':0,'rear_bearing_length_mm':8.2,'keeper_envelope_diameter_mm':1.2,
  'meaning':'Head and installed key geometrically block axial escape. This does not test strength, wear or keeper-band failure.'}
 report['volumes_mm3']={n:round(s.val().Volume(),2) for n,s in solids.items()}
 report['previous_mesh_volumes_mm3']={'actuator_bracket':15773.76,'shaft_cap':38018.13,'carrier':65138.6,'dual_string_guide':5889.7}

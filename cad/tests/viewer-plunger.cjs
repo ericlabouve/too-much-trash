@@ -7,11 +7,15 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
   const page=await browser.newPage({viewport:{width:1500,height:1100}}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   const base=process.env.CAD_VIEWER_URL||'http://127.0.0.1:8767';
-  await page.goto(base+'/versions/v3/viewer.html?revision=flat-back-mount-v3');
+  await page.goto(base+'/versions/v3/viewer.html?revision=straight-corner-guide-v3');
   const canvas=page.locator('#view');await page.locator('#view[data-ready=true]').waitFor({timeout:120000});
   const manifest=await page.evaluate(async()=>await (await fetch('review/manifest.json')).json());
   assert.equal(manifest.motion.kind,'plunger');assert.equal(manifest.printed_pieces,21);assert.equal(manifest.printed_designs,13);
-  assert.equal(manifest.revision,'flat-back-mount-v3');
+  assert.equal(manifest.revision,'straight-corner-guide-v3');
+  const mount=await page.evaluate(async()=>await (await fetch('review/fixed-mount.json')).json());
+  assert.equal(mount.revision,manifest.revision);
+  assert.equal(mount.bracket_mount_seats.locating_lugs,false);
+  assert(mount.bracket_mount_seats.former_lug_region_remaining_mm3<1e-6);
   assert.equal(manifest.assembly.filter(x=>x.name.startsWith('rail_screw_')).length,1);
   assert.equal(manifest.assembly.filter(x=>x.name.startsWith('rail_nut_')).length,1);
   assert.equal(manifest.motion.string_points.length,manifest.motion.head_point_count+4);
@@ -25,6 +29,22 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
   await page.waitForTimeout(1500);
   await page.screenshot({path:'/private/tmp/v3-integrated-plunger.png'});
   await page.locator('[data-view=bom]').click();
+  // Actual rendered geometry extents must match source mm, not a per-part
+  // normalization that makes a small key as large as a jaw.
+  const bomSizes=await page.evaluate(async()=>{
+   const {STLLoader}=await import('three/addons/loaders/STLLoader.js');
+   const {Vector3}=await import('three');const loader=new STLLoader();
+   const m=await (await fetch('review/manifest.json')).json(),results=[];
+   for(const part of m.parts){
+    const geometry=await loader.loadAsync('review/'+part.file);geometry.computeBoundingBox();
+    const row=document.querySelector(`tr[data-id="${part.name}"]`);
+    results.push({name:part.name,scale:Number(row.dataset.displayScale),shown:JSON.parse(row.dataset.modelSizeMm),source:geometry.boundingBox.getSize(new Vector3()).toArray()});
+   }
+   return results;
+  });
+  for(const p of bomSizes){assert.equal(p.scale,1,p.name);p.source.forEach((v,i)=>assert(Math.abs(v-p.shown[i])<.001,p.name));}
+  assert(Math.abs(bomSizes.find(p=>p.name==='pulley_axle').source[1]-20.6)<.001);
+  assert(Math.abs(bomSizes.find(p=>p.name==='pulley_key').source[1]-3)<.001);
   const labels=page.getByRole('checkbox',{name:'Floating labels'});
   assert(await labels.isVisible());assert(await labels.isChecked());
   await labels.uncheck();assert.equal(await canvas.getAttribute('data-bom-labels'),'false');
@@ -50,7 +70,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
   await page.locator('[data-view=phone]').click();await page.locator('#assembly-toggle').click();
   assert.equal(await page.locator('#assembly-step option').count(),34);
   await page.locator('#assembly-exit').click();
-  await page.goto(base+'/versions/v3/viewer.html?sample=large&side=far&revision=flat-back-mount-v3');
+  await page.goto(base+'/versions/v3/viewer.html?sample=large&side=far&revision=straight-corner-guide-v3');
   await page.locator('#view[data-ready=true]').waitFor({timeout:120000});
   await page.locator('[data-view=actuator]').click();
   await page.locator('#stroke').evaluate(e=>{e.value='100';e.dispatchEvent(new Event('input',{bubbles:true}));});

@@ -1,5 +1,5 @@
 {
-  "revision": "flat-back-mount-v3",
+  "revision": "post-print-open-pulley-v3",
   "positions": {
     "near-29": {
       "phone_overlap": {},
@@ -16,14 +16,37 @@
         "phone_thickness_mm": 8,
         "compatible": true
       },
-      "routing_collisions_mm3": {},
-      "routing_clear": true,
-      "usable_with_current_route": true
+      "routing_collisions_mm3": {
+        "cord-33/carrier": 10.781866698050907
+      },
+      "routing_clear": false,
+      "usable_with_current_route": false
     },
     "near-23.75": {
-      "bracket_cap_collision_mm3": 112.97825978144371
+      "bracket_cap_collision_mm3": 0.0
     },
     "far-24": {
+      "phone_overlap": {},
+      "camera_overlap": {},
+      "rigid_overlap": {
+        "carrier/pulley_axle": 47.4062
+      },
+      "sweep": [],
+      "pivot_turn": [],
+      "fastener_shaft_overlap_mm3": {},
+      "clamp_screen_obstruction_mm3": {},
+      "passed": false,
+      "mechanical_passed": false,
+      "pocket_fit": {
+        "pocket_mm": 14,
+        "phone_thickness_mm": 8,
+        "compatible": true
+      },
+      "routing_collisions_mm3": {},
+      "routing_clear": true,
+      "usable_with_current_route": false
+    },
+    "far-28.5": {
       "phone_overlap": {},
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -46,100 +69,61 @@
       "bracket_cap_collision_mm3": 0.0
     }
   },
-  "loose_key": {
-    "0.5": {
-      "slot_intersection_mm3": [
-        0.0,
-        0.0
-      ],
-      "shoe_center_lateral_shift_mm": 0.15707763897073082
-    },
-    "1": {
-      "slot_intersection_mm3": [
-        0.0,
-        0.0
-      ],
-      "shoe_center_lateral_shift_mm": 0.3141433158711032
-    },
-    "1.5": {
-      "slot_intersection_mm3": [
-        0.0,
-        0.0
-      ],
-      "shoe_center_lateral_shift_mm": 0.47118506954171674
-    },
-    "2": {
-      "slot_intersection_mm3": [
-        0.0,
-        0.0
-      ],
-      "shoe_center_lateral_shift_mm": 0.6281909406450175
-    },
-    "2.5": {
-      "slot_intersection_mm3": [
-        0.0,
-        0.0
-      ],
-      "shoe_center_lateral_shift_mm": 0.785148972576048
-    },
-    "3": {
-      "slot_intersection_mm3": [
-        0.3157328171900895,
-        0.3157328171917603
-      ],
-      "shoe_center_lateral_shift_mm": 0.942047212372989
-    }
-  },
   "outgoing_cord_sweep": {
     "near-24": {
       "collisions_mm3": {
-        "carrier": 65.871542080452
+        "carrier": 81.61640345992667,
+        "clamp_screw_3": 0.07957070747168814
       },
       "clear": false,
-      "mount_cap_overlap_mm3": 104.77825978143771,
+      "mount_cap_overlap_mm3": 0.0,
       "mount_center_y_mm": 19.6
     },
     "near-25": {
       "collisions_mm3": {
-        "carrier": 49.01542159208055
+        "carrier": 77.7319820055355
       },
       "clear": false,
-      "mount_cap_overlap_mm3": 71.97825978144154,
+      "mount_cap_overlap_mm3": 0.0,
       "mount_center_y_mm": 20.6
     },
     "near-26": {
       "collisions_mm3": {
-        "carrier": 30.407812220151335
+        "carrier": 65.871542080452
       },
       "clear": false,
-      "mount_cap_overlap_mm3": 39.17825978144148,
+      "mount_cap_overlap_mm3": 0.0,
       "mount_center_y_mm": 21.6
     },
     "near-27": {
       "collisions_mm3": {
-        "carrier": 10.781866698050907
+        "carrier": 49.01542159208055
       },
       "clear": false,
-      "mount_cap_overlap_mm3": 11.875571301467037,
+      "mount_cap_overlap_mm3": 0.0,
       "mount_center_y_mm": 22.6
     },
     "near-28": {
       "collisions_mm3": {
-        "carrier": 0.7852619780883003
+        "carrier": 30.407812220151335
       },
       "clear": false,
-      "mount_cap_overlap_mm3": 1.2130940942902273,
+      "mount_cap_overlap_mm3": 0.0,
       "mount_center_y_mm": 23.6
     },
     "near-28.5": {
-      "collisions_mm3": {},
-      "clear": true,
+      "collisions_mm3": {
+        "carrier": 19.912556797858038
+      },
+      "clear": false,
       "mount_cap_overlap_mm3": 0.0,
       "mount_center_y_mm": 24.1
     },
     "near-29": {
-      "collisions_mm3": {},
-      "clear": true,
+      "collisions_mm3": {
+        "carrier": 10.781866698050907
+      },
+      "clear": false,
       "mount_cap_overlap_mm3": 0.0,
       "mount_center_y_mm": 24.6
     },
@@ -201,13 +185,13 @@
   "rail_length_mm": 120,
   "nominal_previous_two_screw_inward_center_mm": 28,
   "mount_offset_y_mm": -4.4,
-  "isolated_key_rotation_test_center_y_mm": 36,
+  "rail_locating_lugs": false,
   "limitations": [
     "Not a tightened-play, force, strength, wear or print qualification.",
     "Reach uses an explicit 8 mm synthetic phone; original phone proxies remain unchanged.",
-    "Locating-key rotation excludes the rest of the assembly and clamp preload."
+    "No geometric anti-rotation stop: screw preload and friction must resist sliding and rotation."
   ],
   "audit_completed": true,
   "inward_24_usable_both_sides": false,
-  "assessment": "The offset mount changes available slot travel. Original phone positions remain unchanged. Near Y29 and far Y-24 pass the full synthetic check; no continuous reach range or force qualification."
+  "assessment": "Phone envelopes and harness are unchanged. Consult each sampled position for rigid and routing failures after the 2 mm pulley lift; earlier clearance conclusions do not carry forward. The former far Y-24 candidate is retained. No continuous reach range or force qualification."
 }

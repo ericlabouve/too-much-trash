@@ -3,7 +3,7 @@
   "scale_percent": 100,
   "nozzle_mm": 0.4,
   "layer_mm": 0.2,
-  "revision": "flat-back-mount-v3",
+  "revision": "straight-corner-guide-v3",
   "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
   "parts": [
     {
@@ -54,13 +54,13 @@
       "quantity": 1,
       "bounds_mm": [
         66.0,
-        53.0,
+        51.0,
         19.8
       ],
       "bed_z_min_mm": 1.0000000116860974e-07,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Flat Y5.4 back face down (-90 degrees about X); offset mount and eased reinforcement. Bracket only, not assembled. Reference slicing does not qualify strength, support removal or loaded fit."
+      "supports": "Common flat Y5.4 back face down (-90 degrees about X). Outer pulley cheek/arm and raised plinth removed; remaining boss raised 2 mm. Extended curved guide and independent return stop. Fresh slice required; support savings and cantilever strength unqualified."
     },
     {
       "name": "plunger",
@@ -69,9 +69,9 @@
       "bounds_mm": [
         58.0,
         16.0,
-        12.9
+        11.9
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": 1.0000000116860974e-07,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Rounded shoe and cleat need slice review; keep supports off guide surfaces."
@@ -85,7 +85,7 @@
         17.999,
         4.0
       ],
-      "bed_z_min_mm": -1.7857123447724538e-16,
+      "bed_z_min_mm": 1.0000000116860974e-07,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Axis vertical, flange on bed. Keep bore and cord groove clean; running clearance unvalidated."
@@ -97,7 +97,7 @@
       "bounds_mm": [
         10.999,
         10.998,
-        18.4
+        20.6
       ],
       "bed_z_min_mm": 0.0,
       "watertight": true,
@@ -111,7 +111,7 @@
       "bounds_mm": [
         7.0,
         14.0,
-        3.8
+        3.0
       ],
       "bed_z_min_mm": 1.0000000116860974e-07,
       "watertight": true,
@@ -125,7 +125,7 @@
       "bounds_mm": [
         13.997,
         13.998,
-        24.0
+        22.0
       ],
       "bed_z_min_mm": -8.571568438585613e-16,
       "watertight": true,

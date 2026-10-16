@@ -1,9 +1,9 @@
 {
   "axial_retention": {
-    "head_obstruction_mm3": 29.261868885956737,
-    "key_obstruction_mm3": 47.48820235285684
+    "head_obstruction_after_6mm_mm3": 36.650894807199876,
+    "key_obstruction_mm3": 43.38005750619248
   },
-  "revision": "flat-back-mount-v3",
+  "revision": "straight-corner-guide-v3",
   "configurations": {
     "wallet-near": {
       "collisions": []
@@ -41,7 +41,7 @@
   "sequence": [
     "Remove phone and release twine tension.",
     "Fully remove the rail nut toward +X, then withdraw the screw toward -X.",
-    "Pull complete module +X 4.5 mm to disengage the locating lugs.",
+    "Pull complete module +X 4.5 mm along the conservative clearance path.",
     "Lower module 2 mm along -Z, then continue withdrawal toward +X.",
     "Off tool, remove keeper band, slide cross-key -Z, then pull axle -Y. Reverse for assembly."
   ],

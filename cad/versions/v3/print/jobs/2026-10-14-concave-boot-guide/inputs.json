@@ -1,0 +1,59 @@
+{
+  "revision": "concave-boot-guide-v3",
+  "scale_percent": 100,
+  "slice_recipe": "bridged-axle-slot",
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "parts": [
+    {
+      "name": "actuator_bracket",
+      "quantity": 1,
+      "input_sha256": "0d59c78cc6e45b60c175cf78ef4953aa99a46fed9f64df7f23f10f46bdab5757",
+      "center_xy_mm": [
+        60,
+        105
+      ],
+      "bounds_mm": [
+        66.0,
+        51.0,
+        19.799999137060546
+      ],
+      "orientation": "Common flat Y5.4 back face down (-90 degrees about X). Outer pulley cheek/arm and raised plinth removed; remaining boss raised 2 mm. Extended curved guide and independent return stop. Fresh slice required; support savings and cantilever strength unqualified."
+    },
+    {
+      "name": "plunger",
+      "quantity": 1,
+      "input_sha256": "6046bdba52e2b89f50ac38c4a3194466746734623191095e6df5c2951535016e",
+      "center_xy_mm": [
+        115,
+        150
+      ],
+      "bounds_mm": [
+        58.0,
+        16.0,
+        11.900000472204589
+      ],
+      "orientation": "Rounded shoe and cleat need slice review; keep supports off guide surfaces."
+    }
+  ],
+  "profile_source": "Recorded combined-45 0.12 mm starting recipe; current geometry and explicit support gaps",
+  "material_status": "Generic PLA reference recipe; loaded spool not verified",
+  "object_settings": [
+    {
+      "id": "2",
+      "name": "actuator_bracket",
+      "wall_loops": "3",
+      "sparse_infill_pattern": "gyroid",
+      "sparse_infill_density": "15%",
+      "enable_support": "1"
+    },
+    {
+      "id": "4",
+      "name": "plunger",
+      "wall_loops": "3",
+      "sparse_infill_pattern": "gyroid",
+      "sparse_infill_density": "15%",
+      "enable_support": "1"
+    }
+  ]
+}

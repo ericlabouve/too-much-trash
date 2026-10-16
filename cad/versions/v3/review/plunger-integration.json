@@ -1,5 +1,5 @@
 {
-  "revision": "flat-back-mount-v3",
+  "revision": "straight-corner-guide-v3",
   "routing": {
     "return-0": {
       "actuator_bracket": 0.0,
@@ -107,14 +107,42 @@
     }
   },
   "downstream_route": {
-    "wallet-near": [],
+    "wallet-near": [
+      [
+        33,
+        "carrier",
+        10.78187
+      ]
+    ],
     "wallet-far": [],
-    "bare-near": [],
+    "bare-near": [
+      [
+        33,
+        "carrier",
+        10.78187
+      ]
+    ],
     "bare-far": [],
-    "small-near": [],
+    "small-near": [
+      [
+        33,
+        "carrier",
+        10.78187
+      ]
+    ],
     "small-far": [],
     "large-near": [],
     "large-far": []
+  },
+  "installed_keeper": {
+    "wallet-near": {},
+    "wallet-far": {},
+    "bare-near": {},
+    "bare-far": {},
+    "small-near": {},
+    "small-far": {},
+    "large-near": {},
+    "large-far": {}
   },
   "limitations": [
     "Nominal 0.65 mm motion is prescribed, not a physical phone-safe stop.",
@@ -123,18 +151,18 @@
   ],
   "rigid_motion_passed": true,
   "cassette_routing_clear": true,
-  "routing_clear": true,
+  "routing_clear": false,
   "axial_retention": {
-    "head_obstruction_mm3": 29.26187,
-    "key_obstruction_mm3": 47.4882,
-    "wheel_axial_clearance_mm": 0.8,
+    "head_obstruction_after_6mm_mm3": 36.65089,
+    "key_obstruction_mm3": 43.38006,
+    "wheel_axial_clearance_mm": 1.0,
     "axle_diametral_clearance_mm": 0.6,
     "key_slot_clearance_per_side_mm": 0.2,
     "axle_end_ligament_mm": 2.2,
-    "axle_span_mm": 18.4,
+    "axle_span_mm": 20.6,
     "head_thickness_mm": 1.6,
-    "front_bearing_length_mm": 2,
-    "rear_bearing_length_mm": 4,
+    "front_bearing_length_mm": 0,
+    "rear_bearing_length_mm": 8.2,
     "keeper_envelope_diameter_mm": 1.2,
     "meaning": "Head and installed key geometrically block axial escape. This does not test strength, wear or keeper-band failure."
   },
@@ -142,12 +170,12 @@
     "shaft_cap": 37638.67,
     "carrier": 60630.22,
     "sliding_jaw": 17304.5,
-    "actuator_bracket": 8750.78,
-    "plunger": 2302.25,
-    "pulley": 643.41,
-    "pulley_axle": 906.31,
-    "pulley_key": 173.37,
-    "thumb_screw": 1368.73,
+    "actuator_bracket": 9152.51,
+    "plunger": 2177.36,
+    "pulley": 643.55,
+    "pulley_axle": 1016.89,
+    "pulley_key": 156.8,
+    "thumb_screw": 1343.6,
     "collar_screw": 1909.7,
     "thumb_nut": 971.79,
     "string_guide": 4822.9,

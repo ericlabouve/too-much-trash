@@ -32,8 +32,8 @@ const loader=new STLLoader(),raycaster=new THREE.Raycaster();let pointerStart;
 const details={
  phone:['V3 PLUNGER HARNESS','Shared-cleat linear actuator.','The rounded plunger presses straight toward the button. Its rubber band and twine share one capped cleat. Jaw geometry and neck opening are preserved; both collar halves now use compact ears and longer screws. The 14 mm pocket still excludes the recorded wallet and large-phone cases.'],
  full:['INLINE COMPLIANCE','Two twine sections, joined by a band.','The pulley redirects the pull. Run directly to the selected eye of the nearest shaft guide, then through the two lower guides, then join two twine sections with an inline rubber band near the trigger. Return and inline bands have separate functions; forces and maximum extension are not validated.'],
- actuator:['FLAT-BACK KEYED MOUNT','Blended support. Flat print face.','The reinforcement eases smoothly into the spine. Mounting plate, bore and full-length locating lugs shift 4.4 mm sideways to make the back flat without a thin hole wall. The opposite projection remains; the rail and plunger positions are unchanged. Printing is bracket-only, back down. Supports and physical strength still require review.'],
- bom:['THIRTEEN PRINTED DESIGNS','Twenty-one pieces.','Open plunger frame, slider, pulley, recessed headed axle and cross-key; four longer collar screws, one original rail screw, five nuts and three guides. Retention, clamp preload and printed fit need physical qualification.']
+ actuator:['CONCAVE BOOT + LONG GUIDE','Smooth boot. Continuous guide.','The 8 mm neck sweeps into the boot along a concave hyperbola-like curve, tangent at both ends. The highlighted guide is now full height along its extended length, with a retaining lip and curved end. Nominal slider clearance: 0.3 mm at the wall and 0.4 mm under the lip. Pulley and return stop are unchanged. Outgoing twine still intersects the carrier in wallet-near, bare-near and small-near; resolve routing before another print.'],
+ bom:['THIRTEEN PRINTED DESIGNS','Twenty-one pieces. True relative scale.','Printed parts share the assembly’s millimetre scale; twine and band icons are schematic. The selected cross-key keeps its wide T-head with uniform 3 mm thickness. The short rail screw no longer has a contact nose. Retention, clamp preload and printed fit need physical qualification.']
 };
 
 function setDetail(label,title,text){$('#detail-label').textContent=label;$('#detail-title').textContent=title;$('#detail-text').textContent=text;}
@@ -273,11 +273,15 @@ try{
   if(part)geometry=await loader.loadAsync(freshAsset(base+part.file));
   else if(row.id==='twine')geometry=tube([[0,0,0],[20,20,0],[40,0,0],[60,20,0],[80,0,0]],2);
   else geometry=tube(bandPoints(new THREE.Vector3(0,0,0),new THREE.Vector3(0,50,0),12),1.4);
-  geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);geometry.scale(...Array(3).fill(105/Math.max(extent.x,extent.y,extent.z)));
+  // Printed parts use source millimetres, just like the assembly. Never
+  // normalize each part independently: a screw must look smaller than a jaw.
+  geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);
   const rgb=row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
-  const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=105/Math.max(extent.x,extent.y,extent.z);inventory.add(mesh);bomMeshes.set(row.id,mesh);
+  const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=1;inventory.add(mesh);bomMeshes.set(row.id,mesh);
+  geometry.computeBoundingBox();
+  tr.dataset.displayScale=String(mesh.userData.displayScale);tr.dataset.modelSizeMm=JSON.stringify(geometry.boundingBox.getSize(new THREE.Vector3()).toArray());
   const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'Axle cross-key',collar_screw:'Long collar screw',thumb_screw:'Thumb screw',thumb_nut:'Printed nut',string_guide:'Captive guide',dual_string_guide:'Duel captive guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
-  label(`${titles[row.id]||row.name||row.id} ×${row.quantity}`,mesh.position.x,mesh.position.y-65,0);
+  label(`${titles[row.id]||row.name||row.id} ×${row.quantity}${part?'':' · schematic'}`,mesh.position.x,mesh.position.y-Math.max(65,extent.y/2+12),0);
  }
  for(const [i,step] of steps.entries()){const option=document.createElement('option');option.value=i;option.textContent=`${i+1}. ${step.title}`;$('#assembly-step').append(option);}
  $('#assembly-toggle').onclick=()=>stepIndex<0?showStep(0):exitSteps();$('#assembly-exit').onclick=()=>exitSteps();$('#step-back').onclick=()=>showStep(stepIndex-1);$('#step-next').onclick=()=>showStep(stepIndex+1);$('#assembly-step').onchange=e=>showStep(Number(e.target.value));

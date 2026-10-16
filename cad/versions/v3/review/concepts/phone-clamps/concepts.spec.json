@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-14",
+  "purpose": "Clarify five previously researched compact TPU-assisted retention concepts in inspectable three-dimensional scenes.",
+  "status": "Illustration only; no active CAD promotion or physical validation",
+  "user_review_2026_10_16": {
+    "A": "Promising; evaluate universal grip",
+    "B": "Promising; compare angular cuff with genuinely curved profile",
+    "C": "Rejected: camera-obstruction risk",
+    "D": "Concern about phone pivoting; not explicitly rejected",
+    "E": "Rejected: camera-obstruction risk",
+    "constraint": "Phone should not pivot; preserve camera and usable screen clearance",
+    "active_jaw_change_authorized": false
+  },
+  "source": "concepts.js",
+  "research": "research.md",
+  "shared_requirements": [
+    "Retain a schematic fixed/sliding width interlock and rubber-band closure",
+    "Orange rigid printed structure and cyan proposed TPU",
+    "No strap across usable screen",
+    "Case-rim returns require actual non-screen bearing area",
+    "Camera/button/port keepouts and end-for-end reversal remain future fit checks",
+    "Do not change or shrink active phone envelopes; 14 versus 18/20 mm conflict remains",
+    "Compact and minimal materials; no full tray"
+  ],
+  "illustrative_phone_mm": [76, 154, 11],
+  "concepts": {
+    "A": "Three mechanically keyed open V-saddles",
+    "B": "Three C-wrap case-rim cuffs with peel tabs",
+    "C": "Four adjustable rigid corner cups with TPU liners",
+    "D": "Captive limited-angle fixed-jaw equalizer with two TPU pads",
+    "E": "Two rear Y-keepers with captured roots and four corner loops"
+  },
+  "images": ["concept-a-3d.png", "concept-b-3d.png", "concept-c-3d.png", "concept-d-3d.png", "concept-e-3d.png"],
+  "view_conventions": "X jaw closure, Y phone length, Z screen-normal. E defaults to rear view. A/B details exploded; E anchor and corner details separated.",
+  "validation": "Browser render/control smoke checks only; no geometric collision, force, material or manufacturing qualification."
+}

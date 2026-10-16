@@ -1,0 +1,174 @@
+{
+  "revision": "ramped-retainers-v3",
+  "scale_percent": 100,
+  "slice_recipe": "bridged-axle-slot",
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "parts": [
+    {
+      "name": "actuator_bracket",
+      "quantity": 1,
+      "input_sha256": "baf50747a8386414a1aefee1fc80dd8f1806edcdbcdced440f9020fa3e9a3c54",
+      "center_xy_mm": [
+        60,
+        105
+      ],
+      "bounds_mm": [
+        66.0,
+        53.0,
+        19.799999137060546
+      ],
+      "orientation": "Common flat Y5.4 back face down (-90 degrees about X), including rear pulley cheek and extended outer fork leg. Ramped fixed-band lip. Axle/key/band install afterward. See 2026-10-14-actuator-ramped for exact reference supports; remaining overhangs and printed strength unqualified."
+    },
+    {
+      "name": "plunger",
+      "quantity": 1,
+      "input_sha256": "bbadd8f25f9f9f505b109eb0845075676a84b89a5b9da43f10b932e0dfb4a5b1",
+      "center_xy_mm": [
+        115,
+        150
+      ],
+      "bounds_mm": [
+        58.0,
+        16.0,
+        11.900000472204589
+      ],
+      "orientation": "Rounded shoe and cleat need slice review; keep supports off guide surfaces."
+    },
+    {
+      "name": "pulley",
+      "quantity": 1,
+      "input_sha256": "b9861427d361aeda70ed778fdba2ae0f6711052fb3266b411c2d884b979cd49f",
+      "center_xy_mm": [
+        120,
+        100
+      ],
+      "bounds_mm": [
+        17.99886131286621,
+        17.99912929534912,
+        3.999999899999999
+      ],
+      "orientation": "Axis vertical, flange on bed. Keep bore and cord groove clean; running clearance unvalidated."
+    },
+    {
+      "name": "pulley_axle",
+      "quantity": 1,
+      "input_sha256": "68fa557470cbaac992cdf9fffa3ef708a3ca243008aa985c0dd565c67869103c",
+      "center_xy_mm": [
+        145,
+        100
+      ],
+      "bounds_mm": [
+        10.99876880645752,
+        10.997538566589355,
+        20.600000381469727
+      ],
+      "orientation": "No thread. Head-down orientation provisional; cross-key slot needs slice review."
+    },
+    {
+      "name": "pulley_key",
+      "quantity": 1,
+      "input_sha256": "7999fc7a381988a797a2e49f2cc09a42b43f0151d32cb5dee65605eaa97917ed",
+      "center_xy_mm": [
+        145,
+        65
+      ],
+      "bounds_mm": [
+        7.0,
+        14.0,
+        2.999999899999999
+      ],
+      "orientation": "Flat cross-key; preserve square load faces and band seats. Orientation provisional."
+    },
+    {
+      "name": "thumb_screw",
+      "quantity": 1,
+      "input_sha256": "46232a23e05e7a3b50bca116517b5789d696bb0bd26a146c67e2849cd4a42662",
+      "center_xy_mm": [
+        60,
+        50
+      ],
+      "bounds_mm": [
+        13.996867179870605,
+        13.998433113098145,
+        22.0
+      ],
+      "orientation": "Head on bed; no support in threads. Fit trial first; do not force."
+    },
+    {
+      "name": "thumb_nut",
+      "quantity": 1,
+      "input_sha256": "a0a48fd7451b949e834e749556475b0da9ee472bb16faea41c09e3581fba27d8",
+      "center_xy_mm": [
+        95,
+        50
+      ],
+      "bounds_mm": [
+        18.0,
+        15.588457107543945,
+        5.999999899999999
+      ],
+      "orientation": "Flat on bed; no supports. Fit trial first."
+    }
+  ],
+  "profile_source": "Recorded combined-45 0.12 mm starting recipe; current geometry and explicit support gaps",
+  "material_status": "Generic PLA reference recipe; loaded spool not verified",
+  "object_settings": [
+    {
+      "id": "2",
+      "name": "actuator_bracket",
+      "wall_loops": "3",
+      "sparse_infill_pattern": "gyroid",
+      "sparse_infill_density": "15%",
+      "enable_support": "1"
+    },
+    {
+      "id": "4",
+      "name": "plunger",
+      "wall_loops": "3",
+      "sparse_infill_pattern": "gyroid",
+      "sparse_infill_density": "15%",
+      "enable_support": "1"
+    },
+    {
+      "id": "6",
+      "name": "pulley",
+      "wall_loops": "3",
+      "sparse_infill_pattern": "gyroid",
+      "sparse_infill_density": "15%",
+      "enable_support": "1"
+    },
+    {
+      "id": "8",
+      "name": "pulley_axle",
+      "wall_loops": "3",
+      "sparse_infill_pattern": "gyroid",
+      "sparse_infill_density": "15%",
+      "enable_support": "0"
+    },
+    {
+      "id": "10",
+      "name": "pulley_key",
+      "wall_loops": "3",
+      "sparse_infill_pattern": "gyroid",
+      "sparse_infill_density": "15%",
+      "enable_support": "0"
+    },
+    {
+      "id": "12",
+      "name": "thumb_screw",
+      "wall_loops": "2",
+      "sparse_infill_pattern": "grid",
+      "sparse_infill_density": "15%",
+      "enable_support": "0"
+    },
+    {
+      "id": "14",
+      "name": "thumb_nut",
+      "wall_loops": "2",
+      "sparse_infill_pattern": "grid",
+      "sparse_infill_density": "15%",
+      "enable_support": "0"
+    }
+  ]
+}

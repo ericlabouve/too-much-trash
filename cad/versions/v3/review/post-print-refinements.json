@@ -1,0 +1,244 @@
+{
+  "revision": "straight-corner-guide-v3",
+  "passed": true,
+  "neck_width_samples_mm": {
+    "2.5": 8.0,
+    "5": 8.0,
+    "9.5": 7.999999999999998,
+    "11": 7.999999999999998,
+    "25": 7.999999999999998,
+    "35": 8.0
+  },
+  "shoe_end_guide": {
+    "v_range_mm": [
+      2.5,
+      25.5
+    ],
+    "side_gap_mm": 0.3,
+    "lip_gap_mm": 0.4
+  },
+  "straight_corner": {
+    "front_v_mm": 2.5,
+    "side_u_mm": -7.8,
+    "rail_clearance_preserved": true
+  },
+  "boot_blend": {
+    "kind": "Spline fit to rational quadratic hyperbola segment",
+    "weight": 1.4,
+    "v_range_mm": [
+      -4,
+      2
+    ],
+    "radius_range_mm": [
+      6.5,
+      4
+    ],
+    "tangents": "Vertical at boot, horizontal at neck; no inflection",
+    "formula_samples_v_w_mm": [
+      [
+        -4.0,
+        11.9
+      ],
+      [
+        -3.994279176201373,
+        11.690713196033563
+      ],
+      [
+        -3.9776119402985075,
+        11.498880597014926
+      ],
+      [
+        -3.9506217995610826,
+        11.322549378200438
+      ],
+      [
+        -3.913793103448276,
+        11.160057471264368
+      ],
+      [
+        -3.8674911660777385,
+        11.009982332155477
+      ],
+      [
+        -3.8119777158774375,
+        10.871100278551532
+      ],
+      [
+        -3.747422680412371,
+        10.742353951890035
+      ],
+      [
+        -3.6739130434782608,
+        10.622826086956522
+      ],
+      [
+        -3.5914593140551445,
+        10.511718224613315
+      ],
+      [
+        -3.5,
+        10.408333333333335
+      ],
+      [
+        -3.399404367968233,
+        10.312061548643282
+      ],
+      [
+        -3.289473684210526,
+        10.222368421052632
+      ],
+      [
+        -3.169941060903733,
+        10.138785199738049
+      ],
+      [
+        -3.0404699738903394,
+        10.060900783289817
+      ],
+      [
+        -2.900651465798046,
+        9.988355048859935
+      ],
+      [
+        -2.75,
+        9.920833333333334
+      ],
+      [
+        -2.587947882736156,
+        9.858061889250815
+      ],
+      [
+        -2.413838120104439,
+        9.799804177545692
+      ],
+      [
+        -2.2269155206286837,
+        9.745857891290111
+      ],
+      [
+        -2.026315789473684,
+        9.696052631578947
+      ],
+      [
+        -1.8110522832561218,
+        9.650248180013236
+      ],
+      [
+        -1.58,
+        9.608333333333334
+      ],
+      [
+        -1.3318762609280428,
+        9.570225285810356
+      ],
+      [
+        -1.0652173913043477,
+        9.535869565217393
+      ],
+      [
+        -0.7783505154639175,
+        9.50524054982818
+      ],
+      [
+        -0.46935933147632297,
+        9.478342618384401
+      ],
+      [
+        -0.13604240282685512,
+        9.455212014134275
+      ],
+      [
+        0.2241379310344829,
+        9.435919540229886
+      ],
+      [
+        0.6141185076810536,
+        9.420574250182883
+      ],
+      [
+        1.037313432835821,
+        9.409328358208956
+      ],
+      [
+        1.4977116704805493,
+        9.402383676582762
+      ],
+      [
+        2.0,
+        9.4
+      ]
+    ]
+  },
+  "extended_guide": {
+    "constant_height_to_v_mm": 42,
+    "top_w_mm": 9.5,
+    "lip_inner_u_mm": 3.3,
+    "vertical_slider_clearance_mm": 0.4,
+    "wall_side_clearance_mm": 0.3,
+    "taper_end_v_mm": 55
+  },
+  "boot_width_samples_mm": {
+    "-3.5": 10.02710121531686,
+    "-2.5": 8.858475085446475,
+    "-1.5": 8.39223975985238,
+    "-0.1": 8.106657516822494
+  },
+  "removed_outer_support_mm3": 0.0,
+  "removed_leg_mm3": 0.0,
+  "removed_plinth_mm3": 0.0,
+  "boss_height_from_bed_mm": 8.2,
+  "boss_extension_mm": 2,
+  "pulley_translation_mm": 2,
+  "nominal_wheel_axial_clearance_mm": 0.9999999999999982,
+  "axle_diametral_clearance_mm": 0.6,
+  "additional_axle_key_float_mm": 0.4,
+  "wheel_float_samples": {
+    "-0.4": {
+      "bracket": 0.0,
+      "axle": 0.0
+    },
+    "0": {
+      "bracket": 0.0,
+      "axle": 0.0
+    },
+    "0.6": {
+      "bracket": 0.0,
+      "axle": 0.0
+    }
+  },
+  "return_stop_stem_gap_mm": 2,
+  "return_stop_separation_from_fixed_anchor_mm": 5,
+  "nominal_stroke": {
+    "0": {
+      "actuator_bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "0.325": {
+      "actuator_bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "0.65": {
+      "actuator_bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    }
+  },
+  "volumes_mm3": {
+    "actuator_bracket": 9152.513843174913,
+    "plunger": 2177.355200650953,
+    "pulley": 643.5454786731493,
+    "pulley_axle": 1016.893587891253,
+    "pulley_key": 156.80033282386952
+  },
+  "limits": [
+    "Single-bearing cantilever stiffness, wear and axle-head/key retention need physical testing.",
+    "The return stop protects the band anchor, not the phone button; inline compliance still needs testing.",
+    "1 mm is total axial wheel clearance, not radial wobble or a prediction of printed tolerances.",
+    "No new print sent; earlier physical approvals do not qualify the changed bracket/plunger."
+  ]
+}

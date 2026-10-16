@@ -1,5 +1,5 @@
 {
-  "revision": "flat-back-mount-v3",
+  "revision": "post-print-open-pulley-v3",
   "geometry_passed": true,
   "neck_section": {
     "method": "Volume / 0.005 mm slice thickness within local X32..38, Y-10..10, below mounting plate",
@@ -33,20 +33,20 @@
     "mount_center_y_mm": -4.4,
     "mount_hole_diameter_mm": 8.8,
     "bore_to_back_ligament_mm": 5.4,
-    "lug_length_mm": 16,
-    "planar_bed_contact_area_mm2": 1309.04294409213,
+    "locating_lugs": false,
+    "planar_bed_contact_area_mm2": 1466.5548959272548,
     "orientation": "-90 degrees about local X; +Y back down",
     "support_free_verified": false
   },
   "volume": {
     "previous_mm3": 7839.15,
-    "current_mm3": 8750.779828006847,
-    "increase_percent": 11.629192297721659
+    "current_mm3": 8474.861789657567,
+    "increase_percent": 8.109447958740002
   },
   "unchanged": [
     "120 mm cap rail",
-    "one rail screw and nut",
-    "plunger, pulley and axle/key",
+    "single-fastener mount position",
+    "plunger position",
     "phone dimensions and positions",
     "open-frame layout",
     "V1 and V2"
