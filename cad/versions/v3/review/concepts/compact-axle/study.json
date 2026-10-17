@@ -1,0 +1,134 @@
+{
+  "study_only": true,
+  "active_v3_unchanged": true,
+  "solids": {
+    "actuator_bracket": {
+      "valid": true,
+      "solid_count": 1,
+      "volume_mm3": 7839.117
+    },
+    "pulley_axle": {
+      "valid": true,
+      "solid_count": 1,
+      "volume_mm3": 906.31
+    },
+    "pulley_key": {
+      "valid": true,
+      "solid_count": 1,
+      "volume_mm3": 173.37
+    }
+  },
+  "positions": {
+    "near-26": {
+      "collisions_mm3": {},
+      "clear": true
+    },
+    "near-24.5": {
+      "collisions_mm3": {},
+      "clear": true
+    },
+    "near-24": {
+      "collisions_mm3": {},
+      "clear": true
+    },
+    "near-23.75": {
+      "collisions_mm3": {
+        "actuator_bracket/shaft_cap": 0.4976
+      },
+      "clear": false
+    },
+    "near-23.5": {
+      "collisions_mm3": {
+        "actuator_bracket/shaft_cap": 1.8231
+      },
+      "clear": false
+    },
+    "near-23": {
+      "collisions_mm3": {
+        "actuator_bracket/shaft_cap": 17.4205,
+        "actuator_bracket/carrier": 24.5701,
+        "pulley_axle/shaft_cap": 1.2689,
+        "pulley_axle/carrier": 15.8284
+      },
+      "clear": false
+    },
+    "far-26": {
+      "collisions_mm3": {},
+      "clear": true
+    },
+    "far-24.5": {
+      "collisions_mm3": {},
+      "clear": true
+    },
+    "far-24": {
+      "collisions_mm3": {},
+      "clear": true
+    },
+    "far-23.75": {
+      "collisions_mm3": {
+        "actuator_bracket/shaft_cap": 0.4976
+      },
+      "clear": false
+    },
+    "far-23.5": {
+      "collisions_mm3": {
+        "actuator_bracket/shaft_cap": 1.8231
+      },
+      "clear": false
+    },
+    "far-23": {
+      "collisions_mm3": {
+        "actuator_bracket/shaft_cap": 6.3443
+      },
+      "clear": false
+    }
+  },
+  "internal_collisions_mm3": {},
+  "stroke": {
+    "0": {
+      "actuator_bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "0.325": {
+      "actuator_bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "0.65": {
+      "actuator_bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    }
+  },
+  "keeper_envelope_overlap_mm3": {
+    "actuator_bracket": 0.0,
+    "plunger": 0.0,
+    "pulley": 0.0,
+    "pulley_axle": 0.0,
+    "pulley_key": 0.0
+  },
+  "retention": {
+    "head_block_mm3": 29.26187,
+    "key_block_mm3": 20.07728,
+    "shaft_tip_ligament_mm": 2.2,
+    "head_thickness_mm": 1.6,
+    "front_bearing_length_mm": 2,
+    "rear_bearing_length_mm": 4,
+    "wheel_axial_clearance_mm": 0.8,
+    "old_axle_span_mm": 23,
+    "new_axle_span_mm": 18.4,
+    "new_fork_outer_w_mm": 15
+  },
+  "off_tool_removal_collisions": [],
+  "limits": [
+    "Not promoted or print-ready. Head/key strength and bearing wear untested.",
+    "Keeper band is schematic; real loop installation, grip, stretch and knot/cord interactions require review.",
+    "Single-fastener clamp preload and play remain unqualified.",
+    "Full module service at new inward positions and all-phone fit not yet requalified.",
+    "Recorded 14 mm pocket conflict and button-force/overtravel risks remain."
+  ]
+}

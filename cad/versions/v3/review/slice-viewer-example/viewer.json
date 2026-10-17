@@ -1,0 +1,19 @@
+{
+  "title": "V3 actuator \u00b7 reusable slice review",
+  "subtitle": "Reviewed actuator-bridge toolpaths \u00b7 unchanged source job",
+  "notes": [],
+  "links": [
+    {
+      "label": "Original plate review and print records",
+      "href": "../../print/jobs/2026-10-14-actuator-bridge/"
+    },
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "../../print/jobs/2026-10-14-actuator-bridge/actuator.gcode.3mf"
+    },
+    {
+      "label": "Static support projections",
+      "href": "../../print/jobs/2026-10-14-actuator-bridge/support-details.png"
+    }
+  ]
+}

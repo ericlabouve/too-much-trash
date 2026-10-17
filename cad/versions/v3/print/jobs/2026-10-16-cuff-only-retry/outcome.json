@@ -1,0 +1,14 @@
+{
+  "date_local": "2026-10-16",
+  "evidence": "User-reported physical result",
+  "outcome": "Print success",
+  "feedback": [
+    "Bed-contact bottom wall too thin; increase thickness",
+    "Cuff jaws too small; enlarge entire cuff 20% while preserving T-key hole dimensions"
+  ],
+  "limits": [
+    "Does not establish root cause of the preceding failed print",
+    "Does not establish loaded phone retention or TPU behavior",
+    "Historical geometry, slice, profiles and hashes are unchanged"
+  ]
+}

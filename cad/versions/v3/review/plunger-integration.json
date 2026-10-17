@@ -1,0 +1,191 @@
+{
+  "revision": "integrated-cuffs-v3",
+  "routing": {
+    "return-0": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "attachment-0": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "pulley-0": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "keeper-0": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "return-0.325": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "attachment-0.325": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "pulley-0.325": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "keeper-0.325": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "return-0.65": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "attachment-0.65": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "pulley-0.65": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "keeper-0.65": {
+      "actuator_bracket": 0.0,
+      "plunger": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    }
+  },
+  "stroke": {
+    "0": {
+      "actuator_bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "0.325": {
+      "actuator_bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    "0.65": {
+      "actuator_bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    }
+  },
+  "downstream_route": {
+    "wallet-near": [
+      [
+        33,
+        "carrier",
+        10.78187
+      ]
+    ],
+    "wallet-far": [],
+    "bare-near": [
+      [
+        33,
+        "carrier",
+        10.78187
+      ]
+    ],
+    "bare-far": [],
+    "small-near": [
+      [
+        33,
+        "carrier",
+        10.78187
+      ]
+    ],
+    "small-far": [],
+    "large-near": [],
+    "large-far": []
+  },
+  "installed_keeper": {
+    "wallet-near": {},
+    "wallet-far": {},
+    "bare-near": {},
+    "bare-far": {},
+    "small-near": {},
+    "small-far": {},
+    "large-near": {},
+    "large-far": {}
+  },
+  "limitations": [
+    "Nominal 0.65 mm motion is prescribed, not a physical phone-safe stop.",
+    "Band/cord dimensions, knots, button force, fleet-angle friction and printed retention need physical testing.",
+    "The 14 mm pocket still excludes the recorded 18/20 mm phones."
+  ],
+  "rigid_motion_passed": true,
+  "cassette_routing_clear": true,
+  "routing_clear": false,
+  "axial_retention": {
+    "head_obstruction_after_6mm_mm3": 36.65089,
+    "key_obstruction_mm3": 23.64376,
+    "wheel_axial_clearance_mm": 1.0,
+    "axle_diametral_clearance_mm": 0.6,
+    "key_slot_clearance_per_side_mm": 0.2,
+    "axle_end_ligament_mm": 2.2,
+    "axle_span_mm": 20.6,
+    "head_thickness_mm": 1.6,
+    "front_bearing_length_mm": 0,
+    "rear_bearing_length_mm": 8.2,
+    "keeper_envelope_diameter_mm": 1.2,
+    "meaning": "Head and installed key geometrically block axial escape. This does not test strength, wear or keeper-band failure."
+  },
+  "volumes_mm3": {
+    "shaft_cap": 37638.67,
+    "carrier": 59185.38,
+    "sliding_jaw": 15660.05,
+    "phone_cuff": 970.51,
+    "actuator_bracket": 9152.51,
+    "plunger": 2177.36,
+    "pulley": 643.55,
+    "pulley_axle": 1016.89,
+    "pulley_key": 119.83,
+    "thumb_screw": 1343.6,
+    "collar_screw": 1909.7,
+    "thumb_nut": 971.79,
+    "string_guide": 4822.9,
+    "dual_string_guide": 7040.05
+  },
+  "previous_mesh_volumes_mm3": {
+    "actuator_bracket": 15773.76,
+    "shaft_cap": 38018.13,
+    "carrier": 65138.6,
+    "dual_string_guide": 5889.7
+  }
+}

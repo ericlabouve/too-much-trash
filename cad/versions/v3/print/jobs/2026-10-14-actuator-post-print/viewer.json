@@ -1,0 +1,30 @@
+{
+  "title": "V3 post-print refinements \u00b7 comparison slice",
+  "subtitle": "Seven pieces \u00b7 review only \u00b7 not sent",
+  "notes": [
+    "REVIEW ONLY: the lifted pulley causes outgoing-twine/carrier interference in wallet-near, bare-near and small-near. Resolve routing before another print. Single-bearing axle strength and free rotation need physical checking. No printer was contacted.",
+    "Same recipe: support/interface 0.450 \u2192 0.086 g (80.8% less). Only bracket and plunger designs changed; wheel assembly position moved."
+  ],
+  "links": [
+    {
+      "label": "Matched comparison",
+      "href": "comparison.json"
+    },
+    {
+      "label": "Preserved printed plate",
+      "href": "../2026-10-14-actuator-bridge/"
+    },
+    {
+      "label": "Support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Sliced comparison project \u2014 not approved to print",
+      "href": "actuator.gcode.3mf"
+    },
+    {
+      "label": "Source hashes and settings",
+      "href": "inputs.json"
+    }
+  ]
+}

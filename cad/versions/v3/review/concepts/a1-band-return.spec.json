@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-07",
+  "status": "Schematic refinement for evaluation; not implemented manufacturing CAD",
+  "supersedes": "Button-only return as the preferred A1 study direction",
+  "user_constraints": [
+    "Iterate on A sliding plunger",
+    "Add a small rubber band to return the plunger",
+    "Reduce fragility and simplify printing",
+    "Join two twine lengths with an inline rubber band along the grabber neck to accommodate excess pull",
+    "Provide a 3D review model instead of only PNG sketches"
+  ],
+  "proposed_architecture": {
+    "parts": ["open tray body with integral pulley axle", "keyed plunger", "separate pulley", "removable keeper cover with axle-tip support socket"],
+    "return": "One small loop around broad rounded fixed crossbar and moving yoke, with symmetric legs and retaining lips; behind central cord path",
+    "guidance": "Two separated short bearing regions, relieved between them; front/back retention by tray and cover",
+    "stops": "Broad bilateral press shoulders and a return stop; return gap must be set against real button geometry",
+    "assembly": "Load plunger and pulley into open tray, route band and cord, then screw on cover. Fastener locations unresolved.",
+    "mount_interface_target": "Retain V3 8.8 mm holes at local Y +/-9.5, Z -14; do not assume cover fasteners can share these holes before packaging check",
+    "printing": "Tray back on bed with pockets and axle up; plunger broad face down; pulley axis vertical with chamfered groove; cover exterior down and inside details up"
+  },
+  "drawing_notes": [
+    "Schematic local views, not project-axis projections or dimensioned geometry",
+    "Main view omits cover; pulley and twine ahead of slider in depth, band behind cord",
+    "Section shows axle supported by body and cover; supporting socket engagement/clearance unresolved",
+    "Print part icons show intended orientation and part separation, not finished printable outlines",
+    "Fillets, band keeper lips, cord guards, fasteners and return stop require detailed CAD; not all are depicted"
+  ],
+  "unresolved": [
+    "Actual small-band relaxed size, cross section and return tension",
+    "Pulley diameter relative to actual twine; spool groove and axle friction",
+    "Frame and cover retention under full cord force",
+    "Slider clearance, wear and contamination tolerance",
+    "Button gap, press travel, contact patch and adjacent-button clearance",
+    "Size the user-selected inline neck rubber band for trigger travel and tension; return band remains separate",
+    "CAD envelope within existing mounting and service constraints",
+    "Support-free slicing and layer orientation strength"
+  ],
+  "version_scope": "V3 concept files only. V1/V2 and active V3 rocker unchanged. No new material or fastener thread geometry authorized or introduced."
+}

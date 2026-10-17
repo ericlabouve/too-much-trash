@@ -1,0 +1,32 @@
+{
+  "revision": "single-shared-key-v1",
+  "scope": "Candidate only; production unchanged",
+  "baseline_source_sha256": "f2047569bdad79a1145481401614c60e69dfaa20a4da3605a0998ddb7d70b705",
+  "key_mm": {
+    "length": 12.2,
+    "head_width": 7,
+    "head_axial_depth": 1.2,
+    "stem_width": 3,
+    "thickness": 3
+  },
+  "original_key_mm": {
+    "length": 14,
+    "head_width": 7,
+    "head_axial_depth": 3,
+    "stem_width": 3,
+    "thickness": 3
+  },
+  "valid_single_solid": true,
+  "volume_mm3": 119.8335691030483,
+  "actuator_insertion_samples": 41,
+  "max_axle_overlap_mm3": 0.0,
+  "bracket_overlap_mm3": 0.0,
+  "axle_withdrawal_obstruction_at_0_5mm_mm3": 6.899573604008314,
+  "head_bearing_station_u_mm": 18,
+  "limits": [
+    "Thinner head strength and keeper-band behavior untested",
+    "Actuator-only check; cuff fit is reported separately in fit-attachment-check.json",
+    "TPU creep, tear and actual phone grip untested",
+    "No production promotion or print authorization"
+  ]
+}

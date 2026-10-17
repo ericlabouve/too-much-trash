@@ -1,0 +1,206 @@
+{
+  "units": "mm",
+  "scale_percent": 100,
+  "nozzle_mm": 0.4,
+  "layer_mm": 0.2,
+  "revision": "integrated-cuffs-v3",
+  "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
+  "parts": [
+    {
+      "name": "shaft_cap",
+      "file": "shaft_cap.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        122.0,
+        120.0,
+        11.5
+      ],
+      "bed_z_min_mm": 7.789109577460837e-16,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Option A flush-T: common X12 exterior face down (+90 degrees about Y); wings and collar face share the bed plane. Slicer/support review still required; no support-free claim."
+    },
+    {
+      "name": "carrier",
+      "file": "carrier.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        133.5,
+        48.992,
+        112.5
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal."
+    },
+    {
+      "name": "sliding_jaw",
+      "file": "sliding_jaw.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        40.32,
+        112.8,
+        59.6
+      ],
+      "bed_z_min_mm": -5.5417236453231006e-17,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Compact jaw; export orientation provisional. Inspect tongue, ledge and hooks for overhangs; protect sliding faces and minimize removable supports."
+    },
+    {
+      "name": "phone_cuff",
+      "file": "phone_cuff.stl",
+      "quantity": 3,
+      "bounds_mm": [
+        17.505,
+        12.0,
+        8.94
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Exact enlarged cuff, flat back down. PETG prototype approved; TPU 95A intended. Historical cuff-only slice is not a complete-jaw print plan."
+    },
+    {
+      "name": "actuator_bracket",
+      "file": "actuator_bracket.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        66.0,
+        51.0,
+        19.8
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Common flat Y5.4 back face down (-90 degrees about X). Outer pulley cheek/arm and raised plinth removed; remaining boss raised 2 mm. Extended curved guide and independent return stop. Fresh slice required; support savings and cantilever strength unqualified."
+    },
+    {
+      "name": "plunger",
+      "file": "plunger.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        58.0,
+        16.0,
+        11.9
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Rounded shoe and cleat need slice review; keep supports off guide surfaces."
+    },
+    {
+      "name": "pulley",
+      "file": "pulley.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        17.999,
+        17.999,
+        4.0
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Axis vertical, flange on bed. Keep bore and cord groove clean; running clearance unvalidated."
+    },
+    {
+      "name": "pulley_axle",
+      "file": "pulley_axle.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        10.999,
+        10.998,
+        20.6
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "No thread. Head-down orientation provisional; cross-key slot needs slice review."
+    },
+    {
+      "name": "pulley_key",
+      "file": "pulley_key.stl",
+      "quantity": 4,
+      "bounds_mm": [
+        7.0,
+        12.2,
+        3.0
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Flat cross-key; preserve square load faces and band seats. Orientation provisional."
+    },
+    {
+      "name": "thumb_screw",
+      "file": "thumb_screw.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        13.997,
+        13.998,
+        22.0
+      ],
+      "bed_z_min_mm": -8.571568438585613e-16,
+      "watertight": true,
+      "layer_mm": 0.12,
+      "supports": "Head on bed; no support in threads. Fit trial first; do not force."
+    },
+    {
+      "name": "collar_screw",
+      "file": "collar_screw.stl",
+      "quantity": 4,
+      "bounds_mm": [
+        13.997,
+        13.998,
+        36.0
+      ],
+      "bed_z_min_mm": -8.571568438585613e-16,
+      "watertight": true,
+      "layer_mm": 0.12,
+      "supports": "Head on bed; longer 8\u00d73 profile, flush tip. New grip length requires fit and loaded tests."
+    },
+    {
+      "name": "thumb_nut",
+      "file": "thumb_nut.stl",
+      "quantity": 5,
+      "bounds_mm": [
+        18.0,
+        15.588,
+        6.0
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.12,
+      "supports": "Flat on bed; no supports. Fit trial first."
+    },
+    {
+      "name": "string_guide",
+      "file": "string_guide.stl",
+      "quantity": 2,
+      "bounds_mm": [
+        34.296,
+        27.6,
+        14.0
+      ],
+      "bed_z_min_mm": 8.881784197001252e-16,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Eye translated to saddle edge; eye and saddle lower faces coplanar on bed. Verify support-free slice."
+    },
+    {
+      "name": "dual_string_guide",
+      "file": "dual_string_guide.stl",
+      "quantity": 1,
+      "bounds_mm": [
+        20.3,
+        73.992,
+        14.0
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Both eyes translated to saddle edge without rotation; lower faces coplanar on bed, central band lane clear. Verify support-free slice."
+    }
+  ]
+}

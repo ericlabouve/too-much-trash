@@ -1,0 +1,46 @@
+{
+  "baseline_revision": "ramped-retainers-v3",
+  "revision": "post-print-open-pulley-v3",
+  "matched_profiles_placement_scale_and_overrides": true,
+  "support_before_g": 0.45,
+  "support_after_g": 0.0863,
+  "support_reduction_percent": 80.82222222222222,
+  "total_before_g": 13.748059272766113,
+  "total_after_g": 13.164761543273926,
+  "minutes_before": 107.192041015625,
+  "minutes_after": 104.93194173177083,
+  "support_by_part": {
+    "actuator_bracket": {
+      "before_g": 0.45,
+      "after_g": 0.0863
+    },
+    "plunger": {
+      "before_g": 0,
+      "after_g": 0
+    },
+    "pulley": {
+      "before_g": 0,
+      "after_g": 0
+    },
+    "pulley_axle": {
+      "before_g": 0,
+      "after_g": 0
+    },
+    "pulley_key": {
+      "before_g": 0,
+      "after_g": 0
+    },
+    "thumb_screw": {
+      "before_g": 0,
+      "after_g": 0
+    },
+    "thumb_nut": {
+      "before_g": 0,
+      "after_g": 0
+    }
+  },
+  "limits": [
+    "REVIEW ONLY: the lifted pulley causes outgoing-twine/carrier interference in wallet-near, bare-near and small-near. Resolve routing before another print. Single-bearing axle strength and free rotation need physical checking. No printer was contacted.",
+    "Seven-piece comparison is not a request to reprint approved unchanged parts."
+  ]
+}

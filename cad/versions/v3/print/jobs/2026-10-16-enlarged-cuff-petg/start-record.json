@@ -1,0 +1,23 @@
+{
+  "date_local": "2026-10-16",
+  "printer_profile": "tmt-a1-mini",
+  "remote_file": "/tmt-v3-cuff-large-ce97e402.gcode.3mf",
+  "sliced_3mf_sha256": "ce97e402cf28dbb0db239291e720c77c8aa83c3fd30a5cb064fe321fd35cabfc",
+  "gcode_md5": "87cf0eb0793cafa2fbbf014656826452",
+  "plate": 1,
+  "bed_type": "textured_plate",
+  "use_ams": false,
+  "pieces": ["fit-cuff"],
+  "user_authorization": "Proceed with a print when able; confirmed previous cuff removed, clear bed and Bambu PETG Translucent Blue on external spool",
+  "preflight": {"state": "FINISH", "print_type": "idle", "print_error": 0, "hms": [], "nozzle_mm": "0.4", "material": "PETG", "color": "0085D5FF", "spool": "external"},
+  "remote_inspection": {"sidecar_matches": true, "warnings": [], "checksum_matches_local": true},
+  "guards": {"expect_md5": "87cf0eb0793cafa2fbbf014656826452", "expect_plate": 1},
+  "watch": {"cli_watch_requested": true, "timeout_seconds": 2400, "session_id": 13842},
+  "initial_observed_state": "RUNNING",
+  "initial_stage": "heatbed_preheating",
+  "bed_target_c": 70,
+  "initial_layer": 0,
+  "total_layers": 74,
+  "estimated_minutes": 19,
+  "outcome": "Started and observed RUNNING during bed preheat. Completion and physical result pending. CLI watch active at last check."
+}

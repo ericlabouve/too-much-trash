@@ -1,0 +1,67 @@
+{
+    "error_string": "Success.",
+    "export_time": 677,
+    "layer_height": 0.20000000298023224,
+    "plate_index": 0,
+    "prepare_time": 53,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 51.16337203979492,
+                "Bridge": 86.15105438232422,
+                "Custom": 34.55331802368164,
+                "Gap infill": 22.83453369140625,
+                "Inner wall": 357.75628662109375,
+                "Internal solid infill": 256.16943359375,
+                "Outer wall": 238.62130737304688,
+                "Overhang wall": 54.543724060058594,
+                "Sparse infill": 138.1043243408203,
+                "Support": 95.70265197753906,
+                "Support interface": 44.82345962524414,
+                "Support transition": 14.601678848266602,
+                "Top surface": 77.9537582397461,
+                "Travel": 213.41043090820313,
+                "Undefined": 198.02879333496094
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFL99",
+                    "id": 1,
+                    "main_used_g": 8.182775497436523,
+                    "total_used_g": 9.086222648620605
+                }
+            ],
+            "generate_support_material_time": 110,
+            "id": 1,
+            "infill_time": 64,
+            "layer_filament_change": 0,
+            "main_predication": 1651.8604736328125,
+            "make_perimeters_time": 58,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 53.0,
+                        "height": 19.799999237060547,
+                        "width": 66.0,
+                        "x": 57.0,
+                        "y": 63.5000114440918,
+                        "z": 0.0
+                    },
+                    "id": 5,
+                    "name": "actuator_bracket.stl",
+                    "triangle_count": 75120
+                }
+            ],
+            "sliced_time": 570,
+            "sliced_time_with_cache": 323,
+            "total_predication": 1671.001953125,
+            "triangle_count": 75120,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 15.0,
+    "wall_loops": 3
+}

@@ -1,0 +1,37 @@
+{
+  "revision": "post-print-open-pulley-v3",
+  "passed": true,
+  "fixed_cap_intact_half_widths_mm": [
+    8.510476390476192,
+    9.50095258095238,
+    10.491428771428566
+  ],
+  "moving_cap_sample_widths_mm": [
+    5.02095258095239,
+    7.00190496190477,
+    8.982857342857148
+  ],
+  "maximum_cap_side_expansion_mm": 2,
+  "cap_rise_mm": 2.1,
+  "nominal_cap_side_angle_degrees": 46.39718102729638,
+  "pulley_groove_flanks": {
+    "radial_change_mm": 1.1,
+    "axial_change_mm": 1.2,
+    "angle_degrees": 47.489552921999156,
+    "overall_diameter_mm": 18.000000200000002,
+    "overall_width_mm": 4.000000000000002
+  },
+  "outer_leg_removed": true,
+  "flat_back_local_y_mm": 5.4,
+  "unchanged": [
+    "Return band path",
+    "Mount bore and reinforced root",
+    "Axle, cross-key and fasteners",
+    "Print orientations"
+  ],
+  "limits": [
+    "Angles describe main ruled slopes, excluding small edge rounds.",
+    "See matched slice for generated support, integration/service checks for clearances.",
+    "Retainer security, abrasion, print strength and button force remain untested."
+  ]
+}

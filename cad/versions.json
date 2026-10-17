@@ -1,5 +1,5 @@
 {
-  "default": "v2",
+  "default": "v3",
   "versions": [
     {
       "id": "v1",
@@ -12,6 +12,12 @@
       "label": "Version 2 \u00b7 compact shaft-side rails",
       "viewer": "versions/v2/viewer.html",
       "note": "Rotate phone end-for-end for outer-edge buttons. Both actuator positions now near shaft; rotated camera framing unresolved."
+    },
+    {
+      "id": "v3",
+      "label": "Version 3 \u00b7 removable cuffs and sliding plunger",
+      "viewer": "versions/v3/viewer.html",
+      "note": "Comparison baseline: the 16 mm fixed-cuff offset is rejected. Linked concepts use three identical 21.6 mm cuffs and compare two fixed-retention options awaiting TPU tests. New jaws, retention and grip remain unqualified; phone-fit and outgoing-twine conflicts persist."
     }
   ]
 }

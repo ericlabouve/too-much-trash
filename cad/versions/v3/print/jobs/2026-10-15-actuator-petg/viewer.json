@@ -1,0 +1,30 @@
+{
+  "title": "V3 actuator \u00b7 single-plate slice review",
+  "subtitle": "2 separate pieces at 100% scale \u00b7 concave-boot-guide-v3",
+  "notes": [
+    "Physical support cleanup, running clearance and guide surfaces need inspection.",
+    "Assembly routing check fails; resolve the recorded twine interference before another print. This slice is for review, not print approval."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "actuator.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "actuator-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "revision": "integrated-cuffs-v3",
+  "passed": true,
+  "approved_cuff_stl_sha256": "7f259eeb171dc4a3b161805b9f14e4f9ea4c2cbff7cf5d88cdf2e31b5274faba",
+  "approved_cuff_symmetric_difference_mm3": 0.0,
+  "approved_cuff_volume_mm3": 970.511579925237,
+  "cuff_count": 3,
+  "shared_key_count": 4,
+  "fixed_contact_y_mm": 16.0,
+  "sliding_contact_y_mm": [
+    -50,
+    50
+  ],
+  "sliding_socket_outward_shift_mm": 0.3,
+  "cuff_center_z_mm": 11.28,
+  "head_shoulder_mm": 1.7,
+  "stem_hole_mm": [
+    3.4,
+    3.4
+  ],
+  "head_recess_mm": [
+    7.4,
+    3.4
+  ],
+  "jaw_travel_samples": 91,
+  "max_jaw_travel_collision_mm3": 0.0,
+  "overtravel_stop_mm3": 16.000000000000227,
+  "configurations": {
+    "wallet-near": {
+      "service_collisions": [],
+      "screen_hits_3mm_assumed_rim": {},
+      "camera_hits": {},
+      "neck_hits": {}
+    },
+    "wallet-far": {
+      "service_collisions": [],
+      "screen_hits_3mm_assumed_rim": {},
+      "camera_hits": {},
+      "neck_hits": {}
+    },
+    "bare-near": {
+      "service_collisions": [],
+      "screen_hits_3mm_assumed_rim": {},
+      "camera_hits": {},
+      "neck_hits": {}
+    },
+    "bare-far": {
+      "service_collisions": [],
+      "screen_hits_3mm_assumed_rim": {},
+      "camera_hits": {},
+      "neck_hits": {}
+    },
+    "small-near": {
+      "service_collisions": [],
+      "screen_hits_3mm_assumed_rim": {},
+      "camera_hits": {},
+      "neck_hits": {}
+    },
+    "small-far": {
+      "service_collisions": [],
+      "screen_hits_3mm_assumed_rim": {},
+      "camera_hits": {},
+      "neck_hits": {}
+    },
+    "large-near": {
+      "service_collisions": [],
+      "screen_hits_3mm_assumed_rim": {},
+      "camera_hits": {},
+      "neck_hits": {}
+    },
+    "large-far": {
+      "service_collisions": [],
+      "screen_hits_3mm_assumed_rim": {},
+      "camera_hits": {},
+      "neck_hits": {}
+    }
+  },
+  "limits": [
+    "Key sockets are rib-free and have no positive pull-out latch.",
+    "Screen check assumes a 3 mm non-screen rim; actual phones/cases may differ. Camera box is not optical framing.",
+    "Phone dimensions unchanged. 18/20 mm examples remain too thick; thin-phone seating and TPU deformation are not simulated.",
+    "Approved cuff printing does not qualify new sockets, jaw strength, key wear or loaded retention.",
+    "Service paths are sampled rigid motions with phone removed, not ergonomic or force tests."
+  ]
+}

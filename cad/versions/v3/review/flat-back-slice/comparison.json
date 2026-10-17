@@ -1,0 +1,43 @@
+{
+  "revision": "flat-back-mount-v3",
+  "reference_only": true,
+  "printer_contacted": false,
+  "slicer": "Bambu Studio 02.07.01.62",
+  "printer": "A1 mini / 0.4 mm nozzle",
+  "recipe": "Generic PLA, 0.2 mm, 3 walls, 15% gyroid, Normal Snug 30 degrees; 0.2 mm top/bottom support gaps, 0.35 mm XY, 2 interface layers, no brim or raft",
+  "orientation": "Both brackets -90 degrees about local X, translated to bed; scale 100%; automatic reorientation disabled",
+  "parts": {
+    "before": {
+      "input_sha256": "445db16c9cf18ca4144102a442ae88170acaa66261c5629996d2d8195443fe0f",
+      "total_g": 10.747672080993652,
+      "deposited_grams_by_role": {
+        "support": 2.732,
+        "model": 7.9262
+      },
+      "support_seconds": 387.80261993408203,
+      "warning": "",
+      "sliced_3mf": "before/before.gcode.3mf",
+      "preview": "before/layers.png"
+    },
+    "after": {
+      "input_sha256": "80d18f1fc36dea90422750537ed1a96aba27ed02eb73c8af772f6e2e0490000c",
+      "total_g": 9.086222648620605,
+      "deposited_grams_by_role": {
+        "support": 0.9034,
+        "model": 8.0933
+      },
+      "support_seconds": 155.1277904510498,
+      "warning": "",
+      "sliced_3mf": "after/after.gcode.3mf",
+      "preview": "after/layers.png"
+    }
+  },
+  "limits": [
+    "Reference estimates, not qualified PLA+ toolpaths or measured print results.",
+    "Lower support quantity does not prove easy removal, good bearing/sliding finish or structural strength.",
+    "Support/model/adhesion mass estimates sum positive moving extrusion by G-code role; total mass is the slicer estimate.",
+    "Support generation varied slightly between repeated slices; percentages are approximate, not deterministic manufacturing guarantees."
+  ],
+  "support_mass_reduction_percent": 66.93265007320645,
+  "total_mass_reduction_percent": 15.458691145882463
+}

@@ -1,0 +1,128 @@
+{
+  "revision": "enlarged-cuff-v1",
+  "parts": {
+    "fit-cuff": {
+      "valid_single_solid": true,
+      "volume_mm3": 970.511579925237,
+      "bounds_mm": [
+        8.942023462672582,
+        12.004089009882843,
+        17.507067524049525
+      ],
+      "mesh": {
+        "watertight": true,
+        "winding_consistent": true,
+        "removed_degenerate_or_duplicate_faces": 0,
+        "absolute_mesh_tolerance_mm": 0.0005,
+        "weld_precision_mm": 1e-05,
+        "bounds_mm": [
+          8.93999981880188,
+          12.0,
+          17.504976272583008
+        ]
+      }
+    },
+    "fit-jaw": {
+      "valid_single_solid": true,
+      "volume_mm3": 307.1415926535898,
+      "bounds_mm": [
+        4.000192959517938,
+        10.800192959517938,
+        8.200192959517937
+      ],
+      "mesh": {
+        "watertight": true,
+        "winding_consistent": true,
+        "removed_degenerate_or_duplicate_faces": 0,
+        "absolute_mesh_tolerance_mm": 0.0005,
+        "weld_precision_mm": 1e-05,
+        "bounds_mm": [
+          4.0,
+          10.800000190734863,
+          8.199999809265137
+        ]
+      }
+    },
+    "fit-key": {
+      "valid_single_solid": true,
+      "volume_mm3": 119.83356910304832,
+      "bounds_mm": [
+        12.20025285754619,
+        7.000252857546187,
+        3.0002528575461875
+      ],
+      "mesh": {
+        "watertight": true,
+        "winding_consistent": true,
+        "removed_degenerate_or_duplicate_faces": 12,
+        "absolute_mesh_tolerance_mm": 0.0005,
+        "weld_precision_mm": 1e-05,
+        "bounds_mm": [
+          12.199999809265137,
+          7.0,
+          3.0
+        ]
+      }
+    }
+  },
+  "cuff_scale": 1.2,
+  "back_wall_behind_head_mm": 1.7,
+  "flat_bed_face_yz_mm": [
+    12,
+    8.88
+  ],
+  "unchanged_interface_mm": {
+    "stem": [
+      3.4,
+      3.4
+    ],
+    "head": [
+      7.4,
+      3.4
+    ]
+  },
+  "assembly_translation_mm": {
+    "key": [
+      -0.6,
+      0,
+      0
+    ],
+    "jaw": [
+      -1.6,
+      0,
+      0
+    ]
+  },
+  "materials": {
+    "current_prototype": "All three parts PETG; no TPU grip qualification",
+    "intended_cuff": "ELEGOO TPU 95A White 1.75 mm, user-specified",
+    "intended_jaw_key": "Rigid printed material; PETG prototype"
+  },
+  "source_sha256": "ff3a08912255ade207a47573f6dd136cdeb436dd51c284999ba0df1c110c31df",
+  "key_geometry_changed_from_shared_candidate": false,
+  "socket": {
+    "clear_passage_mm": 3.4,
+    "friction_gap_mm": null,
+    "key_stem_mm": 3,
+    "nominal_total_interference_mm": 0,
+    "nominal_clearance_per_side_mm": 0.2,
+    "rib_count": 0,
+    "positive_axial_latch": false
+  },
+  "key_cuff_overlap_mm3": 0.0,
+  "cuff_jaw_overlap_mm3": 0.0,
+  "seated_intentional_rib_overlap_mm3": 0.0,
+  "insertion_samples": 41,
+  "max_intentional_rib_overlap_mm3": 0.0,
+  "non_rib_insertion_overlap_mm3": 0,
+  "second_key": false,
+  "production_geometry_changed": false,
+  "limits": [
+    "Clearance-fit test only; no designed friction grip or positive pull-out latch",
+    "Printed tolerances remain unqualified; never force a jammed key",
+    "PETG cuff is rigid and does not demonstrate TPU grip or safe phone contact",
+    "Use a dummy edge for first fit checks; no phone suspension trial",
+    "Enlarged cuff and reinforced shoulder are unprinted; strength needs physical review",
+    "CAD build only; separate job record governs slicing, no active jaw integration"
+  ]
+}

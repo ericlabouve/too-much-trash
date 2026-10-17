@@ -1,0 +1,135 @@
+{
+  "revision": "concave-boot-guide-v3",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 2,
+  "plates": 1,
+  "total_g": 9.469947814941406,
+  "total_minutes": 76.15515950520833,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 9.3143,
+    "interface": 0.0189,
+    "support": 0.0653
+  },
+  "objects": {
+    "actuator_bracket": {
+      "deposited_g_by_role": {
+        "model": 7.4767,
+        "interface": 0.0189,
+        "support": 0.0653
+      },
+      "deposited_xy_bounds": [
+        [
+          27.21,
+          79.712
+        ],
+        [
+          92.79,
+          130.29
+        ]
+      ],
+      "support_z_mm": [
+        5.84,
+        13.88
+      ]
+    },
+    "plunger": {
+      "deposited_g_by_role": {
+        "model": 1.8376
+      },
+      "deposited_xy_bounds": [
+        [
+          86.21,
+          142.211
+        ],
+        [
+          143.79,
+          157.79
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [
+    {
+      "objects": [
+        "actuator_bracket",
+        "plunger"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 11.321000000000021
+    }
+  ],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0"
+  },
+  "effective_object_settings": [
+    {
+      "name": "actuator_bracket",
+      "enable_support": "1",
+      "extruder": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "wall_loops": "3"
+    },
+    {
+      "name": "plunger",
+      "enable_support": "1",
+      "extruder": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "wall_loops": "3"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "fc70168274694c1fb447c80e522f3477",
+  "hashes": {
+    "actuator-input.3mf": "e03bcf7f227c40185588f58ba8ed827c42af3c6930cb46cfebcd6b8922d1ab07",
+    "actuator.gcode.3mf": "8c68c4f26ed603eecb225584b3e3179a75bcf02d6e868041e0f37fad2efa6662",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and safe button force need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Physical support cleanup, running clearance and guide surfaces need inspection.",
+    "Assembly routing check fails; resolve the recorded twine interference before another print. This slice is for review, not print approval."
+  ]
+}
