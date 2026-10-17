@@ -12,6 +12,10 @@
       "valid": true,
       "solid_count": 1
     },
+    "phone_cuff": {
+      "valid": true,
+      "solid_count": 1
+    },
     "actuator_bracket": {
       "valid": true,
       "solid_count": 1
@@ -56,8 +60,9 @@
   "configurations": {
     "wallet-near": {
       "phone_overlap": {
-        "carrier": 192.0,
-        "sliding_jaw": 128.0
+        "cuff_fixed": 57.5903,
+        "cuff_sliding_1": 44.7352,
+        "cuff_sliding_2": 44.7352
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -68,15 +73,19 @@
       "passed": false,
       "mechanical_passed": true,
       "pocket_fit": {
-        "pocket_mm": 14,
+        "previous_rigid_pocket_mm": 14,
+        "cuff_tip_opening_mm": 13.44,
         "phone_thickness_mm": 18,
-        "compatible": false
+        "uncompressed_clearance_fit": false,
+        "known_oversize": true,
+        "limits": "Scaled curved seats have a varying opening; TPU compression and thin-phone seating need physical tests. 18/20 mm examples remain incompatible."
       }
     },
     "wallet-far": {
       "phone_overlap": {
-        "carrier": 192.0,
-        "sliding_jaw": 128.0
+        "cuff_fixed": 57.5903,
+        "cuff_sliding_1": 44.7352,
+        "cuff_sliding_2": 44.7352
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -87,79 +96,111 @@
       "passed": false,
       "mechanical_passed": true,
       "pocket_fit": {
-        "pocket_mm": 14,
+        "previous_rigid_pocket_mm": 14,
+        "cuff_tip_opening_mm": 13.44,
         "phone_thickness_mm": 18,
-        "compatible": false
+        "uncompressed_clearance_fit": false,
+        "known_oversize": true,
+        "limits": "Scaled curved seats have a varying opening; TPU compression and thin-phone seating need physical tests. 18/20 mm examples remain incompatible."
       }
     },
     "bare-near": {
-      "phone_overlap": {},
+      "phone_overlap": {
+        "cuff_fixed": 3.867,
+        "cuff_sliding_1": 1.0869,
+        "cuff_sliding_2": 1.0869
+      },
       "camera_overlap": {},
       "rigid_overlap": {},
       "sweep": [],
       "pivot_turn": [],
       "fastener_shaft_overlap_mm3": {},
       "clamp_screen_obstruction_mm3": {},
-      "passed": true,
+      "passed": false,
       "mechanical_passed": true,
       "pocket_fit": {
-        "pocket_mm": 14,
+        "previous_rigid_pocket_mm": 14,
+        "cuff_tip_opening_mm": 13.44,
         "phone_thickness_mm": 8,
-        "compatible": true
+        "uncompressed_clearance_fit": false,
+        "known_oversize": false,
+        "limits": "Scaled curved seats have a varying opening; TPU compression and thin-phone seating need physical tests. 18/20 mm examples remain incompatible."
       }
     },
     "bare-far": {
-      "phone_overlap": {},
+      "phone_overlap": {
+        "cuff_fixed": 3.867,
+        "cuff_sliding_1": 1.0869,
+        "cuff_sliding_2": 1.0869
+      },
       "camera_overlap": {},
       "rigid_overlap": {},
       "sweep": [],
       "pivot_turn": [],
       "fastener_shaft_overlap_mm3": {},
       "clamp_screen_obstruction_mm3": {},
-      "passed": true,
+      "passed": false,
       "mechanical_passed": true,
       "pocket_fit": {
-        "pocket_mm": 14,
+        "previous_rigid_pocket_mm": 14,
+        "cuff_tip_opening_mm": 13.44,
         "phone_thickness_mm": 8,
-        "compatible": true
+        "uncompressed_clearance_fit": false,
+        "known_oversize": false,
+        "limits": "Scaled curved seats have a varying opening; TPU compression and thin-phone seating need physical tests. 18/20 mm examples remain incompatible."
       }
     },
     "small-near": {
-      "phone_overlap": {},
+      "phone_overlap": {
+        "cuff_fixed": 3.867,
+        "cuff_sliding_1": 1.0869,
+        "cuff_sliding_2": 1.0869
+      },
       "camera_overlap": {},
       "rigid_overlap": {},
       "sweep": [],
       "pivot_turn": [],
       "fastener_shaft_overlap_mm3": {},
       "clamp_screen_obstruction_mm3": {},
-      "passed": true,
+      "passed": false,
       "mechanical_passed": true,
       "pocket_fit": {
-        "pocket_mm": 14,
+        "previous_rigid_pocket_mm": 14,
+        "cuff_tip_opening_mm": 13.44,
         "phone_thickness_mm": 7.5,
-        "compatible": true
+        "uncompressed_clearance_fit": false,
+        "known_oversize": false,
+        "limits": "Scaled curved seats have a varying opening; TPU compression and thin-phone seating need physical tests. 18/20 mm examples remain incompatible."
       }
     },
     "small-far": {
-      "phone_overlap": {},
+      "phone_overlap": {
+        "cuff_fixed": 3.867,
+        "cuff_sliding_1": 1.0869,
+        "cuff_sliding_2": 1.0869
+      },
       "camera_overlap": {},
       "rigid_overlap": {},
       "sweep": [],
       "pivot_turn": [],
       "fastener_shaft_overlap_mm3": {},
       "clamp_screen_obstruction_mm3": {},
-      "passed": true,
+      "passed": false,
       "mechanical_passed": true,
       "pocket_fit": {
-        "pocket_mm": 14,
+        "previous_rigid_pocket_mm": 14,
+        "cuff_tip_opening_mm": 13.44,
         "phone_thickness_mm": 7.5,
-        "compatible": true
+        "uncompressed_clearance_fit": false,
+        "known_oversize": false,
+        "limits": "Scaled curved seats have a varying opening; TPU compression and thin-phone seating need physical tests. 18/20 mm examples remain incompatible."
       }
     },
     "large-near": {
       "phone_overlap": {
-        "carrier": 192.0,
-        "sliding_jaw": 128.0
+        "cuff_fixed": 57.5903,
+        "cuff_sliding_1": 44.7352,
+        "cuff_sliding_2": 44.7352
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -170,15 +211,19 @@
       "passed": false,
       "mechanical_passed": true,
       "pocket_fit": {
-        "pocket_mm": 14,
+        "previous_rigid_pocket_mm": 14,
+        "cuff_tip_opening_mm": 13.44,
         "phone_thickness_mm": 20,
-        "compatible": false
+        "uncompressed_clearance_fit": false,
+        "known_oversize": true,
+        "limits": "Scaled curved seats have a varying opening; TPU compression and thin-phone seating need physical tests. 18/20 mm examples remain incompatible."
       }
     },
     "large-far": {
       "phone_overlap": {
-        "carrier": 192.0,
-        "sliding_jaw": 128.0
+        "cuff_fixed": 57.5903,
+        "cuff_sliding_1": 44.7352,
+        "cuff_sliding_2": 44.7352
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -189,9 +234,12 @@
       "passed": false,
       "mechanical_passed": true,
       "pocket_fit": {
-        "pocket_mm": 14,
+        "previous_rigid_pocket_mm": 14,
+        "cuff_tip_opening_mm": 13.44,
         "phone_thickness_mm": 20,
-        "compatible": false
+        "uncompressed_clearance_fit": false,
+        "known_oversize": true,
+        "limits": "Scaled curved seats have a varying opening; TPU compression and thin-phone seating need physical tests. 18/20 mm examples remain incompatible."
       }
     }
   },

@@ -6,6 +6,7 @@ across phone thickness after integration. No independent export side effects.
 import math
 from functools import lru_cache
 import cadquery as cq
+from shared_key_design import key_blank
 PULLEY_U=13.5
 PULLEY_V=8
 PULLEY_LIFT=2.0
@@ -125,13 +126,9 @@ def cassette():
     axle=cyl(PULLEY_U,8,-3.6-KEY_OUTBOARD,16.8+KEY_OUTBOARD,4).union(cyl(PULLEY_U,8,13.2,1.6,5.5).edges().fillet(.2))
     axle=axle.cut(box(3,23,6.3,9.7,-1.4-KEY_OUTBOARD,2-KEY_OUTBOARD))
     # Broad removable cross-key carries axial retention; no snap fingers/threads.
-    key=box(7,19,6.5,9.5,-1.2,1.8).edges().fillet(.2)
-    # Retain the transverse pull/retention shoulder, but no thicker head lip:
-    # both faces now share the stem's 3 mm thickness for a flat printing side.
-    key=key.union(box(18,21,4.5,11.5,-1.2,1.8).edges().fillet(.35))
-    # Shallow seats hold a small keeper band around the key and axle.
-    key=key.cut(box(8,9,6.4,7.1,-1.3,1.9)).cut(box(8,9,8.9,9.6,-1.3,1.9))
-    key=key.translate((0,0,-KEY_OUTBOARD))
+    # Same approved 12.2 mm candidate serves all three cuffs and this axle.
+    # Head bearing station and stem/band seats remain; head depth is 1.2 mm.
+    key=key_blank().translate((0,0,-KEY_OUTBOARD))
     
     # Flush-T cap: move mount bar 10 mm inward; keep the mechanism/shoe fixed.
     # One closed screw bore; user removed the rail locating lugs.

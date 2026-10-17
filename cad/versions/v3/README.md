@@ -1,6 +1,22 @@
-# V3 — post-print open pulley and guided plunger
+# V3 — removable rounded cuffs and guided plunger
 
 ## Current review revision (2026-10-16)
+
+**New design direction (October 17):** the user revoked the 16 mm fixed-cuff offset and the 40 mm width that crowds the volume buttons. Current C in `review/concepts/phone-clamps/centered-wide-cuff/` limits the fixed cuff to 21.6 mm, leaves its attachment unresolved, and retains one crossed-T assembly on each opposite cuff. All three concept cuffs are now the same 21.6 mm part, including the T opening. The current production assembly remains the comparison baseline, not the approved final jaw layout. No concept has been promoted to manufacturing.
+
+**Next validation:** `review/concepts/phone-clamps/centered-wide-cuff/fixed-retention.html` compares an integral T-stud and a short removable T with the shared sideways keeper. Both remain unselected. Await ELEGOO TPU 95A to validate compliant installation and retention; PETG fit success does not qualify TPU grip. Do not force the PETG cuff over the integral stud. No new print is authorized by this checkpoint.
+
+`integrated-cuffs-v3` integrates the user-approved enlarged cuff without changing its shape or key openings. Three identical 12 mm-wide cuffs replace the hard contact lips: two on the sliding jaw at Y±50 mm, one on the fixed jaw at **Y+16 mm**, explicitly approved to clear the shared key tip from the stock neck. Sliding sockets sit 0.3 mm outward so the enlarged return tips clear the existing camera-module proxy. Overall contact span is now 112 mm. The 48.5 mm tongue, X−66.5 empty closure, 100 mm contact spacing, closing cleats and shaft-cap geometry remain unchanged.
+
+`source/cuff_design.py` owns the approved 1.2× C curves/seats, 1.7 mm flat-backed head shoulder, 3.4 mm stem passage and 7.4×3.4 mm head recess. `source/shared_key_design.py` owns **one 12.2 mm T-key** used four times: three cuffs and the pulley axle. It retains the 7 mm-wide head and 3 mm stem/thickness, with the approved 1.2 mm head depth. No second cuff-specific key, TPU T, friction ribs or hidden latch is added. The actuator bracket, plunger, wheel and axle shapes are unchanged; only its key adopts the shared candidate. The axle keeper band remains.
+
+The fixed carrier and sliding jaw have integral sockets and recessed former hard lips, not cuffs stacked inside the old pocket. Cuffs are cyan in the viewer to distinguish intended **ELEGOO TPU 95A** from rigid parts; current physical approval is for the PETG cuff shape only. New sockets/jaws are unprinted. The nominal rear return opening is 13.44 mm; curved seats reduce it locally. Original phone dimensions and placement remain unchanged: undeformed cuff/phone overlaps are explicitly reported, including the incompatible 18/20 mm examples. No TPU compression or loaded grip is simulated, and thin-phone seating is not qualified.
+
+**Service prerequisite:** remove the phone, release twine tension, loosen the rail nut, then slide the supported actuator toward the outer end of its existing wing to screw-center Y+50 (near) or Y−50 (far) before removing nut/screw. Do not cross the solid rail center. The former straight screw withdrawal can hit the new fixed socket/cuff. See current `review/service-access.json` for sampled-path results; these are not ergonomic or force tests.
+
+`review/cuff-integration.json` records approved-shape equivalence, unchanged openings, cuff/key removal, neck/camera/assumed-screen clearance and complete jaw travel. `review/validation.json` retains all eight phone-fit results separately from rigid assembly checks. `review/plunger-integration.json` retains the known outgoing-cord/carrier conflicts; this change does not resolve routing. Manufacturing exports and 40 staged assembly views include **14 printed designs / 27 pieces**. No new slicing or print was requested for the integrated jaws. Preserve every historical print job and V1/V2 unchanged.
+
+### Preceding straight-corner bracket revision
 
 The user has approved both the sliding plunger and this bracket design. Full rebuild and eight rigid-assembly checks, local guide/stroke/wheel checks, fixed-mount checks, service paths and viewer smoke test pass. The known 14 mm pocket conflicts and three outgoing-twine/carrier intersections remain explicitly reported. Bracket approval does not establish physical printing or loaded qualification of this latest revision.
 
@@ -101,7 +117,7 @@ The outgoing cord is unchanged: near-side centers +24 through +28 mm intersect t
 
 Generic threaded fasteners can self-loosen under dynamic loading; this does not predict failure of a particular printed nut. The original free-nut arrangement was not validated. Background: [Nord-Lock explanation](https://www.nord-lock.com/learnings/knowledge/2018/why-do-bolts-loosen/); [igus clevis retention examples](https://www.igus.com/igubal/clevis-joints). These sources do not qualify the printed design.
 
-### Preserved jaw requirements
+### Pre-integration jaw requirements (superseded contact lips)
 
 T-jaw contacts are 100 mm apart, with 8 mm pads, 6 mm contact walls, 108 mm overall span, 4 mm retaining lips and a 14 mm pocket. Empty closure is X−66.5 with a 48.5 mm tongue. Each jaw has one broad angular band cleat. The actual 18 mm wallet and 20 mm large-phone proxies remain incompatible with the requested 14 mm pocket; they were not shrunk to pass checks.
 
@@ -123,6 +139,6 @@ The earlier actuator plate was printed according to the user; the newly revised 
 
 ## Files and boundaries
 
-`source/plunger_design.py` owns the actuator; `source/model.py` owns the harness; `source/build.py` regenerates the viewer meshes, STEP, BOM and provisional manufacturing exports. Current BOM: **13 printed designs, 21 pieces, 8 bands, 2 twine sections, no metal hardware**. The viewer contains 34 staged assembly states, not continuous insertion animations.
+`source/plunger_design.py` owns the actuator; `source/model.py` owns the harness; `source/cuff_design.py` and `source/shared_key_design.py` own the shared cuff/key geometry. `source/build.py` regenerates the viewer meshes, STEP, BOM and provisional manufacturing exports. Current BOM: **14 printed designs, 27 pieces, 8 bands, 2 twine sections, no metal hardware**. The viewer contains 40 staged assembly states, not continuous insertion animations.
 
 V1 and V2 remain unchanged. Historical rocker reports and helper checks do not validate this plunger revision; earlier geometry is recoverable through Git, not duplicate source snapshots. Existing V2 print-job files retain the geometry and outcomes actually recorded.

@@ -1,10 +1,10 @@
 {
   "version": "v3",
-  "title": "Flat-back actuator with plain friction rail clamp",
-  "revision": "straight-corner-guide-v3",
+  "title": "Three removable rounded cuffs with shared T-keys",
+  "revision": "integrated-cuffs-v3",
   "phone_rotation_degrees": 0,
   "phone_center_y_mm": -21.0,
-  "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
+  "status": "Integrated review prototype: cuff PETG print approved; replacement jaws and loaded retention unvalidated",
   "parameters": {
     "phone_width": 86,
     "phone_length": 170,
@@ -38,24 +38,31 @@
     },
     {
       "id": "carrier",
-      "name": "Fixed jaw, sliding track and shaft saddle",
+      "name": "Fixed cuff socket, sliding track and shaft saddle",
       "quantity": 1,
       "material": "PLA / PLA+",
-      "note": "Hard rear datum and one broad angular band cleat; the removable cap carries the actuator rail."
+      "note": "Fixed cuff at Y+16 mm clears its key from the neck. Old hard contact lips recessed; socket integral with carrier. Broad band cleat and removable cap retained. New jaw geometry unprinted."
     },
     {
       "id": "sliding_jaw",
-      "name": "Sliding opposing jaw",
+      "name": "Sliding dual-cuff jaw",
       "quantity": 1,
       "material": "PLA / PLA+",
-      "note": "T-shaped jaw has two pads 100 mm apart, a midpoint-closing tongue, 4 mm retaining lips and one broad angular band cleat. Turn the phone end-for-end for originally far-side buttons; 66\u201386 mm width is a geometric range, not qualified."
+      "note": "Two integral cuff sockets retain 100 mm spacing and midpoint-closing tongue. Cuffs replace hard lips; overall contact span 112 mm. One broad band cleat. New jaw and loaded retention unqualified."
+    },
+    {
+      "id": "phone_cuff",
+      "name": "Rounded phone-edge cuff",
+      "quantity": 3,
+      "material": "TPU 95A intended / PETG fit prototype",
+      "note": "Exact approved enlarged PETG geometry: 12 mm width, 1.7 mm back shoulder, unchanged key openings. One fixed and two sliding contacts. Intended ELEGOO TPU 95A; PETG is only a shape/fit trial, not cushioning. Rib-free key sockets have no pull-out lock."
     },
     {
       "id": "actuator_bracket",
       "name": "Flat-back plunger frame and offset rail bracket",
       "quantity": 1,
       "material": "PLA / PLA+",
-      "note": "Smoothly blended reinforcement. Mount bore offset 4.4 mm for a common flat back, preserving 5.4 mm beside the bore. No rail locating lugs: one screw/nut clamps the flat face; friction alone resists sliding and rotation. Unchanged rail. Remove nut/screw, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and retention unqualified."
+      "note": "Smoothly blended reinforcement. Mount bore offset 4.4 mm for a common flat back, preserving 5.4 mm beside the bore. No rail locating lugs: one screw/nut clamps the flat face; friction alone resists sliding and rotation. Unchanged rail. Remove phone/release twine; loosen nut and slide module with captured fasteners to rail screw Y +50 near / -50 far. Remove nut/screw there, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and retention unqualified."
     },
     {
       "id": "plunger",
@@ -80,10 +87,10 @@
     },
     {
       "id": "pulley_key",
-      "name": "Pulley axle cross-key",
-      "quantity": 1,
+      "name": "Shared cuff / axle T-key",
+      "quantity": 4,
       "material": "PLA / PLA+",
-      "note": "Uniform 3 mm head/stem thickness with transverse retaining shoulder. Small keeper band encircles key and axle to resist key drift; verify retention and inspect band wear."
+      "note": "One 12.2 mm design: three cuff keys plus one axle key. 7 mm wide head, 1.2 mm head depth, 3 mm stem/thickness. Axle keeper band retained. Cuff sockets have no positive latch; thinner-head strength and drift require tests."
     },
     {
       "id": "thumb_screw",
@@ -135,10 +142,10 @@
       "note": "2 jaw closing + 3 guides + 1 return + 1 inline overtravel + 1 axle-key keeper. Actual preload and loop count need fitting."
     }
   ],
-  "printed_designs": 13,
-  "printed_pieces": 21,
+  "printed_designs": 14,
+  "printed_pieces": 27,
   "purchased_hardware": 0,
-  "soft_padding": false,
+  "soft_padding": true,
   "parts": [
     {
       "name": "shaft_cap",
@@ -154,6 +161,11 @@
       "name": "sliding_jaw",
       "file": "../sliding_jaw.stl",
       "quantity": 1
+    },
+    {
+      "name": "phone_cuff",
+      "file": "../phone_cuff.stl",
+      "quantity": 3
     },
     {
       "name": "actuator_bracket",
@@ -178,7 +190,7 @@
     {
       "name": "pulley_key",
       "file": "../pulley_key.stl",
-      "quantity": 1
+      "quantity": 4
     },
     {
       "name": "thumb_screw",
@@ -246,6 +258,66 @@
         0.08
       ],
       "bom_id": "sliding_jaw"
+    },
+    {
+      "name": "cuff_fixed",
+      "file": "assembly_cuff_fixed.stl",
+      "color": [
+        0,
+        0.55,
+        0.6
+      ],
+      "bom_id": "phone_cuff"
+    },
+    {
+      "name": "cuff_key_fixed",
+      "file": "assembly_cuff_key_fixed.stl",
+      "color": [
+        0.96,
+        0.36,
+        0.08
+      ],
+      "bom_id": "pulley_key"
+    },
+    {
+      "name": "cuff_sliding_1",
+      "file": "assembly_cuff_sliding_1.stl",
+      "color": [
+        0,
+        0.55,
+        0.6
+      ],
+      "bom_id": "phone_cuff"
+    },
+    {
+      "name": "cuff_key_sliding_1",
+      "file": "assembly_cuff_key_sliding_1.stl",
+      "color": [
+        0.96,
+        0.36,
+        0.08
+      ],
+      "bom_id": "pulley_key"
+    },
+    {
+      "name": "cuff_sliding_2",
+      "file": "assembly_cuff_sliding_2.stl",
+      "color": [
+        0,
+        0.55,
+        0.6
+      ],
+      "bom_id": "phone_cuff"
+    },
+    {
+      "name": "cuff_key_sliding_2",
+      "file": "assembly_cuff_key_sliding_2.stl",
+      "color": [
+        0.96,
+        0.36,
+        0.08
+      ],
+      "bom_id": "pulley_key"
     },
     {
       "name": "actuator_bracket",

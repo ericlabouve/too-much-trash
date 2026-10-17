@@ -1,5 +1,5 @@
 {
-  "revision": "straight-corner-guide-v3",
+  "revision": "integrated-cuffs-v3",
   "routing": {
     "return-0": {
       "actuator_bracket": 0.0,
@@ -154,7 +154,7 @@
   "routing_clear": false,
   "axial_retention": {
     "head_obstruction_after_6mm_mm3": 36.65089,
-    "key_obstruction_mm3": 43.38006,
+    "key_obstruction_mm3": 23.64376,
     "wheel_axial_clearance_mm": 1.0,
     "axle_diametral_clearance_mm": 0.6,
     "key_slot_clearance_per_side_mm": 0.2,
@@ -168,13 +168,14 @@
   },
   "volumes_mm3": {
     "shaft_cap": 37638.67,
-    "carrier": 60630.22,
-    "sliding_jaw": 17304.5,
+    "carrier": 59185.38,
+    "sliding_jaw": 15660.05,
+    "phone_cuff": 970.51,
     "actuator_bracket": 9152.51,
     "plunger": 2177.36,
     "pulley": 643.55,
     "pulley_axle": 1016.89,
-    "pulley_key": 156.8,
+    "pulley_key": 119.83,
     "thumb_screw": 1343.6,
     "collar_screw": 1909.7,
     "thumb_nut": 971.79,

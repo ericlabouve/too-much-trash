@@ -1,0 +1,29 @@
+{
+  "title": "Cuff study \u00b7 curved back down \u00b7 single-plate slice review",
+  "subtitle": "3 separate pieces at 100% scale \u00b7 petg-friction-fit-v1",
+  "notes": [
+    "Unchanged geometry, automatic supports remain enabled. Cuff rotated back-down with the key passage vertical. Inspect bed adhesion and curved-seat overhang finish; zero generated supports is not physical print validation. Integral jaw friction ribs retain 0.05 mm interference and could jam the rigid key."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

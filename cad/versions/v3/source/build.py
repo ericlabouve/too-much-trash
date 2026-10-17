@@ -9,25 +9,27 @@ import trimesh
 from model import *
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'review'
-REVISION='straight-corner-guide-v3'
+REVISION='integrated-cuffs-v3'
 BRACKET_PRINT_NOTE='Common flat Y5.4 back face down (-90 degrees about X). Outer pulley cheek/arm and raised plinth removed; remaining boss raised 2 mm. Extended curved guide and independent return stop. Fresh slice required; support savings and cantilever strength unqualified.'
 BOM=[
  dict(id=n,name=label,quantity=q,material='PLA / PLA+',note=note)
  for n,label,q,note in [
  ('shaft_cap','Rigid shaft clamp cap',1,'Option A: flush-T rail wings, solid center and no offset support. Rail at cap end, Z26 screw center; X12 common outer face. Four-fastener collar fit and loaded retention unvalidated.'),
- ('carrier','Fixed jaw, sliding track and shaft saddle',1,'Hard rear datum and one broad angular band cleat; the removable cap carries the actuator rail.'),
- ('sliding_jaw','Sliding opposing jaw',1,'T-shaped jaw has two pads 100 mm apart, a midpoint-closing tongue, 4 mm retaining lips and one broad angular band cleat. Turn the phone end-for-end for originally far-side buttons; 66–86 mm width is a geometric range, not qualified.'),
- ('actuator_bracket','Flat-back plunger frame and offset rail bracket',1,'Smoothly blended reinforcement. Mount bore offset 4.4 mm for a common flat back, preserving 5.4 mm beside the bore. No rail locating lugs: one screw/nut clamps the flat face; friction alone resists sliding and rotation. Unchanged rail. Remove nut/screw, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and retention unqualified.'),
+ ('carrier','Fixed cuff socket, sliding track and shaft saddle',1,'Fixed cuff at Y+16 mm clears its key from the neck. Old hard contact lips recessed; socket integral with carrier. Broad band cleat and removable cap retained. New jaw geometry unprinted.'),
+ ('sliding_jaw','Sliding dual-cuff jaw',1,'Two integral cuff sockets retain 100 mm spacing and midpoint-closing tongue. Cuffs replace hard lips; overall contact span 112 mm. One broad band cleat. New jaw and loaded retention unqualified.'),
+ ('phone_cuff','Rounded phone-edge cuff',3,'Exact approved enlarged PETG geometry: 12 mm width, 1.7 mm back shoulder, unchanged key openings. One fixed and two sliding contacts. Intended ELEGOO TPU 95A; PETG is only a shape/fit trial, not cushioning. Rib-free key sockets have no pull-out lock.'),
+('actuator_bracket','Flat-back plunger frame and offset rail bracket',1,'Smoothly blended reinforcement. Mount bore offset 4.4 mm for a common flat back, preserving 5.4 mm beside the bore. No rail locating lugs: one screw/nut clamps the flat face; friction alone resists sliding and rotation. Unchanged rail. Remove phone/release twine; loosen nut and slide module with captured fasteners to rail screw Y +50 near / -50 far. Remove nut/screw there, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and retention unqualified.'),
  ('plunger','Rounded-shoe sliding plunger',1,'Shoe and blended root share the stem thickness of 4 mm; contact span remains 16 mm. Shared capped band/twine cleat. Nominal stroke is illustrative, not a physical force limit.'),
  ('pulley','Twine redirect pulley',1,'User-approved wheel geometry, raised 2 mm on the remaining boss. Nominal 1 mm axial clearance between boss and axle head; 0.6 mm diametral axle clearance. New mounted behavior untested.'),
  ('pulley_axle','Headed smooth pulley axle',1,'Unchanged 20.6 mm overall span, 8 mm shaft and outboard cross-key. Now supported by one 8.2 mm boss; head retains the wheel. Cantilever loading and new stack clearance require physical testing.'),
- ('pulley_key','Pulley axle cross-key',1,'Uniform 3 mm head/stem thickness with transverse retaining shoulder. Small keeper band encircles key and axle to resist key drift; verify retention and inspect band wear.'),
+ ('pulley_key','Shared cuff / axle T-key',4,'One 12.2 mm design: three cuff keys plus one axle key. 7 mm wide head, 1.2 mm head depth, 3 mm stem/thickness. Axle keeper band retained. Cuff sockets have no positive latch; thinner-head strength and drift require tests.'),
  ('thumb_screw','Coarse printed rail screw',1,'One central friction rail clamp, without locating lugs. Successful 8 mm major / 3 mm pitch thread and head retained; obsolete contact nose removed. Changed part and loaded clamp retention unqualified.'),
  ('collar_screw','Long-grip printed collar screw',4,'Same 8×3 profile and head, 32 mm threaded span with flush tip; new length is not physically validated.'),
  ('thumb_nut','Printed clamp nut',5,'Matches successful 8×3 trial nut, including entry lead-ins. Hand-tighten only; loaded retention remains untested.'),
  ('dual_string_guide','Duel captive guide',1,'Install nearest the harness; select the eye facing the actuator. Two 8 mm bores with flared entrances.'),
  ('string_guide','Captive shaft guide',2,'Band-held open saddle with reinforced D-shaped lug; 8 mm bore, 11 mm flared mouths. Smooth the twine-contact surfaces.')]]
 BOM += [dict(id='twine',name='Twine sections joined by inline band',quantity=2,material='Twine',note='Two lengths joined with a rubber band along the neck. Run directly from the pulley to the nearest shaft guide; there are no bracket guide holes; leave enough for knots. Cord-clearance checks use the provisional 2 mm diameter; actual twine, knots and larger diameters need qualification.'),dict(id='rubber_bands',name='Rubber bands',quantity=8,material='Rubber',note='2 jaw closing + 3 guides + 1 return + 1 inline overtravel + 1 axle-key keeper. Actual preload and loop count need fitting.')]
+next(r for r in BOM if r['id']=='phone_cuff')['material']='TPU 95A intended / PETG fit prototype'
 SAMPLES={'wallet':Parameters(),'bare':Parameters(phone_thickness=8,button_from_screen=4),'small':Parameters(phone_width=66,phone_length=140,phone_thickness=7.5,button_from_end=99,button_from_screen=3.5),'large':Parameters(phone_width=86,phone_length=170,phone_thickness=20,button_from_end=150,button_from_screen=6)}
 
 @lru_cache(maxsize=8192)
@@ -42,8 +44,12 @@ def export(s,path,manufacturing=False):
  from OCP.BRepTools import BRepTools
  BRepTools.Clean_s(s.val().wrapped)
  if path.suffix=='.stl':
-  s.val().exportStl(str(path),tolerance=.025,angularTolerance=.12,relative=False)
+  # Keep the approved fine manufacturing mesh, without burdening every
+  # assembly view with print-resolution copies of each repeated cuff/key.
+  fine=manufacturing and ('cuff' in path.stem or 'pulley_key' in path.stem)
+  s.val().exportStl(str(path),tolerance=.0005 if fine else .025,angularTolerance=.08 if fine else .12,relative=False)
   mesh=trimesh.load(path,force='mesh')
+  mesh.merge_vertices(digits_vertex=5)
   mesh.update_faces(mesh.unique_faces());mesh.update_faces(mesh.nondegenerate_faces());mesh.remove_unreferenced_vertices()
   mesh.export(path)
  else:cq.exporters.export(s,str(path))
@@ -61,7 +67,7 @@ def check(p,solids):
  for i in range(11):
   for n in ('plunger',):
    moving=a[n].translate((-(p.rest_gap+p.button_stroke)*i/10,0,0))
-   for other in ('carrier','shaft_cap','clamp_screw_1','clamp_screw_2','clamp_screw_3','clamp_screw_4','clamp_nut_1','clamp_nut_2','clamp_nut_3','clamp_nut_4','sliding_jaw','actuator_bracket','pulley','pulley_axle','pulley_key'):
+   for other in tuple(k for k in a if k!='plunger'):
     v=overlap(moving,a[other])
     if v>.01:r['sweep'].append([i/10,n,other,round(v,4)])
  r['pivot_turn']=[]  # No rotating rocker/pivot in active design.
@@ -78,13 +84,17 @@ def check(p,solids):
   if v>.01:r['clamp_screen_obstruction_mm3'][n]=round(v,4)
  r['passed']=not any(r.values())
  r['mechanical_passed']=not any(r[k] for k in ('camera_overlap','rigid_overlap','sweep','pivot_turn','fastener_shaft_overlap_mm3','clamp_screen_obstruction_mm3'))
- r['mechanical_passed']=r['mechanical_passed'] and not any(n not in ('carrier','sliding_jaw') or p.phone_thickness<=14 for n in r['phone_overlap'])
- r['pocket_fit']=dict(pocket_mm=14,phone_thickness_mm=p.phone_thickness,compatible=p.phone_thickness<=14)
+ # Cuffs remain undeformed: report all seat/contact intersections separately,
+ # never treat an overlapping TPU envelope as a demonstrated working fit.
+ r['mechanical_passed']=r['mechanical_passed'] and not any(n not in ('cuff_fixed','cuff_sliding_1','cuff_sliding_2') and (n not in ('carrier','sliding_jaw') or p.phone_thickness<=14) for n in r['phone_overlap'])
+ r['pocket_fit']=dict(previous_rigid_pocket_mm=14,cuff_tip_opening_mm=13.44,phone_thickness_mm=p.phone_thickness,
+     uncompressed_clearance_fit=not r['phone_overlap'],known_oversize=p.phone_thickness>13.44,
+     limits='Scaled curved seats have a varying opening; TPU compression and thin-phone seating need physical tests. 18/20 mm examples remain incompatible.')
  return r
 
 def export_scene(p,solids,out):
  out.mkdir(parents=True,exist_ok=True)
- manifest={'version':'v3','title':'Flat-back actuator with plain friction rail clamp','revision':REVISION,'phone_rotation_degrees':180 if p.side=='far' else 0,'phone_center_y_mm':p.phone_center_y,'status':'Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated','parameters':asdict(p),'bom':BOM,'printed_designs':13,'printed_pieces':21,'purchased_hardware':0,'soft_padding':False,'parts':[],'assembly':[]}
+ manifest={'version':'v3','title':'Three removable rounded cuffs with shared T-keys','revision':REVISION,'phone_rotation_degrees':180 if p.side=='far' else 0,'phone_center_y_mm':p.phone_center_y,'status':'Integrated review prototype: cuff PETG print approved; replacement jaws and loaded retention unvalidated','parameters':asdict(p),'bom':BOM,'printed_designs':14,'printed_pieces':27,'purchased_hardware':0,'soft_padding':True,'parts':[],'assembly':[]}
  for n,s in solids.items():
   file=n+'.stl'
   if out==OUT:export(s,out/file)
@@ -120,6 +130,8 @@ def manufacturing(solids):
  notes={'dual_string_guide':'Both eyes translated to saddle edge without rotation; lower faces coplanar on bed, central band lane clear. Verify support-free slice.','shaft_cap':'Cap with integral rail; export orientation provisional. Compare end-on-bed and side orientations in fresh low-waste slice review; keep supports off the neck mating surface.','carrier':'Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal.', 'sliding_jaw':'Compact jaw; export orientation provisional. Inspect tongue, ledge and hooks for overhangs; protect sliding faces and minimize removable supports.', 'actuator_bracket':'Open frame, small mounting bar and two-cheek pulley fork. Orientation provisional; fresh slice review required.', 'pulley_axle':'No thread. Head-down orientation provisional; cross-key slot needs slice review.', 'pulley_key':'Flat cross-key; preserve square load faces and band seats. Orientation provisional.', 'plunger':'Rounded shoe and cleat need slice review; keep supports off guide surfaces.', 'pulley':'Axis vertical, flange on bed. Keep bore and cord groove clean; running clearance unvalidated.', 'collar_screw':'Head on bed; longer 8×3 profile, flush tip. New grip length requires fit and loaded tests.', 'thumb_screw':'Head on bed; no support in threads. Fit trial first; do not force.', 'thumb_nut':'Flat on bed; no supports. Fit trial first.', 'string_guide':'Eye translated to saddle edge; eye and saddle lower faces coplanar on bed. Verify support-free slice.'}
  notes['shaft_cap']='Option A flush-T: common X12 exterior face down (+90 degrees about Y); wings and collar face share the bed plane. Slicer/support review still required; no support-free claim.'
  notes['actuator_bracket']=BRACKET_PRINT_NOTE
+ rotations['phone_cuff']=('Y',-90)
+ notes['phone_cuff']='Exact enlarged cuff, flat back down. PETG prototype approved; TPU 95A intended. Historical cuff-only slice is not a complete-jaw print plan.'
  result=[]
  for n,s in solids.items():
   axis,deg=rotations[n];v=(1,0,0) if axis=='X' else (0,1,0)
@@ -151,13 +163,13 @@ def build():
  report['checks_passed']=all(x['passed'] for x in report['configurations'].values())
  save(OUT/'validation.json',report)
  if not all(x['mechanical_passed'] for x in report['configurations'].values()):raise SystemExit('Mechanical interferences: see review/validation.json')
- if not report['checks_passed']:print('PHONE FIT CONFLICT: 14 mm pocket excludes recorded wallet/large envelopes; see validation.json',flush=True)
+ if not report['checks_passed']:print('PHONE FIT CONFLICT: undeformed cuff/phone intersections retained; 18/20 mm examples incompatible. See validation.json.',flush=True)
  manufacturing(solids)
  write_bom()
  print('Manufacturing exports complete',flush=True)
 
 def write_bom():
- lines=['# V3 adjustable-clamp BOM','','Generated from `source/build.py`. 13 designs, 21 printed pieces; zero metal hardware.','', '| Component | Quantity | Material | Role |','| --- | ---: | --- | --- |']
+ lines=['# V3 adjustable-clamp BOM','','Generated from `source/build.py`. 14 designs, 27 printed pieces; zero metal hardware. Three cuffs plus four identical shared keys.','', '| Component | Quantity | Material | Role |','| --- | ---: | --- | --- |']
  for r in BOM:lines.append(f"| {r['name']} | {r['quantity']} | {r['material']} | {r['note']} |")
  (ROOT/'bom.md').write_text('\n'.join(lines)+'\n')
 def refresh_metadata():

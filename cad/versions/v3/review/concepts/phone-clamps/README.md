@@ -1,5 +1,9 @@
 # Five phone-retention concepts in 3D
 
+**October 16 promotion:** the approved enlarged rounded cuff is now integrated into active V3 (`integrated-cuffs-v3`). The concept-only statements below describe the preceding exploration. See the V3 assembly and `review/cuff-integration.json` for current placement, service checks and unresolved retention/fit limits.
+
+New exploration: [Rounded B cuff with A's adaptable seating](rounded-cuff/index.html). Three local curved TPU cuffs with shallow seating ribs; front/rear clearance views, end-for-end reversal, an assembled cross-section and an isolated-insert view. Remains a concept, not an active jaw replacement.
+
 October 16 review: user rejects C and E for camera-obstruction risk. A and B remain promising; D is questioned because the phone must not pivot. D's limited-angle joint is intended to seat the pad bar, not provide an adjustable phone pivot, but additional play is a real tradeoff. No jaw concept has been promoted. The original illustrations remain as study evidence, not an indication that rejected concepts are active candidates.
 
 Open `index.html` through the CAD server: `/versions/v3/review/concepts/phone-clamps/`.

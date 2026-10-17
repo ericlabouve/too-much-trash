@@ -8,6 +8,7 @@ from pathlib import Path
 import math
 import sys
 import cadquery as cq
+from cuff_design import cuff, cuff_key, socket as cuff_socket, locate as locate_cuff, CUFF_Z, FIXED_CUFF_Y, SLIDING_CUFF_Y, SLIDING_CUFF_X
 
 V1_SOURCE = Path(__file__).resolve().parents[3] / 'source'
 sys.path.insert(0, str(V1_SOURCE))
@@ -190,6 +191,16 @@ def placed(s,p):
 
 def assembly_parts(p,solids):
     out={'shaft_cap':solids['shaft_cap'],'carrier':solids['carrier'],'sliding_jaw':solids['sliding_jaw'].translate((p.phone_left,0,0))}
+    # Shared T-key is stored in actuator coordinates; reorient that exact solid
+    # for the cuff rather than introducing a second printable key design.
+    key=(solids['pulley_key'].translate((-8.35,-5.4,-8))
+         .rotate((0,0,0),(1,0,0),-90).rotate((0,0,0),(0,0,1),90)
+         .translate((-22.82,-8,2.2-.3)))
+    for name,x,y,fixed in [('fixed',p.phone_right,FIXED_CUFF_Y,True),
+                           ('sliding_1',p.phone_left+SLIDING_CUFF_X,-50,False),
+                           ('sliding_2',p.phone_left+SLIDING_CUFF_X,50,False)]:
+        out['cuff_'+name]=locate_cuff(solids['phone_cuff'],x,y,fixed)
+        out['cuff_key_'+name]=locate_cuff(key,x,y,fixed)
     for n in ('actuator_bracket','plunger','pulley','pulley_axle','pulley_key'):out[n]=placed(solids[n],p)
     for i,y in enumerate((MOUNT_Y,)):
         # Flush-T rail moves only the mounting interface 10 mm inward / 40 mm up.
@@ -254,8 +265,8 @@ def attachment_loop(p):
 def rows(p,solids):
     out=[('twine_attachment',polyline(attachment_loop(p),p.twine_diameter),TWINE,'twine')]
     for n,s in assembly_parts(p,solids).items():
-        bid='collar_screw' if n.startswith('clamp_screw') else 'thumb_screw' if 'screw' in n else 'thumb_nut' if 'nut' in n else 'dual_string_guide' if n=='guide_1' else 'string_guide' if n.startswith('guide_') else n
-        out.append((n,s,ORANGE,bid))
+        bid='pulley_key' if n.startswith('cuff_key_') else 'phone_cuff' if n.startswith('cuff_') else 'collar_screw' if n.startswith('clamp_screw') else 'thumb_screw' if 'screw' in n else 'thumb_nut' if 'nut' in n else 'dual_string_guide' if n=='guide_1' else 'string_guide' if n.startswith('guide_') else n
+        out.append((n,s,(0,.55,.60) if bid=='phone_cuff' else ORANGE,bid))
     for n,s in stock(p).items():
         color=(.035,.27,.75) if 'blue' in n else (.12,.14,.17) if any(x in n for x in ('black','camera','volume')) else (.6,.65,.69)
         out.append((n,s,color,None))
@@ -365,17 +376,24 @@ def carrier(p):
     for y,z in CLAMP_STATIONS:
         s=s.cut(cylinder((-23,y,z),(1,0,0),40,8.8))
         s=s.cut(cylinder((-21,y,z),(1,0,0),7,18.6))
-
+    # Retire the old central hard lips; leave a recessed structural root.
+    s=s.cut(box(-28,-19,-12,12,1.8,22))
+    # Clearance behind the exact approved cuff, not a cavity cut into the cuff.
+    s=s.cut(box(-24,-13.2,FIXED_CUFF_Y-6.4,FIXED_CUFF_Y+6.4,1.8,22))
+    root=cuff_socket().union(box(-10.8,-6.8,-6.4,6.4,3.5,12.72))
+    s=s.union(locate_cuff(root,-20,FIXED_CUFF_Y,True))
+    s=s.cut(locate_cuff(box(-17,-6,-1.7,1.7,-1.7,1.7),-20,FIXED_CUFF_Y,True))
     return s
 
 def sliding_jaw(p):
-    # T crossbar: 8 mm pads at Y +/-50, 6 mm contact walls.
+    # T crossbar retains 100 mm spacing and tongue; sockets replace hard lips.
     # No central projection below the crossbar; retain the tongue/cleat root above.
     s=box(-10,-2,-7,7,12,33).union(box(-10,-2,-54,54,12,22))
-    for lo,hi in ((-54,-46),(46,54)):
-        s=s.union(box(-6,0,lo,hi,3.6,22))
-        s=s.union(box(-6,1.5,lo,hi,18,22))
-        s=s.union(box(-6,4,lo,hi,2,4))
+    for y in SLIDING_CUFF_Y:
+        s=s.cut(box(-6.8+SLIDING_CUFF_X,5,y-6.4,y+6.4,1.8,22.1))
+        root=cuff_socket().union(box(-10.8,-6.8,-6.4,6.4,3.5,12.72))
+        s=s.union(locate_cuff(root,SLIDING_CUFF_X,y))
+        s=s.cut(locate_cuff(box(-17,-6,-1.7,1.7,-1.7,1.7),SLIDING_CUFF_X,y))
     s=s.union(box(-6,SLIDING_TONGUE_LENGTH,-10,10,26.4,30.4))
     s=s.union(box(-6,4,-7,7,32,38.5)).union(jaw_cleat(-1))
     return s
@@ -466,7 +484,7 @@ def axle(p):
     return s.union(head).union(box(18.2,19.8,8.4,10,13.8,22.2))
 
 def parts(p):
-    return dict(shaft_cap=shaft_cap(p),carrier=carrier(p),sliding_jaw=sliding_jaw(p),**plunger_cassette(),thumb_screw=thumb_screw(p),collar_screw=collar_screw(),thumb_nut=thumb_nut(p),string_guide=guide(p),dual_string_guide=dual_guide(p))
+    return dict(shaft_cap=shaft_cap(p),carrier=carrier(p),sliding_jaw=sliding_jaw(p),phone_cuff=cuff(),**plunger_cassette(),thumb_screw=thumb_screw(p),collar_screw=collar_screw(),thumb_nut=thumb_nut(p),string_guide=guide(p),dual_string_guide=dual_guide(p))
 
 # Active V3 actuator (legacy rocker helpers above are historical check support).
 from plunger_design import MOUNT_Y, cassette as plunger_cassette, return_path as plunger_return_path, attachment_path as plunger_attachment_path, pulley_path as plunger_pulley_path, keeper_path as plunger_keeper_path

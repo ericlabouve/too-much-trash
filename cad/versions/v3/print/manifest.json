@@ -3,7 +3,7 @@
   "scale_percent": 100,
   "nozzle_mm": 0.4,
   "layer_mm": 0.2,
-  "revision": "straight-corner-guide-v3",
+  "revision": "integrated-cuffs-v3",
   "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
   "parts": [
     {
@@ -39,14 +39,28 @@
       "file": "sliding_jaw.stl",
       "quantity": 1,
       "bounds_mm": [
-        45.5,
-        108.0,
-        58.5
+        40.32,
+        112.8,
+        59.6
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": -5.5417236453231006e-17,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Compact jaw; export orientation provisional. Inspect tongue, ledge and hooks for overhangs; protect sliding faces and minimize removable supports."
+    },
+    {
+      "name": "phone_cuff",
+      "file": "phone_cuff.stl",
+      "quantity": 3,
+      "bounds_mm": [
+        17.505,
+        12.0,
+        8.94
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Exact enlarged cuff, flat back down. PETG prototype approved; TPU 95A intended. Historical cuff-only slice is not a complete-jaw print plan."
     },
     {
       "name": "actuator_bracket",
@@ -107,13 +121,13 @@
     {
       "name": "pulley_key",
       "file": "pulley_key.stl",
-      "quantity": 1,
+      "quantity": 4,
       "bounds_mm": [
         7.0,
-        14.0,
+        12.2,
         3.0
       ],
-      "bed_z_min_mm": 1.0000000116860974e-07,
+      "bed_z_min_mm": 0.0,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Flat cross-key; preserve square load faces and band seats. Orientation provisional."

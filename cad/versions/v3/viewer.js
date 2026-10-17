@@ -30,10 +30,10 @@ const assetLoad=Date.now();
 const freshAsset=path=>{const url=new URL(path,location.href);url.searchParams.set('load',assetLoad);return url.href;};
 const loader=new STLLoader(),raycaster=new THREE.Raycaster();let pointerStart;
 const details={
- phone:['V3 PLUNGER HARNESS','Shared-cleat linear actuator.','The rounded plunger presses straight toward the button. Its rubber band and twine share one capped cleat. Jaw geometry and neck opening are preserved; both collar halves now use compact ears and longer screws. The 14 mm pocket still excludes the recorded wallet and large-phone cases.'],
+ phone:['V3 REMOVABLE CUFFS','Three cuffs. One shared key design.','Cyan: approved enlarged cuff geometry, PETG fit prototype / TPU 95A intended. Two sliding cuffs remain 100 mm apart; fixed cuff is offset 16 mm to clear the neck. Sliding sockets sit 0.3 mm outward for camera clearance. New jaws and key retention need physical tests. The 18/20 mm phone examples remain incompatible; thin-phone seating is not validated.'],
  full:['INLINE COMPLIANCE','Two twine sections, joined by a band.','The pulley redirects the pull. Run directly to the selected eye of the nearest shaft guide, then through the two lower guides, then join two twine sections with an inline rubber band near the trigger. Return and inline bands have separate functions; forces and maximum extension are not validated.'],
  actuator:['CONCAVE BOOT + LONG GUIDE','Smooth boot. Continuous guide.','The 8 mm neck sweeps into the boot along a concave hyperbola-like curve, tangent at both ends. The highlighted guide is now full height along its extended length, with a retaining lip and curved end. Nominal slider clearance: 0.3 mm at the wall and 0.4 mm under the lip. Pulley and return stop are unchanged. Outgoing twine still intersects the carrier in wallet-near, bare-near and small-near; resolve routing before another print.'],
- bom:['THIRTEEN PRINTED DESIGNS','Twenty-one pieces. True relative scale.','Printed parts share the assembly’s millimetre scale; twine and band icons are schematic. The selected cross-key keeps its wide T-head with uniform 3 mm thickness. The short rail screw no longer has a contact nose. Retention, clamp preload and printed fit need physical qualification.']
+ bom:['FOURTEEN PRINTED DESIGNS','Twenty-seven pieces. True relative scale.','Three identical cuffs and four identical 12.2 mm T-keys: one axle key plus three cuff keys. Cuff head recess and stem opening keep the approved dimensions. Cyan is TPU-intended cuff geometry, currently PETG-tested. Rib-free cuff sockets have no pull-out latch. Retention and new jaw strength require tests.']
 };
 
 function setDetail(label,title,text){$('#detail-label').textContent=label;$('#detail-title').textContent=title;$('#detail-text').textContent=text;}
@@ -276,11 +276,11 @@ try{
   // Printed parts use source millimetres, just like the assembly. Never
   // normalize each part independently: a screw must look smaller than a jaw.
   geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);
-  const rgb=row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
+  const rgb=row.id==='phone_cuff'?[0,.55,.60]:row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
   const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=1;inventory.add(mesh);bomMeshes.set(row.id,mesh);
   geometry.computeBoundingBox();
   tr.dataset.displayScale=String(mesh.userData.displayScale);tr.dataset.modelSizeMm=JSON.stringify(geometry.boundingBox.getSize(new THREE.Vector3()).toArray());
-  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'Axle cross-key',collar_screw:'Long collar screw',thumb_screw:'Thumb screw',thumb_nut:'Printed nut',string_guide:'Captive guide',dual_string_guide:'Duel captive guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
+  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'Shared T-key',phone_cuff:'Rounded cuff',collar_screw:'Long collar screw',thumb_screw:'Thumb screw',thumb_nut:'Printed nut',string_guide:'Captive guide',dual_string_guide:'Duel captive guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
   label(`${titles[row.id]||row.name||row.id} ×${row.quantity}${part?'':' · schematic'}`,mesh.position.x,mesh.position.y-Math.max(65,extent.y/2+12),0);
  }
  for(const [i,step] of steps.entries()){const option=document.createElement('option');option.value=i;option.textContent=`${i+1}. ${step.title}`;$('#assembly-step').append(option);}
@@ -289,7 +289,9 @@ try{
  document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setMode(b.dataset.view));
  $('#string-attachment').disabled=false;$('#string-attachment').onclick=()=>{setPlaying(false);pose(0);setMode('actuator');focus('plunger',meshes.get('plunger'));setDetail('SHARED CAPPED CLEAT','Wrap and tie beneath the cap','The return band and twine share the solid cleat. Keep the band behind the twine and tie back to the standing line. The shown wrap is schematic; verify actual knot and band retention.');};
  $('#flip').onclick=()=>{flipped=!flipped;frameObjects(visibleMeshes());};
- $('#reset').onclick=()=>setMode(mode);$('#phone').onchange=()=>setMode(mode);$('#transparent').onchange=()=>setMode(mode);$('#stroke').oninput=e=>{setPlaying(false);elapsedMs=0;pose(Number(e.target.value)/100);};
+ $('#reset').onclick=()=>setMode(mode);
+ const updateVisibility=()=>{const position=camera.position.clone(),target=controls.target.clone();setMode(mode);camera.position.copy(position);controls.target.copy(target);controls.update();};
+ $('#phone').onchange=updateVisibility;$('#transparent').onchange=updateVisibility;$('#stroke').oninput=e=>{setPlaying(false);elapsedMs=0;pose(Number(e.target.value)/100);};
  $('#animate').onclick=()=>{if(!playing&&mode==='phone')setMode('full');setPlaying(!playing);};
  $('#release').onclick=()=>{setPlaying(false);elapsedMs=0;pose(0);};
  document.addEventListener('visibilitychange',()=>{if(document.hidden)setPlaying(false);});
@@ -302,7 +304,9 @@ try{
  canvas.addEventListener('click',e=>{if(!pointerStart||Math.hypot(e.clientX-pointerStart[0],e.clientY-pointerStart[1])>5)return;const m=pick(e);if(m){if(marking)return;else focus(m.object.userData.bomId,m.object);}});
  canvas.addEventListener('contextmenu',e=>{e.preventDefault();const m=pick(e);if(m)menu(m.object.userData.bomId,e);});
  document.addEventListener('pointerdown',e=>{if(!$('#context').contains(e.target))$('#context').hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#context').hidden=true;});
- stopFraction=findStopFraction();setupPreview();pose(0);setMode('phone');canvas.dataset.ready='true';
+ stopFraction=findStopFraction();setupPreview();pose(0);setMode('phone');
+ if(params.get('focus')==='cuffs')frameObjects([...meshes.values()].filter(m=>m.userData.bomId==='phone_cuff'));
+ canvas.dataset.ready='true';
 }catch(error){status.textContent=`Load failed: ${error.message}`;console.error(error);}
 function resize(){renderer.setSize(canvas.clientWidth,canvas.clientHeight,false);camera.aspect=canvas.clientWidth/canvas.clientHeight;camera.updateProjectionMatrix();}
 window.addEventListener('resize',resize);resize();

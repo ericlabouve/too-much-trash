@@ -15,9 +15,9 @@
     },
     {
       "id": "v3",
-      "label": "Version 3 \u00b7 T-jaw and sliding plunger",
+      "label": "Version 3 \u00b7 removable cuffs and sliding plunger",
       "viewer": "versions/v3/viewer.html",
-      "note": "Approved plunger retained. Bracket has a straight front/side corner and extended shoe-end guide. Revised bracket unprinted; outgoing-twine routing and 14 mm pocket conflicts remain unresolved."
+      "note": "Comparison baseline: the 16 mm fixed-cuff offset is rejected. Linked concepts use three identical 21.6 mm cuffs and compare two fixed-retention options awaiting TPU tests. New jaws, retention and grip remain unqualified; phone-fit and outgoing-twine conflicts persist."
     }
   ]
 }

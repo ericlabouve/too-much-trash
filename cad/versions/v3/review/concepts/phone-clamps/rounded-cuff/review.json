@@ -1,0 +1,312 @@
+{
+  "date": "2026-10-16",
+  "revision": "enlarged-cuff-v1",
+  "passed": true,
+  "audits": [
+    {
+      "method": "Conservative world-axis bounding-box intersections, printed components only",
+      "illustrative_case_mm": [
+        76,
+        154,
+        11
+      ],
+      "screen_mm": [
+        70,
+        146
+      ],
+      "rim_mm": 3,
+      "screen_margin_measured_mm": 0.7799999713897705,
+      "camera_module_keepout_mm": [
+        28,
+        38
+      ],
+      "contacts_y_mm": [
+        -50,
+        50,
+        0
+      ],
+      "end_for_end": false,
+      "hits": {
+        "screen": [],
+        "camera": []
+      },
+      "limits": [
+        "Not a lens field-of-view test",
+        "Not active 18/20 mm phone envelopes",
+        "No TPU deformation, grip force or peel strength simulation"
+      ]
+    },
+    {
+      "method": "Conservative world-axis bounding-box intersections, printed components only",
+      "illustrative_case_mm": [
+        76,
+        154,
+        11
+      ],
+      "screen_mm": [
+        70,
+        146
+      ],
+      "rim_mm": 3,
+      "screen_margin_measured_mm": 0.7799999713897705,
+      "camera_module_keepout_mm": [
+        28,
+        38
+      ],
+      "contacts_y_mm": [
+        -50,
+        50,
+        0
+      ],
+      "end_for_end": true,
+      "hits": {
+        "screen": [],
+        "camera": []
+      },
+      "limits": [
+        "Not a lens field-of-view test",
+        "Not active 18/20 mm phone envelopes",
+        "No TPU deformation, grip force or peel strength simulation"
+      ]
+    }
+  ],
+  "keyAudit": {
+    "method": "81 key positions through rib-free clear passage; 707 cavity rays against 1.2x C wall",
+    "source": "fit-key.stl, same shared candidate with fine watertight tessellation",
+    "material": "PETG trial; intended cuff ELEGOO TPU 95A",
+    "samples": 81,
+    "violations": 0,
+    "minimum_slot_clearance_mm": 0.19999999999999996,
+    "key_thickness_mm": 3,
+    "key_length_mm": 12.199999809265137,
+    "key_head_width_mm": 7,
+    "head_axial_depth_mm": 1.2,
+    "key_phone_gap_mm": 3.619999885559082,
+    "stem_width_mm": 3,
+    "cuff_width_mm": 12,
+    "cavity_ray_samples": 707,
+    "open_tolerance_seam_rays": 8,
+    "max_cavity_encroachment_mm": 0.0004483733312912186,
+    "side_keeper": false,
+    "second_key": false,
+    "limits": [
+      "No jaw ribs or designed pull-out retention; clearance-fit PETG test",
+      "No TPU deformation or loaded strength validation",
+      "Approved actuator and active jaws unchanged"
+    ]
+  },
+  "retentionAudit": {
+    "revision": "single-shared-key-v1",
+    "scope": "Candidate only; production unchanged",
+    "baseline_source_sha256": "f2047569bdad79a1145481401614c60e69dfaa20a4da3605a0998ddb7d70b705",
+    "key_mm": {
+      "length": 12.2,
+      "head_width": 7,
+      "head_axial_depth": 1.2,
+      "stem_width": 3,
+      "thickness": 3
+    },
+    "original_key_mm": {
+      "length": 14,
+      "head_width": 7,
+      "head_axial_depth": 3,
+      "stem_width": 3,
+      "thickness": 3
+    },
+    "valid_single_solid": true,
+    "volume_mm3": 119.8335691030483,
+    "actuator_insertion_samples": 41,
+    "max_axle_overlap_mm3": 0,
+    "bracket_overlap_mm3": 0,
+    "axle_withdrawal_obstruction_at_0_5mm_mm3": 6.899573604008314,
+    "head_bearing_station_u_mm": 18,
+    "limits": [
+      "Thinner head strength and keeper-band behavior untested",
+      "Actuator-only check; cuff fit is reported separately in fit-attachment-check.json",
+      "TPU creep, tear and actual phone grip untested",
+      "No production promotion or print authorization"
+    ],
+    "cuff_positive_pullout_lock": false,
+    "second_key": false
+  },
+  "fitAudit": {
+    "revision": "enlarged-cuff-v1",
+    "parts": {
+      "fit-cuff": {
+        "valid_single_solid": true,
+        "volume_mm3": 970.511579925237,
+        "bounds_mm": [
+          8.942023462672582,
+          12.004089009882843,
+          17.507067524049525
+        ],
+        "mesh": {
+          "watertight": true,
+          "winding_consistent": true,
+          "removed_degenerate_or_duplicate_faces": 0,
+          "absolute_mesh_tolerance_mm": 0.0005,
+          "weld_precision_mm": 0.00001,
+          "bounds_mm": [
+            8.93999981880188,
+            12,
+            17.504976272583008
+          ]
+        }
+      },
+      "fit-jaw": {
+        "valid_single_solid": true,
+        "volume_mm3": 307.1415926535898,
+        "bounds_mm": [
+          4.000192959517938,
+          10.800192959517938,
+          8.200192959517937
+        ],
+        "mesh": {
+          "watertight": true,
+          "winding_consistent": true,
+          "removed_degenerate_or_duplicate_faces": 0,
+          "absolute_mesh_tolerance_mm": 0.0005,
+          "weld_precision_mm": 0.00001,
+          "bounds_mm": [
+            4,
+            10.800000190734863,
+            8.199999809265137
+          ]
+        }
+      },
+      "fit-key": {
+        "valid_single_solid": true,
+        "volume_mm3": 119.83356910304832,
+        "bounds_mm": [
+          12.20025285754619,
+          7.000252857546187,
+          3.0002528575461875
+        ],
+        "mesh": {
+          "watertight": true,
+          "winding_consistent": true,
+          "removed_degenerate_or_duplicate_faces": 12,
+          "absolute_mesh_tolerance_mm": 0.0005,
+          "weld_precision_mm": 0.00001,
+          "bounds_mm": [
+            12.199999809265137,
+            7,
+            3
+          ]
+        }
+      }
+    },
+    "cuff_scale": 1.2,
+    "back_wall_behind_head_mm": 1.7,
+    "flat_bed_face_yz_mm": [
+      12,
+      8.88
+    ],
+    "unchanged_interface_mm": {
+      "stem": [
+        3.4,
+        3.4
+      ],
+      "head": [
+        7.4,
+        3.4
+      ]
+    },
+    "assembly_translation_mm": {
+      "key": [
+        -0.6,
+        0,
+        0
+      ],
+      "jaw": [
+        -1.6,
+        0,
+        0
+      ]
+    },
+    "materials": {
+      "current_prototype": "All three parts PETG; no TPU grip qualification",
+      "intended_cuff": "ELEGOO TPU 95A White 1.75 mm, user-specified",
+      "intended_jaw_key": "Rigid printed material; PETG prototype"
+    },
+    "source_sha256": "ff3a08912255ade207a47573f6dd136cdeb436dd51c284999ba0df1c110c31df",
+    "key_geometry_changed_from_shared_candidate": false,
+    "socket": {
+      "clear_passage_mm": 3.4,
+      "friction_gap_mm": null,
+      "key_stem_mm": 3,
+      "nominal_total_interference_mm": 0,
+      "nominal_clearance_per_side_mm": 0.2,
+      "rib_count": 0,
+      "positive_axial_latch": false
+    },
+    "key_cuff_overlap_mm3": 0,
+    "cuff_jaw_overlap_mm3": 0,
+    "seated_intentional_rib_overlap_mm3": 0,
+    "insertion_samples": 41,
+    "max_intentional_rib_overlap_mm3": 0,
+    "non_rib_insertion_overlap_mm3": 0,
+    "second_key": false,
+    "production_geometry_changed": false,
+    "limits": [
+      "Clearance-fit test only; no designed friction grip or positive pull-out latch",
+      "Printed tolerances remain unqualified; never force a jammed key",
+      "PETG cuff is rigid and does not demonstrate TPU grip or safe phone contact",
+      "Use a dummy edge for first fit checks; no phone suspension trial",
+      "Enlarged cuff and reinforced shoulder are unprinted; strength needs physical review",
+      "CAD build only; separate job record governs slicing, no active jaw integration"
+    ]
+  },
+  "cubeChecks": [
+    {
+      "pane": "assembly",
+      "passed": true,
+      "checks": [
+        "face/edge/corner snap",
+        "keyboard snap",
+        "hover inert",
+        "arrow click inert",
+        "arrow drag",
+        "cube drag",
+        "projection toggle",
+        "independent panes"
+      ]
+    },
+    {
+      "pane": "detail",
+      "passed": true,
+      "checks": [
+        "face/edge/corner snap",
+        "keyboard snap",
+        "hover inert",
+        "arrow click inert",
+        "arrow drag",
+        "cube drag",
+        "projection toggle",
+        "independent panes"
+      ]
+    }
+  ],
+  "browser_errors": [],
+  "views_tested": [
+    "iso",
+    "front",
+    "back",
+    "section",
+    "3d",
+    "insert",
+    "locked",
+    "retention",
+    "pin",
+    "open",
+    "exploded",
+    "key",
+    "crosskey",
+    "socket"
+  ],
+  "mobile_widths": [
+    390,
+    320
+  ],
+  "scope": "Viewer, illustrative keepouts, C profile, direct key insertion and actuator slot/obstruction; friction ribs removed for clearance fit, NOT a pull-out lock; NOT TPU strength, key drift, manufacturing or optical validation"
+}

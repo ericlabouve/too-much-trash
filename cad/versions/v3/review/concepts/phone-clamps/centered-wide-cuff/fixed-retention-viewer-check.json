@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "revision": "fixed-retention-pair-v1",
+  "modes": [
+    "assembled",
+    "exploded",
+    "section"
+  ],
+  "full_assembly": true,
+  "cubes": 2,
+  "mobile_widths": [
+    390,
+    320
+  ],
+  "browser_errors": []
+}

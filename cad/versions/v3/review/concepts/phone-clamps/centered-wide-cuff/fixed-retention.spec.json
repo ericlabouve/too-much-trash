@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-17",
+  "request": "Explore and show both integral stud and short removable T with sideways keeper",
+  "scope": "Review-only alternatives; neither selected or promoted",
+  "constraints": [
+    "All three cuffs must remain the exact same 21.6 mm part, including the T opening",
+    "Retain the two opposing sliding crosslocked T assemblies",
+    "No fixed-cuff widening, offset, phone shift or stock-neck collision",
+    "Keep the C phone pocket and seating regions",
+    "Preserve the approved actuator geometry",
+    "Show assembled and exploded 3D concepts with navigation cubes"
+  ],
+  "study_choices": {
+    "integral_stud": "Tapered 9.2 mm head integral with jaw; TPU deforms over it, no PETG snap-fit claim",
+    "short_T": "8.6 mm long, 0.5 mm neck clearance, 1.1 mm tip/channel ligaments, existing 12.2 mm keeper rotated sideways",
+    "root_relief": "Trim old schematic upright to backing plane above Z0 to eliminate cuff overlap without altering cuff"
+  },
+  "unresolved": ["TPU snap insertion and pull-off", "Thin printed ligament strength", "Keeper drift", "Finger access", "Print tolerances", "All-phone actuator and camera clearance", "Full service paths"]
+}
