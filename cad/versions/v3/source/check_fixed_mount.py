@@ -5,8 +5,8 @@ from dataclasses import replace
 import build as b
 from plunger_design import SHOE_WIDTH, box
 p=b.Parameters();parts=b.parts(p);rows={}
-# The former lug envelope ahead of the unchanged X32 mounting face is empty.
-lug_remaining=b.overlap(parts['actuator_bracket'],box(28,31.999,b.MOUNT_Y-8,b.MOUNT_Y+8,21.9,30.1))
+# No locating lugs ahead of the new continuous X30.2 mounting face.
+lug_remaining=b.overlap(parts['actuator_bracket'],box(28,30.199,b.MOUNT_Y-8,b.MOUNT_Y+8,21.9,30.1))
 assert lug_remaining<1e-6,lug_remaining
 for name,base in b.SAMPLES.items():
  for side in ('near','far'):

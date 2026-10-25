@@ -18,7 +18,7 @@ PARTS={
     'fit-jaw':((90,85),'Y',90,'Socket axis vertical; no friction ribs for PETG clearance test'),
     'fit-key':((115,85),'Z',0,'Uniform 3 mm thickness flat; T head and stem on bed')}
 
-def main():
+def main(process_overrides=None, material_status='Bambu PETG Translucent Blue recipe; current loaded spool not queried'):
     parser=argparse.ArgumentParser()
     parser.add_argument('--output-dir',type=Path,required=True)
     parser.add_argument('--parts',nargs='+',choices=list(PARTS),default=list(PARTS),help='Print only the selected fit-test pieces, without changing their placement or scale.')
@@ -49,6 +49,7 @@ def main():
         curr_bed_type='Textured PEI Plate',brim_type='no_brim',brim_width='0',raft_layers='0')
     if args.bridge_no_support:
         profiles['process']['bridge_no_support']='1'
+    profiles['process'].update(process_overrides or {})
     for kind,data in profiles.items():common.save(out/(kind+'.json'),data)
     model=ET.Element('model',{'unit':'millimeter','xmlns':common.NS})
     resources=ET.SubElement(model,'resources');build=ET.SubElement(model,'build')
@@ -78,13 +79,13 @@ def main():
     common.cli(['--load-settings',str(out/'machine.json')+';'+str(out/'process.json'),
         '--load-filaments',str(out/'filament.json'),'--arrange','0','--orient','0',
         '--export-3mf','cuff-fit-input.3mf','--outputdir',str(out),str(out/'raw-layout.3mf')],'prepare-retry' if args.resume_unsliced else 'prepare')
-    settings=[{'name':n,'wall_loops':'3','sparse_infill_density':'15%',
-               'sparse_infill_pattern':'gyroid','enable_support':'1'} for n in parts]
+    settings=[dict(name=n,**{k:profiles['process'][k] for k in
+               ('wall_loops','sparse_infill_density','sparse_infill_pattern','enable_support')}) for n in parts]
     common.save(out/'inputs.json',{'revision':json.loads((SOURCE/'fit-attachment-check.json').read_text())['revision'],
         'scale_percent':100,'parts':rows,'object_settings':settings,'printer_contacted':False,
         'slicer':'BambuStudio-02.07.01.62','profile_source':str(PRIOR.relative_to(ROOT)),
         'profile_source_sha256':{k:hashlib.sha256((PRIOR/(k+'.json')).read_bytes()).hexdigest() for k in profiles},
-        'material_status':'Bambu PETG Translucent Blue recipe; current loaded spool not queried',
+        'material_status':material_status,
         'geometry_check_sha256':hashlib.sha256((out/'geometry-check.json').read_bytes()).hexdigest(),
         'scope':'Selected standalone fit-test pieces: '+', '.join(parts)+'. NOT complete jaws; consult geometry check for retention limitations.'})
     common.cli(['--load-settings',str(out/'machine.json')+';'+str(out/'process.json'),

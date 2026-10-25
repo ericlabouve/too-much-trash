@@ -1,5 +1,5 @@
 {
-  "revision": "t-jaw-compact-actuator-v3",
+  "revision": "opposed-slots-restored-base-v3",
   "configurations": {
     "wallet": {
       "band_levels_z_mm": [
@@ -7,7 +7,7 @@
         43.0
       ],
       "symmetric_force_center_y_mm": 0,
-      "post_span_x_mm": 70,
+      "post_span_x_mm": 75.4,
       "collisions": {}
     },
     "bare": {
@@ -16,7 +16,7 @@
         43.0
       ],
       "symmetric_force_center_y_mm": 0,
-      "post_span_x_mm": 70,
+      "post_span_x_mm": 75.4,
       "collisions": {}
     },
     "small": {
@@ -25,7 +25,7 @@
         43.0
       ],
       "symmetric_force_center_y_mm": 0,
-      "post_span_x_mm": 60,
+      "post_span_x_mm": 65.4,
       "collisions": {}
     },
     "large": {
@@ -34,7 +34,7 @@
         43.0
       ],
       "symmetric_force_center_y_mm": 0,
-      "post_span_x_mm": 80,
+      "post_span_x_mm": 85.4,
       "collisions": {}
     }
   },
@@ -43,6 +43,6 @@
     "1.4 mm circular band visualization is provisional; real width/thickness and stretched cross-section unknown.",
     "Equal band tension is an assumption, not a measured force balance.",
     "No claim of preload, jaw friction, fatigue or loaded retention.",
-    "Rounded rectangular paths wrap broad single cleats below retaining crossbars; actual band stacking and preload need physical validation."
+    "Rounded rectangular paths run through opposed V seats without square caps; actual seating, escape resistance and preload need physical validation."
   ]
 }

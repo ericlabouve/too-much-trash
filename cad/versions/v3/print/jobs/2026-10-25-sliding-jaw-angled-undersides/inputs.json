@@ -1,0 +1,73 @@
+{
+  "revision": "sliding-jaw-angled-undersides",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "sliding-jaw",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-25-sliding-jaw-angled-undersides-source/sliding-jaw.stl",
+      "input_sha256": "235f398aebce660a4aaadfbdd5a0bd7db1e0630fe91bc9de2a3cb08bda06e8de",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        42.019999980926514,
+        121.5999984741211,
+        58.5
+      ],
+      "orientation": "Rear X=-10 crossbar face on bed; tongue rises vertically. No scaling.",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        26.490000009536743,
+        -0.0,
+        10.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "sliding-jaw",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "839e41e555fb071506399d20a9c7185ddb7a69a14ada1e76c1592c86cbcda12a",
+  "scope": "One complete sliding jaw, matched support comparison. Offline only."
+}

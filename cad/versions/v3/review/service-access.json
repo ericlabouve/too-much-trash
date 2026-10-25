@@ -3,15 +3,13 @@
     "head_obstruction_after_6mm_mm3": 36.650894807199876,
     "key_obstruction_mm3": 23.643757504989384
   },
-  "revision": "integrated-cuffs-v3",
+  "revision": "common-tpu-fasteners-v3",
   "configurations": {
     "wallet-near": {
       "collisions": [],
       "rail_slot_service_y_mm": 50,
       "slide_delta_y_mm": 25.4,
-      "former_direct_screw_withdrawal_hits_at_14mm": {
-        "carrier": 39.01746
-      }
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
     },
     "wallet-far": {
       "collisions": [],
@@ -23,9 +21,7 @@
       "collisions": [],
       "rail_slot_service_y_mm": 50,
       "slide_delta_y_mm": 25.4,
-      "former_direct_screw_withdrawal_hits_at_14mm": {
-        "carrier": 39.01746
-      }
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
     },
     "bare-far": {
       "collisions": [],
@@ -37,9 +33,7 @@
       "collisions": [],
       "rail_slot_service_y_mm": 50,
       "slide_delta_y_mm": 25.4,
-      "former_direct_screw_withdrawal_hits_at_14mm": {
-        "carrier": 39.01746
-      }
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
     },
     "small-far": {
       "collisions": [],
@@ -63,9 +57,7 @@
       "collisions": [],
       "rail_slot_service_y_mm": 50,
       "slide_delta_y_mm": 25.9,
-      "former_direct_screw_withdrawal_hits_at_14mm": {
-        "carrier": 45.62718
-      }
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
     },
     "inward-28.5-far": {
       "collisions": [],

@@ -8,7 +8,8 @@ from pathlib import Path
 import math
 import sys
 import cadquery as cq
-from cuff_design import cuff, cuff_key, socket as cuff_socket, locate as locate_cuff, CUFF_Z, FIXED_CUFF_Y, SLIDING_CUFF_Y, SLIDING_CUFF_X
+from jaw_support_angles import JAW_SUPPORT_ANGLE
+from cuff_design import cuff, cuff_key, integral_stud, socket as cuff_socket, locate as locate_cuff, CUFF_Z, FIXED_CUFF_Y, FIXED_CUFF_X, CUFF_INWARD_SHIFT, SLIDING_CUFF_Y, SLIDING_CUFF_X
 
 V1_SOURCE = Path(__file__).resolve().parents[3] / 'source'
 sys.path.insert(0, str(V1_SOURCE))
@@ -84,6 +85,9 @@ def loop_between(a,b,width=4):
 JAW_BAND_LEVELS=(40.5,43.0)
 SLIDING_TONGUE_LENGTH=48.5
 CLOSED_JAW_X=-66.5
+TRACK_ROOT_SHIFT=2.7
+FIXED_CLEAT_X=-27+TRACK_ROOT_SHIFT
+SLIDING_CLEAT_SHIFT=-4.5
 
 def jaw_cleat(x):
     # One broad rectangular stem and retaining crossbar per jaw.
@@ -121,17 +125,17 @@ class Parameters:
     button_from_end: float=105
     button_from_screen: float=6
     side: str='near'
-    phone_right: float=-20
+    phone_right: float=FIXED_CUFF_X
     collar_opening_x: float=11.6
     collar_opening_y: float=17.6
     twine_diameter: float=2
-    guide_bore: float=8
+    guide_bore: float=4
     pivot_diameter: float=6
     pivot_clearance: float=.5
     rest_gap: float=.35
     button_stroke: float=.30
     series_span_rest: float=80
-    guide_stations: tuple=(-190,-230,-300)
+    guide_stations: tuple=(-190,)
     @property
     def phone_left(self): return self.phone_right-self.phone_width
     @property
@@ -154,7 +158,7 @@ class Parameters:
     @property
     def string_eye(self): return self.point(plunger_attachment_path()[-1])
     @property
-    def first_guide(self): return (0,(1 if self.side=='near' else -1)*28,self.guide_stations[0]+GUIDE_EYE_Z)
+    def first_guide(self): return (0,(1 if self.side=='near' else -1)*15.2,self.guide_stations[0])
     @property
     def contact(self): return self.point((self.rest_gap,0,6))
 
@@ -180,9 +184,10 @@ def thumb_nut(p):
 @lru_cache(None)
 def collar_screw():
     # Same successful 8×3 profile/head/nose, longer grip for external bearing faces.
-    s=successful_thread(False,length=42).intersect(cylinder((0,0,2),(0,0,1),32,9))
+    s=successful_thread(False,length=42).intersect(cylinder((0,0,2),(0,0,1),30.2,9))
     # Flush threaded tip stays outside the screen boundary; no projecting nose.
-    return s.union(cylinder((0,0,34),(0,0,1),4,14))
+    # Shorten only the head end 1.8 mm: keep the tip and nut thread phase.
+    return s.union(cylinder((0,0,32.2),(0,0,1),4,14))
 
 
 def placed(s,p):
@@ -191,31 +196,29 @@ def placed(s,p):
 
 def assembly_parts(p,solids):
     out={'shaft_cap':solids['shaft_cap'],'carrier':solids['carrier'],'sliding_jaw':solids['sliding_jaw'].translate((p.phone_left,0,0))}
-    # Shared T-key is stored in actuator coordinates; reorient that exact solid
-    # for the cuff rather than introducing a second printable key design.
-    key=(solids['pulley_key'].translate((-8.35,-5.4,-8))
-         .rotate((0,0,0),(1,0,0),-90).rotate((0,0,0),(0,0,1),90)
-         .translate((-22.82,-8,2.2-.3)))
+    # Identical TPU cuffs flex onto studs integral to the rigid jaws.
     for name,x,y,fixed in [('fixed',p.phone_right,FIXED_CUFF_Y,True),
                            ('sliding_1',p.phone_left+SLIDING_CUFF_X,-50,False),
                            ('sliding_2',p.phone_left+SLIDING_CUFF_X,50,False)]:
         out['cuff_'+name]=locate_cuff(solids['phone_cuff'],x,y,fixed)
-        out['cuff_key_'+name]=locate_cuff(key,x,y,fixed)
     for n in ('actuator_bracket','plunger','pulley','pulley_axle','pulley_key'):out[n]=placed(solids[n],p)
     for i,y in enumerate((MOUNT_Y,)):
         # Flush-T rail moves only the mounting interface 10 mm inward / 40 mm up.
         # The plunger, pulley and phone alignment stay in their original positions.
-        s=solids['thumb_screw'].rotate((0,0,0),(0,1,0),-90).translate((46,y,26-p.height))
+        # Common long screw: preserve head bearing at local X26, extending
+        # the free tip 12.2 mm beyond the old screw. Re-index helix by 24 deg
+        # to preserve its mating phase with the unchanged seated nut.
+        s=solids['collar_screw'].rotate((0,0,0),(0,0,1),-24).rotate((0,0,0),(0,1,0),-90).translate((58.2,y,26-p.height))
         out[f'rail_screw_{i+1}']=placed(s,p)
         # Match thread phase: the nut occupies screw-local Z2..8.
         nut=solids['thumb_nut'].rotate((0,0,0),(0,1,0),-90).translate((44,y,26-p.height))
         out[f'rail_nut_{i+1}']=placed(nut,p)
     for i,(y,z) in enumerate(CLAMP_STATIONS):
-        out[f'clamp_screw_{i+1}']=solids['collar_screw'].rotate((0,0,0),(0,1,0),90).translate((-22,y,z))
-        out[f'clamp_nut_{i+1}']=solids['thumb_nut'].rotate((0,0,0),(0,1,0),90).translate((-20,y,z))
+        out[f'clamp_screw_{i+1}']=solids['collar_screw'].rotate((0,0,0),(0,1,0),90).translate((-22+CUFF_INWARD_SHIFT,y,z))
+        out[f'clamp_nut_{i+1}']=solids['thumb_nut'].rotate((0,0,0),(0,1,0),90).translate((-20+CUFF_INWARD_SHIFT,y,z))
     for i,z in enumerate(p.guide_stations):
-        guide=solids['dual_string_guide'] if i==0 else solids['string_guide']
-        out[f'guide_{i+1}']=guide.translate((0,0,z))
+        from tpu_clip_guide import placed as place_guide
+        out[f'guide_{i+1}']=place_guide(solids['clip_string_guide'],z,p.side)
     return out
 
 
@@ -241,20 +244,18 @@ def stock(p):
 
 
 def flexible_paths(p):
-    trigger=(-42,0,-417);last=(-18,0,p.guide_stations[-1]+GUIDE_EYE_Z)
+    trigger=(-42,0,-417);last=p.first_guide
     v=cq.Vector(*trigger).sub(cq.Vector(*last));lower_tail=25
     tail=v.Length-p.series_span_rest-lower_tail
     knot=cq.Vector(*last).add(v.normalized().multiply(tail)).toTuple()
     band_end=cq.Vector(*trigger).sub(v.normalized().multiply(lower_tail)).toTuple()
     guide_side=1 if p.side=='near' else -1
     target=(p.first_guide[0]-p.phone_right,p.first_guide[1]-p.button_y,p.first_guide[2]-p.height)
-    string=[p.point(q) for q in plunger_pulley_path(target=target)]+[p.first_guide]+[(-18,0,z+GUIDE_EYE_Z) for z in p.guide_stations[1:]]+[knot]
+    string=[p.point(q) for q in plunger_pulley_path(target=target)]+[p.first_guide]+[knot]
     bands={'band_return':[p.point(q) for q in plunger_return_path()],
         'band_keeper':[p.point(q) for q in plunger_keeper_path()],
         'band_overtravel':loop_between(knot,band_end,5)}
-    for i,z in enumerate(JAW_BAND_LEVELS):bands[f'band_jaw_{i+1}']=jaw_band(p.phone_left-1,-27,z)
-    for i,z in enumerate(p.guide_stations):
-        bands[f'band_guide_{i+1}']=rounded_band_xy(z)
+    for i,z in enumerate(JAW_BAND_LEVELS):bands[f'band_jaw_{i+1}']=jaw_band(p.phone_left-1+SLIDING_CLEAT_SHIFT,FIXED_CLEAT_X,z)
     return string,bands,{'trigger_pivot':(-4,0,-416),'trigger_attach':trigger,'trigger_angle':-.48,'tail_length':tail,'lower_twine_length':lower_tail,'band_end':band_end,'series_span_rest':p.series_span_rest}
 
 
@@ -265,8 +266,8 @@ def attachment_loop(p):
 def rows(p,solids):
     out=[('twine_attachment',polyline(attachment_loop(p),p.twine_diameter),TWINE,'twine')]
     for n,s in assembly_parts(p,solids).items():
-        bid='pulley_key' if n.startswith('cuff_key_') else 'phone_cuff' if n.startswith('cuff_') else 'collar_screw' if n.startswith('clamp_screw') else 'thumb_screw' if 'screw' in n else 'thumb_nut' if 'nut' in n else 'dual_string_guide' if n=='guide_1' else 'string_guide' if n.startswith('guide_') else n
-        out.append((n,s,(0,.55,.60) if bid=='phone_cuff' else ORANGE,bid))
+        bid='pulley_key' if n.startswith('cuff_key_') else 'phone_cuff' if n.startswith('cuff_') else 'collar_screw' if 'screw' in n else 'thumb_nut' if 'nut' in n else 'clip_string_guide' if n.startswith('guide_') else n
+        out.append((n,s,(0,.55,.60) if bid in ('phone_cuff','collar_screw','thumb_nut','clip_string_guide') else ORANGE,bid))
     for n,s in stock(p).items():
         color=(.035,.27,.75) if 'blue' in n else (.12,.14,.17) if any(x in n for x in ('black','camera','volume')) else (.6,.65,.69)
         out.append((n,s,color,None))
@@ -330,72 +331,84 @@ def paired_neck_rail():
     return s
 
 # Split opens toward +X after actuator removal; both fasteners stay off the screen.
-# Four fasteners: paired on both sides, below either actuator position.
-# Upper station lowered for the second actuator position; pairs span 52 mm.
-CLAMP_STATIONS=((-15.5,-30),(15.5,-76),(15.5,-30),(-15.5,-76))
-CLAMP_BOTTOM=-86
-CLAMP_TOP=16
+# Two fasteners on each axial side of the fixed contact (screenshot left/right).
+# Retain the near-left pair, remove the old -76 station and its tail, and
+# extend toward the claws. New pair clears the Z47.5 jaw cleat during nut
+# removal (9 mm nut radius); 110 mm body now straddles the jaw.
+CLAMP_STATIONS=((-15.5,-30),(15.5,60),(15.5,-30),(-15.5,60))
+CLAMP_BOTTOM=-40
+CLAMP_TOP=70
 def shaft_clamp_half(p,cap=False):
     x0,x1=(.5,12) if cap else (-11.3,-.5)
     s=box(x0,x1,-13.8,13.8,CLAMP_BOTTOM,CLAMP_TOP)
     s=s.cut(box(-p.collar_opening_x/2,p.collar_opening_x/2,-p.collar_opening_y/2,p.collar_opening_y/2,CLAMP_BOTTOM-1,CLAMP_TOP+1))
-    ex0,ex1=(.5,12) if cap else (-14,-.5)
+    # Move both bearing planes with the phone to retain the original grip
+    # length and keep unchanged fasteners out of the straight-on screen view.
+    ex0,ex1=(.5,12+CUFF_INWARD_SHIFT) if cap else (-14+CUFF_INWARD_SHIFT,-.5)
     for y,z in CLAMP_STATIONS:
         s=s.union(cylinder((ex0,y,z),(1,0,0),ex1-ex0,18))
         s=s.union(box(ex0,ex1,min(y,11),max(y,-11),z-9,z+9))
         s=s.cut(cylinder((-15,y,z),(1,0,0),30,8.8))
-    return s
+    # Boss roots must not refill the accepted rectangular neck opening.
+    return s.cut(box(-p.collar_opening_x/2,p.collar_opening_x/2,
+                     -p.collar_opening_y/2,p.collar_opening_y/2,
+                     CLAMP_BOTTOM-1,CLAMP_TOP+1))
 
 def shaft_cap(p):
-    # Coplanar wings connect directly to the cap. No projecting bridge/ribs.
-    return shaft_clamp_half(p,True).union(paired_neck_rail())
+    # One bed plane across body, crossing, rail wings and all four bosses.
+    # The mating bracket reaches back to this plane without moving the shoe.
+    s=shaft_clamp_half(p,True).union(paired_neck_rail().translate((CUFF_INWARD_SHIFT,0,0)))
+    return s.cut(box(12,15,-70,70,-50,80)).clean()
 
 def carrier(p):
-    s=box(-20,-14,-12,12,3.6,26).union(box(-28,-14,-12,12,18,26))
-    s=s.union(box(-24,-14,-12,12,2,4)).union(box(-113,-8,-16,16,22,26))
-    for y0,y1,li,lj in ((-16,-10.3,-16,-7.5),(10.3,16,7.5,16)):
+    # Plain L junction: track meets the main clamp wall directly. No old
+    # hard-lip tray, raised cuff pedestal or surrounding end/side walls.
+    # Flush outer sides share the collar's Y +/-13.8 planes. Preserve the
+    # inner channel and lip edges; only the excess exterior width is removed.
+    s=box(-113,-8,-13.8,13.8,22,26)
+    for y0,y1,li,lj in ((-13.8,-10.3,-13.8,-7.5),(10.3,13.8,7.5,13.8)):
         s=s.union(box(-113,-18,y0,y1,26,34)).union(box(-113,-18,li,lj,30.8,34))
-    s=s.union(box(-18,-14,-16,16,26,34))
-    # The removable shaft cap carries the actuator rail; no bridge encircles the neck.
-    s=s.union(shaft_clamp_half(p,False))
-    # Broad side connection: twin webs tie the fixed jaw into the long saddle.
-    # End above the lower ear, with a tapered transition to the rear bridge.
-    for y0,y1 in ((-13.8,-8.8),(8.8,13.8)):
-        web=cq.Workplane('XZ').polyline([(-11.3,-72),(-6,-72),(-6,22),(-20,22),(-20,-35)]).close().extrude(y1-y0)
-        # XZ workplane normal is -Y.
-        s=s.union(web.translate((0,y1,0)))
-    s=s.union(box(-20,-11.3,-8.8,8.8,-4,22))
+    s=s.union(box(-18,-14,-13.8,13.8,26,34))
     # Center the closing force over the track; roots land on the two track lips.
     s=s.union(box(-32,-22,-10,10,33,38.5))
-    s=s.union(jaw_cleat(-27))
-    s=s.cut(box(-16,-7,12,17,21,39)).cut(box(-119,CLOSED_JAW_X,-10.2,10.2,21.9,26.1)).cut(box(-5.8,5.8,-8.8,8.8,21,61))
+    # Opposed, matching V seats replace the square retaining caps.
+    # Sliding stem center is -5.5; reflect and move to fixed center -27.
+    from jaw_support_angles import band_slot_stem
+    s=s.union(band_slot_stem().mirror('YZ').translate((-32.5,0,0)))
+    # Lower the entire track and its cleat onto the clamp exterior. Its
+    # full-depth end now meets X-11.3 directly, not through a thin floor tab.
+    s=s.translate((TRACK_ROOT_SHIFT,0,0)).union(shaft_clamp_half(p,False))
+    # Broaden the end wall back to the original inner stop plane so lowering
+    # the root does not accidentally add 2.7 mm of sliding-jaw overtravel.
+    s=s.union(box(-18,-11.3,-13.8,13.8,26,34))
+    # Keep the proven sliding stop and the accepted neck opening in place.
+    s=s.cut(box(-119,CLOSED_JAW_X,-10.2,10.2,21.9,26.1)).cut(box(-5.8,5.8,-8.8,8.8,21,61))
     s=s.cut(box(-5.8,5.8,-8.8,8.8,-39,65))
 
-    # Re-cut after the supporting webs: no web material may refill bolt passages
-    # or occupy the relocated external nut bearing faces.
+    # Preserve clear bolt passages and external nut bearing faces.
     for y,z in CLAMP_STATIONS:
         s=s.cut(cylinder((-23,y,z),(1,0,0),40,8.8))
-        s=s.cut(cylinder((-21,y,z),(1,0,0),7,18.6))
-    # Retire the old central hard lips; leave a recessed structural root.
-    s=s.cut(box(-28,-19,-12,12,1.8,22))
-    # Clearance behind the exact approved cuff, not a cavity cut into the cuff.
-    s=s.cut(box(-24,-13.2,FIXED_CUFF_Y-6.4,FIXED_CUFF_Y+6.4,1.8,22))
-    root=cuff_socket().union(box(-10.8,-6.8,-6.4,6.4,3.5,12.72))
-    s=s.union(locate_cuff(root,-20,FIXED_CUFF_Y,True))
-    s=s.cut(locate_cuff(box(-17,-6,-1.7,1.7,-1.7,1.7),-20,FIXED_CUFF_Y,True))
+        s=s.cut(cylinder((-21,y,z),(1,0,0),7+CUFF_INWARD_SHIFT,18.6))
+    # The unchanged stud emerges directly from the X -11.3 clamp exterior.
+    s=s.union(locate_cuff(integral_stud(),FIXED_CUFF_X,FIXED_CUFF_Y,True))
     return s
 
-def sliding_jaw(p):
+def sliding_jaw(p, *, flat_back=True, cleat_shift=SLIDING_CLEAT_SHIFT, support_angle=JAW_SUPPORT_ANGLE):
     # T crossbar retains 100 mm spacing and tongue; sockets replace hard lips.
     # No central projection below the crossbar; retain the tongue/cleat root above.
     s=box(-10,-2,-7,7,12,33).union(box(-10,-2,-54,54,12,22))
     for y in SLIDING_CUFF_Y:
-        s=s.cut(box(-6.8+SLIDING_CUFF_X,5,y-6.4,y+6.4,1.8,22.1))
-        root=cuff_socket().union(box(-10.8,-6.8,-6.4,6.4,3.5,12.72))
+        s=s.cut(box(-6.9+SLIDING_CUFF_X,5,y-11,y+11,0,22.1))
+        root=cuff_socket().union(box(-9.2,-6.9,-10.8,10.8,3.5,12.72))
+        if flat_back:
+            # Extend only the rear of each stud pad to the crossbar bed plane.
+            root=root.union(box(-9.7,-9.2,-10.8,10.8,-5.8,12.72))
         s=s.union(locate_cuff(root,SLIDING_CUFF_X,y))
-        s=s.cut(locate_cuff(box(-17,-6,-1.7,1.7,-1.7,1.7),SLIDING_CUFF_X,y))
     s=s.union(box(-6,SLIDING_TONGUE_LENGTH,-10,10,26.4,30.4))
-    s=s.union(box(-6,4,-7,7,32,38.5)).union(jaw_cleat(-1))
+    s=s.union(box(max(-10,-6+cleat_shift),4+cleat_shift,-7,7,32,38.5)).union(jaw_cleat(-1+cleat_shift))
+    if support_angle is not None:
+        from jaw_support_angles import refine
+        s=refine(s,support_angle)
     return s
 
 # Eye thickness stays 6 mm; translating -4 mm aligns its lower face
@@ -484,7 +497,8 @@ def axle(p):
     return s.union(head).union(box(18.2,19.8,8.4,10,13.8,22.2))
 
 def parts(p):
-    return dict(shaft_cap=shaft_cap(p),carrier=carrier(p),sliding_jaw=sliding_jaw(p),phone_cuff=cuff(),**plunger_cassette(),thumb_screw=thumb_screw(p),collar_screw=collar_screw(),thumb_nut=thumb_nut(p),string_guide=guide(p),dual_string_guide=dual_guide(p))
+    from tpu_clip_guide import guide as clip_guide
+    return dict(shaft_cap=shaft_cap(p),carrier=carrier(p),sliding_jaw=sliding_jaw(p),phone_cuff=cuff(),**plunger_cassette(),collar_screw=collar_screw(),thumb_nut=thumb_nut(p),clip_string_guide=clip_guide())
 
 # Active V3 actuator (legacy rocker helpers above are historical check support).
 from plunger_design import MOUNT_Y, cassette as plunger_cassette, return_path as plunger_return_path, attachment_path as plunger_attachment_path, pulley_path as plunger_pulley_path, keeper_path as plunger_keeper_path

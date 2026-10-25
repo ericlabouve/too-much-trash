@@ -1,0 +1,69 @@
+{
+  "revision": "flat-bed-shaft-cap-v3",
+  "passed": true,
+  "valid": true,
+  "solid_count": 1,
+  "bed_plane_x_mm": 12,
+  "one_connected_planar_face": {
+    "area_mm2": 4524.374500661724,
+    "y": [
+      -60.0,
+      60.0
+    ],
+    "z": [
+      -40.0,
+      70.0
+    ]
+  },
+  "removed_height_mm": 1.8,
+  "removed_from_untrimmed_cap_mm3": 4393.746705305418,
+  "rail_thickness_mm": 4.2,
+  "collar_screw_threaded_span_mm": 30.2,
+  "collar_screw_seats": [
+    {
+      "yz_mm": [
+        -15.5,
+        -30
+      ],
+      "head_seat_x_mm": 12.000000000000004,
+      "tip_x_mm": -18.20000010000001
+    },
+    {
+      "yz_mm": [
+        15.5,
+        60
+      ],
+      "head_seat_x_mm": 12.000000000000004,
+      "tip_x_mm": -18.20000010000001
+    },
+    {
+      "yz_mm": [
+        15.5,
+        -30
+      ],
+      "head_seat_x_mm": 12.000000000000004,
+      "tip_x_mm": -18.20000010000001
+    },
+    {
+      "yz_mm": [
+        -15.5,
+        60
+      ],
+      "head_seat_x_mm": 12.000000000000004,
+      "tip_x_mm": -18.20000010000001
+    }
+  ],
+  "bracket_bearing_extension_mm": 1.8,
+  "rail_bracket_plane_x_mm": 12,
+  "released_shoe_gap_mm": 0.35,
+  "changed_designs": [
+    "shaft_cap",
+    "collar_screw",
+    "actuator_bracket"
+  ],
+  "limits": [
+    "No fresh slice: flat bed contact is not proof of support-free printing.",
+    "Thinner rail, full collar fit, preload and strength require physical checks.",
+    "Existing phone-fit and outgoing-twine routing limitations remain."
+  ]
+}

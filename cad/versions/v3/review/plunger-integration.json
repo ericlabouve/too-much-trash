@@ -1,5 +1,5 @@
 {
-  "revision": "integrated-cuffs-v3",
+  "revision": "deep-groove-pulley-v3",
   "routing": {
     "return-0": {
       "actuator_bracket": 0.0,
@@ -111,7 +111,7 @@
       [
         33,
         "carrier",
-        10.78187
+        33.82838
       ]
     ],
     "wallet-far": [],
@@ -119,7 +119,7 @@
       [
         33,
         "carrier",
-        10.78187
+        33.82838
       ]
     ],
     "bare-far": [],
@@ -127,12 +127,18 @@
       [
         33,
         "carrier",
-        10.78187
+        33.82838
       ]
     ],
     "small-far": [],
     "large-near": [],
-    "large-far": []
+    "large-far": [
+      [
+        33,
+        "pulley",
+        0.0922
+      ]
+    ]
   },
   "installed_keeper": {
     "wallet-near": {},
@@ -167,20 +173,18 @@
     "meaning": "Head and installed key geometrically block axial escape. This does not test strength, wear or keeper-band failure."
   },
   "volumes_mm3": {
-    "shaft_cap": 37638.67,
-    "carrier": 59185.38,
-    "sliding_jaw": 15660.05,
-    "phone_cuff": 970.51,
-    "actuator_bracket": 9152.51,
+    "shaft_cap": 33737.16,
+    "carrier": 44849.35,
+    "sliding_jaw": 15553.07,
+    "phone_cuff": 1667.75,
+    "actuator_bracket": 9681.91,
     "plunger": 2177.36,
-    "pulley": 643.55,
+    "pulley": 558.71,
     "pulley_axle": 1016.89,
     "pulley_key": 119.83,
-    "thumb_screw": 1343.6,
-    "collar_screw": 1909.7,
+    "collar_screw": 1836.91,
     "thumb_nut": 971.79,
-    "string_guide": 4822.9,
-    "dual_string_guide": 7040.05
+    "clip_string_guide": 819.78
   },
   "previous_mesh_volumes_mm3": {
     "actuator_bracket": 15773.76,

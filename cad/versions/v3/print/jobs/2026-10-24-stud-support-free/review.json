@@ -1,0 +1,105 @@
+{
+  "revision": "integral-stud-side-flush-v1",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 1,
+  "plates": 1,
+  "total_g": 0.7579962015151978,
+  "total_minutes": 19.4364013671875,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 0.6866
+  },
+  "objects": {
+    "integral-stud": {
+      "deposited_g_by_role": {
+        "model": 0.6866
+      },
+      "deposited_xy_bounds": [
+        [
+          87.56,
+          79.41
+        ],
+        [
+          92.44,
+          100.59
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "integral-stud",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "2306f5ba3dd4ac4a02f3a480f56ec743",
+  "hashes": {
+    "cuff-fit-input.3mf": "4d1f1693afa7fbf25dafe624f6293bbee18c23655d791ed5b2586eade27407e7",
+    "cuff-fit.gcode.3mf": "9a975d8e3938962c8a830fde374668514296ec749df6a68d51f5c994bcd06a45",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Support-free candidate: automatic supports remain enabled, but none are generated.",
+    "Only one backing edge is trimmed 2.6 mm. T-head and stem geometry are unchanged; full jaw remains unchanged.",
+    "Side-down printing puts a retaining-head side on textured PEI: inspect first-layer flare before fitting TPU. Reduced backing area does not validate full-jaw stiffness or cuff seating."
+  ]
+}

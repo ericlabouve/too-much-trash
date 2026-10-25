@@ -121,8 +121,9 @@ def cassette():
     cleat_cap=ramped_cap((-2.5,2.5,44,48),(-4.5,4.5,42,50),12.8,14.9,15.3,.7,1)
     slider=slider.union(cleat_stem).union(cleat_cap)
     # Pulley prints opposite the bracket's w direction. Taper both groove
-    # flanks at 47.5 degrees to the bed, retaining the original outer envelope.
-    pulley=cq.Workplane('XZ').polyline([(4.3,6.6),(9,6.6),(9,6.8),(7.9,8),(7.9,9.2),(9,10.4),(9,10.6),(4.3,10.6)]).close().revolve(360,(0,0),(0,1)).edges().fillet(.09).translate((PULLEY_U,8,PULLEY_LIFT))
+    # flanks at atan(1.6/2.2)=36.0 degrees to the bed. Double groove depth
+    # from 1.1 to 2.2 mm, preserving diameter, width, bore and bearing faces.
+    pulley=cq.Workplane('XZ').polyline([(4.3,6.6),(9,6.6),(9,6.8),(6.8,8.4),(6.8,8.8),(9,10.4),(9,10.6),(4.3,10.6)]).close().revolve(360,(0,0),(0,1)).edges().fillet(.09).translate((PULLEY_U,8,PULLEY_LIFT))
     axle=cyl(PULLEY_U,8,-3.6-KEY_OUTBOARD,16.8+KEY_OUTBOARD,4).union(cyl(PULLEY_U,8,13.2,1.6,5.5).edges().fillet(.2))
     axle=axle.cut(box(3,23,6.3,9.7,-1.4-KEY_OUTBOARD,2-KEY_OUTBOARD))
     # Broad removable cross-key carries axial retention; no snap fingers/threads.
@@ -135,7 +136,9 @@ def cassette():
     # Clamp preload and surface friction alone resist sliding and rotation.
     # Offset the mount, not the mechanism, to put the plate and spine on one
     # flat Y5.4 print face. Keep 5.4 mm beside the 8.8 mm bore on this side.
-    plate=box(32,38,MOUNT_Y-10,BACK_Y,17,35).edges('|X').fillet(1.2)
+    # Flat cap face is now 1.8 mm lower. Extend only the bearing plate;
+    # mechanism, shoe, bore, screw and nut keep their assembly positions.
+    plate=box(30.2,38,MOUNT_Y-10,BACK_Y,17,35).edges('|X').fillet(1.2)
     plate=plate.union(box(32,48,2.4,5.4,12,17.8).edges('|X').fillet(.6))
     bracket=local_shape(body).union(plate)
     # Broad tapered haunch replaces the narrow mounting-foot load path.
@@ -184,9 +187,9 @@ def attachment_path(d=0):
     return [local_point((u,v-d,w)) for u,v,w in points]
 
 def pulley_path(d=0, target=None):
-    # Tangent from cleat (u=0, v=41.4-d) to radius-8 groove around (9.5,8).
+    # Nominal 2 mm cord sits in the deeper V groove; update both tangencies.
     # Exact tangent avoids a kink/intersection at the entry to the wheel.
-    a=(-4.5,41.4-d);c=(PULLEY_U,8);r=9.05
+    a=(-4.5,41.4-d);c=(PULLEY_U,8);r=8.35
     dx,dy=a[0]-c[0],a[1]-c[1]
     angle=math.atan2(dy,dx)+math.acos(r/math.hypot(dx,dy))
     # Pick the outgoing tangent to the first shaft guide, not an air-bend waypoint.

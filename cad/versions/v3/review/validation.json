@@ -36,10 +36,6 @@
       "valid": true,
       "solid_count": 1
     },
-    "thumb_screw": {
-      "valid": true,
-      "solid_count": 1
-    },
     "collar_screw": {
       "valid": true,
       "solid_count": 1
@@ -48,11 +44,7 @@
       "valid": true,
       "solid_count": 1
     },
-    "string_guide": {
-      "valid": true,
-      "solid_count": 1
-    },
-    "dual_string_guide": {
+    "clip_string_guide": {
       "valid": true,
       "solid_count": 1
     }
@@ -60,9 +52,9 @@
   "configurations": {
     "wallet-near": {
       "phone_overlap": {
-        "cuff_fixed": 57.5903,
-        "cuff_sliding_1": 44.7352,
-        "cuff_sliding_2": 44.7352
+        "cuff_fixed": 103.8468,
+        "cuff_sliding_1": 80.5477,
+        "cuff_sliding_2": 80.5477
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -83,9 +75,9 @@
     },
     "wallet-far": {
       "phone_overlap": {
-        "cuff_fixed": 57.5903,
-        "cuff_sliding_1": 44.7352,
-        "cuff_sliding_2": 44.7352
+        "cuff_fixed": 103.8468,
+        "cuff_sliding_1": 80.5477,
+        "cuff_sliding_2": 80.5477
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -106,9 +98,9 @@
     },
     "bare-near": {
       "phone_overlap": {
-        "cuff_fixed": 3.867,
-        "cuff_sliding_1": 1.0869,
-        "cuff_sliding_2": 1.0869
+        "cuff_fixed": 7.0527,
+        "cuff_sliding_1": 1.9685,
+        "cuff_sliding_2": 1.9685
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -129,9 +121,9 @@
     },
     "bare-far": {
       "phone_overlap": {
-        "cuff_fixed": 3.867,
-        "cuff_sliding_1": 1.0869,
-        "cuff_sliding_2": 1.0869
+        "cuff_fixed": 7.0527,
+        "cuff_sliding_1": 1.9685,
+        "cuff_sliding_2": 1.9685
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -152,9 +144,9 @@
     },
     "small-near": {
       "phone_overlap": {
-        "cuff_fixed": 3.867,
-        "cuff_sliding_1": 1.0869,
-        "cuff_sliding_2": 1.0869
+        "cuff_fixed": 7.0527,
+        "cuff_sliding_1": 1.9685,
+        "cuff_sliding_2": 1.9685
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -175,9 +167,9 @@
     },
     "small-far": {
       "phone_overlap": {
-        "cuff_fixed": 3.867,
-        "cuff_sliding_1": 1.0869,
-        "cuff_sliding_2": 1.0869
+        "cuff_fixed": 7.0527,
+        "cuff_sliding_1": 1.9685,
+        "cuff_sliding_2": 1.9685
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -198,9 +190,9 @@
     },
     "large-near": {
       "phone_overlap": {
-        "cuff_fixed": 57.5903,
-        "cuff_sliding_1": 44.7352,
-        "cuff_sliding_2": 44.7352
+        "cuff_fixed": 103.8468,
+        "cuff_sliding_1": 80.5477,
+        "cuff_sliding_2": 80.5477
       },
       "camera_overlap": {},
       "rigid_overlap": {},
@@ -221,9 +213,9 @@
     },
     "large-far": {
       "phone_overlap": {
-        "cuff_fixed": 57.5903,
-        "cuff_sliding_1": 44.7352,
-        "cuff_sliding_2": 44.7352
+        "cuff_fixed": 103.8468,
+        "cuff_sliding_1": 80.5477,
+        "cuff_sliding_2": 80.5477
       },
       "camera_overlap": {},
       "rigid_overlap": {},

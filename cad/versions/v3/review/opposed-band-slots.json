@@ -1,0 +1,21 @@
+{
+  "revision": "opposed-slots-restored-base-v3",
+  "angle_from_bed_degrees": 35.0,
+  "checks": {
+    "sliding_matches_prior_35_degree_jaw_except_top_cap": true,
+    "sliding_single_valid_solid": true,
+    "fixed_single_valid_solid": true,
+    "sliding_cap_removed": true,
+    "fixed_cap_removed": true,
+    "lower_projection_restored": true,
+    "sliding_slot_present": true,
+    "fixed_exact_mirrored_slot_present": true,
+    "tongue_preserved": true
+  },
+  "passed": true,
+  "limitations": [
+    "No new slice or print: previous support estimates predate this revision.",
+    "Band seating and escape resistance without square caps require physical testing.",
+    "Lower projection restored to X=-0.5; structural tongue remains unchanged."
+  ]
+}

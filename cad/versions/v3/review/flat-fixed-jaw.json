@@ -1,0 +1,17 @@
+{
+  "revision": "flat-fixed-jaw-v3",
+  "valid": true,
+  "solid_count": 1,
+  "previous_volume_mm3": 56486.34067694547,
+  "current_volume_mm3": 52078.8751457731,
+  "removed_mm3": 4407.465532218634,
+  "removed_percent": 7.802710317925608,
+  "added_mm3": 0.0,
+  "removal_outside_highlighted_rib_envelopes_mm3": 0.0,
+  "missing_clamp_wall_or_boss_mm3": 0.0,
+  "limits": [
+    "Geometric continuity is not measured stiffness or strength. Full fixed jaw remains unprinted.",
+    "Historical sliced print jobs and current TPU plate are unchanged."
+  ],
+  "passed": true
+}

@@ -8,6 +8,13 @@ def volume(s):return sum(x.Volume() for x in s.solids().vals())
 def overlap(a,c):return round(volume(a.intersect(c)),7)
 def placed(s):return b.place(s,-20,0,True)
 
+def integral_stud():
+    """Canonical local stud, shared by the concept and physical fit coupon."""
+    head=(cq.Workplane('XY').polyline([(-5.42,-4.6),(-4.65,-4.6),(-3.9,-3.2),
+                                      (-3.9,3.2),(-4.65,4.6),(-5.42,4.6)])
+          .close().extrude(3.2,both=True))
+    return b.soften(b.box(-7.4,-4.8,-3.2,3.2,-3.2,3.2),.25).union(head)
+
 def build():
     solids={}
     baseline=b.make('c','C · Common 21.6 mm cuffs',solid_output=solids)
@@ -20,10 +27,7 @@ def build():
     jaw=jaw.cut(b.box(-18,-13.1,-11,11,0,6.01))
     # Same 9.2 mm head envelope and 6.4 mm stem as the sliding retainer.
     # A tapered nose is only an insertion lead-in, not a simulated snap fit.
-    head=(cq.Workplane('XY').polyline([(-5.42,-4.6),(-4.65,-4.6),(-3.9,-3.2),
-                                      (-3.9,3.2),(-4.65,4.6),(-5.42,4.6)])
-          .close().extrude(3.2,both=True))
-    stud=b.soften(b.box(-7.4,-4.8,-3.2,3.2,-3.2,3.2),.25).union(head)
+    stud=integral_stud()
     integral=jaw.union(placed(stud))
 
     # Existing shared keeper rotated about its insertion axis to put the wide

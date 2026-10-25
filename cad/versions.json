@@ -17,7 +17,7 @@
       "id": "v3",
       "label": "Version 3 \u00b7 removable cuffs and sliding plunger",
       "viewer": "versions/v3/viewer.html",
-      "note": "Comparison baseline: the 16 mm fixed-cuff offset is rejected. Linked concepts use three identical 21.6 mm cuffs and compare two fixed-retention options awaiting TPU tests. New jaws, retention and grip remain unqualified; phone-fit and outgoing-twine conflicts persist."
+      "note": "V3: pulley groove doubled to 2.2 mm depth with 36-degree flanks. PETG slice has zero support paths; physical string retention remains untested. Single TPU clip and common TPU fasteners retained."
     }
   ]
 }

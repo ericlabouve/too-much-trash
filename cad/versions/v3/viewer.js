@@ -1,5 +1,6 @@
-import {installViewCube} from '../../view_cube.js';
+import {installViewCube} from '../../view_cube.js?revision=quarter-turns-v1';
 import {assemblySteps} from './assembly_steps.js';
+import {installFullscreen} from './viewer_fullscreen.js';
 import * as THREE from 'three';
 import {cycleStroke} from './stroke_animation.js';
 import {STLLoader} from 'three/addons/loaders/STLLoader.js';
@@ -12,7 +13,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0xf8
 const scene=new THREE.Scene();scene.add(new THREE.HemisphereLight(0xffffff,0x8d9698,2.6));
 const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-150,250,180);scene.add(light);
 const camera=new THREE.PerspectiveCamera(35,1,.1,4000),controls=new OrbitControls(camera,canvas);controls.enableDamping=true;
-const viewCube=installViewCube({canvas,camera,controls});
+const viewCube=installViewCube({canvas,camera,controls,clickStepDegrees:90});
 let marking=false,featureOverlay=null,featureHit=null,stepIndex=-1,painting=false,paintLast=null;const featureOverlays=[];let shapeStart=null,shapePreview=null;let paintTime=0;const steps=assemblySteps();
 const featureLabel=document.createElement('div');featureLabel.className='feature-label';featureLabel.hidden=true;$('#stage').append(featureLabel);
 const root=new THREE.Group();root.rotation.x=-Math.PI/2;scene.add(root);
@@ -24,16 +25,27 @@ labelControl.append(labelToggle,' Floating labels');document.querySelector('nav 
 labelToggle.onchange=()=>{bomLabels.visible=labelToggle.checked;canvas.dataset.bomLabels=String(bomLabels.visible);};
 canvas.dataset.bomLabels='true';
 const meshes=new Map(),bomMeshes=new Map();let manifest,mode='phone',selected=null,outline,flipped=false,selectionTargets=[];
+let isolated=false;
+const isolateButton=document.createElement('button');isolateButton.id='bom-isolate';isolateButton.hidden=true;isolateButton.disabled=true;
+Object.assign(isolateButton.style,{position:'absolute',left:'12px',top:'38px',zIndex:5});$('#stage').append(isolateButton);
+function updateIsolation(){
+ for(const [id,mesh] of bomMeshes)mesh.visible=!isolated||id===selected;
+ for(const sprite of bomLabels.children)sprite.visible=!isolated||sprite.userData.bomId===selected;
+ isolateButton.hidden=mode!=='bom';isolateButton.disabled=!selected;
+ isolateButton.textContent=isolated?'Show all items':'Hide other items';isolateButton.setAttribute('aria-pressed',String(isolated));
+ canvas.dataset.bomIsolated=String(isolated);canvas.dataset.bomVisible=JSON.stringify([...bomMeshes].filter(([,m])=>m.visible).map(([id])=>id));
+}
+isolateButton.onclick=()=>{if(mode!=='bom'||!selected)return;isolated=!isolated;updateIsolation();};
 let playing=false,elapsedMs=0,lastFrame=null,lastPoseTime=0,strokeFraction=0,stopFraction=.05;
 let previewRenderer,previewScene,previewCamera,previewRoot,previewControls,previewCube;const previewMeshes=new Map();
 const assetLoad=Date.now();
 const freshAsset=path=>{const url=new URL(path,location.href);url.searchParams.set('load',assetLoad);return url.href;};
 const loader=new STLLoader(),raycaster=new THREE.Raycaster();let pointerStart;
 const details={
- phone:['V3 REMOVABLE CUFFS','Three cuffs. One shared key design.','Cyan: approved enlarged cuff geometry, PETG fit prototype / TPU 95A intended. Two sliding cuffs remain 100 mm apart; fixed cuff is offset 16 mm to clear the neck. Sliding sockets sit 0.3 mm outward for camera clearance. New jaws and key retention need physical tests. The 18/20 mm phone examples remain incompatible; thin-phone seating is not validated.'],
- full:['INLINE COMPLIANCE','Two twine sections, joined by a band.','The pulley redirects the pull. Run directly to the selected eye of the nearest shaft guide, then through the two lower guides, then join two twine sections with an inline rubber band near the trigger. Return and inline bands have separate functions; forces and maximum extension are not validated.'],
+ phone:['V3 RAMPED STUD CUFFS','Three identical cuffs. 35° stud ramps.','Cyan: unchanged interchangeable 21.6 mm TPU cuffs. Fixed cuff centered; sliding cuffs 100 mm apart. All three integral studs now have 35° retaining ramps; previous square-stud success does not validate their pull-out resistance. Full-jaw strength, phone grip and service access need physical checks. Recorded 18/20 mm phones remain incompatible.'],
+ full:['INLINE COMPLIANCE','Two twine sections, joined by a band.','The pulley redirects the pull. Run directly to the single reversible TPU clip guide, then join two twine sections with an inline rubber band near the trigger. Return and inline bands have separate functions; forces and maximum extension are not validated.'],
  actuator:['CONCAVE BOOT + LONG GUIDE','Smooth boot. Continuous guide.','The 8 mm neck sweeps into the boot along a concave hyperbola-like curve, tangent at both ends. The highlighted guide is now full height along its extended length, with a retaining lip and curved end. Nominal slider clearance: 0.3 mm at the wall and 0.4 mm under the lip. Pulley and return stop are unchanged. Outgoing twine still intersects the carrier in wallet-near, bare-near and small-near; resolve routing before another print.'],
- bom:['FOURTEEN PRINTED DESIGNS','Twenty-seven pieces. True relative scale.','Three identical cuffs and four identical 12.2 mm T-keys: one axle key plus three cuff keys. Cuff head recess and stem opening keep the approved dimensions. Cyan is TPU-intended cuff geometry, currently PETG-tested. Rib-free cuff sockets have no pull-out latch. Retention and new jaw strength require tests.']
+ bom:['TWELVE PRINTED DESIGNS','Twenty-two pieces. True relative scale.','Three identical 21.6 mm TPU cuffs and integral studs on the rigid jaws. Only the pulley axle uses a loose T-key. Local TPU/stud fit is reported successful; full assembly retention and strength remain unqualified.']
 };
 
 function setDetail(label,title,text){$('#detail-label').textContent=label;$('#detail-title').textContent=title;$('#detail-text').textContent=text;}
@@ -53,7 +65,7 @@ function clearSelection(){
  if(outline){scene.remove(outline);outline.geometry.dispose();outline.material.dispose();outline=null;}
  selected=null;selectionTargets=[];document.querySelectorAll('tr[data-id]').forEach(el=>el.classList.remove('selected'));
 }
-function visibleMeshes(){return mode==='bom'?[...bomMeshes.values()]:[...meshes.values()].filter(m=>m.visible);}
+function visibleMeshes(){return (mode==='bom'?[...bomMeshes.values()]:[...meshes.values()]).filter(m=>m.visible);}
 function frameObjects(objects,view=mode){
  root.updateWorldMatrix(true,true);const box=new THREE.Box3();for(const m of objects)box.expandByObject(m);
  if(box.isEmpty())return;
@@ -65,12 +77,13 @@ function frameObjects(objects,view=mode){
   :Math.max(size.length()/2,14)/Math.sin(fov/2)*1.13;
  camera.up.set(0,view==='bom'?0:1,view==='bom'?-1:0);controls.target.copy(center);camera.position.copy(center).add(direction.normalize().multiplyScalar(distance));controls.update();
 }
-function label(text,x,y,z){
+function label(text,x,y,z,id){
  const c=document.createElement('canvas');c.width=700;c.height=64;const ctx=c.getContext('2d');ctx.fillStyle='#243138';ctx.font='46px system-ui';ctx.textAlign='center';ctx.fillText(text,350,42);
- const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));sprite.position.set(x,y,z);sprite.scale.set(190,20,1);bomLabels.add(sprite);
+ const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));sprite.position.set(x,y,z);sprite.scale.set(190,20,1);sprite.userData.bomId=id;bomLabels.add(sprite);
 }
 function focus(id,object){
  clearSelection();selected=id;const row=manifest.bom.find(r=>r.id===id);if(!row)return;
+ updateIsolation();
  let objects=object?[object]:mode==='bom'?[bomMeshes.get(id)].filter(Boolean):[...meshes.values()].filter(m=>m.userData.bomId===id&&m.visible);
  if(!objects.length){setMode('full');selected=id;objects=[...meshes.values()].filter(m=>m.userData.bomId===id);}
  selectionTargets=objects;
@@ -84,7 +97,7 @@ function setMode(next){
  if(stepIndex>=0)exitSteps(false);viewCube.perspective();
  $('#assembly-toggle').hidden=next!=='phone';
  if(next==='bom')setPlaying(false);
- clearSelection();mode=next;inventory.visible=mode==='bom';assembly.visible=!inventory.visible;
+ clearSelection();mode=next;isolated=false;updateIsolation();inventory.visible=mode==='bom';assembly.visible=!inventory.visible;
  document.body.classList.toggle('bom',inventory.visible);$('#inventory').hidden=!inventory.visible;
  labelControl.hidden=!inventory.visible;
  for(const b of document.querySelectorAll('[data-view]'))b.setAttribute('aria-pressed',String(b.dataset.view===mode));
@@ -164,7 +177,7 @@ function setupPreview(){
  previewCamera=new THREE.PerspectiveCamera(35,1,.1,500);
  const target=new THREE.Vector3(...manifest.motion.pivot).applyAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2);target.y-=10;
  previewCamera.position.copy(target).add(new THREE.Vector3(5,3,82));previewCamera.lookAt(target);
- previewControls=new OrbitControls(previewCamera,$('#actuator-preview'));previewControls.target.copy(target);previewControls.enableDamping=true;previewControls.update();previewCube=installViewCube({canvas:$('#actuator-preview'),camera:previewCamera,controls:previewControls});
+ previewControls=new OrbitControls(previewCamera,$('#actuator-preview'));previewControls.target.copy(target);previewControls.enableDamping=true;previewControls.update();previewCube=installViewCube({canvas:$('#actuator-preview'),camera:previewCamera,controls:previewControls,clickStepDegrees:90});
 }
 function renderPreview(){
  if(!previewRenderer||mode==='bom')return;
@@ -276,12 +289,12 @@ try{
   // Printed parts use source millimetres, just like the assembly. Never
   // normalize each part independently: a screw must look smaller than a jaw.
   geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);
-  const rgb=row.id==='phone_cuff'?[0,.55,.60]:row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
+  const rgb=['phone_cuff','collar_screw','thumb_nut','clip_string_guide'].includes(row.id)?[0,.55,.60]:row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
   const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=1;inventory.add(mesh);bomMeshes.set(row.id,mesh);
   geometry.computeBoundingBox();
   tr.dataset.displayScale=String(mesh.userData.displayScale);tr.dataset.modelSizeMm=JSON.stringify(geometry.boundingBox.getSize(new THREE.Vector3()).toArray());
-  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'Shared T-key',phone_cuff:'Rounded cuff',collar_screw:'Long collar screw',thumb_screw:'Thumb screw',thumb_nut:'Printed nut',string_guide:'Captive guide',dual_string_guide:'Duel captive guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
-  label(`${titles[row.id]||row.name||row.id} ×${row.quantity}${part?'':' · schematic'}`,mesh.position.x,mesh.position.y-Math.max(65,extent.y/2+12),0);
+  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'Shared T-key',phone_cuff:'Rounded cuff',collar_screw:'Common TPU screw',thumb_screw:'Thumb screw',thumb_nut:'TPU nut',clip_string_guide:'TPU clip guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
+  label(`${titles[row.id]||row.name||row.id} ×${row.quantity}${part?'':' · schematic'}`,mesh.position.x,mesh.position.y-Math.max(65,extent.y/2+12),0,row.id);
  }
  for(const [i,step] of steps.entries()){const option=document.createElement('option');option.value=i;option.textContent=`${i+1}. ${step.title}`;$('#assembly-step').append(option);}
  $('#assembly-toggle').onclick=()=>stepIndex<0?showStep(0):exitSteps();$('#assembly-exit').onclick=()=>exitSteps();$('#step-back').onclick=()=>showStep(stepIndex-1);$('#step-next').onclick=()=>showStep(stepIndex+1);$('#assembly-step').onchange=e=>showStep(Number(e.target.value));
@@ -310,6 +323,10 @@ try{
 }catch(error){status.textContent=`Load failed: ${error.message}`;console.error(error);}
 function resize(){renderer.setSize(canvas.clientWidth,canvas.clientHeight,false);camera.aspect=canvas.clientWidth/canvas.clientHeight;camera.updateProjectionMatrix();}
 window.addEventListener('resize',resize);resize();
+new ResizeObserver(resize).observe(canvas);
+installFullscreen($('#stage'),$('#viewer-fullscreen'),resize);
+// Keep the context menu in the fullscreen subtree as well.
+$('#stage').append($('#context'));
 function frame(now){
  requestAnimationFrame(frame);
  if(playing&&manifest){

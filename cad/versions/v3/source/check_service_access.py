@@ -16,7 +16,7 @@ def overlap(a,b):
 import model as m
 s=m.parts(m.Parameters());report={}
 module=['actuator_bracket','plunger','pulley','pulley_axle','pulley_key']
-fixed=['carrier','shaft_cap','sliding_jaw']+[f'clamp_{kind}_{i}' for kind in ('screw','nut') for i in range(1,5)]+[f'cuff_{prefix}{station}' for prefix in ('','key_') for station in ('fixed','sliding_1','sliding_2')]
+fixed=['carrier','shaft_cap','sliding_jaw']+[f'clamp_{kind}_{i}' for kind in ('screw','nut') for i in range(1,5)]+[f'cuff_{station}' for station in ('fixed','sliding_1','sliding_2')]
 samples={**SAMPLES,'inward-28.5':m.Parameters(phone_thickness=8,button_from_end=104.5)}
 for name,base in samples.items():
  for side in ('near','far'):
@@ -40,7 +40,7 @@ for name,base in samples.items():
   # Remove nut and screw completely before moving the module.
   # A cylindrical nut envelope includes its full rotation; exclude mating thread.
   for dx in range(21):
-   nut=m.cylinder((18+dx,slot_y,26),(1,0,0),6,18)
+   nut=m.cylinder((p.phone_right+38+dx,slot_y,26),(1,0,0),6,18)
    for n in module+fixed:
     v=overlap(nut,a[n])
     if v>.01:hits.append(['nut-loosen',dx,n,round(v,5)])

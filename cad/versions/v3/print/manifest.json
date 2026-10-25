@@ -3,69 +3,74 @@
   "scale_percent": 100,
   "nozzle_mm": 0.4,
   "layer_mm": 0.2,
-  "revision": "integrated-cuffs-v3",
+  "revision": "deep-groove-pulley-v3",
   "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
   "parts": [
     {
       "name": "shaft_cap",
       "file": "shaft_cap.stl",
       "quantity": 1,
+      "material": "PLA / PLA+",
       "bounds_mm": [
-        122.0,
+        110.0,
         120.0,
         11.5
       ],
       "bed_z_min_mm": 7.789109577460837e-16,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Option A flush-T: common X12 exterior face down (+90 degrees about Y); wings and collar face share the bed plane. Slicer/support review still required; no support-free claim."
+      "supports": "Single X12 outer face down (+90 degrees about Y), including body, rail wings and all four screw seats; 4.2 mm rail thickness. Slicer/support review still required; no support-free claim."
     },
     {
       "name": "carrier",
       "file": "carrier.stl",
       "quantity": 1,
+      "material": "PLA / PLA+",
       "bounds_mm": [
-        133.5,
+        110.0,
         48.992,
-        112.5
+        109.8
       ],
       "bed_z_min_mm": 0.0,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Carrier without actuator rail; export orientation provisional. Compare cut-end-on-bed to protect neck mating surfaces; inspect track roofs and accessible support removal."
+      "supports": "Canonical +90-degree Y orientation. Mirrored 35-degree band slot without square cap; cuff stud unchanged. Previous fixed-angle-35 slice predates this cleat revision; reslice before printing. Band seating, TPU retention and strength need testing."
     },
     {
       "name": "sliding_jaw",
       "file": "sliding_jaw.stl",
       "quantity": 1,
+      "material": "PLA / PLA+",
       "bounds_mm": [
-        40.32,
-        112.8,
-        59.6
+        39.52,
+        121.6,
+        58.5
       ],
-      "bed_z_min_mm": -5.5417236453231006e-17,
+      "bed_z_min_mm": 0.0,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Compact jaw; export orientation provisional. Inspect tongue, ledge and hooks for overhangs; protect sliding faces and minimize removable supports."
+      "supports": "Rear X=-10 down (-90 degrees about Y). Uncapped 35-degree band slot; lower projection restored to its original extent. Tongue and cuff studs unchanged. Previous angle-35 zero-support slice predates this revision; reslice before printing. Strength and retention unqualified."
     },
     {
       "name": "phone_cuff",
       "file": "phone_cuff.stl",
       "quantity": 3,
+      "material": "ELEGOO TPU 95A",
       "bounds_mm": [
         17.505,
-        12.0,
+        21.6,
         8.94
       ],
       "bed_z_min_mm": 1.0000000116860974e-07,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Exact enlarged cuff, flat back down. PETG prototype approved; TPU 95A intended. Historical cuff-only slice is not a complete-jaw print plan."
+      "supports": "Common 21.6 mm TPU cuff, back down. User reports tiny first-layer supports unnecessary; cuff batch disables support. Not a complete-jaw qualification."
     },
     {
       "name": "actuator_bracket",
       "file": "actuator_bracket.stl",
       "quantity": 1,
+      "material": "PLA / PLA+",
       "bounds_mm": [
         66.0,
         51.0,
@@ -80,6 +85,7 @@
       "name": "plunger",
       "file": "plunger.stl",
       "quantity": 1,
+      "material": "PLA / PLA+",
       "bounds_mm": [
         58.0,
         16.0,
@@ -94,6 +100,7 @@
       "name": "pulley",
       "file": "pulley.stl",
       "quantity": 1,
+      "material": "PLA / PLA+",
       "bounds_mm": [
         17.999,
         17.999,
@@ -108,6 +115,7 @@
       "name": "pulley_axle",
       "file": "pulley_axle.stl",
       "quantity": 1,
+      "material": "PLA / PLA+",
       "bounds_mm": [
         10.999,
         10.998,
@@ -121,7 +129,8 @@
     {
       "name": "pulley_key",
       "file": "pulley_key.stl",
-      "quantity": 4,
+      "quantity": 1,
+      "material": "PLA / PLA+",
       "bounds_mm": [
         7.0,
         12.2,
@@ -133,27 +142,14 @@
       "supports": "Flat cross-key; preserve square load faces and band seats. Orientation provisional."
     },
     {
-      "name": "thumb_screw",
-      "file": "thumb_screw.stl",
-      "quantity": 1,
-      "bounds_mm": [
-        13.997,
-        13.998,
-        22.0
-      ],
-      "bed_z_min_mm": -8.571568438585613e-16,
-      "watertight": true,
-      "layer_mm": 0.12,
-      "supports": "Head on bed; no support in threads. Fit trial first; do not force."
-    },
-    {
       "name": "collar_screw",
       "file": "collar_screw.stl",
-      "quantity": 4,
+      "quantity": 5,
+      "material": "ELEGOO TPU 95A",
       "bounds_mm": [
         13.997,
         13.998,
-        36.0
+        34.2
       ],
       "bed_z_min_mm": -8.571568438585613e-16,
       "watertight": true,
@@ -164,6 +160,7 @@
       "name": "thumb_nut",
       "file": "thumb_nut.stl",
       "quantity": 5,
+      "material": "ELEGOO TPU 95A",
       "bounds_mm": [
         18.0,
         15.588,
@@ -175,32 +172,19 @@
       "supports": "Flat on bed; no supports. Fit trial first."
     },
     {
-      "name": "string_guide",
-      "file": "string_guide.stl",
-      "quantity": 2,
-      "bounds_mm": [
-        34.296,
-        27.6,
-        14.0
-      ],
-      "bed_z_min_mm": 8.881784197001252e-16,
-      "watertight": true,
-      "layer_mm": 0.2,
-      "supports": "Eye translated to saddle edge; eye and saddle lower faces coplanar on bed. Verify support-free slice."
-    },
-    {
-      "name": "dual_string_guide",
-      "file": "dual_string_guide.stl",
+      "name": "clip_string_guide",
+      "file": "clip_string_guide.stl",
       "quantity": 1,
+      "material": "ELEGOO TPU 95A",
       "bounds_mm": [
-        20.3,
-        73.992,
-        14.0
+        17.0,
+        30.198,
+        6.0
       ],
-      "bed_z_min_mm": 1.0000000116860974e-07,
+      "bed_z_min_mm": 0.0,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Both eyes translated to saddle edge without rotation; lower faces coplanar on bed, central band lane clear. Verify support-free slice."
+      "supports": "Axial end flat on bed; vertical 4 mm hole and constant-section clip. TPU 95A. Fresh slice and physical snap-fit test required; no support-free claim before slicing."
     }
   ]
 }

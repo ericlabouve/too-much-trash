@@ -1,0 +1,105 @@
+{
+  "revision": "deep-groove-pulley-v3",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 1,
+  "plates": 1,
+  "total_g": 0.7315467000007629,
+  "total_minutes": 13.248928833007813,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 0.6429
+  },
+  "objects": {
+    "pulley": {
+      "deposited_g_by_role": {
+        "model": 0.6429
+      },
+      "deposited_xy_bounds": [
+        [
+          81.212,
+          81.213
+        ],
+        [
+          98.789,
+          98.783
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "pulley",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "3db0ced9f193b8f676386084ab4aca4b",
+  "hashes": {
+    "cuff-fit-input.3mf": "dd945ab477dfac98145fde29210ff03d3371e10642ab4634173348ff68314c65",
+    "cuff-fit.gcode.3mf": "692b8e070a83f801d3e270f917eab2718a397722f8b29ea7710bf3e5ef178605",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Bambu PETG Translucent / A1 mini / 0.4 mm nozzle / 0.12 mm layers.",
+    "Automatic Normal Snug supports enabled. Groove depth doubled to 2.2 mm with 36-degree sides.",
+    "No printer contacted. String retention and support-free print quality remain physical checks."
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "revision": "direct-root-fixed-jaw-v3",
+  "passed": true,
+  "collar_body_z_mm": [
+    -40,
+    70
+  ],
+  "stations_yz_mm": [
+    [
+      -15.5,
+      -30
+    ],
+    [
+      15.5,
+      60
+    ],
+    [
+      15.5,
+      -30
+    ],
+    [
+      -15.5,
+      60
+    ]
+  ],
+  "axial_station_spacing_mm": 90,
+  "fastener_pairs": 4,
+  "left_pairs": 2,
+  "right_pairs": 2,
+  "collars": {
+    "carrier": {
+      "valid": true,
+      "solids": 1,
+      "removed_tail_remaining_mm3": 0.0,
+      "bolt_bore_obstructions_mm3": {
+        "-15.5,-30": 0.0,
+        "15.5,60": 0.0,
+        "15.5,-30": 0.0,
+        "-15.5,60": 0.0
+      },
+      "accepted_neck_opening_obstruction_mm3": 0.0
+    },
+    "shaft_cap": {
+      "valid": true,
+      "solids": 1,
+      "removed_tail_remaining_mm3": 0.0,
+      "bolt_bore_obstructions_mm3": {
+        "-15.5,-30": 0.0,
+        "15.5,60": 0.0,
+        "15.5,-30": 0.0,
+        "-15.5,60": 0.0
+      },
+      "accepted_neck_opening_obstruction_mm3": 0.0
+    }
+  },
+  "fastener_removal_hits": [],
+  "nominal_bore_to_neck_ligament_mm": 2.299999999999999,
+  "rejected_candidate": "Z+52 nuts hit the jaw-band cleat on axial withdrawal; use Z+60 with 3.5 mm vertical clearance.",
+  "sideways_cap_removal_hits": [],
+  "stock_claw_or_brace_hits": {},
+  "unchanged": [
+    "thumb_nut",
+    "phone_cuff",
+    "sliding_jaw"
+  ],
+  "limits": [
+    "Sampled rigid paths after phone, tension and actuator removal; not human hand access or strength proof.",
+    "Stock proxy remains larger than the physically accepted opening; use a full printed fit test.",
+    "No slicing or print authorization. Existing phone-fit and twine routing issues remain separate."
+  ]
+}

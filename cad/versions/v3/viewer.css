@@ -3,3 +3,16 @@
 #stroke-value{font-variant-numeric:tabular-nums;min-width:35px}#animate{border-color:#a25125;color:#8c411c}#animate[aria-pressed=true]{background:#a25125;color:white}button:disabled{opacity:.45;cursor:default}#stroke-panel{border-top:1px solid #ddd;margin-top:18px;padding-top:10px}#stroke-panel[hidden]{display:none}#stroke-panel h3{margin:0 0 6px;font-size:13px}#actuator-preview{width:100%;height:190px;background:#f8f7f3;touch-action:auto;border:1px solid #e4e3dd;border-radius:6px}#stroke-phase{font-size:13px;font-weight:650;color:#345c66;margin:8px 0}#stroke-help{font-size:11px;margin:5px 0 12px}#motion-info{font-variant-numeric:tabular-nums}.toggles{flex-wrap:wrap}
 
 .preview-stage{position:relative}#actuator-preview{touch-action:none;height:250px}#assembly-walkthrough{padding:16px 30px;background:#edf6f5;border-bottom:1px solid #bbcfcf}#assembly-walkthrough[hidden]{display:none}#assembly-walkthrough h2{margin:10px 0 4px}#assembly-walkthrough p{max-width:900px;margin:0 0 8px}#assembly-step{max-width:50vw;padding:8px}#assembly-walkthrough small{color:#46656b}.feature-label{position:absolute;top:480px;left:20px;background:#fff;padding:8px 12px;border-left:4px solid #00a7b5;pointer-events:none;max-width:70%;font-size:12px}
+.viewer-expanded{overflow:hidden}
+main{display:block}
+main>aside{border-left:0;border-top:1px solid #ddd;padding:24px 30px}
+main>aside p,main>aside .note{max-width:100ch}
+#stroke-panel{max-width:640px}
+#view{height:clamp(440px,70vh,900px)}
+#viewer-fullscreen{position:absolute;right:16px;bottom:52px;z-index:5;box-shadow:0 2px 8px #0001}
+#stage:fullscreen,#stage.is-expanded{background:#f8f7f3;width:100%;height:100%;display:flex;flex-direction:column}
+#stage.is-expanded{position:fixed;inset:0;z-index:1000;height:100dvh}
+#stage:fullscreen #view,#stage.is-expanded #view{height:0;flex:1;min-height:0;width:100%}
+#stage:fullscreen #status,#stage.is-expanded #status{flex-shrink:0;padding-right:160px}
+#stage:fullscreen #viewer-fullscreen,#stage.is-expanded #viewer-fullscreen{bottom:8px}
+@media(max-width:600px){#legend{max-width:calc(100% - 140px);left:10px;top:10px}main>aside{padding:20px 16px}}

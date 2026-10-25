@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 // Controls keep a perspective backing camera; orthographic rendering preserves
 // its target, orientation and apparent scale so orbit/zoom work in either mode.
-export function installViewCube({canvas,camera,controls}) {
+export function installViewCube({canvas,camera,controls,clickStepDegrees=0}) {
   const host=document.createElement('div');host.className='view-cube';
   Object.assign(host.style,{position:'absolute',right:'8px',top:'8px',zIndex:4,width:'112px',background:'#ffffffdc',borderRadius:'8px',font:'11px system-ui',textAlign:'center'});
   const parent=canvas.parentElement;if(getComputedStyle(parent).position==='static')parent.style.position='relative';parent.append(host);
@@ -17,9 +17,12 @@ export function installViewCube({canvas,camera,controls}) {
   let arrowDrag=null;
   function turn(axisName,sign,angle){const local={pitch:[1,0,0],yaw:[0,1,0],roll:[0,0,1]}[axisName];const axis=new THREE.Vector3(...local).applyQuaternion(camera.quaternion);const q=new THREE.Quaternion().setFromAxisAngle(axis,sign*angle);camera.position.sub(controls.target).applyQuaternion(q).add(controls.target);camera.up.applyQuaternion(q);camera.lookAt(controls.target);controls.update();}
   for(const [symbol,title,axis,sign] of [['↶','Roll counterclockwise','roll',1],['↑','Rotate up','pitch',-1],['↷','Roll clockwise','roll',-1],['←','Rotate left','yaw',-1],['↓','Rotate down','pitch',1],['→','Rotate right','yaw',1]]){const button=document.createElement('button');button.textContent=symbol;button.title=title+' — drag along arrow for smooth rotation';button.setAttribute('aria-label',title);button.style.cssText='padding:2px;font-size:17px;line-height:22px;touch-action:none;cursor:ew-resize';if(axis==='pitch')button.style.cursor='ns-resize';
-    button.onpointerdown=e=>{if(e.button!==0)return;e.preventDefault();arrowDrag={x:e.clientX,y:e.clientY,axis,sign};button.setPointerCapture(e.pointerId);controls.enabled=false;};
-    button.onpointermove=e=>{if(!arrowDrag)return;const delta=axis==='pitch'?e.clientY-arrowDrag.y:e.clientX-arrowDrag.x;arrowDrag.x=e.clientX;arrowDrag.y=e.clientY;turn(axis,axis==='roll'?-1:1,delta*.008);};
-    const endDrag=()=>{arrowDrag=null;controls.enabled=true;};button.onpointerup=endDrag;button.onpointercancel=endDrag;button.onblur=endDrag;arrows.append(button);}
+    let suppressClick=false;
+    if(clickStepDegrees)button.title=title+` — click ${clickStepDegrees}°; drag for smooth rotation`;
+    button.onpointerdown=e=>{if(e.button!==0)return;e.preventDefault();suppressClick=false;arrowDrag={x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,moved:false,axis,sign};button.setPointerCapture(e.pointerId);controls.enabled=false;};
+    button.onpointermove=e=>{if(!arrowDrag)return;if(!arrowDrag.moved&&Math.hypot(e.clientX-arrowDrag.startX,e.clientY-arrowDrag.startY)<=4)return;arrowDrag.moved=true;const delta=axis==='pitch'?e.clientY-arrowDrag.y:e.clientX-arrowDrag.x;arrowDrag.x=e.clientX;arrowDrag.y=e.clientY;turn(axis,axis==='roll'?-1:1,delta*.008);};
+    const endDrag=()=>{suppressClick=Boolean(arrowDrag?.moved);arrowDrag=null;controls.enabled=true;};button.onpointerup=endDrag;button.onpointercancel=()=>{endDrag();suppressClick=true;};button.onblur=endDrag;
+    button.onclick=()=>{if(clickStepDegrees&&!suppressClick)turn(axis,sign,THREE.MathUtils.degToRad(clickStepDegrees));suppressClick=false;};arrows.append(button);}
   const cancelArrowDrag=()=>{arrowDrag=null;controls.enabled=true;};window.addEventListener('blur',cancelArrowDrag);document.addEventListener('visibilitychange',cancelArrowDrag);host.addEventListener('pointercancel',cancelArrowDrag);
   const ray=new THREE.Raycaster();let start,last,moved=false;
   function snap(direction){const distance=camera.position.distanceTo(controls.target);camera.up.set(0,Math.abs(direction.y)>.99?0:1,Math.abs(direction.y)>.99?-Math.sign(direction.y):0);camera.position.copy(controls.target).addScaledVector(direction.normalize(),distance);controls.update();orthographic=true;toggle.textContent='Orthographic';}

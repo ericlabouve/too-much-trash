@@ -1,6 +1,34 @@
 # V3 manufacturing exports — not approved for printing
 
-## Current revision: concave-boot-guide-v3
+## Current revision: deep-groove-pulley-v3
+
+Redirect pulley groove doubled to 2.2 mm nominal depth, preserving its external envelope and bore. [Actual PETG slice review](jobs/2026-10-25-deep-groove-pulley/) reports zero support/interface paths with automatic supports enabled, 0.7315 g and 13.25 minutes. Only the pulley requires a replacement print for this change. No job sent; live groove quality and string retention remain unvalidated.
+
+One `clip_string_guide` in ELEGOO TPU 95A replaces the two old guide designs and all three guide bands. Print end-on-bed (6 mm height), with the 4 mm eye vertical. Geometry is constant-section but no slice has qualified it yet. Test snap installation, axial sliding and actual cord travel on the stock neck. Two lower guides are removed. Current total: 12 designs / 22 printed pieces; five rubber bands.
+
+Five identical long screws (four collar + one actuator) and five matching nuts are now specified in ELEGOO TPU 95A. Use the current `collar_screw` and `thumb_nut` exports, 0.12 mm thread layers, with a fresh TPU slice; old PETG/PLA jobs do not implement this material change. No print has been sent. Long-screw TPU fit, loaded retention and creep remain physical checks despite the user's positive TPU tightening feedback.
+
+### Previous jaw support study
+
+Sliding cleat, tongue shoulders and all three cuff-stud undersides use 35° from the bed. The user rounds the tested 34° functional minimum up for memorability; the slicer-only boundary is 31°. Exact existing 21.6 mm TPU cuffs remain unchanged. New retaining ramps require a physical pull-out test; square-stud success does not transfer.
+
+Matched Bambu PETG Translucent / A1 mini 0.4 / 0.12 mm slices: [sliding jaw](jobs/2026-10-25-sliding-jaw-angle-35/) has zero supports; [fixed jaw](jobs/2026-10-25-sliding-jaw-fixed-angle-35/) has zero at its stud but retains support elsewhere (neck cavity/fixed cleat). These are offline reviews, not print authorization or physical validation. After the next print containing these 35° features, ask the user whether they printed successfully without supports; retain this pending check until physical feedback arrives.
+
+### Preceding direct-root-fixed-jaw-v3
+
+Carrier-only update: track and fixed band cleat move +2.7 mm X to join the collar directly through the full-depth end. No thin connector. Cuffs, phone, sliding-jaw stop, cap and fasteners retain their positions/designs. Carrier STEP/STL must be freshly sliced; no print authorized. Physical root strength and band preload are unqualified.
+
+### Preceding flat-bed-shaft-cap-v3
+
+Whole exterior side flattened to X12, including both rail wings and all four screw seats, with this face down on Z0. Rail thickness is 4.2 mm. Matching bracket bearing plate extends inward 1.8 mm; collar screws shorten at the head end to 30.2 mm threaded span. These three designs need new prints; do not mix the previous longer collar screws with this cap near the phone screen. Existing nuts, cuffs and other parts are unchanged. No fresh slice or support-free claim. Fit, strength and preload remain unqualified.
+
+### Preceding straddled-four-bolt-collar-v3
+
+The fixed carrier and shaft cap now have two screw/nut pairs on each axial side of the jaw, four pairs total. Collar bodies span Z−40..70 (110 mm), with stations at Z−30/+60. The old left tail is removed; the new right pair clears the jaw-band cleat for nut removal. The accepted neck opening is recut through all boss roots. Existing collar screws/nuts, actuator, sliding jaw and three identical 21.6 mm TPU cuffs are unchanged by this revision.
+
+Current STEP/STL exports and `manifest.json` are regenerated from the editable source, but neither new collar half has been sliced or print-qualified. Use a fresh job directory for any future slice; never reuse the historical jobs below as toolpaths for this geometry. The current BOM has 12 designs / 22 pieces. Full-neck fit, retention and strength still need physical validation; existing phone-fit and outgoing-twine issues remain recorded in the review reports.
+
+## Historical concave-boot-guide-v3 print preparation
 
 The [two-piece slice review](jobs/2026-10-14-concave-boot-guide/index.html) contains only the revised actuator bracket and sliding plunger, at 100% scale. It uses the recorded A1 mini / 0.4 mm / Generic PLA reference recipe, 0.12 mm layers, 3 walls, 15% gyroid and automatic Normal Snug supports. The concave boot blend and full-height extended guide supersede the earlier shapes. See the current `review.json` for exact estimates and hashes; no new print was sent.
 
@@ -20,7 +48,7 @@ Reference comparison: support extrusion estimate **2.73 → 0.90 g**, total slic
 
 The preceding compact-axle iteration changed the bracket, axle and cross-key. The flush-T cap remains unchanged: its wings share the X12 exterior plane and the rail remains 120 mm long. Cap export rotates +90° about Y to put the common outer face down; no support-free slice claim. The bracket uses one closed bore without locating lugs. Fully remove nut and screw, move outward 4.5 mm, lower the module 2 mm, then withdraw along the conservative sampled clearance path.
 
-Use `manifest.json` and the [BOM](../bom.md): 13 designs, 21 printed pieces. The bracket has no twine-guide holes or lower base. The axle is 20.6 mm long with a recessed 1.6 mm head and an outboard cross-key/keeper band. Front/rear bearing lands are 2/6.2 mm. The earlier 18.4 mm axle does not match this flush-back bracket. Head strength, bearing wear and key fit are untested.
+Use `manifest.json` and the [BOM](../bom.md): 12 designs, 22 printed pieces. The bracket has no twine-guide holes or lower base. The axle is 20.6 mm long with a recessed 1.6 mm head and an outboard cross-key/keeper band. Front/rear bearing lands are 2/6.2 mm. The earlier 18.4 mm axle does not match this flush-back bracket. Head strength, bearing wear and key fit are untested.
 
 Across the preceding plunger iterations, changed parts also include **both collar halves**, pulley, nearest dual guide and **four longer collar screws**. Do not mix the former collar screw length with the new ears. The rail screw retains its earlier thread and head but loses the former contact nose; all five nuts, lower centered guides and jaw contact geometry are unchanged.
 
