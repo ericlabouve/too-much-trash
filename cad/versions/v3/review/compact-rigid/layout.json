@@ -38,7 +38,7 @@
     "plunger": {
       "angle": 180,
       "center_xy_mm": [
-        109.2,
+        115.2,
         154.2
       ]
     },
@@ -53,7 +53,7 @@
   "sources": {
     "carrier": "print/jobs/2026-10-26-ramped-fixed-hook-source/carrier.stl",
     "shaft_cap": "print/jobs/2026-10-26-final-materials-source/shaft_cap.stl",
-    "sliding_jaw": "print/sliding_jaw.stl",
+    "sliding_jaw": "print/jobs/2026-10-26-flush-fins-source/sliding_jaw.stl",
     "actuator_bracket": "print/actuator_bracket.stl",
     "plunger": "print/plunger.stl",
     "pulley": "print/pulley.stl",

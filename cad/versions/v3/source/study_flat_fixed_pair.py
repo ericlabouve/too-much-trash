@@ -12,7 +12,7 @@ out = Path(sys.argv[sys.argv.index('--output-dir') + 1]).resolve()
 source = out.parent / (out.name + '-source')
 source.mkdir(exist_ok='--resume-unsliced' in sys.argv)
 p = m.Parameters()
-fixed, cap = m.carrier(p), m.shaft_cap(p)
+fixed, cap = m.carrier(p,flat_ramped=False), m.shaft_cap(p,tall=False)
 original_fixed, original_cap = fixed, cap
 if candidate:
     # Move the split to the neck's negative-X face. Maintain the 1 mm gap.

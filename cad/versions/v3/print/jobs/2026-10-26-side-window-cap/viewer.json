@@ -1,0 +1,29 @@
+{
+  "title": "Shaft cap \u00b7 paired side windows \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 side-window-cap-trial",
+  "notes": [
+    "Two 64 mm side-wall openings with 35-degree roofs across wall thickness. Automatic supports enabled; no printer contacted."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

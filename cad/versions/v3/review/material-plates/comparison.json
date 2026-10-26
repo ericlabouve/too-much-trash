@@ -3,10 +3,10 @@
     {
       "plate": "1",
       "title": "PETG \u00b7 all seven rigid parts",
-      "job": "2026-10-26-final-petg",
+      "job": "2026-10-26-flush-fins-petg",
       "pieces": 7,
-      "grams": 78.53158569335938,
-      "minutes": 547.5682942708333,
+      "grams": 78.74777221679688,
+      "minutes": 549.2658203125,
       "support_g": 0.37639999999999996,
       "warning": ""
     },
@@ -30,9 +30,9 @@
       "material": "PETG",
       "quantity": 1,
       "support_g": 0.0292,
-      "model_g": 12.8513,
+      "model_g": 13.0678,
       "support_each_g": 0.0292,
-      "model_each_g": 12.8513
+      "model_each_g": 13.0678
     },
     {
       "design": "carrier",
@@ -74,9 +74,9 @@
       "material": "PETG",
       "quantity": 1,
       "support_g": 0.1094,
-      "model_g": 8.0157,
+      "model_g": 8.0154,
       "support_each_g": 0.1094,
-      "model_each_g": 8.0157
+      "model_each_g": 8.0154
     },
     {
       "design": "plunger",

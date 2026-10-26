@@ -1,0 +1,398 @@
+{
+  "revision": "material-set-ramped-fixed-v3",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "sliding_jaw",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-keeper-petg-source/sliding_jaw.stl",
+      "input_sha256": "19166a1479b0f0d111c1ad106317167c628b86adb622e6525c70633e2e1f1352",
+      "center_xy_mm": [
+        65.99999923706055,
+        154.95999999046325
+      ],
+      "bounds_mm": [
+        121.5999984741211,
+        39.519999980926514,
+        58.5
+      ],
+      "orientation": "Approved bed face preserved; nested XY arrangement.",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          6.123233995736766e-17,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        25.240000009536743,
+        10.0
+      ]
+    },
+    {
+      "name": "carrier",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-keeper-petg-source/carrier.stl",
+      "input_sha256": "ce11bc0060628f7513997a2e9e9d78362e7755b0cb2eb45c8558eeacd0397695",
+      "center_xy_mm": [
+        60.2,
+        116.69720191955567
+      ],
+      "bounds_mm": [
+        110.0,
+        48.99440383911133,
+        104.50000286102295
+      ],
+      "orientation": "Approved bed face preserved; nested XY arrangement.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -15.0,
+        -0.0,
+        -5.800000190734863
+      ]
+    },
+    {
+      "name": "shaft_cap",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-keeper-petg-source/shaft_cap.stl",
+      "input_sha256": "f04d84b5788c8b001086d1daffd4e315e84f26f5945d225dace67cf5c55007b5",
+      "center_xy_mm": [
+        117.7,
+        74.2
+      ],
+      "bounds_mm": [
+        107.0,
+        120.0,
+        16.800000190734863
+      ],
+      "orientation": "Approved bed face preserved; nested XY arrangement.",
+      "rotation_matrix": [
+        [
+          -1.8369701987210297e-16,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          -1.0,
+          -1.8369701987210297e-16,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -15.0,
+        3.552713678800501e-15,
+        12.0
+      ]
+    },
+    {
+      "name": "pulley",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-keeper-petg-source/pulley.stl",
+      "input_sha256": "d5f0f999e143244667b9096c069d0987aee2dfc61a36136f727f68a45c0b69ec",
+      "center_xy_mm": [
+        28.19940502678277,
+        150.19949409971755
+      ],
+      "bounds_mm": [
+        17.99886131286621,
+        17.99912929534912,
+        3.999999899999999
+      ],
+      "orientation": "Approved bed face preserved; nested XY arrangement.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        0.00043773651123046875,
+        -0.0004353523254394531,
+        -1.0000000116860974e-07
+      ]
+    },
+    {
+      "name": "actuator_bracket",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-keeper-petg-source/actuator_bracket.stl",
+      "input_sha256": "ac3c937605500bcb3d15892ab27bc0afedaa9121d9b8ca17a684622da40592dc",
+      "center_xy_mm": [
+        35.7,
+        66.2
+      ],
+      "bounds_mm": [
+        51.0,
+        66.0,
+        19.799999137060546
+      ],
+      "orientation": "Approved bed face preserved; nested XY arrangement.",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          6.123233995736766e-17,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -0.0,
+        -1.0000000116860974e-07
+      ]
+    },
+    {
+      "name": "plunger",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-keeper-petg-source/plunger.stl",
+      "input_sha256": "6046bdba52e2b89f50ac38c4a3194466746734623191095e6df5c2951535016e",
+      "center_xy_mm": [
+        109.2,
+        154.2
+      ],
+      "bounds_mm": [
+        58.0,
+        16.0,
+        11.900000472204589
+      ],
+      "orientation": "Approved bed face preserved; nested XY arrangement.",
+      "rotation_matrix": [
+        [
+          -1.0,
+          -1.2246467991473532e-16,
+          0.0,
+          0.0
+        ],
+        [
+          1.2246467991473532e-16,
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        3.1086244689504383e-15,
+        -1.0000000116860974e-07
+      ]
+    },
+    {
+      "name": "pulley_axle",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-keeper-petg-source/pulley_axle.stl",
+      "input_sha256": "68fa557470cbaac992cdf9fffa3ef708a3ca243008aa985c0dd565c67869103c",
+      "center_xy_mm": [
+        46.69778463089696,
+        153.69913825761327
+      ],
+      "bounds_mm": [
+        10.997538566589355,
+        10.99876880645752,
+        20.600000381469727
+      ],
+      "orientation": "Approved bed face preserved; nested XY arrangement.",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          6.123233995736766e-17,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        0.0012307167053222656,
+        -0.0,
+        -0.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "sliding_jaw",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "carrier",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "shaft_cap",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "pulley",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "actuator_bracket",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "plunger",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "pulley_axle",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "0"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "5ec151c8e31b0709d0dc9abf000748ac9b743ec358af170d324031a3724430ef",
+  "scope": "Material-separated complete-assembly plate: rigid-compact",
+  "nested_layout": true
+}

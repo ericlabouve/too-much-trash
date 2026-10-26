@@ -1,0 +1,13 @@
+{
+  "revision": "side-window-cap-trial",
+  "valid_single_solid": true,
+  "side_window_length_mm": 64,
+  "visible_opening_height_mm": 5,
+  "roof_angle_from_bed_degrees": 35,
+  "minimum_split_edge_ligament_mm": 3.0494811544757257,
+  "old_volume_mm3": 34765.05384954197,
+  "new_volume_mm3": 31004.887818974203,
+  "limits": [
+    "Roof print quality and clamp stiffness require physical checks."
+  ]
+}

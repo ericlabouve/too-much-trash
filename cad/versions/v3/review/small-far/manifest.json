@@ -1,7 +1,7 @@
 {
   "version": "v3",
   "title": "Three interchangeable cuffs on integral studs",
-  "revision": "thicker-cap-slot-ends-v3",
+  "revision": "flush-width-fins-v3",
   "phone_rotation_degrees": 180,
   "phone_center_y_mm": 0,
   "status": "Local TPU/stud fit approved; full jaws and loaded phone retention unvalidated",
@@ -31,22 +31,22 @@
       "id": "shaft_cap",
       "name": "Rigid shaft clamp cap",
       "quantity": 1,
-      "material": "PLA / PLA+",
-      "note": "Slot end ligaments thickened 1.6 to 2.6 mm; slot width 8.8 mm unchanged. 110 mm collar spans Z-40..70; two screws on each axial side of the jaw at Z-30/+60. Entire outer side at X12: body, crossing, rail wings and four screw seats share one bed plane. Use 1.8 mm shorter collar screws and the extended bracket bearing plate. New full collar fit and loaded retention unvalidated."
+      "material": "PETG / PLA",
+      "note": "Taller cap walls meet the flat fixed jaw across a 1 mm split gap; inner extent X-4.8. Slot end ligaments thickened 1.6 to 2.6 mm; slot width 8.8 mm unchanged. 110 mm collar spans Z-40..70; two screws on each axial side of the jaw at Z-30/+60. Entire outer side at X12: body, crossing, rail wings and four screw seats share one bed plane. Use 1.8 mm shorter collar screws and the extended bracket bearing plate. New full collar fit and loaded retention unvalidated."
     },
     {
       "id": "carrier",
       "name": "Centered fixed stud, sliding track and shaft saddle",
       "quantity": 1,
-      "material": "PLA / PLA+",
-      "note": "Straddled collar with two windows and retained central root; guide-floor slot with35-degree roof. Four screw mounts, track edges/stops and centered cuff unchanged. PETG slice adds no support to baseline; physical strength and retention unqualified."
+      "material": "PETG / PLA",
+      "note": "Flat collar underside at X-5.8 with approved ramp below the fixed band hook; guide-floor slot with35-degree roof. Four screw mounts, track edges/stops and centered cuff unchanged. Matches the approved PETG plate geometry; physical strength and retention unqualified."
     },
     {
       "id": "sliding_jaw",
       "name": "Sliding dual-stud jaw",
       "quantity": 1,
-      "material": "PLA / PLA+",
-      "note": "Two 31 x 4 mm beam openings with 3.8 mm edge rails. Continuous121.6 mm beam flush with central root at X-10/-2. Studs100 mm apart; jaw sits5.2 mm farther out to keep cuff contacts unchanged. Tongue design retained; engagement and band preload need physical checks. See flush-beam slice."
+      "material": "PETG / PLA",
+      "note": "Two fins end flush with the fixed rails at Y +/-13.8 mm, with 0.4 mm top clearance; wraparound skirts removed. Two 31 x 4 mm beam openings with 3.8 mm edge rails. Continuous121.6 mm beam flush with central root at X-10/-2. Studs100 mm apart; jaw sits5.2 mm farther out to keep cuff contacts unchanged. Tongue design retained; engagement and band preload need physical checks. See flush-beam slice."
     },
     {
       "id": "phone_cuff",
@@ -59,28 +59,28 @@
       "id": "actuator_bracket",
       "name": "Flat-back plunger frame and offset rail bracket",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "note": "Smoothly blended reinforcement. Mount bore offset 4.4 mm for a common flat back, preserving 5.4 mm beside the bore. No rail locating lugs: one screw/nut clamps the flat face; friction alone resists sliding and rotation. Bearing plate extends inward 1.8 mm to the flat cap; phone/plunger positions and rail fasteners unchanged. Remove phone/release twine; loosen nut and slide module with captured fasteners to rail screw Y +50 near / -50 far. Remove nut/screw there, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and retention unqualified."
     },
     {
       "id": "plunger",
       "name": "Rounded-shoe sliding plunger",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "note": "Shoe and blended root share the stem thickness of 4 mm; contact span remains 16 mm. Shared capped band/twine cleat. Nominal stroke is illustrative, not a physical force limit."
     },
     {
       "id": "pulley",
       "name": "Deep-groove redirect pulley",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "note": "Groove depth 1.1 to 2.2 mm nominal, with 36-degree flanks. Same 18 mm diameter, 4 mm width and 8.6 mm bore; unchanged axle and bearing envelope. Minimum radial web 2.5 mm. PETG slice review required; physical string retention, strength and rotation untested."
     },
     {
       "id": "pulley_axle",
       "name": "Headed smooth pulley axle",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "note": "Unchanged 20.6 mm overall span, 8 mm shaft and outboard cross-key. Now supported by one 8.2 mm boss; head retains the wheel. Cantilever loading and new stack clearance require physical testing."
     },
     {

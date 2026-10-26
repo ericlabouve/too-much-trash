@@ -11,7 +11,7 @@ if braced:sys.argv.remove('--braced')
 out=Path(sys.argv[sys.argv.index('--output-dir')+1]).resolve()
 source=out.parent/(out.name+'-source')
 source.mkdir(exist_ok='--resume-unsliced' in sys.argv)
-fixed=m.carrier(m.Parameters()).cut(m.box(-5.8,30,-80,80,-50,80)).clean()
+fixed=m.carrier(m.Parameters(),flat_ramped=False).cut(m.box(-5.8,30,-80,80,-50,80)).clean()
 angle=35
 # Fill only below the band seat. Print height runs toward negative CAD X.
 start=-19.35+4.55*math.tan(math.radians(angle))

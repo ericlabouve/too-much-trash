@@ -356,7 +356,21 @@ def shaft_clamp_half(p,cap=False):
                      -p.collar_opening_y/2,p.collar_opening_y/2,
                      CLAMP_BOTTOM-1,CLAMP_TOP+1))
 
-def shaft_cap(p):
+def shaft_cap(p, *, tall=True, side_windows=False):
+    if tall:
+        s=box(-4.8,12,-13.8,13.8,CLAMP_BOTTOM,CLAMP_TOP)
+        for y,z in CLAMP_STATIONS:
+            s=s.union(cylinder((-4.8,y,z),(1,0,0),18.6,18))
+            s=s.union(box(-4.8,13.8,min(y,11),max(y,-11),z-9,z+9))
+            s=s.cut(cylinder((-15,y,z),(1,0,0),30,8.8))
+        s=s.cut(box(-5.8,5.8,-8.8,8.8,-41,71))
+        s=s.union(paired_neck_rail().translate((CUFF_INWARD_SHIFT,0,0)))
+        s=s.intersect(box(-20,12,-70,70,-38.5,68.5))
+        s=s.cut(box(-10,15,-5.5,5.5,-30,60).edges('|X').fillet(5.49)).clean()
+        if side_windows:
+            from cap_side_windows import refine
+            s=refine(s)
+        return s
     # One bed plane across body, crossing, rail wings and all four bosses.
     # The mating bracket reaches back to this plane without moving the shoe.
     s=shaft_clamp_half(p,True).union(paired_neck_rail().translate((CUFF_INWARD_SHIFT,0,0)))
@@ -371,7 +385,7 @@ def shaft_cap(p):
     s=s.cut(opening)
     return s.clean()
 
-def carrier(p, *, lightened=True, arm_slots=True):
+def carrier(p, *, lightened=True, arm_slots=True, flat_ramped=True):
     # Plain L junction: track meets the main clamp wall directly. No old
     # hard-lip tray, raised cuff pedestal or surrounding end/side walls.
     # Flush outer sides share the collar's Y +/-13.8 planes. Preserve the
@@ -410,9 +424,15 @@ def carrier(p, *, lightened=True, arm_slots=True):
     if arm_slots:
         from jaw_arm_slots import refine as slot_refine
         s=slot_refine(s,'carrier')
+    if flat_ramped:
+        s=s.cut(box(-5.8,30,-80,80,-50,80)).clean()
+        # Match the approved sliced hook, including its 0.05 mm fusion overlap.
+        start=-19.3+4.55*math.tan(math.radians(35))
+        ramp=cq.Workplane('XZ').polyline([(start,33.95),(-19.35,38.5),(-19.35,33.95)]).close().extrude(10,both=True)
+        s=s.union(ramp)
     return s.clean()
 
-def sliding_jaw(p, *, flat_back=True, cleat_shift=SLIDING_CLEAT_SHIFT, support_angle=JAW_SUPPORT_ANGLE, arm_slots=True, continuous_beam=True, flush_beam=True, beam_window_width=4):
+def sliding_jaw(p, *, flat_back=True, cleat_shift=SLIDING_CLEAT_SHIFT, support_angle=JAW_SUPPORT_ANGLE, arm_slots=True, continuous_beam=True, flush_beam=True, beam_window_width=4, keeper_tabs=True):
     # T crossbar retains 100 mm spacing and tongue; sockets replace hard lips.
     # No central projection below the crossbar; retain the tongue/cleat root above.
     s=box(-10,-2,-7,7,12,33)
@@ -446,6 +466,9 @@ def sliding_jaw(p, *, flat_back=True, cleat_shift=SLIDING_CLEAT_SHIFT, support_a
         for a,b in ((-43,-12),(12,43)):
             tool=box(-11,0,a,b,CUFF_Z-beam_window_width/2,CUFF_Z+beam_window_width/2).edges('|X').fillet(beam_window_width/2-.01)
             s=s.cut(tool)
+    if keeper_tabs:
+        from jaw_keeper_tabs import refine as add_keepers
+        s=add_keepers(s)
     return s
 
 # Eye thickness stays 6 mm; translating -4 mm aligns its lower face

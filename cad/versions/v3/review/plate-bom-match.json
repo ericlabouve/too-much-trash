@@ -1,0 +1,12 @@
+{
+  "carrier": {
+    "symmetric_difference_mm3": 0,
+    "valid_single_solid": true,
+    "reference": "2026-10-26-ramped-fixed-hook-source"
+  },
+  "shaft_cap": {
+    "symmetric_difference_mm3": 0,
+    "valid_single_solid": true,
+    "reference": "2026-10-26-final-materials-source"
+  }
+}

@@ -3,44 +3,44 @@
   "scale_percent": 100,
   "nozzle_mm": 0.4,
   "layer_mm": 0.2,
-  "revision": "thicker-cap-slot-ends-v3",
+  "revision": "flush-width-fins-v3",
   "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
   "parts": [
     {
       "name": "shaft_cap",
       "file": "shaft_cap.stl",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "bounds_mm": [
         107.0,
         120.0,
-        11.5
+        16.8
       ],
       "bed_z_min_mm": 8.539492889059869e-16,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Single X12 outer face down (+90 degrees about Y), including body, rail wings and all four screw seats; 4.2 mm rail thickness. Slicer/support review still required; no support-free claim."
+      "supports": "Approved taller cap: X-4.8 inner wall, 2.6 mm slot end ligaments. Single X12 outer face down (+90 degrees about Y), including body, rail wings and all four screw seats; 4.2 mm rail thickness. Slicer/support review still required; no support-free claim."
     },
     {
       "name": "carrier",
       "file": "carrier.stl",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "bounds_mm": [
         110.0,
         48.992,
-        109.8
+        104.5
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": -1.0926743548426196e-16,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "CAD Y+90; collar face down. Approved upright orientation; 6 mm arm/tongue slot with 35-degree roof. Matched PETG 0.12 mm automatic-support slice adds no support geometry; existing supports remain. See 2026-10-25-jaw-arm-slots. Physical roof quality, sliding fit and loaded strength unverified."
+      "supports": "Approved flat X-5.8 collar underside down (CAD Y+90), lower hook ramp; matches final PETG plate. Approved upright orientation; 6 mm arm/tongue slot with 35-degree roof. Matched PETG 0.12 mm automatic-support slice adds no support geometry; existing supports remain. See 2026-10-25-jaw-arm-slots. Physical roof quality, sliding fit and loaded strength unverified."
     },
     {
       "name": "sliding_jaw",
       "file": "sliding_jaw.stl",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "bounds_mm": [
         39.52,
         121.6,
@@ -70,7 +70,7 @@
       "name": "actuator_bracket",
       "file": "actuator_bracket.stl",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "bounds_mm": [
         66.0,
         51.0,
@@ -85,7 +85,7 @@
       "name": "plunger",
       "file": "plunger.stl",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "bounds_mm": [
         58.0,
         16.0,
@@ -100,7 +100,7 @@
       "name": "pulley",
       "file": "pulley.stl",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "bounds_mm": [
         17.999,
         17.999,
@@ -115,7 +115,7 @@
       "name": "pulley_axle",
       "file": "pulley_axle.stl",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "PETG / PLA",
       "bounds_mm": [
         10.999,
         10.998,

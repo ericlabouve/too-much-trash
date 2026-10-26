@@ -1,0 +1,110 @@
+{
+  "revision": "external-keeper-tabs-study",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 1,
+  "plates": 1,
+  "total_g": 13.350333213806152,
+  "total_minutes": 134.71720377604166,
+  "warning": "",
+  "deposited_g_by_role": {
+    "interface": 0.0129,
+    "support": 0.0514,
+    "model": 13.1594
+  },
+  "objects": {
+    "sliding_jaw": {
+      "deposited_g_by_role": {
+        "interface": 0.0129,
+        "support": 0.0514,
+        "model": 13.1594
+      },
+      "deposited_xy_bounds": [
+        [
+          5.41,
+          135.41
+        ],
+        [
+          126.59,
+          174.51
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        5.6
+      ]
+    }
+  },
+  "gaps": [],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "sliding_jaw",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "7f14ecc484fba9354d65936213f9face",
+  "hashes": {
+    "cuff-fit-input.3mf": "65029525bf952f4c9376c3b83f09596892f3c3b712a112031073394c1706f3af",
+    "cuff-fit.gcode.3mf": "b4d7bed6905070599723be4896b2316fa0f2d7c6069c9b7ac2823dc034cc15d4",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Two external keepers with 0.4 mm nominal rail clearance; automatic supports enabled. No print sent."
+  ]
+}
