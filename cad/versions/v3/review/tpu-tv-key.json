@@ -1,0 +1,25 @@
+{
+  "revision": "tpu-tv-axle-key-v3",
+  "passed": true,
+  "material": "ELEGOO TPU95A",
+  "overall_length_mm": 14.7,
+  "stem_width_mm": 3,
+  "thickness_mm": 3,
+  "axle_slot_mm": [
+    3.4,
+    3.4
+  ],
+  "relaxed_v_width_mm": 5,
+  "ideal_compressed_v_width_mm": 3,
+  "required_tip_deflection_per_side_mm": 1,
+  "seated_overlap_mm3": 0,
+  "compressed_envelope_max_axle_overlap_mm3": 0.0,
+  "relaxed_reverse_2mm_interference_mm3": 2.9020302376410148,
+  "keeper_clear": true,
+  "limits": [
+    "Ideal compressed envelope only; bending strain, insertion force and spring-back not calculated.",
+    "Test snap reopening, pull-out, repeated removal, axle retention and TPU creep physically.",
+    "Remove keeper, pinch V arms inward, then withdraw toward T-head; never force.",
+    "Existing keeper retained until snap is physically qualified. No print sent."
+  ]
+}

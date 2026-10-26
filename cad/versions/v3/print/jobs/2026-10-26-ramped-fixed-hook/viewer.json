@@ -1,0 +1,31 @@
+{
+  "title": "Ramped fixed hook + taller cap \u00b7 PETG \u00b7 single-plate slice review",
+  "subtitle": "2 separate pieces at 100% scale \u00b7 fixed-hook-ramp-study",
+  "notes": [
+    "35-degree ramp below the unchanged fixed band seat. Tongue travel and band paths preserved.",
+    "Same two-part placement and PETG recipe as the accepted flat-fixed/taller-cap study. Automatic supports enabled.",
+    "No printer contact. Actual ramp quality, clamping and band-anchor strength require physical tests."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

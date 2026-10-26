@@ -1,0 +1,19 @@
+{
+  "baseline": {
+    "interface": 0.0125,
+    "support": 0.0167,
+    "model": 12.2099
+  },
+  "wide_windows": {
+    "interface": 0.0125,
+    "support": 0.0167,
+    "model": 12.0402
+  },
+  "model_saving_g": 0.16969999999999885,
+  "model_saving_percent": 1.3898557727745424,
+  "same_support": true,
+  "compact_plate_total_g": 77.69385528564453,
+  "compact_plate_minutes": 548.9321614583333,
+  "compact_support_g": 0.37639999999999996,
+  "minimum_exact_projected_path_gap_mm": 3.9200000000000013
+}

@@ -1,0 +1,31 @@
+{
+  "title": "Current fixed jaw + cap \u00b7 PETG comparison \u00b7 single-plate slice review",
+  "subtitle": "2 separate pieces at 100% scale \u00b7 current-fixed-cap-baseline",
+  "notes": [
+    "Two complete parts, same profiles and plate positions in both trials. Automatic Snug supports enabled.",
+    "Unchanged current fixed jaw and cap baseline.",
+    "Study only; not promoted into the assembly or sent to the printer. Physical stiffness and clamp fit remain unverified."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "version": "v3",
   "title": "Three interchangeable cuffs on integral studs",
-  "revision": "deep-groove-pulley-v3",
+  "revision": "thicker-cap-slot-ends-v3",
   "phone_rotation_degrees": 180,
   "phone_center_y_mm": 0,
   "status": "Local TPU/stud fit approved; full jaws and loaded phone retention unvalidated",
@@ -32,21 +32,21 @@
       "name": "Rigid shaft clamp cap",
       "quantity": 1,
       "material": "PLA / PLA+",
-      "note": "110 mm collar spans Z-40..70; two screws on each axial side of the jaw at Z-30/+60. Entire outer side at X12: body, crossing, rail wings and four screw seats share one bed plane. Use 1.8 mm shorter collar screws and the extended bracket bearing plate. New full collar fit and loaded retention unvalidated."
+      "note": "Slot end ligaments thickened 1.6 to 2.6 mm; slot width 8.8 mm unchanged. 110 mm collar spans Z-40..70; two screws on each axial side of the jaw at Z-30/+60. Entire outer side at X12: body, crossing, rail wings and four screw seats share one bed plane. Use 1.8 mm shorter collar screws and the extended bracket bearing plate. New full collar fit and loaded retention unvalidated."
     },
     {
       "id": "carrier",
       "name": "Centered fixed stud, sliding track and shaft saddle",
       "quantity": 1,
       "material": "PLA / PLA+",
-      "note": "Straddled four-fastener collar, direct full-depth track root and centered unchanged 21.6 mm cuff. Mirrored 35-degree band slot without square cap. Cuff stud retains its 35-degree ramp. New slice and physical band/TPU retention testing required; full jaw unprinted."
+      "note": "Straddled collar with two windows and retained central root; guide-floor slot with35-degree roof. Four screw mounts, track edges/stops and centered cuff unchanged. PETG slice adds no support to baseline; physical strength and retention unqualified."
     },
     {
       "id": "sliding_jaw",
       "name": "Sliding dual-stud jaw",
       "quantity": 1,
       "material": "PLA / PLA+",
-      "note": "Two identical integral studs, 100 mm contact spacing; 121.6 mm cuff span. No removable cuff keys. New jaw strength and loaded retention unqualified."
+      "note": "Two 31 x 4 mm beam openings with 3.8 mm edge rails. Continuous121.6 mm beam flush with central root at X-10/-2. Studs100 mm apart; jaw sits5.2 mm farther out to keep cuff contacts unchanged. Tongue design retained; engagement and band preload need physical checks. See flush-beam slice."
     },
     {
       "id": "phone_cuff",
@@ -85,10 +85,10 @@
     },
     {
       "id": "pulley_key",
-      "name": "Axle T-key",
+      "name": "TPU T/V axle snap key",
       "quantity": 1,
-      "material": "PLA / PLA+",
-      "note": "Unchanged 12.2 mm pulley axle key and keeper band. Cuffs now use integral jaw studs, not loose keys."
+      "material": "ELEGOO TPU 95A",
+      "note": "T-head stop and split V tip;14.7 mm overall,3 mm stem/thickness,5 mm relaxed V span. Pinch arms for removal. Snap insertion, pull-out, wear and creep untested; keeper band retained pending qualification. Cuffs use integral studs."
     },
     {
       "id": "collar_screw",
@@ -307,9 +307,9 @@
       "name": "pulley_key",
       "file": "assembly_pulley_key.stl",
       "color": [
-        0.96,
-        0.36,
-        0.08
+        0,
+        0.55,
+        0.6
       ],
       "bom_id": "pulley_key"
     },
@@ -944,9 +944,14 @@
       ],
       "band_keeper": [
         [
-          -4.149999999999999,
+          -2.6499999999999986,
           -21.7,
-          1.7999999999999998
+          4.3
+        ],
+        [
+          -5.149999999999999,
+          -21.7,
+          -0.8000000000000007
         ],
         [
           -6.284621756054175,
@@ -1019,14 +1024,19 @@
           -3.66311952464757
         ],
         [
-          0.4499999999999993,
+          1.4499999999999993,
           -21.7,
-          1.7999999999999998
+          -0.8000000000000007
         ],
         [
-          -4.149999999999999,
+          -1.0500000000000007,
           -21.7,
-          1.7999999999999998
+          4.3
+        ],
+        [
+          -2.6499999999999986,
+          -21.7,
+          4.3
         ]
       ],
       "band_overtravel": [
@@ -1343,132 +1353,132 @@
           40.5
         ],
         [
-          -92.2,
+          -97.4,
           9.0,
           40.5
         ],
         [
-          -92.39578928833008,
+          -97.59578928833008,
           8.987167292060715,
           40.5
         ],
         [
-          -92.58822856765379,
+          -97.78822856765379,
           8.948888739433603,
           40.5
         ],
         [
-          -92.77402514854764,
+          -97.97402514854764,
           8.885819298766929,
           40.5
         ],
         [
-          -92.95,
+          -98.15,
           8.799038105676658,
           40.5
         ],
         [
-          -93.11314214351309,
+          -98.31314214351309,
           8.690030010436853,
           40.5
         ],
         [
-          -93.26066017177982,
+          -98.46066017177982,
           8.560660171779821,
           40.5
         ],
         [
-          -93.39003001043686,
+          -98.59003001043686,
           8.413142143513081,
           40.5
         ],
         [
-          -93.49903810567666,
+          -98.69903810567666,
           8.25,
           40.5
         ],
         [
-          -93.58581929876694,
+          -98.78581929876694,
           8.074025148547635,
           40.5
         ],
         [
-          -93.6488887394336,
+          -98.8488887394336,
           7.8882285676537816,
           40.5
         ],
         [
-          -93.68716729206072,
+          -98.88716729206072,
           7.695789288330078,
           40.5
         ],
         [
-          -93.7,
+          -98.9,
           7.5,
           40.5
         ],
         [
-          -93.7,
+          -98.9,
           -7.5,
           40.5
         ],
         [
-          -93.68716729206072,
+          -98.88716729206072,
           -7.695789288330077,
           40.5
         ],
         [
-          -93.6488887394336,
+          -98.8488887394336,
           -7.8882285676537816,
           40.5
         ],
         [
-          -93.58581929876694,
+          -98.78581929876694,
           -8.074025148547635,
           40.5
         ],
         [
-          -93.49903810567666,
+          -98.69903810567666,
           -8.25,
           40.5
         ],
         [
-          -93.39003001043686,
+          -98.59003001043686,
           -8.413142143513081,
           40.5
         ],
         [
-          -93.26066017177982,
+          -98.46066017177982,
           -8.560660171779821,
           40.5
         ],
         [
-          -93.11314214351309,
+          -98.31314214351309,
           -8.690030010436853,
           40.5
         ],
         [
-          -92.95,
+          -98.15,
           -8.799038105676658,
           40.5
         ],
         [
-          -92.77402514854764,
+          -97.97402514854764,
           -8.88581929876693,
           40.5
         ],
         [
-          -92.58822856765379,
+          -97.78822856765379,
           -8.948888739433603,
           40.5
         ],
         [
-          -92.39578928833008,
+          -97.59578928833008,
           -8.987167292060715,
           40.5
         ],
         [
-          -92.2,
+          -97.4,
           -9.0,
           40.5
         ],
@@ -1610,132 +1620,132 @@
           43.0
         ],
         [
-          -92.2,
+          -97.4,
           9.0,
           43.0
         ],
         [
-          -92.39578928833008,
+          -97.59578928833008,
           8.987167292060715,
           43.0
         ],
         [
-          -92.58822856765379,
+          -97.78822856765379,
           8.948888739433603,
           43.0
         ],
         [
-          -92.77402514854764,
+          -97.97402514854764,
           8.885819298766929,
           43.0
         ],
         [
-          -92.95,
+          -98.15,
           8.799038105676658,
           43.0
         ],
         [
-          -93.11314214351309,
+          -98.31314214351309,
           8.690030010436853,
           43.0
         ],
         [
-          -93.26066017177982,
+          -98.46066017177982,
           8.560660171779821,
           43.0
         ],
         [
-          -93.39003001043686,
+          -98.59003001043686,
           8.413142143513081,
           43.0
         ],
         [
-          -93.49903810567666,
+          -98.69903810567666,
           8.25,
           43.0
         ],
         [
-          -93.58581929876694,
+          -98.78581929876694,
           8.074025148547635,
           43.0
         ],
         [
-          -93.6488887394336,
+          -98.8488887394336,
           7.8882285676537816,
           43.0
         ],
         [
-          -93.68716729206072,
+          -98.88716729206072,
           7.695789288330078,
           43.0
         ],
         [
-          -93.7,
+          -98.9,
           7.5,
           43.0
         ],
         [
-          -93.7,
+          -98.9,
           -7.5,
           43.0
         ],
         [
-          -93.68716729206072,
+          -98.88716729206072,
           -7.695789288330077,
           43.0
         ],
         [
-          -93.6488887394336,
+          -98.8488887394336,
           -7.8882285676537816,
           43.0
         ],
         [
-          -93.58581929876694,
+          -98.78581929876694,
           -8.074025148547635,
           43.0
         ],
         [
-          -93.49903810567666,
+          -98.69903810567666,
           -8.25,
           43.0
         ],
         [
-          -93.39003001043686,
+          -98.59003001043686,
           -8.413142143513081,
           43.0
         ],
         [
-          -93.26066017177982,
+          -98.46066017177982,
           -8.560660171779821,
           43.0
         ],
         [
-          -93.11314214351309,
+          -98.31314214351309,
           -8.690030010436853,
           43.0
         ],
         [
-          -92.95,
+          -98.15,
           -8.799038105676658,
           43.0
         ],
         [
-          -92.77402514854764,
+          -97.97402514854764,
           -8.88581929876693,
           43.0
         ],
         [
-          -92.58822856765379,
+          -97.78822856765379,
           -8.948888739433603,
           43.0
         ],
         [
-          -92.39578928833008,
+          -97.59578928833008,
           -8.987167292060715,
           43.0
         ],
         [
-          -92.2,
+          -97.4,
           -9.0,
           43.0
         ],

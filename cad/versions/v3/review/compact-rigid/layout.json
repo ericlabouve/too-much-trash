@@ -1,0 +1,68 @@
+{
+  "parts": {
+    "sliding_jaw": {
+      "angle": 90,
+      "center_xy_mm": [
+        65.99999923706055,
+        154.95999999046325
+      ]
+    },
+    "carrier": {
+      "angle": 0,
+      "center_xy_mm": [
+        60.2,
+        116.69720191955567
+      ]
+    },
+    "shaft_cap": {
+      "angle": 270,
+      "center_xy_mm": [
+        117.7,
+        74.2
+      ]
+    },
+    "pulley": {
+      "angle": 0,
+      "center_xy_mm": [
+        28.19940502678277,
+        150.19949409971755
+      ]
+    },
+    "actuator_bracket": {
+      "angle": 90,
+      "center_xy_mm": [
+        35.7,
+        66.2
+      ]
+    },
+    "plunger": {
+      "angle": 180,
+      "center_xy_mm": [
+        109.2,
+        154.2
+      ]
+    },
+    "pulley_axle": {
+      "angle": 90,
+      "center_xy_mm": [
+        46.69778463089696,
+        153.69913825761327
+      ]
+    }
+  },
+  "sources": {
+    "carrier": "print/jobs/2026-10-26-ramped-fixed-hook-source/carrier.stl",
+    "shaft_cap": "print/jobs/2026-10-26-final-materials-source/shaft_cap.stl",
+    "sliding_jaw": "print/sliding_jaw.stl",
+    "actuator_bracket": "print/actuator_bracket.stl",
+    "plunger": "print/plunger.stl",
+    "pulley": "print/pulley.stl",
+    "pulley_axle": "print/pulley_axle.stl"
+  },
+  "trial": 2,
+  "projection_clearance_buffer_mm": 2.2,
+  "grid_mm": 1,
+  "limits": [
+    "Approved tall cap and ramped fixed jaw retained; current 4 mm sliding windows and 2.6 mm cap end ligaments. Actual paths require fresh slice audit."
+  ]
+}

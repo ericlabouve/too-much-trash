@@ -1,22 +1,22 @@
 {
-  "revision": "flat-bed-shaft-cap-v3",
+  "revision": "through-slot-shaft-cap-v3",
   "passed": true,
   "valid": true,
   "solid_count": 1,
   "bed_plane_x_mm": 12,
   "one_connected_planar_face": {
-    "area_mm2": 4524.374500661724,
+    "area_mm2": 3470.080484412427,
     "y": [
       -60.0,
       60.0
     ],
     "z": [
-      -40.0,
-      70.0
+      -38.5,
+      68.5
     ]
   },
   "removed_height_mm": 1.8,
-  "removed_from_untrimmed_cap_mm3": 4393.746705305418,
+  "removed_from_untrimmed_cap_mm3": 11128.412053458445,
   "rail_thickness_mm": 4.2,
   "collar_screw_threaded_span_mm": 30.2,
   "collar_screw_seats": [

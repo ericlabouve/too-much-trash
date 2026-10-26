@@ -9,26 +9,28 @@ import trimesh
 from model import *
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'review'
-REVISION='deep-groove-pulley-v3'
+REVISION='thicker-cap-slot-ends-v3'
+SLIDING_BEAM_PRINT_NOTE='Two 31 x 4 mm beam windows leave 3.8 mm edge rails; tongue slot and central/stud islands retained. Fresh slice required. Continuous beam and root share X-10 rear bed face (CAD Y-90) and X-2 front face. Beam/studs shift5.2 mm; assembly slides outward5.2 mm to preserve cuff contacts. See flush-beam PETG slice; physical strength, engagement and band preload unverified.'
 BRACKET_PRINT_NOTE='Common flat Y5.4 back face down (-90 degrees about X). Outer pulley cheek/arm and raised plinth removed; remaining boss raised 2 mm. Extended curved guide and independent return stop. Fresh slice required; support savings and cantilever strength unqualified.'
+JAW_SLOT_PRINT_NOTE='Approved upright orientation; 6 mm arm/tongue slot with 35-degree roof. Matched PETG 0.12 mm automatic-support slice adds no support geometry; existing supports remain. See 2026-10-25-jaw-arm-slots. Physical roof quality, sliding fit and loaded strength unverified.'
 BOM=[
  dict(id=n,name=label,quantity=q,material='PLA / PLA+',note=note)
  for n,label,q,note in [
- ('shaft_cap','Rigid shaft clamp cap',1,'110 mm collar spans Z-40..70; two screws on each axial side of the jaw at Z-30/+60. Entire outer side at X12: body, crossing, rail wings and four screw seats share one bed plane. Use 1.8 mm shorter collar screws and the extended bracket bearing plate. New full collar fit and loaded retention unvalidated.'),
- ('carrier','Centered fixed stud, sliding track and shaft saddle',1,'Straddled four-fastener collar, direct full-depth track root and centered unchanged 21.6 mm cuff. Mirrored 35-degree band slot without square cap. Cuff stud retains its 35-degree ramp. New slice and physical band/TPU retention testing required; full jaw unprinted.'),
- ('sliding_jaw','Sliding dual-stud jaw',1,'Two identical integral studs, 100 mm contact spacing; 121.6 mm cuff span. No removable cuff keys. New jaw strength and loaded retention unqualified.'),
+ ('shaft_cap','Rigid shaft clamp cap',1,'Slot end ligaments thickened 1.6 to 2.6 mm; slot width 8.8 mm unchanged. 110 mm collar spans Z-40..70; two screws on each axial side of the jaw at Z-30/+60. Entire outer side at X12: body, crossing, rail wings and four screw seats share one bed plane. Use 1.8 mm shorter collar screws and the extended bracket bearing plate. New full collar fit and loaded retention unvalidated.'),
+ ('carrier','Centered fixed stud, sliding track and shaft saddle',1,'Straddled collar with two windows and retained central root; guide-floor slot with35-degree roof. Four screw mounts, track edges/stops and centered cuff unchanged. PETG slice adds no support to baseline; physical strength and retention unqualified.'),
+ ('sliding_jaw','Sliding dual-stud jaw',1,'Two 31 x 4 mm beam openings with 3.8 mm edge rails. Continuous121.6 mm beam flush with central root at X-10/-2. Studs100 mm apart; jaw sits5.2 mm farther out to keep cuff contacts unchanged. Tongue design retained; engagement and band preload need physical checks. See flush-beam slice.'),
  ('phone_cuff','Interchangeable 21.6 mm TPU cuff',3,'One unchanged shape at all three contacts: 6.8 mm square passage, 9.6 x 6.8 mm head recess. Integral seating ribs. ELEGOO TPU95A; previous square-stud fit successful, new ramped-stud pull-out resistance and full phone grip unqualified.'),
 ('actuator_bracket','Flat-back plunger frame and offset rail bracket',1,'Smoothly blended reinforcement. Mount bore offset 4.4 mm for a common flat back, preserving 5.4 mm beside the bore. No rail locating lugs: one screw/nut clamps the flat face; friction alone resists sliding and rotation. Bearing plate extends inward 1.8 mm to the flat cap; phone/plunger positions and rail fasteners unchanged. Remove phone/release twine; loosen nut and slide module with captured fasteners to rail screw Y +50 near / -50 far. Remove nut/screw there, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and retention unqualified.'),
  ('plunger','Rounded-shoe sliding plunger',1,'Shoe and blended root share the stem thickness of 4 mm; contact span remains 16 mm. Shared capped band/twine cleat. Nominal stroke is illustrative, not a physical force limit.'),
  ('pulley','Deep-groove redirect pulley',1,'Groove depth 1.1 to 2.2 mm nominal, with 36-degree flanks. Same 18 mm diameter, 4 mm width and 8.6 mm bore; unchanged axle and bearing envelope. Minimum radial web 2.5 mm. PETG slice review required; physical string retention, strength and rotation untested.'),
  ('pulley_axle','Headed smooth pulley axle',1,'Unchanged 20.6 mm overall span, 8 mm shaft and outboard cross-key. Now supported by one 8.2 mm boss; head retains the wheel. Cantilever loading and new stack clearance require physical testing.'),
- ('pulley_key','Axle T-key',1,'Unchanged 12.2 mm pulley axle key and keeper band. Cuffs now use integral jaw studs, not loose keys.'),
+ ('pulley_key','TPU T/V axle snap key',1,'T-head stop and split V tip;14.7 mm overall,3 mm stem/thickness,5 mm relaxed V span. Pinch arms for removal. Snap insertion, pull-out, wear and creep untested; keeper band retained pending qualification. Cuffs use integral studs.'),
  ('collar_screw','Common long TPU screw',5,'One unchanged 30.2 mm threaded-span 8×3 design: four collar screws and one actuator rail screw. Rail screw projects 12.2 mm farther beyond its nut; head bearing stays unchanged. User selects TPU for tighter feel; loaded retention, creep and thread strength unverified.'),
  ('thumb_nut','Common TPU clamp nut',5,'Same 8×3 nut geometry at all five stations. ELEGOO TPU 95A selected by user for tighter feel; hand-tighten only. Sustained preload, creep and thread stripping remain untested.'),
  ('clip_string_guide','Reversible TPU clip guide',1,'Single offset 4 mm eye, half the former diameter. 6 mm axial width; 1.6 mm walls around a 13.8 x 18.8 mm opening and 13 mm snap mouth. Flip end-for-end for left/right eye. No guide bands, grooves or lower guides. Snap fit, sliding retention, cord friction and creep untested.')]]
 BOM += [dict(id='twine',name='Twine sections joined by inline band',quantity=2,material='Twine',note='Two lengths joined with a rubber band along the neck. Run directly from the pulley to the nearest shaft guide; there are no bracket guide holes; leave enough for knots. Cord-clearance checks use the provisional 2 mm diameter; actual twine, knots and larger diameters need qualification.'),dict(id='rubber_bands',name='Rubber bands',quantity=5,material='Rubber',note='2 jaw closing + 1 return + 1 inline overtravel + 1 axle-key keeper. Actual preload and loop count need fitting.')]
 for row in BOM:
- if row['id'] in ('phone_cuff','collar_screw','thumb_nut','clip_string_guide'):row['material']='ELEGOO TPU 95A'
+ if row['id'] in ('phone_cuff','collar_screw','thumb_nut','clip_string_guide','pulley_key'):row['material']='ELEGOO TPU 95A'
 SAMPLES={'wallet':Parameters(),'bare':Parameters(phone_thickness=8,button_from_screen=4),'small':Parameters(phone_width=66,phone_length=140,phone_thickness=7.5,button_from_end=99,button_from_screen=3.5),'large':Parameters(phone_width=86,phone_length=170,phone_thickness=20,button_from_end=150,button_from_screen=6)}
 
 @lru_cache(maxsize=8192)
@@ -131,6 +133,9 @@ def manufacturing(solids):
  notes['actuator_bracket']=BRACKET_PRINT_NOTE
  notes['carrier']='Canonical +90-degree Y orientation. Mirrored 35-degree band slot without square cap; cuff stud unchanged. Previous fixed-angle-35 slice predates this cleat revision; reslice before printing. Band seating, TPU retention and strength need testing.'
  notes['sliding_jaw']='Rear X=-10 down (-90 degrees about Y). Uncapped 35-degree band slot; lower projection restored to its original extent. Tongue and cuff studs unchanged. Previous angle-35 zero-support slice predates this revision; reslice before printing. Strength and retention unqualified.'
+ notes['carrier']='CAD Y+90; collar face down. '+JAW_SLOT_PRINT_NOTE
+ notes['sliding_jaw']=SLIDING_BEAM_PRINT_NOTE
+ notes['pulley_key']='ELEGOO TPU95A T/V snap prototype, uniform3 mm thickness flat on bed. Fresh TPU slice and insertion/reopening/pull-out tests required. Keep channels open; retain keeper until qualified.'
  rotations['phone_cuff']=('Y',-90)
  notes['phone_cuff']='Common 21.6 mm TPU cuff, back down. User reports tiny first-layer supports unnecessary; cuff batch disables support. Not a complete-jaw qualification.'
  result=[]
@@ -183,5 +188,7 @@ def refresh_metadata():
  path=ROOT/'print/manifest.json';data=json.loads(path.read_text());assert data['revision']==REVISION
  for part in data['parts']:
   if part['name']=='actuator_bracket':part['supports']=BRACKET_PRINT_NOTE
+  if part['name']=='carrier':part['supports']='CAD Y+90; collar face down. '+JAW_SLOT_PRINT_NOTE
+  if part['name']=='sliding_jaw':part['supports']=SLIDING_BEAM_PRINT_NOTE
  save(path,data);write_bom()
 if __name__=='__main__':build()

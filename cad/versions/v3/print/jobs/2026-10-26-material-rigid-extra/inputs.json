@@ -1,0 +1,289 @@
+{
+  "revision": "material-set-ramped-fixed-v3",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "sliding_jaw",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-material-rigid-extra-source/sliding_jaw.stl",
+      "input_sha256": "e608c70be5abf16765c9a4cdd562f9588dbdfce99c47f08dbd2fc430fe60756b",
+      "center_xy_mm": [
+        35,
+        90
+      ],
+      "bounds_mm": [
+        39.52000045776367,
+        121.5999984741211,
+        58.5
+      ],
+      "orientation": "Flush rear beam down; tongue upright.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -0.0,
+        -0.0
+      ]
+    },
+    {
+      "name": "actuator_bracket",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-material-rigid-extra-source/actuator_bracket.stl",
+      "input_sha256": "6167fb203e3f04a555f59e881cc694476119d673f51b7ea37a6d2be6e50de657",
+      "center_xy_mm": [
+        110,
+        115
+      ],
+      "bounds_mm": [
+        66.0,
+        51.0,
+        19.799999137060546
+      ],
+      "orientation": "Current flat-back mount export.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -0.0,
+        -1.0000000116860974e-07
+      ]
+    },
+    {
+      "name": "plunger",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-material-rigid-extra-source/plunger.stl",
+      "input_sha256": "6046bdba52e2b89f50ac38c4a3194466746734623191095e6df5c2951535016e",
+      "center_xy_mm": [
+        105,
+        65
+      ],
+      "bounds_mm": [
+        58.0,
+        16.0,
+        11.900000472204589
+      ],
+      "orientation": "Approved flat print orientation.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -0.0,
+        -1.0000000116860974e-07
+      ]
+    },
+    {
+      "name": "pulley",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-material-rigid-extra-source/pulley.stl",
+      "input_sha256": "d5f0f999e143244667b9096c069d0987aee2dfc61a36136f727f68a45c0b69ec",
+      "center_xy_mm": [
+        90,
+        35
+      ],
+      "bounds_mm": [
+        17.99886131286621,
+        17.99912929534912,
+        3.999999899999999
+      ],
+      "orientation": "Axis vertical, flange down.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        0.00043773651123046875,
+        -0.0004353523254394531,
+        -1.0000000116860974e-07
+      ]
+    },
+    {
+      "name": "pulley_axle",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-material-rigid-extra-source/pulley_axle.stl",
+      "input_sha256": "68fa557470cbaac992cdf9fffa3ef708a3ca243008aa985c0dd565c67869103c",
+      "center_xy_mm": [
+        125,
+        35
+      ],
+      "bounds_mm": [
+        10.99876880645752,
+        10.997538566589355,
+        20.600000381469727
+      ],
+      "orientation": "Head down; cross-slot bridged.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -0.0012307167053222656,
+        -0.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "sliding_jaw",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "actuator_bracket",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "plunger",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "pulley",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "pulley_axle",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "0"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "af272fe6ea078b2caa7a6fcb3de9f2ca6f113ae03dcc7d056cb765b8bb8518fd",
+  "scope": "Material-separated complete-assembly plate: rigid-extra"
+}

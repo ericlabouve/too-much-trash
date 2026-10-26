@@ -1,0 +1,18 @@
+{
+  "baseline_support_g": 2.5835,
+  "candidate_support_g": 0.5418,
+  "support_saved_g": 2.0417,
+  "support_reduction_percent": 79.02844977743372,
+  "baseline_total_g": 56.36591339111328,
+  "candidate_total_g": 54.305320739746094,
+  "total_saved_g": 2.0605926513671875,
+  "minutes_saved": 12.038671875000034,
+  "matched_profiles": true,
+  "active_assembly_changed": false,
+  "printer_contacted": false,
+  "split_transfer_mm": 5.3,
+  "limits": [
+    "Physical stiffness and clamping unverified. Fixed collar thickness becomes 5.5 mm at the body; four existing bearing faces retained.",
+    "Both parts remain valid single solids; clear bolt bores and 1 mm split gap preserved."
+  ]
+}

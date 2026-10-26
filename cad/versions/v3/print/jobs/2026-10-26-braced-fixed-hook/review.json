@@ -1,0 +1,145 @@
+{
+  "revision": "fixed-hook-braced-study",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 2,
+  "plates": 1,
+  "total_g": 54.972938537597656,
+  "total_minutes": 401.5190104166667,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 54.4938,
+    "support": 0.3505,
+    "interface": 0.0572
+  },
+  "objects": {
+    "carrier": {
+      "deposited_g_by_role": {
+        "support": 0.3505,
+        "model": 27.8479,
+        "interface": 0.0572
+      },
+      "deposited_xy_bounds": [
+        [
+          35.21,
+          10.713
+        ],
+        [
+          144.79,
+          59.287
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        15.32
+      ]
+    },
+    "shaft_cap": {
+      "deposited_g_by_role": {
+        "model": 26.6459
+      },
+      "deposited_xy_bounds": [
+        [
+          30.21,
+          66.71
+        ],
+        [
+          149.79,
+          173.29
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [
+    {
+      "objects": [
+        "carrier",
+        "shaft_cap"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 6.822999999999995
+    }
+  ],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "carrier",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "shaft_cap",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "7d87ee39ca8395a9aa52894afe78640c",
+  "hashes": {
+    "cuff-fit-input.3mf": "91a2c1b1675f4c6331d85a30ce40671f924d3643ac647e73f6f743c287f70c9b",
+    "cuff-fit.gcode.3mf": "e4378e99e59bb86a5fb923ccb4ff841291d00ea2cf97080465d9b5a7f1a1e777",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "35-degree ramp below the unchanged fixed band seat. Tongue travel and band paths preserved.",
+    "Same two-part placement and PETG recipe as the accepted flat-fixed/taller-cap study. Automatic supports enabled.",
+    "Upper return brace leaves the V seat and modeled band lanes clear; physical band installation access needs checking.",
+    "No printer contact. Actual ramp quality, clamping and band-anchor strength require physical tests."
+  ]
+}

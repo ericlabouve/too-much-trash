@@ -15,7 +15,7 @@ for f in cap.val().Faces():
   faces.append(dict(area_mm2=f.Area(),y=[bb.ymin,bb.ymax],z=[bb.zmin,bb.zmax]))
 assert len(faces)==1,faces
 assert faces[0]['y'][0]<-59.99 and faces[0]['y'][1]>59.99
-assert faces[0]['z'][0]<-39.99 and faces[0]['z'][1]>69.99
+assert abs(faces[0]['z'][0]+38.5)<1e-6 and abs(faces[0]['z'][1]-68.5)<1e-6
 seats=[]
 for i,(y,z) in enumerate(b.CLAMP_STATIONS,1):
  # Every annular boss reaches exactly the same plane, not merely below it.

@@ -1,0 +1,127 @@
+{
+  "revision": "through-window-fixed-jaw-v3",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "carrier",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-25-jaw-arm-baseline-source/carrier.stl",
+      "input_sha256": "2aae3a70f2b54f2fae90f527178fcdc90af31999b02acb8f594ac95cbb6d592c",
+      "center_xy_mm": [
+        90,
+        45
+      ],
+      "bounds_mm": [
+        110.0,
+        48.99440383911133,
+        109.80000305175781
+      ],
+      "orientation": "Approved collar face down, arms upright; CAD Y+90.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -15.0,
+        -0.0,
+        -0.5
+      ]
+    },
+    {
+      "name": "sliding_jaw",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-25-jaw-arm-baseline-source/sliding_jaw.stl",
+      "input_sha256": "e610cb11ad8bb1920c555396f2bb4194d67a4f7b404de52b6da46406370ffb00",
+      "center_xy_mm": [
+        90,
+        125
+      ],
+      "bounds_mm": [
+        121.5999984741211,
+        39.519999980926514,
+        58.5
+      ],
+      "orientation": "Approved crossbar back down, tongue upright; CAD Y-90 then bed Z+90.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        25.240000009536743,
+        10.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "carrier",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "sliding_jaw",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "2ee825c2abb7ac02cc77538ab312be0dd07a20d727710625b62f67d8c69a76c1",
+  "scope": "Two complete jaws; matched arm-slot comparison, approved orientations."
+}

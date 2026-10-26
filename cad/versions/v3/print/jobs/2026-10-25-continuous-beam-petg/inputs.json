@@ -1,0 +1,73 @@
+{
+  "revision": "continuous-beam-sliding-jaw-v3",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "sliding_jaw",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-25-continuous-beam-petg-source/sliding_jaw.stl",
+      "input_sha256": "2bc0d57a1f28fb040cf583b847451487389d529844d76860b0db7aeec17ec9ec",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        39.519999980926514,
+        121.5999984741211,
+        63.69999980926514
+      ],
+      "orientation": "Continuous beam rear X-15.2 down; CAD Y-90, tongue upright.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        25.240000009536743,
+        -0.0,
+        15.199999809265137
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "sliding_jaw",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "db4e40de7f8f63c037219ceb52462477836afe12825422badfc272d4b0fdc145",
+  "scope": "One complete continuous-beam sliding jaw; PETG support review only."
+}

@@ -6,7 +6,7 @@ across phone thickness after integration. No independent export side effects.
 import math
 from functools import lru_cache
 import cadquery as cq
-from shared_key_design import key_blank
+from shared_key_design import snap_key
 PULLEY_U=13.5
 PULLEY_V=8
 PULLEY_LIFT=2.0
@@ -126,10 +126,9 @@ def cassette():
     pulley=cq.Workplane('XZ').polyline([(4.3,6.6),(9,6.6),(9,6.8),(6.8,8.4),(6.8,8.8),(9,10.4),(9,10.6),(4.3,10.6)]).close().revolve(360,(0,0),(0,1)).edges().fillet(.09).translate((PULLEY_U,8,PULLEY_LIFT))
     axle=cyl(PULLEY_U,8,-3.6-KEY_OUTBOARD,16.8+KEY_OUTBOARD,4).union(cyl(PULLEY_U,8,13.2,1.6,5.5).edges().fillet(.2))
     axle=axle.cut(box(3,23,6.3,9.7,-1.4-KEY_OUTBOARD,2-KEY_OUTBOARD))
-    # Broad removable cross-key carries axial retention; no snap fingers/threads.
-    # Same approved 12.2 mm candidate serves all three cuffs and this axle.
-    # Head bearing station and stem/band seats remain; head depth is 1.2 mm.
-    key=key_blank().translate((0,0,-KEY_OUTBOARD))
+    # TPU T stop plus flexible leading V; axle and seated T stop unchanged.
+    # Keeper remains pending physical snap/creep qualification.
+    key=snap_key().translate((0,0,-KEY_OUTBOARD))
     
     # Flush-T cap: move mount bar 10 mm inward; keep the mechanism/shoe fixed.
     # One closed screw bore; user removed the rail locating lugs.
@@ -206,7 +205,8 @@ def pulley_path(d=0, target=None):
 
 def keeper_path():
     # Convex taut-loop envelope around key ends and axle, not unsupported bends.
-    points=[(17.2,3.7),(17.2,12.3),(21.8,3.7),(21.8,12.3),(6.2,5.7),(6.2,10.3)]
+    points=[(17.2,3.7),(17.2,12.3),(21.8,3.7),(21.8,12.3),
+            (3.7,7.2),(3.7,8.8),(8.8,4.7),(8.8,11.3)]
     points += [(PULLEY_U+4.8*math.cos(i*math.pi/32),8+4.8*math.sin(i*math.pi/32)) for i in range(64)]
     points=sorted(set(points))
     def cross(a,b,c):return (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])

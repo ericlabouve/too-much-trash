@@ -71,6 +71,10 @@ def main(project_stem="actuator", title="V3 actuator", detail_parts=None, notes=
     feature = ''
     label = None
     label_names = {}
+    object_names = {o.get('id'): next(m.get('value') for m in o.findall('metadata') if m.get('key') == 'name') for o in config.findall('object')}
+    for instance in config.findall('plate/model_instance'):
+        meta = {m.get('key'): m.get('value') for m in instance.findall('metadata')}
+        label_names[meta['identify_id']] = object_names[meta['object_id']]
     # Bambu omits object-label comments on a one-object plate. Attribute only
     # explicitly typed layer extrusion, never startup/end Custom/purge paths.
     unlabelled_single = len(boxes) == 1 and '; start printing object, unique label id:' not in text
@@ -142,8 +146,19 @@ def main(project_stem="actuator", title="V3 actuator", detail_parts=None, notes=
     for a, b in itertools.combinations(object_report, 2):
         aa, bb = np.array(object_report[a]['deposited_xy_bounds']), np.array(object_report[b]['deposited_xy_bounds'])
         gap = max(np.maximum(aa[0]-bb[1], bb[0]-aa[1]))-.6
-        assert gap > 0, (a, b, gap)
-        gaps.append({'objects': [a, b], 'bbox_gap_with_0_6mm_path_margin': float(gap)})
+        if gap <= 0 and inputs.get('nested_layout'):
+            import shapely
+            # Project every actual deposited segment, including supports, across
+            # all heights. This is conservative for nested, overlapping boxes.
+            lines_a = shapely.linestrings([(s[3], s[4]) for s in segments if s[1] == a])
+            lines_b = shapely.linestrings([(s[3], s[4]) for s in segments if s[1] == b])
+            _, distances = shapely.STRtree(lines_a).query_nearest(lines_b, return_distance=True)
+            exact = float(distances.min())
+            assert exact > .6, (a, b, 'deposited paths overlap', exact)
+            gaps.append({'objects': [a, b], 'exact_projected_path_gap_mm': exact, 'path_margin_mm': .6})
+        else:
+            assert gap > 0, (a, b, gap)
+            gaps.append({'objects': [a, b], 'bbox_gap_with_0_6mm_path_margin': float(gap)})
     for name in ('thumb_screw', 'thumb_nut', 'pulley_key'):
         if name in object_report:
             assert object_report[name]['support_z_mm'] is None

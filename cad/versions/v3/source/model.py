@@ -88,6 +88,7 @@ CLOSED_JAW_X=-66.5
 TRACK_ROOT_SHIFT=2.7
 FIXED_CLEAT_X=-27+TRACK_ROOT_SHIFT
 SLIDING_CLEAT_SHIFT=-4.5
+SLIDING_BEAM_SHIFT=5.2  # Flush crossbar; assembly compensates to retain phone contacts.
 
 def jaw_cleat(x):
     # One broad rectangular stem and retaining crossbar per jaw.
@@ -195,7 +196,7 @@ def placed(s,p):
 
 
 def assembly_parts(p,solids):
-    out={'shaft_cap':solids['shaft_cap'],'carrier':solids['carrier'],'sliding_jaw':solids['sliding_jaw'].translate((p.phone_left,0,0))}
+    out={'shaft_cap':solids['shaft_cap'],'carrier':solids['carrier'],'sliding_jaw':solids['sliding_jaw'].translate((p.phone_left-SLIDING_BEAM_SHIFT,0,0))}
     # Identical TPU cuffs flex onto studs integral to the rigid jaws.
     for name,x,y,fixed in [('fixed',p.phone_right,FIXED_CUFF_Y,True),
                            ('sliding_1',p.phone_left+SLIDING_CUFF_X,-50,False),
@@ -255,7 +256,7 @@ def flexible_paths(p):
     bands={'band_return':[p.point(q) for q in plunger_return_path()],
         'band_keeper':[p.point(q) for q in plunger_keeper_path()],
         'band_overtravel':loop_between(knot,band_end,5)}
-    for i,z in enumerate(JAW_BAND_LEVELS):bands[f'band_jaw_{i+1}']=jaw_band(p.phone_left-1+SLIDING_CLEAT_SHIFT,FIXED_CLEAT_X,z)
+    for i,z in enumerate(JAW_BAND_LEVELS):bands[f'band_jaw_{i+1}']=jaw_band(p.phone_left-SLIDING_BEAM_SHIFT-1+SLIDING_CLEAT_SHIFT,FIXED_CLEAT_X,z)
     return string,bands,{'trigger_pivot':(-4,0,-416),'trigger_attach':trigger,'trigger_angle':-.48,'tail_length':tail,'lower_twine_length':lower_tail,'band_end':band_end,'series_span_rest':p.series_span_rest}
 
 
@@ -267,7 +268,7 @@ def rows(p,solids):
     out=[('twine_attachment',polyline(attachment_loop(p),p.twine_diameter),TWINE,'twine')]
     for n,s in assembly_parts(p,solids).items():
         bid='pulley_key' if n.startswith('cuff_key_') else 'phone_cuff' if n.startswith('cuff_') else 'collar_screw' if 'screw' in n else 'thumb_nut' if 'nut' in n else 'clip_string_guide' if n.startswith('guide_') else n
-        out.append((n,s,(0,.55,.60) if bid in ('phone_cuff','collar_screw','thumb_nut','clip_string_guide') else ORANGE,bid))
+        out.append((n,s,(0,.55,.60) if bid in ('phone_cuff','collar_screw','thumb_nut','clip_string_guide','pulley_key') else ORANGE,bid))
     for n,s in stock(p).items():
         color=(.035,.27,.75) if 'blue' in n else (.12,.14,.17) if any(x in n for x in ('black','camera','volume')) else (.6,.65,.69)
         out.append((n,s,color,None))
@@ -324,7 +325,8 @@ def paired_neck_rail():
     # Separate wing slots leave the middle solid; no offset bridge or center slot.
     # End-mounted at Z16..36 to clear the unchanged pulley and frame below.
     s=box(6,12,-60,60,16,36).edges('|X').fillet(1.2)
-    for y0,y1 in ((-54,-18.5),(18.5,54)):
+    # Increase the outer end ligament from 1.6 to 2.6 mm; retain slot width.
+    for y0,y1 in ((-53,-18.5),(18.5,53)):
         cut=box(5,13,y0,y1,21.6,30.4)
         for y in (y0,y1):cut=cut.union(cylinder((5,y,26),(1,0,0),8,8.8))
         s=s.cut(cut)
@@ -358,9 +360,18 @@ def shaft_cap(p):
     # One bed plane across body, crossing, rail wings and all four bosses.
     # The mating bracket reaches back to this plane without moving the shoe.
     s=shaft_clamp_half(p,True).union(paired_neck_rail().translate((CUFF_INWARD_SHIFT,0,0)))
-    return s.cut(box(12,15,-70,70,-50,80)).clean()
+    s=s.cut(box(12,15,-70,70,-50,80))
+    # Reviewable cap-only end flattening: shave 0.5 mm off the boss extremes
+    # and the projecting body steps, leaving 4.1 mm beyond each screw bore.
+    s=s.intersect(box(-20,20,-70,70,-38.5,68.5))
+    # Continuous through-window requested in place of the shallow pockets.
+    # The two side rails remain joined by 8.5 mm end bridges. The actuator
+    # wings attach to their respective side rail, not a central solid web.
+    opening=box(-1,15,-5.5,5.5,-30,60).edges('|X').fillet(5.49)
+    s=s.cut(opening)
+    return s.clean()
 
-def carrier(p):
+def carrier(p, *, lightened=True, arm_slots=True):
     # Plain L junction: track meets the main clamp wall directly. No old
     # hard-lip tray, raised cuff pedestal or surrounding end/side walls.
     # Flush outer sides share the collar's Y +/-13.8 planes. Preserve the
@@ -391,24 +402,50 @@ def carrier(p):
         s=s.cut(cylinder((-21,y,z),(1,0,0),7+CUFF_INWARD_SHIFT,18.6))
     # The unchanged stud emerges directly from the X -11.3 clamp exterior.
     s=s.union(locate_cuff(integral_stud(),FIXED_CUFF_X,FIXED_CUFF_Y,True))
-    return s
+    if lightened:
+        # Through-windows preserve the stud base (Z8.08..14.48) and the
+        # direct track root (Z22..34); retain one bridge at Z4..38.
+        for z0,z1 in ((-30,4),(38,60)):
+            s=s.cut(box(-12,-.4,-5.5,5.5,z0,z1).edges('|X').fillet(5.49))
+    if arm_slots:
+        from jaw_arm_slots import refine as slot_refine
+        s=slot_refine(s,'carrier')
+    return s.clean()
 
-def sliding_jaw(p, *, flat_back=True, cleat_shift=SLIDING_CLEAT_SHIFT, support_angle=JAW_SUPPORT_ANGLE):
+def sliding_jaw(p, *, flat_back=True, cleat_shift=SLIDING_CLEAT_SHIFT, support_angle=JAW_SUPPORT_ANGLE, arm_slots=True, continuous_beam=True, flush_beam=True, beam_window_width=4):
     # T crossbar retains 100 mm spacing and tongue; sockets replace hard lips.
     # No central projection below the crossbar; retain the tongue/cleat root above.
-    s=box(-10,-2,-7,7,12,33).union(box(-10,-2,-54,54,12,22))
-    for y in SLIDING_CUFF_Y:
-        s=s.cut(box(-6.9+SLIDING_CUFF_X,5,y-11,y+11,0,22.1))
-        root=cuff_socket().union(box(-9.2,-6.9,-10.8,10.8,3.5,12.72))
-        if flat_back:
-            # Extend only the rear of each stud pad to the crossbar bed plane.
-            root=root.union(box(-9.7,-9.2,-10.8,10.8,-5.8,12.72))
-        s=s.union(locate_cuff(root,SLIDING_CUFF_X,y))
+    s=box(-10,-2,-7,7,12,33)
+    if continuous_beam:
+        # One rectangular beam replaces the stepped crossbar/end plates.
+        # Raise the whole beam/studs to the root's X -10/-2 planes.
+        # Assembly slides outward by the same amount, preserving cuff contact.
+        shift=SLIDING_BEAM_SHIFT if flush_beam else 0
+        face=-6.9+SLIDING_CUFF_X+shift
+        s=s.union(box(face-8,face,-60.8,60.8,CUFF_Z-5.8,CUFF_Z+5.8))
+        for y in SLIDING_CUFF_Y:
+            s=s.union(locate_cuff(integral_stud(),SLIDING_CUFF_X+shift,y))
+    else:
+        # Retain exact previous construction for scoped reversal/comparison.
+        s=s.union(box(-10,-2,-54,54,12,22))
+        for y in SLIDING_CUFF_Y:
+            s=s.cut(box(-6.9+SLIDING_CUFF_X,5,y-11,y+11,0,22.1))
+            root=cuff_socket().union(box(-9.2,-6.9,-10.8,10.8,3.5,12.72))
+            if flat_back:
+                root=root.union(box(-9.7,-9.2,-10.8,10.8,-5.8,12.72))
+            s=s.union(locate_cuff(root,SLIDING_CUFF_X,y))
     s=s.union(box(-6,SLIDING_TONGUE_LENGTH,-10,10,26.4,30.4))
     s=s.union(box(max(-10,-6+cleat_shift),4+cleat_shift,-7,7,32,38.5)).union(jaw_cleat(-1+cleat_shift))
     if support_angle is not None:
         from jaw_support_angles import refine
         s=refine(s,support_angle)
+    if arm_slots:
+        from jaw_arm_slots import refine as slot_refine
+        s=slot_refine(s,'sliding_jaw')
+    if continuous_beam and flush_beam and beam_window_width:
+        for a,b in ((-43,-12),(12,43)):
+            tool=box(-11,0,a,b,CUFF_Z-beam_window_width/2,CUFF_Z+beam_window_width/2).edges('|X').fillet(beam_window_width/2-.01)
+            s=s.cut(tool)
     return s
 
 # Eye thickness stays 6 mm; translating -4 mm aligns its lower face

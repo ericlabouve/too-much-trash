@@ -37,7 +37,7 @@ for name,base in b.SAMPLES.items():
     print(name+'-'+side,'identical cuffs/studs; seated fit clear',flush=True)
 fixed=solids['carrier'].union(locate(c,b.FIXED_CUFF_X,0,True))
 moving=solids['sliding_jaw']
-for y in (-50,50):moving=moving.union(locate(c,SLIDING_CUFF_X,y))
+for y in (-50,50):moving=moving.union(locate(c,SLIDING_CUFF_X+b.SLIDING_BEAM_SHIFT,y))
 travel=[]
 for i in range(91):
     x=b.CLOSED_JAW_X-45*i/90;v=b.overlap(fixed,moving.translate((x,0,0)))

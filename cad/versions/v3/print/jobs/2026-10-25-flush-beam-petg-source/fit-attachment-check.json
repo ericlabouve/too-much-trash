@@ -1,0 +1,38 @@
+{
+  "revision": "flush-beam-sliding-jaw-v3",
+  "passed": true,
+  "valid": true,
+  "solid_count": 1,
+  "beam_mm": [
+    8,
+    121.6,
+    11.6
+  ],
+  "common_rear_plane_x_mm": -10,
+  "common_front_plane_x_mm": -2,
+  "local_beam_stud_shift_mm": 5.2,
+  "assembly_jaw_shift_mm": -5.2,
+  "assembled_cuff_positions_unchanged": true,
+  "tongue_and_cleat_design_unchanged": true,
+  "tongue_track_axial_overlap_mm": {
+    "wallet": 54.5,
+    "bare": 54.5,
+    "small": 54.5,
+    "large": 49.4
+  },
+  "nominal_moving_band_clear": true,
+  "band_envelope_diameter_mm": 1.4,
+  "previous_volume_mm3": 18641.824861446286,
+  "new_volume_mm3": 18272.00086144629,
+  "limits": [
+    "Geometric engagement only, not stiffness or loaded retention.",
+    "Jaw bands span5.2 mm farther; real preload/return need testing.",
+    "No print sent."
+  ],
+  "source_sha256": {
+    "model.py": "6a190f95f30f1d06be1556b36610a0c9744d0bea02fa8f14e3b0d36ebc48fc93",
+    "cuff_design.py": "8d830a0e429d3b8b97b7f7990f9e6a156fccf59d24789a8fe7a395205ad48d5e",
+    "jaw_support_angles.py": "1adb6f80f9e9433df0640e5dfb630b1db2ee9a462904f7dcc534a81735a816aa",
+    "jaw_arm_slots.py": "5194bb36c00b285836ef190da01b2946640d7c1255c273f00e807cf342625e38"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "revision": "four-mm-jaw-windows-v3",
+  "window_mm": [
+    31,
+    4
+  ],
+  "edge_rails_mm": 3.8,
+  "valid_single_solid": true,
+  "central_connection_and_studs_preserved": true,
+  "subtraction_only": true,
+  "physical_strength_verified": false
+}

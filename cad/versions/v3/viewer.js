@@ -289,11 +289,11 @@ try{
   // Printed parts use source millimetres, just like the assembly. Never
   // normalize each part independently: a screw must look smaller than a jaw.
   geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);
-  const rgb=['phone_cuff','collar_screw','thumb_nut','clip_string_guide'].includes(row.id)?[0,.55,.60]:row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
+  const rgb=['phone_cuff','collar_screw','thumb_nut','clip_string_guide','pulley_key'].includes(row.id)?[0,.55,.60]:row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
   const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=1;inventory.add(mesh);bomMeshes.set(row.id,mesh);
   geometry.computeBoundingBox();
   tr.dataset.displayScale=String(mesh.userData.displayScale);tr.dataset.modelSizeMm=JSON.stringify(geometry.boundingBox.getSize(new THREE.Vector3()).toArray());
-  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'Shared T-key',phone_cuff:'Rounded cuff',collar_screw:'Common TPU screw',thumb_screw:'Thumb screw',thumb_nut:'TPU nut',clip_string_guide:'TPU clip guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
+  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'TPU T/V snap key',phone_cuff:'Rounded cuff',collar_screw:'Common TPU screw',thumb_screw:'Thumb screw',thumb_nut:'TPU nut',clip_string_guide:'TPU clip guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
   label(`${titles[row.id]||row.name||row.id} ×${row.quantity}${part?'':' · schematic'}`,mesh.position.x,mesh.position.y-Math.max(65,extent.y/2+12),0,row.id);
  }
  for(const [i,step] of steps.entries()){const option=document.createElement('option');option.value=i;option.textContent=`${i+1}. ${step.title}`;$('#assembly-step').append(option);}

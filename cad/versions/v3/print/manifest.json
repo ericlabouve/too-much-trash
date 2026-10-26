@@ -3,7 +3,7 @@
   "scale_percent": 100,
   "nozzle_mm": 0.4,
   "layer_mm": 0.2,
-  "revision": "deep-groove-pulley-v3",
+  "revision": "thicker-cap-slot-ends-v3",
   "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
   "parts": [
     {
@@ -12,11 +12,11 @@
       "quantity": 1,
       "material": "PLA / PLA+",
       "bounds_mm": [
-        110.0,
+        107.0,
         120.0,
         11.5
       ],
-      "bed_z_min_mm": 7.789109577460837e-16,
+      "bed_z_min_mm": 8.539492889059869e-16,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Single X12 outer face down (+90 degrees about Y), including body, rail wings and all four screw seats; 4.2 mm rail thickness. Slicer/support review still required; no support-free claim."
@@ -34,7 +34,7 @@
       "bed_z_min_mm": 0.0,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Canonical +90-degree Y orientation. Mirrored 35-degree band slot without square cap; cuff stud unchanged. Previous fixed-angle-35 slice predates this cleat revision; reslice before printing. Band seating, TPU retention and strength need testing."
+      "supports": "CAD Y+90; collar face down. Approved upright orientation; 6 mm arm/tongue slot with 35-degree roof. Matched PETG 0.12 mm automatic-support slice adds no support geometry; existing supports remain. See 2026-10-25-jaw-arm-slots. Physical roof quality, sliding fit and loaded strength unverified."
     },
     {
       "name": "sliding_jaw",
@@ -49,7 +49,7 @@
       "bed_z_min_mm": 0.0,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Rear X=-10 down (-90 degrees about Y). Uncapped 35-degree band slot; lower projection restored to its original extent. Tongue and cuff studs unchanged. Previous angle-35 zero-support slice predates this revision; reslice before printing. Strength and retention unqualified."
+      "supports": "Two 31 x 4 mm beam windows leave 3.8 mm edge rails; tongue slot and central/stud islands retained. Fresh slice required. Continuous beam and root share X-10 rear bed face (CAD Y-90) and X-2 front face. Beam/studs shift5.2 mm; assembly slides outward5.2 mm to preserve cuff contacts. See flush-beam PETG slice; physical strength, engagement and band preload unverified."
     },
     {
       "name": "phone_cuff",
@@ -130,16 +130,16 @@
       "name": "pulley_key",
       "file": "pulley_key.stl",
       "quantity": 1,
-      "material": "PLA / PLA+",
+      "material": "ELEGOO TPU 95A",
       "bounds_mm": [
         7.0,
-        12.2,
+        14.7,
         3.0
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": -4.4374682986835957e-17,
       "watertight": true,
       "layer_mm": 0.2,
-      "supports": "Flat cross-key; preserve square load faces and band seats. Orientation provisional."
+      "supports": "ELEGOO TPU95A T/V snap prototype, uniform3 mm thickness flat on bed. Fresh TPU slice and insertion/reopening/pull-out tests required. Keep channels open; retain keeper until qualified."
     },
     {
       "name": "collar_screw",

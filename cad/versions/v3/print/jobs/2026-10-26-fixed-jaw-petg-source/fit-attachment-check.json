@@ -1,0 +1,26 @@
+{
+  "revision": "tpu-tv-axle-key-v3",
+  "part": {
+    "name": "carrier",
+    "file": "carrier.stl",
+    "quantity": 1,
+    "material": "PLA / PLA+",
+    "bounds_mm": [
+      110.0,
+      48.992,
+      109.8
+    ],
+    "bed_z_min_mm": 0.0,
+    "watertight": true,
+    "layer_mm": 0.2,
+    "supports": "CAD Y+90; collar face down. Approved upright orientation; 6 mm arm/tongue slot with 35-degree roof. Matched PETG 0.12 mm automatic-support slice adds no support geometry; existing supports remain. See 2026-10-25-jaw-arm-slots. Physical roof quality, sliding fit and loaded strength unverified."
+  },
+  "source_sha256": {
+    "model.py": "1d413c3b6f89ebbdc0fc9a8c6af011aefe2ff8635a43f24219a352817c841c3a",
+    "jaw_arm_slots.py": "5194bb36c00b285836ef190da01b2946640d7c1255c273f00e807cf342625e38",
+    "jaw_support_angles.py": "1adb6f80f9e9433df0640e5dfb630b1db2ee9a462904f7dcc534a81735a816aa"
+  },
+  "limits": [
+    "Slice only; physical fit, strength and 35-degree roof quality unverified."
+  ]
+}

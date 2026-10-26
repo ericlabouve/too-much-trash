@@ -1,0 +1,12 @@
+{
+  "revision": "fixed-hook-braced-study",
+  "valid_single_solid": true,
+  "angle_from_bed_degrees": 35,
+  "added_mm3": 927.7441834173319,
+  "band_seat_unchanged": true,
+  "travel_samples_clear": 91,
+  "source_sha256": "881471719d2c1293b453a081b1ac88e21eada8ce86849f00163d354b9c83a261",
+  "limits": [
+    "35-degree print quality and loaded band-anchor strength still require physical tests."
+  ]
+}

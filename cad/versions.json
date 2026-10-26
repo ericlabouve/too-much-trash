@@ -17,7 +17,7 @@
       "id": "v3",
       "label": "Version 3 \u00b7 removable cuffs and sliding plunger",
       "viewer": "versions/v3/viewer.html",
-      "note": "V3: pulley groove doubled to 2.2 mm depth with 36-degree flanks. PETG slice has zero support paths; physical string retention remains untested. Single TPU clip and common TPU fasteners retained."
+      "note": "TPU T/V axle-key prototype: flexible V tip and retained T stop, unchanged axle slot. Keeper remains until physical snap/retention qualification. Flush jaws and interchangeable cuffs unchanged."
     }
   ]
 }
