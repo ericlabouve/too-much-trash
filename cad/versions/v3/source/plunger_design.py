@@ -63,7 +63,7 @@ def local_shape(s):
     return s.rotate((0,0,0),(0,0,1),-90).rotate((0,0,0),(1,0,0),90).translate((8.35,5.4,8))
 
 @lru_cache(None)
-def cassette():
+def legacy_cassette():
     # Open spine replaces deep tray and full cover. Pulley moves to button end.
     body=box(-9,9,0,66,0,3).union(box(0,24,0,18,0,3)).edges('|Z').fillet(1.2).edges('not |Z').fillet(.35)
     body=body.union(box(-8.5,8.5,59,63,2.3,8).edges().fillet(.6))
@@ -220,3 +220,47 @@ def keeper_path():
             half.append(q)
         halves.extend(half[:-1])
     return [local_point((u,v,.3-KEY_OUTBOARD)) for u,v in halves+[halves[0]]]
+
+
+# Promoted 2026-10-31: exact solids from the currently printing PETG plate.
+@lru_cache(None)
+def cassette():
+    from pathlib import Path
+    folder=Path(__file__).parent/'actuator_current'
+    parts=legacy_cassette()
+    for name,file in [('actuator_bracket','b-bracket'),('plunger','b-plunger'),('pulley_axle','pulley_axle')]:
+        parts[name]=local_shape(cq.importers.importStep(str(folder/(file+'.step'))))
+    # Reposition the unchanged wheel and key to the reviewed raised-wheel assembly.
+    parts['pulley']=parts['pulley'].translate((8.3,-2.05,3.024908093204035))
+    parts['pulley_key']=parts['pulley_key'].translate((8.3,0,3.024908093204035))
+    return parts
+
+_legacy_keeper_path=keeper_path
+def keeper_path():
+    return [(x+8.3,y,z+3.024908093204035) for x,y,z in _legacy_keeper_path()]
+
+@lru_cache(None)
+def _current_routes():
+    import json
+    from pathlib import Path
+    return json.loads((Path(__file__).parent/'actuator_current/motion-paths.json').read_text())
+
+def return_path(d=0):
+    frame=min(_current_routes(),key=lambda f:abs(f['travel']+d))
+    return [local_point(q) for q in frame['band']]
+
+def attachment_path(d=0):
+    frame=min(_current_routes(),key=lambda f:abs(f['travel']+d))
+    return [local_point(q) for q in frame['attachment']]
+
+def pulley_path(d=0,target=None):
+    frame=min(_current_routes(),key=lambda f:abs(f['travel']+d))
+    a=frame['lead'][0];u,v=10.475091906795965,16.3
+    r=6.8+(.5*math.sqrt(1+(1.6/2.2)**2)-.2)/(1.6/2.2)
+    start=math.atan2(a[1]-v,a[0]-u)+math.acos(r/math.hypot(a[0]-u,a[1]-v))
+    end=1.5*math.pi
+    if target is not None:
+        tx,ty,tz=target;tu,tv=8-tz,tx-8.35
+        end=math.atan2(tv-v,tu-u)-math.acos(r/math.hypot(tu-u,tv-v))
+        while end<start:end+=2*math.pi
+    return [local_point(a)]+[local_point((u+r*math.cos(t),v+r*math.sin(t),12.65)) for t in [start+(end-start)*i/40 for i in range(41)]]

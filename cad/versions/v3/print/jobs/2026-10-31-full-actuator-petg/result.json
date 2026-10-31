@@ -1,0 +1,118 @@
+{
+    "error_string": "Success.",
+    "export_time": 465,
+    "layer_height": 0.11999999731779099,
+    "plate_index": 0,
+    "prepare_time": 214,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 55.37321853637695,
+                "Bridge": 36.48429489135742,
+                "Custom": 418.8081359863281,
+                "Flush": 28.0,
+                "Gap infill": 55.745731353759766,
+                "Inner wall": 1292.625732421875,
+                "Internal solid infill": 346.7015075683594,
+                "Outer wall": 1433.3328857421875,
+                "Sparse infill": 127.3912353515625,
+                "Top surface": 71.16781616210938,
+                "Travel": 954.107666015625,
+                "Undefined": 935.6062622070313
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFG01",
+                    "id": 1,
+                    "main_used_g": 8.462223052978516,
+                    "total_used_g": 8.462223052978516
+                }
+            ],
+            "generate_support_material_time": 36,
+            "id": 1,
+            "infill_time": 146,
+            "layer_filament_change": 0,
+            "main_predication": 4344.8525390625,
+            "make_perimeters_time": 235,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 37.19999694824219,
+                        "height": 19.799999237060547,
+                        "width": 48.57508850097656,
+                        "x": 40.71245574951172,
+                        "y": 66.4000015258789,
+                        "z": 1.469725674496658e-09
+                    },
+                    "id": 5,
+                    "name": "b-bracket",
+                    "triangle_count": 13322
+                },
+                {
+                    "bbox": {
+                        "depth": 38.14999771118164,
+                        "height": 12.899998664855957,
+                        "width": 16.0,
+                        "x": 102.0,
+                        "y": 65.92500305175781,
+                        "z": -2.427978706975864e-09
+                    },
+                    "id": 9,
+                    "name": "b-plunger",
+                    "triangle_count": 28774
+                },
+                {
+                    "bbox": {
+                        "depth": 10.998766899108887,
+                        "height": 25.354164123535156,
+                        "width": 10.997533798217773,
+                        "x": 131.50123596191406,
+                        "y": 70.50061798095703,
+                        "z": 3.823242167300123e-08
+                    },
+                    "id": 13,
+                    "name": "pulley_axle",
+                    "triangle_count": 12332
+                },
+                {
+                    "bbox": {
+                        "depth": 17.998859405517578,
+                        "height": 4.0,
+                        "width": 17.999122619628906,
+                        "x": 128.0004425048828,
+                        "y": 92.00057220458984,
+                        "z": 0.0
+                    },
+                    "id": 17,
+                    "name": "pulley",
+                    "triangle_count": 50572
+                }
+            ],
+            "sliced_time": 1753,
+            "sliced_time_with_cache": 1283,
+            "total_predication": 4801.1591796875,
+            "triangle_count": 105000,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 15.0,
+    "upward_compatible_machine": [
+        "Bambu Lab P1S 0.4 nozzle",
+        "Bambu Lab P1P 0.4 nozzle",
+        "Bambu Lab X1 0.4 nozzle",
+        "Bambu Lab X1 Carbon 0.4 nozzle",
+        "Bambu Lab X1E 0.4 nozzle",
+        "Bambu Lab A1 0.4 nozzle",
+        "Bambu Lab H2D 0.4 nozzle",
+        "Bambu Lab H2D Pro 0.4 nozzle",
+        "Bambu Lab H2S 0.4 nozzle",
+        "Bambu Lab P2S 0.4 nozzle",
+        "Bambu Lab H2C 0.4 nozzle",
+        "Bambu Lab X2D 0.4 nozzle",
+        "Bambu Lab A2L 0.4 nozzle"
+    ],
+    "wall_loops": 3
+}

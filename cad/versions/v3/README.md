@@ -1,3 +1,7 @@
+# Latest actuator promotion — 2026-10-31
+
+V3 now uses the exact braced-tail-b bracket, triangular plunger and 2.05 mm extended diamond axle from the running three-piece PETG plate. Unchanged redirect pulley and TPU hardware are reused; assembly placements follow the reviewed concept. The plunger foot is retracted from the phone by design. Current bracket/plunger/extended axle physical assessment is pending; prior short axle approval does not qualify the longer axle. Source STEP solids are in `source/actuator_current/`.
+
 # V3 — removable rounded cuffs and guided plunger
 
 Viewer controls (October 25): select a BOM model or row, then use **Hide other items / Show all items** inside the viewport (also available fullscreen). Isolation follows a newly selected row and resets when changing views or using Show all. Cube arrow buttons rotate 90° per click; dragging remains continuous without an additional release step. Geometry and print exports are unchanged by this UI revision.

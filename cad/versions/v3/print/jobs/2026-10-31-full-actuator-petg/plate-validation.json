@@ -1,0 +1,9 @@
+{
+  "source_matches": true,
+  "support_bytes": 0,
+  "interface_bytes": 0,
+  "parts": 4,
+  "checkpoint": "ada494e",
+  "no_print_sent": true,
+  "physical_check_after_print": "Ask whether 35-degree ramps and triangular tunnel printed cleanly without supports; check sliding and wrap retention."
+}

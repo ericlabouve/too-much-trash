@@ -1,0 +1,38 @@
+{
+  "pulley": {
+    "printed_job": "2026-10-26-flush-fins-petg",
+    "printed_extents_mm": [
+      3.999999899999999,
+      17.99886131286621,
+      17.99912929534912
+    ],
+    "current_extents_mm": [
+      4.0,
+      17.998860359191895,
+      17.999129056930542
+    ],
+    "printed_volume_mm3": 557.8242480087191,
+    "current_volume_mm3": 557.8246327628266,
+    "best_centered_vertex_hausdorff_mm": 0.12476211194796209,
+    "sampled_surface_distance_mm": 0.008560706119743031,
+    "reuse": true
+  },
+  "pulley_axle": {
+    "printed_job": "2026-10-30-diamond-axle-petg",
+    "printed_extents_mm": [
+      10.997538566589355,
+      10.99876880645752,
+      23.304162979125977
+    ],
+    "current_extents_mm": [
+      10.997538566589355,
+      10.998769760131836,
+      25.35416316986084
+    ],
+    "printed_volume_mm3": 1152.1412617346907,
+    "current_volume_mm3": 1255.124470989698,
+    "best_centered_vertex_hausdorff_mm": 1.0250010490421917,
+    "reuse": false,
+    "length_increase_mm": 2.05
+  }
+}

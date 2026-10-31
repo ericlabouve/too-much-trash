@@ -3,7 +3,7 @@
   "scale_percent": 100,
   "nozzle_mm": 0.4,
   "layer_mm": 0.2,
-  "revision": "verified-diamond-axle-v3",
+  "revision": "braced-triangle-actuator-v3",
   "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
   "parts": [
     {
@@ -72,14 +72,14 @@
       "quantity": 1,
       "material": "PETG / PLA",
       "bounds_mm": [
-        66.0,
-        51.0,
+        37.2,
+        48.575,
         19.8
       ],
-      "bed_z_min_mm": 1.0000000116860974e-07,
+      "bed_z_min_mm": 8.881784197001252e-16,
       "watertight": true,
-      "layer_mm": 0.2,
-      "supports": "Common flat Y5.4 back face down (-90 degrees about X). Outer pulley cheek/arm and raised plinth removed; remaining boss raised 2 mm. Extended curved guide and independent return stop. Fresh slice required; support savings and cantilever strength unqualified."
+      "layer_mm": 0.12,
+      "supports": "Exact braced-tail-b geometry; flat spine down. Automatic-support PETG slice generates zero supports. Physical validation pending current print."
     },
     {
       "name": "plunger",
@@ -87,14 +87,14 @@
       "quantity": 1,
       "material": "PETG / PLA",
       "bounds_mm": [
-        58.0,
+        38.15,
         16.0,
-        11.9
+        12.9
       ],
       "bed_z_min_mm": 1.0000000116860974e-07,
       "watertight": true,
-      "layer_mm": 0.2,
-      "supports": "Rounded shoe and cleat need slice review; keep supports off guide surfaces."
+      "layer_mm": 0.12,
+      "supports": "Exact braced-tail-b triangle plunger; flat spine down, PETG 0.12 mm. Automatic-support slice generates zero supports; physical validation pending."
     },
     {
       "name": "pulley",
@@ -106,7 +106,7 @@
         17.999,
         4.0
       ],
-      "bed_z_min_mm": 1.0000000116860974e-07,
+      "bed_z_min_mm": -1.985194824249048e-16,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Axis vertical, flange on bed. Keep bore and cord groove clean; running clearance unvalidated."
@@ -119,12 +119,12 @@
       "bounds_mm": [
         10.999,
         10.998,
-        23.304
+        25.354
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": 6.01626803067081e-16,
       "watertight": true,
-      "layer_mm": 0.2,
-      "supports": "No thread. Head-down orientation provisional; cross-key slot needs slice review."
+      "layer_mm": 0.12,
+      "supports": "Extended diamond-hole axle; head down, PETG 0.12 mm. Automatic-support slice generates zero supports; current extended length awaits physical validation."
     },
     {
       "name": "pulley_key",
@@ -132,11 +132,11 @@
       "quantity": 1,
       "material": "ELEGOO TPU 95A",
       "bounds_mm": [
-        7.071,
+        7.0,
         14.7,
-        7.071
+        3.0
       ],
-      "bed_z_min_mm": 8.881784197001252e-16,
+      "bed_z_min_mm": -4.4374682986835957e-17,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "ELEGOO TPU95A T/V snap prototype, uniform3 mm thickness flat on bed. Fresh TPU slice and insertion/reopening/pull-out tests required. Keep channels open; retain keeper until qualified."
@@ -177,11 +177,11 @@
       "quantity": 1,
       "material": "ELEGOO TPU 95A",
       "bounds_mm": [
-        17.0,
-        30.198,
+        22.337,
+        27.798,
         6.0
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": 1.3322676295501878e-15,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Axial end flat on bed; vertical 4 mm hole and constant-section clip. TPU 95A. Fresh slice and physical snap-fit test required; no support-free claim before slicing."

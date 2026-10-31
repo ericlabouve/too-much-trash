@@ -1,0 +1,181 @@
+{
+  "revision": "braced-tail-b",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "b-bracket",
+      "quantity": 1,
+      "source": "review/concepts/braced-tail-b/b-bracket.stl",
+      "input_sha256": "2b8a091016ba89fdbb79336e0c1aa900481e8c86771f7f69ae4a8ba8a76a4cbe",
+      "center_xy_mm": [
+        65,
+        85
+      ],
+      "bounds_mm": [
+        48.57509231567383,
+        37.19999980926514,
+        19.799999237060547
+      ],
+      "orientation": "Flat spine on bed; open triangular guide upright.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        6.3124542236328125,
+        -27.40000009536743,
+        3.700743608425998e-18
+      ]
+    },
+    {
+      "name": "b-plunger",
+      "quantity": 1,
+      "source": "review/concepts/braced-tail-b/b-plunger.stl",
+      "input_sha256": "8872f83da066cef5a35881278b100698c1047e0aa6d0d718b51db4b8a8ce80fb",
+      "center_xy_mm": [
+        110,
+        85
+      ],
+      "bounds_mm": [
+        16.0,
+        38.15000009536743,
+        12.899999141693115
+      ],
+      "orientation": "Broad triangular shaft base on bed; curved foot and rounded handle.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -21.924999952316284,
+        -3.4000000953674316
+      ]
+    },
+    {
+      "name": "pulley_axle",
+      "quantity": 1,
+      "source": "review/concepts/braced-tail-b/pulley_axle.stl",
+      "input_sha256": "595eb87634b4fc4363b5d04d1233419d178cf4da6a02fbeefff688d240561e95",
+      "center_xy_mm": [
+        137,
+        76
+      ],
+      "bounds_mm": [
+        10.997538566589355,
+        10.998769760131838,
+        25.35416316986084
+      ],
+      "orientation": "Head down; extended shaft and diamond key passage.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          -1.2246467991473532e-16,
+          0.0
+        ],
+        [
+          0.0,
+          1.2246467991473532e-16,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -10.476322650909424,
+        16.300000190734867,
+        16.850000381469727
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "b-bracket",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "b-plunger",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "pulley_axle",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-compact-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; readiness must be verified before sending.",
+  "geometry_check_sha256": "1c53e1ed207db52fab14165814dd477c558db24030f5a2d526b08458db85f9ab",
+  "scope": "Selected standalone fit-test pieces: b-bracket, b-plunger, pulley_axle. NOT complete jaws; consult geometry check for retention limitations."
+}

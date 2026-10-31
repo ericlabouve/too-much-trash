@@ -129,7 +129,7 @@ class Parameters:
     phone_right: float=FIXED_CUFF_X
     collar_opening_x: float=11.6
     collar_opening_y: float=17.6
-    twine_diameter: float=2
+    twine_diameter: float=1
     guide_bore: float=4
     pivot_diameter: float=6
     pivot_clearance: float=.5
@@ -211,8 +211,8 @@ def assembly_parts(p,solids):
         # to preserve its mating phase with the unchanged seated nut.
         s=solids['collar_screw'].rotate((0,0,0),(0,0,1),-24).rotate((0,0,0),(0,1,0),-90).translate((58.2,y,26-p.height))
         out[f'rail_screw_{i+1}']=placed(s,p)
-        # Match thread phase: the nut occupies screw-local Z2..8.
-        nut=solids['thumb_nut'].rotate((0,0,0),(0,1,0),-90).translate((44,y,26-p.height))
+        # Nut bearing face X32.6 matches the open mount; re-index threads at this seat.
+        nut=solids['thumb_nut'].rotate((0,0,0),(0,0,1),180).rotate((0,0,0),(0,1,0),-90).translate((38.6,y,26-p.height))
         out[f'rail_nut_{i+1}']=placed(nut,p)
     for i,(y,z) in enumerate(CLAMP_STATIONS):
         out[f'clamp_screw_{i+1}']=solids['collar_screw'].rotate((0,0,0),(0,1,0),90).translate((-22+CUFF_INWARD_SHIFT,y,z))
