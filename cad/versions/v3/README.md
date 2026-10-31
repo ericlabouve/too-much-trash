@@ -400,3 +400,33 @@ Flat printing requires a bed-reaching guide floor and a tangent 45° roof above 
 User requested shorter bracket and plunger at both ends. The tail-only candidate in `review/concepts/compact-b/` shortens bracket length 66→46 mm and plunger length 58→44 mm, preserving the mounting hole and curved foot position. The moving cleat advances 14 mm and rises 1 mm; the rear anchor advances 20 mm. A 45° relief in the mounting reinforcement and shortened guide clear the return band. Three motion and five insertion samples have zero solid overlap; three route samples clear bracket/plunger. Seven band/string samples retain 0.25 mm separation. Across 21 motion frames the provisional 3 mm-wide ×1 mm-thick band clears the nut’s 9.3 mm-radius turning envelope by at least 0.4447 mm. These are nominal geometric checks, not proof of physical freedom from snagging.
 
 The first compact slice is superseded because its band intersected the guide/haunch. Final `2026-10-30-compact-b-tail-clearance-petg` uses matching source meshes, automatic supports ON and bridge suppression OFF: zero support/interface paths, 7.3361 g /62.60 min. No print; active V3 unchanged. Foot alignment is pending clarification: moving the contact face to the neck face nearest the phone would retract it 10.85 mm and lose the current phone-button reach. Do not move the foot/phone without resolving that relationship.
+
+
+### B tail seated in band anchor — October 30
+
+User removes the separate plunger return-stop block and asks for the tail to fit snugly into the fixed rubber-band anchor, using small rubber bands. `review/concepts/nested-tail-b/` extends the triangular tail into a 2 mm-deep seated engagement with a blind-end socket in that anchor. Sloping-face clearance is 0.4 mm; rear gap is 0.4 mm at the illustrated rest pose. The socket has a 2.4 mm top opening, preserving the outer band-retaining lip and rear wall. The anchor itself arrests return travel; no separate stop block remains. Bracket envelope46 mm; plunger49 mm including the extended tail. Mount/foot position unchanged. Review motion pulls1.5 mm from the seated position. This is not a safe button-force/stroke limit.
+
+The first closed socket roof generated0.0102 g support/interface and is rejected in job `2026-10-30-nested-tail-b-petg`. Opening the apex eliminates that roof: final job `2026-10-30-nested-tail-open-b-petg` has automatic supports ON, bridge suppression OFF, matching source meshes and zero actual support/interface paths. Total7.3700 g /63.30 min, model7.2987 g. No print. Nominal band thickness1 mm/string diameter1 mm; band width remains provisionally3 mm. Small-band tension, snug printed sliding fit and retention require physical checks. Active V3 unchanged pending review.
+
+
+### Retracted B foot — October 30
+
+User confirms the intended extra button clearance: retract the curved foot away from the phone. Candidate `review/concepts/retracted-foot-b/` translates the exact foot/transition10.85 mm toward the tail, aligning its contact face at global X−7 mm with the nearest neck-face plane (previous X−17.85). Foot shape and flat printing plane are preserved. Bracket front and complete pulley/hardware translate by the same10.85 mm; mounting hole and nested tail/band anchor remain fixed. Bracket length35.15 mm, plunger38.15 mm; open main guide9.15 mm. Previous foot is shown as a gray wireframe for comparison. No active V3 promotion.
+
+Sampled insertion,1.5 mm pull travel and rear-stop approach are collision-free. Relocated pulley, axle and key clear both pieces at three travel samples. Nominal band/string checks retain0.25 mm separation and0.4447 mm nut-envelope gap. Auto-support PETG job `2026-10-30-retracted-foot-b-petg` generates zero support/interface paths with bridge suppression OFF,6.3898 g/57.88 min; source meshes match. No print. The added rest gap is intentional; actual button reach, required stroke, shortened-guide stiffness, printed fit and small-band tension remain to be established physically.
+
+
+### Extended B capture tunnel — October 30
+
+User requests maximizing the triangle tunnel to reduce the risk of the plunger falling out during squeezing. `review/concepts/long-guide-b/` extends the continuous channel from concept v21.25 to41.4, joining the rear band-anchor socket:20.15 mm versus the preceding9.15 mm main guide. Its front starts just behind the foot/triangle transition at the return position. Tapered outside shoulders clear the return-band diagonals while keeping the original0.4 mm inner-face clearance and2.4 mm apex slot. Foot, complete plunger, pulley and mounting placement remain unchanged.
+
+Continuous captured overlap is19.75 mm at rest,18.25 mm after1.5 mm pull, and13.75 mm after6 mm pull. Sampled straight motion through6 mm has zero bracket intersection; an additional0.8 mm upward lift intersects the retaining shoulders at every sampled pull, demonstrating rigid geometric capture. This is not elastic/tilt/strength validation. Three nominal operational route samples cover the illustrated1.5 mm range. Six-mm results are shaft-only retention checks, not an approved complete operating stroke. User has been asked for actual full-squeeze string travel. No forward withdrawal stop is added; an unlimited pull can eventually withdraw through the assembly opening.
+
+Final `2026-10-30-long-guide-b-petg` generates zero support/interface with automatic supports ON and bridge suppression OFF:6.4817 g/58.15 min, matching viewer source meshes. About0.092 g more than the preceding shortened design. No print or active V3 promotion.
+
+
+### B handle moved toward the boot — October 30
+
+User asks for a small handle move toward the curved boot without interference. `review/concepts/forward-handle-b/` moves the shared handle, its narrowed base, wrap paths and knot envelope1 mm toward the boot. Foot, triangular shaft,20.15 mm continuous tunnel, rear socket, pulley and mounting remain unchanged. A2 mm study left only0.0905 mm beyond the reserved9.3 mm-radius nut-turning envelope and is superseded. The selected1 mm move leaves0.2548 mm beyond that envelope, which already includes0.3 mm allowance beyond the nominal9 mm nut radius: nominal minimum clearance0.5548 mm. Band/string separation remains0.25 mm; band width3 mm is provisional.
+
+Sampled plunger motion/insertion and pulley/axle/key checks clear, including shaft/hardware positions through6 mm pull. Full band/string/knot checks cover the illustrated1.5 mm travel only. Actual full-squeeze cord travel, band tension, physical sliding and printed fit remain unverified. Final auto-support PETG slice `2026-10-30-forward-handle-1mm-b-petg` has0 support/interface,6.4812 g/58.17 min; exact source hashes match. No print or active V3 promotion.
