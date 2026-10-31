@@ -1,0 +1,73 @@
+{
+  "revision": "diamond-slot-axle-v3",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "pulley_axle",
+      "quantity": 1,
+      "source": "review/concepts/diamond-axle/pulley_axle.stl",
+      "input_sha256": "33ea2930738cbc9788b5e5cc8122b381b7ed4989dafb18f0bd15c6d73a28cc98",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        10.997538566589355,
+        10.99876880645752,
+        23.304162979125977
+      ],
+      "orientation": "Head flat on bed; diamond roof 45 degrees.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0012307167053222656,
+        -0.0,
+        6.489901855600221e-16
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "pulley_axle",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-flush-fins-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "9426f3e3367d9a7bd75311ac1dc09a64d1713aaf0326a65b2eb52420f3c3ab21",
+  "scope": "Selected standalone fit-test pieces: pulley_axle. NOT complete jaws; consult geometry check for retention limitations."
+}

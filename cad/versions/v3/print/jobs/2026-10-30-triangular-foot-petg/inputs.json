@@ -1,0 +1,235 @@
+{
+  "revision": "curved-foot-triangle-diamond-study-v1",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "b-guide",
+      "quantity": 1,
+      "source": "review/concepts/triangular-foot/b-guide.stl",
+      "input_sha256": "04db1676621b4ab3ad113e11f772f65f552124514a6da41a29b79d2e8537daf1",
+      "center_xy_mm": [
+        65,
+        65
+      ],
+      "bounds_mm": [
+        11.600000381469727,
+        7.100000023841861,
+        28.0
+      ],
+      "orientation": "Longitudinal axis vertical, standing on end face; foot-first plunger.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.123233995736766e-17,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        4.94999998807907,
+        -12.0
+      ]
+    },
+    {
+      "name": "b-plunger",
+      "quantity": 1,
+      "source": "review/concepts/triangular-foot/b-plunger.stl",
+      "input_sha256": "cc52f28ea87a61bfd5d87a2dac46b8f87d68b1adae64b1e37bbda237343f4164",
+      "center_xy_mm": [
+        65,
+        110
+      ],
+      "bounds_mm": [
+        16.0,
+        11.802019596099854,
+        57.0
+      ],
+      "orientation": "Longitudinal axis vertical, standing on end face; foot-first plunger.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.123233995736766e-17,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        9.301009893417355,
+        8.0
+      ]
+    },
+    {
+      "name": "c-guide",
+      "quantity": 1,
+      "source": "review/concepts/triangular-foot/c-guide.stl",
+      "input_sha256": "1d18a53ef223f47aee5db42a607a7fda54b0d9d2b1799f428f3344f14a84fd13",
+      "center_xy_mm": [
+        115,
+        65
+      ],
+      "bounds_mm": [
+        11.600000381469727,
+        11.100000023841861,
+        28.0
+      ],
+      "orientation": "Longitudinal axis vertical, standing on end face; foot-first plunger.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.123233995736766e-17,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        4.94999998807907,
+        -12.0
+      ]
+    },
+    {
+      "name": "c-plunger",
+      "quantity": 1,
+      "source": "review/concepts/triangular-foot/c-plunger.stl",
+      "input_sha256": "a8e73f5b894d9672265163f3a9765b02749c4f9ec9b7f80b348a37482523c3db",
+      "center_xy_mm": [
+        115,
+        110
+      ],
+      "bounds_mm": [
+        16.0,
+        13.740526795387268,
+        57.0
+      ],
+      "orientation": "Longitudinal axis vertical, standing on end face; foot-first plunger.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.123233995736766e-17,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        8.270263373851773,
+        8.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "b-guide",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "b-plunger",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "c-guide",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "c-plunger",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-compact-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Offline Bambu PETG Translucent recipe; no print.",
+  "geometry_check_sha256": "17d0c5e7de71ce0de2159d0ff6c772bdecf84ce7dca653d3ea02070ac4453f63",
+  "scope": "Selected standalone fit-test pieces: b-guide, b-plunger, c-guide, c-plunger. NOT complete jaws; consult geometry check for retention limitations."
+}

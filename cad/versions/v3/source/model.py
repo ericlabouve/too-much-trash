@@ -159,7 +159,7 @@ class Parameters:
     @property
     def string_eye(self): return self.point(plunger_attachment_path()[-1])
     @property
-    def first_guide(self): return (0,(1 if self.side=='near' else -1)*15.2,self.guide_stations[0])
+    def first_guide(self): return (0,(1 if self.side=='near' else -1)*13.3,self.guide_stations[0])
     @property
     def contact(self): return self.point((self.rest_gap,0,6))
 
@@ -430,6 +430,8 @@ def carrier(p, *, lightened=True, arm_slots=True, flat_ramped=True):
         start=-19.3+4.55*math.tan(math.radians(35))
         ramp=cq.Workplane('XZ').polyline([(start,33.95),(-19.35,38.5),(-19.35,33.95)]).close().extrude(10,both=True)
         s=s.union(ramp)
+    # Match cap end planes; remove the two projecting collar end strips.
+    s=s.intersect(box(-200,30,-80,80,-38.5,68.5))
     return s.clean()
 
 def sliding_jaw(p, *, flat_back=True, cleat_shift=SLIDING_CLEAT_SHIFT, support_angle=JAW_SUPPORT_ANGLE, arm_slots=True, continuous_beam=True, flush_beam=True, beam_window_width=4, keeper_tabs=True):

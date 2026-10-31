@@ -1,0 +1,73 @@
+{
+  "revision": "formfit-square-snap-v1",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "clip",
+      "quantity": 1,
+      "source": "review/concepts/formfit-square-clip/clip.stl",
+      "input_sha256": "58778bde9ed8319e1c2b4802c416317fb85668d15b51ccd3ba9cf15a50009c44",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        27.93050765991211,
+        27.798236846923828,
+        6.0
+      ],
+      "orientation": "C body flat; local closure ends on bed, vertical square hole and stud.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -5.965253829956055,
+        -3.399118423461914,
+        -0.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "clip",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-material-tpu",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "a8ae157dd9157846f8aaf3b73df950bdbc7d811ec4a8de6e8259437a2811610b",
+    "filament": "ee2c9caab7bcecbbceba3dda6ca7a5420afc9163296ed42a3a13780f1af7333c"
+  },
+  "material_status": "ELEGOO TPU95A saved recipe; offline slice only. No print.",
+  "geometry_check_sha256": "beb6cd046b047b8117928454b1211d9f6132786c242b933bb80c3d9ca14058dc",
+  "scope": "Selected standalone fit-test pieces: clip. NOT complete jaws; consult geometry check for retention limitations."
+}

@@ -1,0 +1,24 @@
+{
+  "approved": [
+    "shaft_cap",
+    "sliding_jaw",
+    "phone_cuff",
+    "pulley",
+    "pulley_axle",
+    "pulley_key",
+    "collar_screw",
+    "thumb_nut",
+    "carrier",
+    "clip_string_guide"
+  ],
+  "not_approved": [
+    "actuator_bracket",
+    "plunger"
+  ],
+  "axle_feedback": "Diamond axle printed successfully and existing TPU key fits",
+  "fixed_jaw": "User approves trimmed fixed jaw; no reprint required for this visual refinement.",
+  "limits": "Approval is user assessment, not measured load qualification.",
+  "clip_guide_feedback": "User approves straight-arm-roof45-fit-v1 design: 12.8 x 17.8 mm opening, original straight arm planes, 45-degree hole roof and matching stud. Earlier loose clip superseded. Revised guide has not been printed; approval is design acceptance, not physical fit validation.",
+  "clip_guide_approved_revision": "straight-arm-roof45-fit-v1",
+  "clip_guide_approved_review": "review/concepts/straight-arm-clip-45/"
+}

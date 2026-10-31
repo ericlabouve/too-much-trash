@@ -26,13 +26,12 @@ labelToggle.onchange=()=>{bomLabels.visible=labelToggle.checked;canvas.dataset.b
 canvas.dataset.bomLabels='true';
 const meshes=new Map(),bomMeshes=new Map();let manifest,mode='phone',selected=null,outline,flipped=false,selectionTargets=[];
 let isolated=false;
-const isolateButton=document.createElement('button');isolateButton.id='bom-isolate';isolateButton.hidden=true;isolateButton.disabled=true;
-Object.assign(isolateButton.style,{position:'absolute',left:'12px',top:'38px',zIndex:5});$('#stage').append(isolateButton);
+const isolateControl=document.createElement('label');const isolateButton=document.createElement('input');isolateButton.type='checkbox';isolateButton.id='bom-isolate';isolateButton.disabled=true;isolateControl.append(isolateButton,' Hide other items');labelControl.after(isolateControl);
 function updateIsolation(){
  for(const [id,mesh] of bomMeshes)mesh.visible=!isolated||id===selected;
  for(const sprite of bomLabels.children)sprite.visible=!isolated||sprite.userData.bomId===selected;
- isolateButton.hidden=mode!=='bom';isolateButton.disabled=!selected;
- isolateButton.textContent=isolated?'Show all items':'Hide other items';isolateButton.setAttribute('aria-pressed',String(isolated));
+ isolateControl.hidden=mode!=='bom';isolateButton.disabled=!selected;
+ isolateButton.checked=isolated;
  canvas.dataset.bomIsolated=String(isolated);canvas.dataset.bomVisible=JSON.stringify([...bomMeshes].filter(([,m])=>m.visible).map(([id])=>id));
 }
 isolateButton.onclick=()=>{if(mode!=='bom'||!selected)return;isolated=!isolated;updateIsolation();};

@@ -124,11 +124,13 @@ def cassette():
     # flanks at atan(1.6/2.2)=36.0 degrees to the bed. Double groove depth
     # from 1.1 to 2.2 mm, preserving diameter, width, bore and bearing faces.
     pulley=cq.Workplane('XZ').polyline([(4.3,6.6),(9,6.6),(9,6.8),(6.8,8.4),(6.8,8.8),(9,10.4),(9,10.6),(4.3,10.6)]).close().revolve(360,(0,0),(0,1)).edges().fillet(.09).translate((PULLEY_U,8,PULLEY_LIFT))
-    axle=cyl(PULLEY_U,8,-3.6-KEY_OUTBOARD,16.8+KEY_OUTBOARD,4).union(cyl(PULLEY_U,8,13.2,1.6,5.5).edges().fillet(.2))
-    axle=axle.cut(box(3,23,6.3,9.7,-1.4-KEY_OUTBOARD,2-KEY_OUTBOARD))
+    extension=2+1.7*(math.sqrt(2)-1)
+    axle=cyl(PULLEY_U,8,-3.6-KEY_OUTBOARD-extension,16.8+KEY_OUTBOARD+extension,4).union(cyl(PULLEY_U,8,13.2,1.6,5.5).edges().fillet(.2))
+    axis0=(0,8,.3-KEY_OUTBOARD);axis1=(1,8,.3-KEY_OUTBOARD)
+    axle=axle.cut(box(3,23,6.3,9.7,-1.4-KEY_OUTBOARD,2-KEY_OUTBOARD).rotate(axis0,axis1,45).translate((0,0,-2)))
     # TPU T stop plus flexible leading V; axle and seated T stop unchanged.
     # Keeper remains pending physical snap/creep qualification.
-    key=snap_key().translate((0,0,-KEY_OUTBOARD))
+    key=snap_key().translate((0,0,-KEY_OUTBOARD)).rotate(axis0,axis1,45).translate((0,0,-2))
     
     # Flush-T cap: move mount bar 10 mm inward; keep the mechanism/shoe fixed.
     # One closed screw bore; user removed the rail locating lugs.

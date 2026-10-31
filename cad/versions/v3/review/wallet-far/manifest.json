@@ -1,7 +1,7 @@
 {
   "version": "v3",
   "title": "Three interchangeable cuffs on integral studs",
-  "revision": "flush-width-fins-v3",
+  "revision": "approved-square-clip-v3",
   "phone_rotation_degrees": 180,
   "phone_center_y_mm": 0,
   "status": "Local TPU/stud fit approved; full jaws and loaded phone retention unvalidated",
@@ -32,84 +32,96 @@
       "name": "Rigid shaft clamp cap",
       "quantity": 1,
       "material": "PETG / PLA",
-      "note": "Taller cap walls meet the flat fixed jaw across a 1 mm split gap; inner extent X-4.8. Slot end ligaments thickened 1.6 to 2.6 mm; slot width 8.8 mm unchanged. 110 mm collar spans Z-40..70; two screws on each axial side of the jaw at Z-30/+60. Entire outer side at X12: body, crossing, rail wings and four screw seats share one bed plane. Use 1.8 mm shorter collar screws and the extended bracket bearing plate. New full collar fit and loaded retention unvalidated."
+      "note": "Approved (user assessment 2026-10-30). Taller cap walls meet the flat fixed jaw across a 1 mm split gap; inner extent X-4.8. Slot end ligaments thickened 1.6 to 2.6 mm; slot width 8.8 mm unchanged. 110 mm collar spans Z-40..70; two screws on each axial side of the jaw at Z-30/+60. Entire outer side at X12: body, crossing, rail wings and four screw seats share one bed plane. Use 1.8 mm shorter collar screws and the extended bracket bearing plate. New full collar fit and loaded retention unvalidated.",
+      "approval": "Approved"
     },
     {
       "id": "carrier",
       "name": "Centered fixed stud, sliding track and shaft saddle",
       "quantity": 1,
       "material": "PETG / PLA",
-      "note": "Flat collar underside at X-5.8 with approved ramp below the fixed band hook; guide-floor slot with35-degree roof. Four screw mounts, track edges/stops and centered cuff unchanged. Matches the approved PETG plate geometry; physical strength and retention unqualified."
+      "note": "Approved (user assessment 2026-10-30). Flat collar underside at X-5.8 with approved ramp below the fixed band hook; guide-floor slot with35-degree roof. Four screw mounts, track edges/stops and centered cuff unchanged. End strips trimmed to cap planes Z -38.5 / 68.5; no reprint requested for this visual refinement.",
+      "approval": "Approved"
     },
     {
       "id": "sliding_jaw",
       "name": "Sliding dual-stud jaw",
       "quantity": 1,
       "material": "PETG / PLA",
-      "note": "Two fins end flush with the fixed rails at Y +/-13.8 mm, with 0.4 mm top clearance; wraparound skirts removed. Two 31 x 4 mm beam openings with 3.8 mm edge rails. Continuous121.6 mm beam flush with central root at X-10/-2. Studs100 mm apart; jaw sits5.2 mm farther out to keep cuff contacts unchanged. Tongue design retained; engagement and band preload need physical checks. See flush-beam slice."
+      "note": "Approved (user assessment 2026-10-30). Two fins end flush with the fixed rails at Y +/-13.8 mm, with 0.4 mm top clearance; wraparound skirts removed. Two 31 x 4 mm beam openings with 3.8 mm edge rails. Continuous121.6 mm beam flush with central root at X-10/-2. Studs100 mm apart; jaw sits5.2 mm farther out to keep cuff contacts unchanged. Tongue design retained; engagement and band preload need physical checks. See flush-beam slice.",
+      "approval": "Approved"
     },
     {
       "id": "phone_cuff",
       "name": "Interchangeable 21.6 mm TPU cuff",
       "quantity": 3,
       "material": "ELEGOO TPU 95A",
-      "note": "One unchanged shape at all three contacts: 6.8 mm square passage, 9.6 x 6.8 mm head recess. Integral seating ribs. ELEGOO TPU95A; previous square-stud fit successful, new ramped-stud pull-out resistance and full phone grip unqualified."
+      "note": "Approved (user assessment 2026-10-30). One unchanged shape at all three contacts: 6.8 mm square passage, 9.6 x 6.8 mm head recess. Integral seating ribs. ELEGOO TPU95A; previous square-stud fit successful, new ramped-stud pull-out resistance and full phone grip unqualified.",
+      "approval": "Approved"
     },
     {
       "id": "actuator_bracket",
       "name": "Flat-back plunger frame and offset rail bracket",
       "quantity": 1,
       "material": "PETG / PLA",
-      "note": "Smoothly blended reinforcement. Mount bore offset 4.4 mm for a common flat back, preserving 5.4 mm beside the bore. No rail locating lugs: one screw/nut clamps the flat face; friction alone resists sliding and rotation. Bearing plate extends inward 1.8 mm to the flat cap; phone/plunger positions and rail fasteners unchanged. Remove phone/release twine; loosen nut and slide module with captured fasteners to rail screw Y +50 near / -50 far. Remove nut/screw there, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and retention unqualified."
+      "note": "Not approved (user assessment 2026-10-30). Smoothly blended reinforcement. Mount bore offset 4.4 mm for a common flat back, preserving 5.4 mm beside the bore. No rail locating lugs: one screw/nut clamps the flat face; friction alone resists sliding and rotation. Bearing plate extends inward 1.8 mm to the flat cap; phone/plunger positions and rail fasteners unchanged. Remove phone/release twine; loosen nut and slide module with captured fasteners to rail screw Y +50 near / -50 far. Remove nut/screw there, withdraw 4.5 mm, lower 2 mm, then withdraw. Strength and retention unqualified.",
+      "approval": "Not approved"
     },
     {
       "id": "plunger",
       "name": "Rounded-shoe sliding plunger",
       "quantity": 1,
       "material": "PETG / PLA",
-      "note": "Shoe and blended root share the stem thickness of 4 mm; contact span remains 16 mm. Shared capped band/twine cleat. Nominal stroke is illustrative, not a physical force limit."
+      "note": "Not approved (user assessment 2026-10-30). Shoe and blended root share the stem thickness of 4 mm; contact span remains 16 mm. Shared capped band/twine cleat. Nominal stroke is illustrative, not a physical force limit.",
+      "approval": "Not approved"
     },
     {
       "id": "pulley",
       "name": "Deep-groove redirect pulley",
       "quantity": 1,
       "material": "PETG / PLA",
-      "note": "Groove depth 1.1 to 2.2 mm nominal, with 36-degree flanks. Same 18 mm diameter, 4 mm width and 8.6 mm bore; unchanged axle and bearing envelope. Minimum radial web 2.5 mm. PETG slice review required; physical string retention, strength and rotation untested."
+      "note": "Approved (user assessment 2026-10-30). Groove depth 1.1 to 2.2 mm nominal, with 36-degree flanks. Same 18 mm diameter, 4 mm width and 8.6 mm bore; unchanged axle and bearing envelope. Minimum radial web 2.5 mm. PETG slice review required; physical string retention, strength and rotation untested.",
+      "approval": "Approved"
     },
     {
       "id": "pulley_axle",
       "name": "Headed smooth pulley axle",
       "quantity": 1,
       "material": "PETG / PLA",
-      "note": "Unchanged 20.6 mm overall span, 8 mm shaft and outboard cross-key. Now supported by one 8.2 mm boss; head retains the wheel. Cantilever loading and new stack clearance require physical testing."
+      "note": "Approved (user assessment 2026-10-30). Approved printed diamond-slot axle: 23.304 mm overall span, 8 mm shaft, 45-degree passage shifted 2 mm outboard. User confirms successful print and TPU key fit. Loaded retention remains unmeasured.",
+      "approval": "Approved"
     },
     {
       "id": "pulley_key",
       "name": "TPU T/V axle snap key",
       "quantity": 1,
       "material": "ELEGOO TPU 95A",
-      "note": "T-head stop and split V tip;14.7 mm overall,3 mm stem/thickness,5 mm relaxed V span. Pinch arms for removal. Snap insertion, pull-out, wear and creep untested; keeper band retained pending qualification. Cuffs use integral studs."
+      "note": "Approved (user assessment 2026-10-30). T-head stop and split V tip;14.7 mm overall,3 mm stem/thickness,5 mm relaxed V span. Pinch arms for removal. User confirms key fits the diamond axle; loaded pull-out, wear and creep unmeasured; keeper band retained pending qualification. Cuffs use integral studs.",
+      "approval": "Approved"
     },
     {
       "id": "collar_screw",
       "name": "Common long TPU screw",
       "quantity": 5,
       "material": "ELEGOO TPU 95A",
-      "note": "One unchanged 30.2 mm threaded-span 8\u00d73 design: four collar screws and one actuator rail screw. Rail screw projects 12.2 mm farther beyond its nut; head bearing stays unchanged. User selects TPU for tighter feel; loaded retention, creep and thread strength unverified."
+      "note": "Approved (user assessment 2026-10-30). One unchanged 30.2 mm threaded-span 8\u00d73 design: four collar screws and one actuator rail screw. Rail screw projects 12.2 mm farther beyond its nut; head bearing stays unchanged. User selects TPU for tighter feel; loaded retention, creep and thread strength unverified.",
+      "approval": "Approved"
     },
     {
       "id": "thumb_nut",
       "name": "Common TPU clamp nut",
       "quantity": 5,
       "material": "ELEGOO TPU 95A",
-      "note": "Same 8\u00d73 nut geometry at all five stations. ELEGOO TPU 95A selected by user for tighter feel; hand-tighten only. Sustained preload, creep and thread stripping remain untested."
+      "note": "Approved (user assessment 2026-10-30). Same 8\u00d73 nut geometry at all five stations. ELEGOO TPU 95A selected by user for tighter feel; hand-tighten only. Sustained preload, creep and thread stripping remain untested.",
+      "approval": "Approved"
     },
     {
       "id": "clip_string_guide",
       "name": "Reversible TPU clip guide",
       "quantity": 1,
       "material": "ELEGOO TPU 95A",
-      "note": "Single offset 4 mm eye, half the former diameter. 6 mm axial width; 1.6 mm walls around a 13.8 x 18.8 mm opening and 13 mm snap mouth. Flip end-for-end for left/right eye. No guide bands, grooves or lower guides. Snap fit, sliding retention, cord friction and creep untested."
+      "note": "Approved (user assessment 2026-10-30). Approved 45-degree square press-stud clip. 12.8 x 17.8 mm opening; original 6 mm band, 1.6 mm walls and straight 35-degree print arm. Only roof and matching stud reshaped. Zero supports in the reviewed TPU slice. Design approved; revised clip unprinted, physical fit and retention untested. Assembly shows open manufactured pose, not a closed deformation simulation.",
+      "approval": "Approved"
     },
     {
       "id": "twine",
@@ -656,12 +668,12 @@
       -417
     ],
     "trigger_angle": -0.48,
-    "tail_length": 126.35263127961178,
+    "tail_length": 126.2355725229144,
     "lower_twine_length": 25,
     "band_end": [
-      -37.461473707074575,
-      -1.6425142774396786,
-      -392.4703459882364
+      -37.45917616159188,
+      -1.437927548829239,
+      -392.45792830193705
     ],
     "series_span_rest": 80,
     "kind": "plunger",
@@ -850,13 +862,13 @@
       ],
       [
         0,
-        -15.2,
+        -13.3,
         -190
       ],
       [
-        -22.938189569713202,
-        -6.898559965246651,
-        -313.9754531505928
+        -22.928539878685886,
+        -6.039295705082804,
+        -313.9232988681356
       ]
     ],
     "band_paths": {
@@ -1041,249 +1053,249 @@
       ],
       "band_overtravel": [
         [
-          -37.461473707074575,
-          -1.6425142774396786,
-          -392.47034598823643
+          -37.45917616159188,
+          -1.4379275488292391,
+          -392.45792830193705
         ],
         [
-          -37.39934935252324,
-          -2.316170142960467,
-          -392.1781814012842
+          -37.39702035772838,
+          -2.1091238732827278,
+          -392.1601633669058
         ],
         [
-          -37.21403925379974,
-          -3.0232657693342784,
-          -391.21948114174404
+          -37.21161644917483,
+          -2.808201184980923,
+          -391.19561863070635
         ],
         [
-          -36.9087141180709,
-          -3.7517025543499116,
-          -389.6106488368588
+          -36.906136748210244,
+          -3.5231980772998215,
+          -389.5807977211974
         ],
         [
-          -36.48859814306115,
-          -4.489016742654917,
-          -387.3792120534174
+          -36.48580809721312,
+          -4.241880755177255,
+          -387.34333067185366
         ],
         [
-          -35.960879629581065,
-          -5.222592684065283,
-          -384.56335129345587
+          -35.95782243593913,
+          -4.951952358738263,
+          -384.52150116423235
         ],
         [
-          -35.33458798770751,
-          -5.939878690837805,
-          -381.2112467152813
+          -35.33121374543794,
+          -5.641263365976869,
+          -381.1635914835679
         ],
         [
-          -34.62043924107378,
-          -6.628601800527352,
-          -377.380253757605
+          -34.61670347413279,
+          -6.298019474446109,
+          -377.32705639548493
         ],
         [
-          -33.83065267273423,
-          -7.276977769777013,
-          -373.1359217720848
+          -33.82651709086538,
+          -6.910983405042877,
+          -373.07754007902895
         ],
         [
-          -32.978741749843344,
-          -7.8739127059891505,
-          -368.5508724557442
+          -32.97417490373447,
+          -7.469667174968958,
+          -368.4877529365631
         ],
         [
-          -32.079282904486114,
-          -8.40919288690354,
-          -363.7035572736015
+          -32.07426072387577,
+          -7.9645115500245085,
+          -363.6362274986243
         ],
         [
-          -31.147666126883717,
-          -8.873659520217036,
-          -358.676915132353
+          -31.142172332410006,
+          -8.38704960575555,
+          -358.60597471055274
         ],
         [
-          -30.19983163839389,
-          -9.25936545305916,
-          -353.5569532726837
+          -30.193858020138883,
+          -8.730051598878841,
+          -353.48306359220186
         ],
         [
-          -29.25199714990406,
-          -9.559711149981101,
-          -348.4312756615343
+          -29.24554370786776,
+          -8.987648670193927,
+          -348.35514857314587
         ],
         [
-          -28.32038037230166,
-          -9.769557612836962,
-          -343.3875840639379
+          -28.313455316402,
+          -9.155433262391202,
+          -343.30996970108754
         ],
         [
-          -27.420921526944433,
-          -9.885314310466851,
-          -338.51217744150483
+          -27.413541136543298,
+          -9.230534534579496,
+          -338.4338513853155
         ],
         [
-          -26.569010604053545,
-          -9.9050006136805,
-          -333.888475353263
+          -26.561198949412386,
+          -9.21166748316966,
+          -333.8102253621282
         ],
         [
-          -25.77922403571399,
-          -9.828279684371848,
-          -329.59559062387467
+          -25.771012566144975,
+          -9.099154928642252,
+          -329.5182031546936
         ],
         [
-          -25.065075289080266,
-          -9.656464238912427,
-          -325.7069757012721
+          -25.056502294839827,
+          -8.894921991999606,
+          -325.6312224529543
         ],
         [
-          -24.438783647206712,
-          -9.392494087210288,
-          -322.2891658649088
+          -24.42989360433864,
+          -8.602463155411751,
+          -322.21579057439163
         ],
         [
-          -23.91106513372663,
-          -9.040885831747408,
-          -319.4006407886809
+          -23.901907943064643,
+          -8.226782470657607,
+          -319.33034650538445
         ],
         [
-          -23.490949158716884,
-          -8.607655587258982,
-          -317.09082393749304
+          -23.48157929206752,
+          -7.774307938411686,
+          -317.02426099394984
         ],
         [
-          -23.185624022988037,
-          -8.100216043342325,
-          -315.3992369180713
+          -23.17609959110294,
+          -7.252781523370355,
+          -315.3369918025559
         ],
         [
-          -23.000313924264535,
-          -7.527249631282667,
-          -314.3548232533145
+          -22.990695682549386,
+          -6.671126687089411,
+          -314.2974085748669
         ],
         [
-          -22.938189569713202,
-          -6.898559965246652,
-          -313.9754531505928
+          -22.92853987868589,
+          -6.039295705082805,
+          -313.9232988681356
         ],
         [
-          -23.000313924264535,
-          -6.224904099725862,
-          -314.26761773754504
+          -22.990695682549386,
+          -5.368099380629314,
+          -314.2210638031668
         ],
         [
-          -23.185624022988037,
-          -5.517808473352051,
-          -315.2263179970852
+          -23.17609959110294,
+          -4.6690220689311195,
+          -315.1856085393663
         ],
         [
-          -23.490949158716884,
-          -4.789371688336419,
-          -316.83515030197043
+          -23.48157929206752,
+          -3.9540251766122223,
+          -316.8004294488752
         ],
         [
-          -23.91106513372663,
-          -4.052057500031415,
-          -319.0665870854118
+          -23.901907943064643,
+          -3.2353424987347883,
+          -319.03789649821897
         ],
         [
-          -24.438783647206712,
-          -3.318481558621046,
-          -321.88244784537335
+          -24.42989360433864,
+          -2.525270895173781,
+          -321.8597260058403
         ],
         [
-          -25.065075289080262,
-          -2.6011955518485275,
-          -325.23455242354794
+          -25.056502294839824,
+          -1.835959887935176,
+          -325.2176356865047
         ],
         [
-          -25.77922403571399,
-          -1.9124724421589803,
-          -329.06554538122424
+          -25.771012566144975,
+          -1.1792037794659356,
+          -329.0541707745877
         ],
         [
-          -26.569010604053542,
-          -1.2640964729093183,
-          -333.3098773667444
+          -26.561198949412383,
+          -0.5662398488691673,
+          -333.3036870910437
         ],
         [
-          -27.420921526944433,
-          -0.6671615366971775,
-          -337.89492668308503
+          -27.413541136543298,
+          -0.007556078943084188,
+          -337.89347423350955
         ],
         [
-          -28.32038037230166,
-          -0.13188135578278892,
-          -342.7422418652277
+          -28.313455316402,
+          0.4872882961124656,
+          -342.74499967144834
         ],
         [
-          -29.25199714990406,
-          0.3325852775307059,
-          -347.76888400647624
+          -29.24554370786776,
+          0.9098263518435061,
+          -347.7752524595199
         ],
         [
-          -30.19983163839389,
-          0.7182912103728301,
-          -352.8888458661455
+          -30.193858020138883,
+          1.2528283449667983,
+          -352.8981635778708
         ],
         [
-          -31.147666126883713,
-          1.018636907294772,
-          -358.01452347729486
+          -31.142172332410002,
+          1.5104254162818838,
+          -358.02607859692677
         ],
         [
-          -32.079282904486114,
-          1.2284833701506335,
-          -363.0582150748913
+          -32.07426072387577,
+          1.6782100084791596,
+          -363.0712574689851
         ],
         [
-          -32.97874174984334,
-          1.3442400677805222,
-          -367.9336216973244
+          -32.974174903734465,
+          1.7533112806674533,
+          -367.94737578475707
         ],
         [
-          -33.83065267273423,
-          1.3639263709941707,
-          -372.5573237855662
+          -33.82651709086538,
+          1.7344442292576172,
+          -372.5710018079444
         ],
         [
-          -34.62043924107378,
-          1.2872054416855199,
-          -376.8502085149545
+          -34.616703474132784,
+          1.6219316747302095,
+          -376.863024015379
         ],
         [
-          -35.33458798770751,
-          1.115389996226098,
-          -380.7388234375571
+          -35.331213745437935,
+          1.4176987380875645,
+          -380.7500047171183
         ],
         [
-          -35.960879629581065,
-          0.8514198445239591,
-          -384.1566332739204
+          -35.95782243593912,
+          1.1252399014997079,
+          -384.165436595681
         ],
         [
-          -36.48859814306115,
-          0.49981158906108014,
-          -387.0451583501483
+          -36.485808097213116,
+          0.749559216745566,
+          -387.0508806646881
         ],
         [
-          -36.9087141180709,
-          0.0665813445726513,
-          -389.3549752013362
+          -36.906136748210244,
+          0.2970846844996422,
+          -389.3569661761228
         ],
         [
-          -37.21403925379974,
-          -0.44085819934400305,
-          -391.0465622207579
+          -37.21161644917483,
+          -0.22444173054168481,
+          -391.04423536751676
         ],
         [
-          -37.39934935252324,
-          -1.0138246114036638,
-          -392.0909758855147
+          -37.39702035772838,
+          -0.8060965668226334,
+          -392.08381859520574
         ],
         [
-          -37.461473707074575,
-          -1.6425142774396773,
-          -392.47034598823643
+          -37.45917616159188,
+          -1.4379275488292378,
+          -392.45792830193705
         ]
       ],
       "band_jaw_1": [
@@ -5452,5 +5464,6 @@
     ],
     "side_sign": 1,
     "phone_point_count": 35
-  }
+  },
+  "clip_guide_pose": "Approved manufactured open pose; closed TPU deformation not simulated."
 }

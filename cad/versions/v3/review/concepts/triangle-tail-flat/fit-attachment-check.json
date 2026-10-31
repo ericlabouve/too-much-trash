@@ -1,0 +1,187 @@
+{
+  "revision": "triangle-tail-flat-v3",
+  "scope": "Integrated selected B; original foot, shared cleat, band anchor, pulley interface and rear stop retained.",
+  "variants": {
+    "b": {
+      "foot_symmetric_difference_mm3": 0.0,
+      "sampled_stroke_intersections_mm3": {
+        "-1.5": 0.0,
+        "0": 0.0,
+        "1.5": 0.0
+      },
+      "guide_length_mm": 28,
+      "guide_slot_mm": 2.4,
+      "plunger_volume_mm3": 1443.4550060469185,
+      "guide_volume_mm3": 1615.0060606060604,
+      "limits": [
+        "Retained rear stop is a return stop, not a button-safe press stop.",
+        "Front withdrawal remains possible after removing band/string.",
+        "Band width, knot size, slack and loaded friction remain unverified."
+      ]
+    }
+  },
+  "wrap_check": {
+    "band_thickness_mm": 1,
+    "band_width_provisional_mm": 3,
+    "string_diameter_mm": 1,
+    "knot_envelope_diameter_mm": 3,
+    "samples": [
+      {
+        "travel_mm": -1.5,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": -1.0,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": -0.5,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": 0.0,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": 0.5,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": 1.0,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": 1.5,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      }
+    ],
+    "limits": [
+      "Band width provisional; tube sweep approximates flat elastic band.",
+      "Pulley approach is nominal: tension, knot, wear and slack need physical testing."
+    ],
+    "refined_geometry_evidence": "Plunger is a subset of swept baseline; new guide additions are below w8 and within v12..40. Tail wraps remain at v>=41, string lead/knot above w10.1. Added floor below w1.5. Mount roof only removes material.",
+    "sample_count": 7
+  },
+  "refinement": {
+    "new_plunger_added_material_mm3": 0.0,
+    "band_width_provisional_mm": 3,
+    "band_thickness_confirmed_mm": 1,
+    "cleat_slot_web_mm": 1.6,
+    "slot_mm": 2.4,
+    "mount_bore_roof_deg": 45,
+    "mount_bore_circular_clearance_mm": 8.8,
+    "floor_added_max_w_mm": 1.5,
+    "triangle_face_clearance_mm": 0.4,
+    "guide_outer_width_mm": 12.4,
+    "guide_top_w_mm": 8,
+    "plunger_min_w_mm": 3.3999998999998726
+  },
+  "stroke_samples": [
+    {
+      "translation_mm": -1.5,
+      "intersection_mm3": 0.0
+    },
+    {
+      "translation_mm": 0,
+      "intersection_mm3": 0.0
+    },
+    {
+      "translation_mm": 1.5,
+      "intersection_mm3": 0.0
+    }
+  ],
+  "insertion_samples": [
+    {
+      "translation_mm": -38,
+      "intersection_mm3": 0.0
+    },
+    {
+      "translation_mm": -32,
+      "intersection_mm3": 0.0
+    },
+    {
+      "translation_mm": -24,
+      "intersection_mm3": 0.0
+    },
+    {
+      "translation_mm": -16,
+      "intersection_mm3": 0.0
+    },
+    {
+      "translation_mm": -8,
+      "intersection_mm3": 0.0
+    },
+    {
+      "translation_mm": 0,
+      "intersection_mm3": 0.0
+    }
+  ],
+  "bracket_volume_mm3": 8432.723016809361,
+  "slice": {
+    "job": "cad/versions/v3/print/jobs/2026-10-30-triangle-tail-clearance-petg",
+    "total_g": 8.767677307128906,
+    "minutes": 70.68474934895833,
+    "support_g": 0,
+    "interface_g": 0,
+    "automatic_supports": true,
+    "bridge_suppression": false,
+    "gcode_md5": "a4e20937e37ee22cc40d09e66416c5ef"
+  },
+  "band_string_clearance_report": "band-string-clearance.json"
+}

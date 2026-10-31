@@ -316,3 +316,80 @@ The earlier actuator plate was printed according to the user; the newly revised 
 `source/plunger_design.py` owns the actuator; `source/model.py` owns the harness; `source/cuff_design.py` and `source/shared_key_design.py` own the shared cuff/key geometry. `source/build.py` regenerates the viewer meshes, STEP, BOM and provisional manufacturing exports. Current BOM: **14 printed designs, 27 pieces, 8 bands, 2 twine sections, no metal hardware**. The viewer contains 40 staged assembly states, not continuous insertion animations.
 
 V1 and V2 remain unchanged. Historical rocker reports and helper checks do not validate this plunger revision; earlier geometry is recoverable through Git, not duplicate source snapshots. Existing V2 print-job files retain the geometry and outcomes actually recorded.
+
+
+### Diamond-slot axle review — 2026-10-30
+
+User reports the upper section above the square key hole failed to print. This supersedes the earlier support-disabled bridge assumption; the cause is suspected, not proven. The isolated `review/concepts/diamond-axle/` candidate rotates the 3.4 mm square passage and existing TPU key 45 degrees. It moves the passage 2 mm outboard for bracket clearance and extends the tip 2.704 mm, preserving 2.2 mm end ligament. Head and bearing interface are unchanged. Seated key interference is zero; ideal compressed insertion and relaxed retention checks pass. Keeper-band fit, real spring-back and roof quality remain physical checks. Active assembly is unchanged pending review.
+
+PETG axle-only slice `print/jobs/2026-10-30-diamond-axle-petg/`: automatic normal supports enabled, zero support/interface paths, 1.100 g total and 38.06 minutes at 0.12 mm layers. No warnings. No print sent; user explicitly requires approval first.
+
+
+### October 30 physical review and active promotion
+
+`verified-diamond-axle-v3` promotes the successfully printed diamond axle and 45-degree key placement. The user confirms key fit. The unchanged TPU key keeps its original flat manufacturing orientation. Fixed-jaw end strips are trimmed to match the shaft-cap end planes at Z -38.5 and 68.5; the user explicitly waives reprinting this visual refinement for V3 verification. See `review/physical-assessment-2026-10-30.json` for approvals and rejected parts. All eight mechanical assembly checks pass; existing phone-envelope conflicts remain. Historical sliced plates remain unchanged.
+
+
+### Smaller plug-in TPU clip proposal — October 30
+
+`review/concepts/plug-clip/` has a 12.8 x 17.8 mm nominal frame opening, 6 mm flat extrusion, reversible 4 mm eye and integral tapered plug/socket outside the neck. Open pose is one valid printable solid. Closed pose is schematic tongue extension, not elastic validation. External latch sits beyond nominal frame; continuous contact and closing force are not established. Automatic-support TPU slice generates no support/interface paths (1.402 g,28.22 minutes). Source `study_plug_clip.py`; immutable preview `print/jobs/2026-10-30-plug-clip-tpu`. Kept as an unprinted review design pending fit; user explicitly declines printing now.
+
+### Square press-stud clip review — October 30
+
+User rejected the earlier tapered in-plane plug and selected option A: a square peg through a square hole in slightly overlapping TPU tabs. `review/concepts/square-clip/` contains the one-piece open print geometry and a separate seated latch detail. Nominal frame opening12.8 ×17.8 mm, eye4 mm, square stem2.6 mm, hole3 mm, lip3.4 mm, tab thickness1.8 mm. The lip grows at45 degrees. Valid single solid; rigid seated end geometry has zero intersection. This does not validate wrapping, closing force, retention or creep. Active V3 guide remains unchanged pending review. User explicitly requests no print.
+
+The later seamless-band refinement supersedes the paddle tabs: both arms use the6 mm band width and1.6 mm wall; upper arm prints35° outward and flexes inward for4.8 mm overlap. The lower peg has a35° underside ramp. Closed pose is an illustrative arm rotation, not elastic analysis. Default automatic supports add0.0068 g under the square roof. A rotated-square trial increased support and was rejected; retained source uses square faces.
+
+Final review geometry `angled-arm-peaked-roof-clip-v3` keeps the user-requested angled arm and uniform6 mm band. A55° peaked receiving roof and matching peg chamfers remove the remaining support. Job `2026-10-30-angled-clip-peaked-roof-tpu`: automatic normal supports enabled, bridge_no_support=0, zero support/interface paths,1.1793 g total,24.72 minutes, no warnings. A1 mini0.4 mm nozzle/0.12 mm layers, saved ELEGOO TPU95A230°C/35°C recipe. G-code MD5 ed2a46692892c044462b2ba2e6365fc9. No printer contacted. Closed pose remains illustrative; no physical bending/retention validation. Ask about support-free roof/peg quality if this design is printed later.
+
+User requested a straight manufactured arm from the circular root, without the dogleg. `straight-arm-peaked-roof-clip-v3` replaces only the open arm with a straight1.6×6 mm section at35°. Closed display schematically bends it to the overlap; it is not a physical deformation result. New immutable job `2026-10-30-straight-arm-clip-tpu` confirms zero support/interface paths with automatic supports on and bridge suppression off:1.1699 g/24.79 minutes, no warnings. No print.
+
+Simplified triangular closure study `straight-arm-triangle-clip-v3` replaces the house-shaped opening and peg with triangular profiles and a small retaining ridge, keeping the straight35° printed arm. Hole base3 mm, sides60° from bed; peg2.3 mm wide, ridge3.1 mm wide. Job `2026-10-30-triangle-clip-tpu`: zero support/interface paths with automatic supports on/bridge suppression off,1.1693 g/24.45 minutes, no warnings. Seated CAD fit is clear; flexible retention and print quality remain unverified. No print sent.
+
+User rejected the triangle and requested a square focus, emphasizing TPU flexibility. `straight-arm-chamfered-square-clip-v3` uses3 mm square envelope with small upper corner chamfers,2.6 mm peg and3.2 mm retaining lip intended to flex through. Straight arm preserved. Job `2026-10-30-chamfered-square-clip-tpu` generates0.0036 g support +0.0018 g interface,1.1757 g total/24.91 minutes. It is NOT support-free; do not reuse the triangle's zero-support claim. No print.
+
+
+User requires absolutely zero supports and prefers square closure faces. `flat-arm-square-clip-v3` prints the straight receiver arm flat (6 mm wide × 1.6 mm thick), with a vertical 3 mm square through-hole. Assembly requires a 90° twist and inward bending; closed display remains schematic, not an elastic simulation. Square peg retains its 35° underside ramp. Job `2026-10-30-flat-arm-square-clip-tpu` confirms zero support/interface paths with automatic supports enabled and bridge suppression off: 1.17972 g / 24.746 minutes, no warnings. Valid single CAD solid and zero seated latch intersection. Fit, twist force, retention and creep untested. Review only; active guide unchanged. No printer contacted.
+
+
+### Bend-only closure pair — October 30
+
+User rejected the quarter-twist receiver and requested both agreed mechanisms. `review/concepts/closure-pair/` shows A square press-stud (3 mm hole, 2.6 mm peg, 3.2 mm lip) and B tongue/6 mm short sleeve with release window. Both developed straps print flat, then bend without axial twisting; band6×1.6 mm, developed length73.6 mm targets12.8×17.8 mm inside with6 mm overlap. Real bend radius and stretch may require length adjustment. Single4 mm reversible eye. Both valid single solids; exact seated end sections have zero intersection. No active guide promotion or print. First B roof generated0.0212 g support/interface; revised peaked internal roof retains rectangular outer sleeve. Job `2026-10-30-bend-only-closures-roof-tpu`: auto supports enabled, bridge suppression off; zero support/interface for both. Model-only deposited A0.9326 g, B1.1121 g; whole plate2.11552 g /36.36 min, no warnings. Insertion, wrapping, retention and creep remain untested.
+
+
+### Form-fitting square snap — October 30
+
+User requests original C body12.8×17.8 mm opening with option A closure, superseding the developed flat straps. `review/concepts/formfit-square-clip/` retains1.6 mm walls,6 mm depth and4 mm eye. Local closure ends lie outside the neck in6×1.6 mm tabs; receiver prints55° splayed outward then bends inward and lifts1.8 mm to overlap by6 mm, with no twist. Hole3 mm, peg2.6 mm, lip3.2 mm. Valid single solid and zero seated latch intersection. Closed view is schematic bending, not elastic validation. Job `2026-10-30-formfit-square-snap-tpu`: automatic supports on, bridge suppression off; zero support/interface paths,1.18838 g /24.59 min. No warnings. No print or active guide promotion; bending force, fit, retention and creep remain untested.
+
+
+October30: user rejects changed arm planes and asks to reproduce the previous straight-arm screenshot. `review/concepts/straight-arm-clip/` restores the exact immutable `2026-10-30-straight-arm-clip-tpu/clip-source.stl`, with original35° straight arm,6 mm band/1.6 mm wall and12.8×17.8 opening. Existing peaked stud/hole unchanged; future scope restricted to their fit. Historical auto-support slice remains applicable because mesh is byte-identical: zero supports,1.1699 g/24.79 min. No print.
+
+
+### 45-degree clip roof and matched stud — October30
+
+User selected45° from bed after isolated45/35° roof trials generated zero support. `source/study_clip_roof45_fit.py` makes only local edits to exact restored straight-arm mesh: hole apex lowered from5.4422 to4.8 mm (roof rise2.1422→1.5 mm), upper stem shoulders trimmed to clear it. Body/arm coordinates outside those local vertices are unchanged. Original retaining lip and35° underside retained, avoiding support introduced by the earlier global stud-height scaling trial. Watertight mesh, nominal minimum stem-to-roof clearance0.35 mm. No physical fit claim. `review/concepts/straight-arm-clip-45/` is current review. Job `2026-10-30-clip-roof45-fit-tpu` confirms zero support/interface with automatic support on/bridge suppression off:1.17004 g/24.76 min, no warnings. No print or active-guide promotion.
+
+
+October30 approval update: user approves the `straight-arm-roof45-fit-v1` clip guide design. This revised guide remains unprinted; approval does not establish physical fit or retention. Actuator bracket and sliding plunger remain not approved. See `review/physical-assessment-2026-10-30.json`.
+
+
+October30 viewer promotion `approved-square-clip-v3`: approved45° clip replaces the old guide in BOM mesh and all eight assembly scenes. Source guide loads the exact approved mesh as a valid faceted CAD solid for future builds. Guide eye routing updated15.2→13.3 mm. BOM shows design approval and unprinted status; bracket/plunger remain not approved. Assembly shows open print pose. Viewer-only refresh leaves historical print jobs and assembly STEP unchanged; STEP link is labeled older clip. Reproduce via `source/promote_clip_viewer.py`.
+
+
+### Triangular plunger interpretations — October30
+
+User requests smaller bracket/plunger with triangular neck in an open-top triangular guide, retaining a continuous path for the raised tail handle. `review/concepts/triangular-plunger/` presents schematic A point-down V cradle (not lift-retaining), B point-up captured triangle with apex slot, and C captured diamond with top slot. User will select before CAD regeneration. Proposed end-face printing remains unsliced; zero supports mandatory. Current V3 bracket/plunger unchanged and not approved. Paired existing meshes are available in `current.html`.
+
+
+### B/C curved-foot candidates — October30
+
+User keeps both B and C undecided and requires existing curved button foot with a support-free transition. `source/study_triangular_foot.py` preserves the exact prior foot through concept v1.8 mm (symmetric difference0), then smoothly lofts to triangular B or diamond C neck byv10. Both valid single solids; sampled ±1.5 mm sliding positions have zero overlap with28 mm slotted guides. Ramped tail handle preserves longitudinal slot passage. These are isolated guide/plunger candidates: mount, pulley support, return anchor and end stop remain to integrate. No active V3 replacement. PETG job `2026-10-30-triangular-foot-petg` verifies zero support/interface on all four pieces with automatic supports enabled, end-face orientation,0.12 mm layers. Model-only mass B3.5403 g versus C5.2529 g, excluding purge. No physical sliding/strength/adhesion qualification or print. Viewer: `review/concepts/triangular-foot/`.
+
+
+### Selected B actuator with shared tail cleat — October 30
+
+User selected captured triangular B and confirmed a 1 mm-thick return band and 1 mm string. `review/concepts/triangle-tail-flat/` integrates the guide with the existing mount, pulley interface, return anchor and rear stop, keeping the exact curved foot and upper shared cleat. Band width remains provisional at 3 mm. Preserve the opposing loads: band loops back to the fixed anchor; string wraps the tail above the band and leads tangentially toward the pulley. This remains a review candidate; active V3 bracket/plunger are not replaced or approved.
+
+The guide has 0.4 mm normal clearance on both triangular faces and a 2.4 mm apex slot. Narrow the cleat base to 1.6 mm so it can enter from the foot end, then flare it above the guide. Fit band/string after insertion. Retain the rear return stop; it is not a safe button press limit. Seven nominal ±1.5 mm motion samples clear the bracket for the plunger, band envelope, 1 mm string, 3 mm knot envelope and pulley approach; six insertion samples clear. The final plunger only removes material from that checked wrap geometry. New guide additions stay below w8 and ahead of the wraps. Nominal paths are not elastic/slack simulations or physical proof against snagging.
+
+Flat printing requires a bed-reaching guide floor and a tangent 45° roof above the mount's unchanged 8.8 mm circular screw clearance. New immutable job `2026-10-30-triangle-tail-clearance-petg` has automatic Normal Snug supports enabled and bridge suppression off: **zero support/interface paths**, 8.7677 g total / 70.68 min; model-only bracket 7.2659 g and plunger 1.4304 g. Exact source hashes match the shown meshes. Earlier end-on and round-roof slices are retained as failed support comparisons. No printer contacted. Source: `study_triangle_tail.py`, `refine_triangle_tail.py`, `slice_triangle_tail_flat.py`, `check_triangle_routes.py`. Live fit, band width, knot size, retention, strength, friction, button force and the pre-existing outgoing-string/jaw conflict remain unqualified.

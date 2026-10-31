@@ -1,0 +1,30 @@
+{
+  "title": "Square press-stud TPU clip \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 angled-arm-square-clip-v3",
+  "notes": [
+    "Automatic supports enabled; open clip flat; angled arm; ramped horizontal peg.",
+    "New closure unprinted. User explicitly requests no print."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

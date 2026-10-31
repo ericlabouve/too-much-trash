@@ -1,0 +1,24 @@
+{
+  "revision": "angled-arm-peaked-roof-clip-v3",
+  "nominal_frame_opening_mm": [
+    12.8,
+    17.8
+  ],
+  "band_width_mm": 6,
+  "wall_mm": 1.6,
+  "eye_mm": 4,
+  "open_arm_angle_deg": 35,
+  "peg_stem_mm": 2.6,
+  "hole_mm": 3,
+  "roof_angle_from_bed_deg": 55,
+  "lip_mm": 3.4,
+  "overlap_length_mm": 4.8,
+  "peg_underside_angle_deg_from_bed": 35,
+  "valid_single_solid": true,
+  "closed_latch_intersection_mm3": 0.0,
+  "limits": [
+    "Closed pose is rigid rotation of arm, not elastic simulation.",
+    "Root flexure, fit, force, creep and support-free print quality need physical validation.",
+    "No print requested."
+  ]
+}

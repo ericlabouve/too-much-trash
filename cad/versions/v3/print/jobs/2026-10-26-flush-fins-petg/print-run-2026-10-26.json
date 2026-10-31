@@ -1,0 +1,23 @@
+{
+  "started_at_utc": "2026-10-27T02:42:59.556265+00:00",
+  "remote_file": "/tmt-v3-full-fit-petg-20261026.gcode.3mf",
+  "gcode_md5": "7fe893e7b43c5b403aea854767a24832",
+  "user_confirmed": "TPU removed; textured PEI bed clear; Bambu PETG Translucent Blue external spool loaded",
+  "dry_run": "matched remote G-code and sidecar; no warnings; plate 1; external spool",
+  "start_outcome": "verified",
+  "latest_status": {
+    "gcode_state": "RUNNING",
+    "subtask_name": "tmt-v3-full-fit-petg-20261026.gcode.3mf",
+    "stage": "heatbed_preheating",
+    "print_error": 0,
+    "mc_percent": 0,
+    "remaining_time_min": 549,
+    "nozzle_target": 100.0,
+    "bed_target": 70.0
+  },
+  "physical_validation_pending": [
+    "35-degree unsupported features",
+    "fit and strength",
+    "twine routing"
+  ]
+}

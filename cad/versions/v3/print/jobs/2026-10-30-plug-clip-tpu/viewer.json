@@ -1,0 +1,30 @@
+{
+  "title": "Smaller TPU plug clip \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 plug-clip-review-v3",
+  "notes": [
+    "Automatic supports enabled. Flat open clip; socket passes through thickness.",
+    "Unprinted fit and flexible closure; user declined a print now."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

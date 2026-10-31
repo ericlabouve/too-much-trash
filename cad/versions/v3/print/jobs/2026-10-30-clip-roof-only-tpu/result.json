@@ -1,0 +1,90 @@
+{
+    "error_string": "Success.",
+    "export_time": 76,
+    "layer_height": 0.11999999731779099,
+    "plate_index": 0,
+    "prepare_time": 13,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Custom": 474.62713623046875,
+                "Flush": 28.0,
+                "Gap infill": 105.62384796142578,
+                "Inner wall": 761.242431640625,
+                "Internal solid infill": 0.8307772278785706,
+                "Outer wall": 737.7211303710938,
+                "Overhang wall": 0.45560190081596375,
+                "Top surface": 18.19438362121582,
+                "Travel": 247.4060516357422,
+                "Undefined": 229.14329528808594
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFU99",
+                    "id": 1,
+                    "main_used_g": 2.274653434753418,
+                    "total_used_g": 2.274653434753418
+                }
+            ],
+            "generate_support_material_time": 13,
+            "id": 1,
+            "infill_time": 24,
+            "layer_filament_change": 0,
+            "main_predication": 1843.4866943359375,
+            "make_perimeters_time": 95,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 27.798234939575195,
+                        "height": 6.0,
+                        "width": 22.33673858642578,
+                        "x": 53.83163070678711,
+                        "y": 76.10088348388672,
+                        "z": 0.0
+                    },
+                    "id": 5,
+                    "name": "roof-45",
+                    "triangle_count": 1686
+                },
+                {
+                    "bbox": {
+                        "depth": 27.798234939575195,
+                        "height": 6.0,
+                        "width": 22.336734771728516,
+                        "x": 98.83163452148438,
+                        "y": 76.10088348388672,
+                        "z": 0.0
+                    },
+                    "id": 9,
+                    "name": "roof-35",
+                    "triangle_count": 1686
+                }
+            ],
+            "sliced_time": 350,
+            "sliced_time_with_cache": 200,
+            "total_predication": 2355.85107421875,
+            "triangle_count": 3372,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 15.0,
+    "upward_compatible_machine": [
+        "Bambu Lab P1S 0.4 nozzle",
+        "Bambu Lab P1P 0.4 nozzle",
+        "Bambu Lab X1 0.4 nozzle",
+        "Bambu Lab X1 Carbon 0.4 nozzle",
+        "Bambu Lab X1E 0.4 nozzle",
+        "Bambu Lab A1 0.4 nozzle",
+        "Bambu Lab H2D 0.4 nozzle",
+        "Bambu Lab H2D Pro 0.4 nozzle",
+        "Bambu Lab H2S 0.4 nozzle",
+        "Bambu Lab P2S 0.4 nozzle",
+        "Bambu Lab H2C 0.4 nozzle",
+        "Bambu Lab X2D 0.4 nozzle",
+        "Bambu Lab A2L 0.4 nozzle"
+    ],
+    "wall_loops": 3
+}
