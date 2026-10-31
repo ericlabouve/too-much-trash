@@ -1,0 +1,210 @@
+{
+  "revision": "left-lip-flat-handle-b-v1",
+  "left_lip_extension_mm": 0.4,
+  "left_face_u_mm": -4.9,
+  "lip_v_mm": [
+    28,
+    34
+  ],
+  "lip_w_mm": [
+    14.9,
+    16.3
+  ],
+  "underside_angle_from_bed_deg": 36.027,
+  "mount_side_clearance_mm": 0.5,
+  "wheel_side_face_u_mm": 1,
+  "added_volume_mm3": 3.406034477842527,
+  "insertion_added_lip": [
+    {
+      "pull_mm": 0,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 1,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 2,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 3,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 4,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 5,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 6,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 7,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 8,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 9,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 10,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 11,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 12,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 13,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 14,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 15,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 16,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 17,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 18,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 19,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 20,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 21,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 22,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 23,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 24,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 25,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 26,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 27,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 28,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 29,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 30,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 31,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 32,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 33,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 34,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 35,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 36,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 37,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 38,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 39,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 40,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 41,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 42,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 43,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 44,
+      "bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 45,
+      "bracket_overlap_mm3": 0.0
+    }
+  ],
+  "limits": [
+    "Rigid plunger inserted before fitting wraps.",
+    "Small-band retention, TPU preload, narrow handle strength and printed fit require physical testing.",
+    "Operating travel remains limited by guide overlap and phone button;45 mm is insertion/removal only.",
+    "Cord approach is slightly angled after flattening the wheel-side face. No print sent."
+  ],
+  "hardware_clearance_by_bounds": "Added lip u -4.9..-3.8, w14.9..16.3: wheel u>=1.475, axle u>=4.975 at head, screw/nut u<=-8.7, key w<=-0.364. Clear for every translation along v."
+}

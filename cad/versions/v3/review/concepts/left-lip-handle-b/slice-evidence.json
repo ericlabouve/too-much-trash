@@ -1,0 +1,12 @@
+{
+  "source_matches": {
+    "b-bracket": true,
+    "b-plunger": true,
+    "pulley_axle": true
+  },
+  "support_bytes": 0,
+  "interface_bytes": 0,
+  "total_g": 7.737544059753418,
+  "total_minutes": 74.99730631510417,
+  "warning": ""
+}

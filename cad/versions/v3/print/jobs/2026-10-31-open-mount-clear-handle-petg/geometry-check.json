@@ -1,0 +1,298 @@
+{
+  "revision": "open-mount-clear-handle-b-v1",
+  "rear_opening_mm": 16,
+  "screw_head_diameter_mm": 14,
+  "head_bearing_v_mm": 17.65,
+  "nut_bearing_v_mm": 24.25,
+  "rail_faces_v_mm": [
+    17.65,
+    21.85
+  ],
+  "front_wall_mm": 2.4,
+  "positive_handle_limit_above_13p1_mm": 1,
+  "insertion": [
+    {
+      "pull_mm": 0,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 1,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 2,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 3,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 4,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 5,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 6,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 7,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 8,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 9,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 10,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 11,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 12,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 13,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 14,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 15,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 16,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 17,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 18,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 19,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 20,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 21,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 22,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 23,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 24,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 25,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 26,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 27,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 28,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 29,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 30,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 31,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 32,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 33,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 34,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 35,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 36,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 37,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 38,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 39,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 40,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 41,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 42,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 43,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 44,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 45,
+      "bracket_overlap_mm3": 0.0,
+      "wheel_overlap_mm3": 0.0,
+      "axle_overlap_mm3": 0.0
+    }
+  ],
+  "limits": [
+    "Install band and string after rigid plunger insertion.",
+    "One-sided upper cap retention needs physical wrap testing.",
+    "No forward withdrawal stop; working stroke must retain triangle overlap.",
+    "No print or active V3 promotion."
+  ],
+  "minimum_wheel_gap_mm": 0.47509190679596536
+}

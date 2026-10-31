@@ -1,0 +1,30 @@
+{
+  "title": "Open rail mount and clear handle \u2014 PETG \u00b7 single-plate slice review",
+  "subtitle": "3 separate pieces at 100% scale \u00b7 open-mount-clear-handle-b-v1",
+  "notes": [
+    "Automatic supports ON; bridge suppression OFF.",
+    "Insert plunger before fitting rubber band and string. No print sent."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

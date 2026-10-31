@@ -1,0 +1,34 @@
+{
+  "revision": "flat-handle-face-b-v1",
+  "wheel_side_face_u_mm": 1,
+  "geometry_change": "Plunger material removal only; bracket and hardware byte-identical to preceding candidate. Existing rigid insertion overlap checks remain valid at their sampled positions.",
+  "removed_volume_mm3": 11.789889538833222,
+  "route_checks": [
+    {
+      "travel_mm": -1.5,
+      "cord_angle_deg": 8.040679238039097,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "attachment_bracket_mm3": 0.0,
+      "attachment_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0
+    },
+    {
+      "travel_mm": 0.0,
+      "cord_angle_deg": 7.091674841351828,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "attachment_bracket_mm3": 0.0,
+      "attachment_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0
+    }
+  ],
+  "limits": [
+    "Cord approach gains a small lateral angle because its wrap moves inward while the wheel stays clear of the flat face.",
+    "Wrap retention, full operating stroke and printed fit remain unverified.",
+    "Fit wraps after inserting the plunger. No print requested."
+  ],
+  "rest_cord_angle_degrees": 7.091674841351828
+}

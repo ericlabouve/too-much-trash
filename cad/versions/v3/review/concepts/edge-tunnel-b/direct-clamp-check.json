@@ -1,0 +1,76 @@
+{
+  "head_reaches_rail_directly": true,
+  "head_lip_side_clearance_mm": 1,
+  "head_overlap_per_rail_land_mm": 2.6,
+  "load_path": "Head -> rail -> front actuator wall -> nut",
+  "cases": {
+    "wallet-near": {
+      "cap_head": 0.0,
+      "cap_shaft": 0.0,
+      "cap_bracket": 0.0,
+      "jaw_head": 0.0,
+      "jaw_shaft": 0.0,
+      "jaw_bracket": 0.0
+    },
+    "wallet-far": {
+      "cap_head": 0.0,
+      "cap_shaft": 0.0,
+      "cap_bracket": 0.0,
+      "jaw_head": 0.0,
+      "jaw_shaft": 0.0,
+      "jaw_bracket": 0.0
+    },
+    "bare-near": {
+      "cap_head": 0.0,
+      "cap_shaft": 0.0,
+      "cap_bracket": 0.0,
+      "jaw_head": 0.0,
+      "jaw_shaft": 0.0,
+      "jaw_bracket": 0.0
+    },
+    "bare-far": {
+      "cap_head": 0.0,
+      "cap_shaft": 0.0,
+      "cap_bracket": 0.0,
+      "jaw_head": 0.0,
+      "jaw_shaft": 0.0,
+      "jaw_bracket": 0.0
+    },
+    "small-near": {
+      "cap_head": 0.0,
+      "cap_shaft": 0.0,
+      "cap_bracket": 0.0,
+      "jaw_head": 0.0,
+      "jaw_shaft": 0.0,
+      "jaw_bracket": 0.0
+    },
+    "small-far": {
+      "cap_head": 0.0,
+      "cap_shaft": 0.0,
+      "cap_bracket": 0.0,
+      "jaw_head": 0.0,
+      "jaw_shaft": 0.0,
+      "jaw_bracket": 0.0
+    },
+    "large-near": {
+      "cap_head": 0.0,
+      "cap_shaft": 0.0,
+      "cap_bracket": 0.0,
+      "jaw_head": 0.0,
+      "jaw_shaft": 0.0,
+      "jaw_bracket": 0.0
+    },
+    "large-far": {
+      "cap_head": 0.0,
+      "cap_shaft": 0.0,
+      "cap_bracket": 0.0,
+      "jaw_head": 0.0,
+      "jaw_shaft": 0.0,
+      "jaw_bracket": 0.0
+    }
+  },
+  "hardware_insertion_bounds": "Screw/head/nut remain at u <= -8.7; plunger u >= -8. TPU axle key remains below w=-0.364; plunger w>=3.4. Thus no overlap for any v translation.",
+  "limits": [
+    "Actual clamp preload, TPU deformation and loaded retention require physical checks."
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "zero_support_and_interface_paths": true,
+  "exact_source_mesh_matches": true,
+  "total_g": 7.735757827758789,
+  "total_minutes": 75.01611328125,
+  "automatic_supports": true,
+  "bridge_suppression": false,
+  "warning": ""
+}

@@ -1,0 +1,194 @@
+{
+  "revision": "aligned-pulley-b-v2",
+  "scope": "Review only. Curved foot, rail sleeve, wheel and key shapes unchanged. Smooth axle shaft extended2.05 mm; diamond opening unchanged.",
+  "pulley_shift_uvw_mm": [
+    -3.0249080932040346,
+    -2.5500000000000007,
+    2.05
+  ],
+  "pulley_center_uvw_mm": [
+    10.475091906795965,
+    16.3,
+    12.65
+  ],
+  "incoming_cord_angle_to_travel_degrees": 0,
+  "cord_offset_from_shaft_center_mm": 3.1,
+  "axle_shaft_extension_mm": 2.05,
+  "handle_cap_trim_mm": 2,
+  "guide_length_mm": 20.15,
+  "rigid_motion": [
+    {
+      "travel_mm": 0,
+      "bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    {
+      "travel_mm": -0.75,
+      "bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    {
+      "travel_mm": -1.5,
+      "bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    {
+      "travel_mm": -3,
+      "bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    {
+      "travel_mm": -4.5,
+      "bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    },
+    {
+      "travel_mm": -6,
+      "bracket": 0.0,
+      "pulley": 0.0,
+      "pulley_axle": 0.0,
+      "pulley_key": 0.0
+    }
+  ],
+  "route_checks": [
+    {
+      "travel_mm": -1.5,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "attachment_bracket_mm3": 0.0,
+      "attachment_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0,
+      "lead_axle_mm3": 0.0,
+      "knot_bracket_mm3": 0.0,
+      "knot_plunger_mm3": 0.0
+    },
+    {
+      "travel_mm": -0.75,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "attachment_bracket_mm3": 0.0,
+      "attachment_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0,
+      "lead_axle_mm3": 0.0,
+      "knot_bracket_mm3": 0.0,
+      "knot_plunger_mm3": 0.0
+    },
+    {
+      "travel_mm": 0.0,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "attachment_bracket_mm3": 0.0,
+      "attachment_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0,
+      "lead_axle_mm3": 0.0,
+      "knot_bracket_mm3": 0.0,
+      "knot_plunger_mm3": 0.0
+    }
+  ],
+  "assembly_context": {
+    "wallet-near": {
+      "cap_bracket_mm3": 0.0,
+      "cap_pulley_mm3": 0.0,
+      "cap_pulley_axle_mm3": 0.0,
+      "cap_pulley_key_mm3": 0.0,
+      "jaw_bracket_mm3": 0.0,
+      "jaw_pulley_mm3": 0.0,
+      "jaw_pulley_axle_mm3": 0.0,
+      "jaw_pulley_key_mm3": 0.0
+    },
+    "wallet-far": {
+      "cap_bracket_mm3": 0.0,
+      "cap_pulley_mm3": 0.0,
+      "cap_pulley_axle_mm3": 0.0,
+      "cap_pulley_key_mm3": 0.0,
+      "jaw_bracket_mm3": 0.0,
+      "jaw_pulley_mm3": 0.0,
+      "jaw_pulley_axle_mm3": 0.0,
+      "jaw_pulley_key_mm3": 0.0
+    },
+    "bare-near": {
+      "cap_bracket_mm3": 0.0,
+      "cap_pulley_mm3": 0.0,
+      "cap_pulley_axle_mm3": 0.0,
+      "cap_pulley_key_mm3": 0.0,
+      "jaw_bracket_mm3": 0.0,
+      "jaw_pulley_mm3": 0.0,
+      "jaw_pulley_axle_mm3": 0.0,
+      "jaw_pulley_key_mm3": 0.0
+    },
+    "bare-far": {
+      "cap_bracket_mm3": 0.0,
+      "cap_pulley_mm3": 0.0,
+      "cap_pulley_axle_mm3": 0.0,
+      "cap_pulley_key_mm3": 0.0,
+      "jaw_bracket_mm3": 0.0,
+      "jaw_pulley_mm3": 0.0,
+      "jaw_pulley_axle_mm3": 0.0,
+      "jaw_pulley_key_mm3": 0.0
+    },
+    "small-near": {
+      "cap_bracket_mm3": 0.0,
+      "cap_pulley_mm3": 0.0,
+      "cap_pulley_axle_mm3": 0.0,
+      "cap_pulley_key_mm3": 0.0,
+      "jaw_bracket_mm3": 0.0,
+      "jaw_pulley_mm3": 0.0,
+      "jaw_pulley_axle_mm3": 0.0,
+      "jaw_pulley_key_mm3": 0.0
+    },
+    "small-far": {
+      "cap_bracket_mm3": 0.0,
+      "cap_pulley_mm3": 0.0,
+      "cap_pulley_axle_mm3": 0.0,
+      "cap_pulley_key_mm3": 0.0,
+      "jaw_bracket_mm3": 0.0,
+      "jaw_pulley_mm3": 0.0,
+      "jaw_pulley_axle_mm3": 0.0,
+      "jaw_pulley_key_mm3": 0.0
+    },
+    "large-near": {
+      "cap_bracket_mm3": 0.0,
+      "cap_pulley_mm3": 0.0,
+      "cap_pulley_axle_mm3": 0.0,
+      "cap_pulley_key_mm3": 0.0,
+      "jaw_bracket_mm3": 0.0,
+      "jaw_pulley_mm3": 0.0,
+      "jaw_pulley_axle_mm3": 0.0,
+      "jaw_pulley_key_mm3": 0.0
+    },
+    "large-far": {
+      "cap_bracket_mm3": 0.0,
+      "cap_pulley_mm3": 0.0,
+      "cap_pulley_axle_mm3": 0.0,
+      "cap_pulley_key_mm3": 0.0,
+      "jaw_bracket_mm3": 0.0,
+      "jaw_pulley_mm3": 0.0,
+      "jaw_pulley_axle_mm3": 0.0,
+      "jaw_pulley_key_mm3": 0.0
+    }
+  },
+  "limits": [
+    "Parallel cord approach is offset3.1 mm from the shaft centerline, so a small eccentric moment remains.",
+    "Nominal cord/rubber-band envelopes do not establish tension, friction or printed performance.",
+    "Actual full-squeeze stroke remains unknown; 6 mm rigid sweep is not a qualified operating limit.",
+    "No print or active V3 promotion."
+  ],
+  "hardware_bracket": {
+    "pulley": 0.0,
+    "pulley_axle": 0.0,
+    "pulley_key": 0.0
+  }
+}

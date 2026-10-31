@@ -1,0 +1,174 @@
+{
+  "revision": "seamless-lower-lip-b",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 3,
+  "plates": 1,
+  "total_g": 7.737794876098633,
+  "total_minutes": 75.02167154947917,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 7.6664
+  },
+  "objects": {
+    "b-bracket": {
+      "deposited_g_by_role": {
+        "model": 5.5014
+      },
+      "deposited_xy_bounds": [
+        [
+          30.922,
+          61.61
+        ],
+        [
+          79.078,
+          98.39
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "b-plunger": {
+      "deposited_g_by_role": {
+        "model": 1.0589
+      },
+      "deposited_xy_bounds": [
+        [
+          97.21,
+          61.135
+        ],
+        [
+          112.79,
+          98.865
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "pulley_axle": {
+      "deposited_g_by_role": {
+        "model": 1.1061
+      },
+      "deposited_xy_bounds": [
+        [
+          124.711,
+          74.713
+        ],
+        [
+          135.289,
+          85.289
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [
+    {
+      "objects": [
+        "b-bracket",
+        "b-plunger"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 17.53199999999999
+    },
+    {
+      "objects": [
+        "b-bracket",
+        "pulley_axle"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 45.032999999999994
+    },
+    {
+      "objects": [
+        "b-plunger",
+        "pulley_axle"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 11.320999999999993
+    }
+  ],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "b-bracket",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "b-plunger",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "pulley_axle",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "16711331efe04d3a23f59cd1ba35ec62",
+  "hashes": {
+    "cuff-fit-input.3mf": "b0b7c2d870b8897db35cfb7b315eefbf57cee88e667a75b3ddb435fb840876ec",
+    "cuff-fit.gcode.3mf": "c51a04ea6a741f6aab3f479354567f267fdff0367e00dfff11078abce3498df6",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Automatic supports ON; bridge suppression OFF.",
+    "Insert plunger before fitting rubber band and string. No print sent."
+  ]
+}

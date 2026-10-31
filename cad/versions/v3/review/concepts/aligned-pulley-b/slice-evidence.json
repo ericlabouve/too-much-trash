@@ -1,0 +1,15 @@
+{
+  "job": "cad/versions/v3/print/jobs/2026-10-30-aligned-pulley-b-flat-petg",
+  "supports_g": 0,
+  "total_g": 8.520264625549316,
+  "minutes": 79.93727213541666,
+  "automatic_supports_enabled": true,
+  "bridge_suppression": false,
+  "source_sha256": {
+    "b-bracket": "426aab1e6c050ff783ac7fdecc0b605eca6d13a6297c1361e8ac6215113bcab4",
+    "b-plunger": "e4eacb2b30e4d3b31c32e3e8f29bdfc3935eefc19898415b664aefa8dc07bc11",
+    "pulley_axle": "595eb87634b4fc4363b5d04d1233419d178cf4da6a02fbeefff688d240561e95"
+  },
+  "sliced_sha256": "9ae3bddc0d54395afebe2eb89231cd1e4b3a2c721058a4549f3ba605939f3610",
+  "printer_contacted": false
+}
