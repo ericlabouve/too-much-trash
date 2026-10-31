@@ -430,3 +430,48 @@ Final `2026-10-30-long-guide-b-petg` generates zero support/interface with autom
 User asks for a small handle move toward the curved boot without interference. `review/concepts/forward-handle-b/` moves the shared handle, its narrowed base, wrap paths and knot envelope1 mm toward the boot. Foot, triangular shaft,20.15 mm continuous tunnel, rear socket, pulley and mounting remain unchanged. A2 mm study left only0.0905 mm beyond the reserved9.3 mm-radius nut-turning envelope and is superseded. The selected1 mm move leaves0.2548 mm beyond that envelope, which already includes0.3 mm allowance beyond the nominal9 mm nut radius: nominal minimum clearance0.5548 mm. Band/string separation remains0.25 mm; band width3 mm is provisional.
 
 Sampled plunger motion/insertion and pulley/axle/key checks clear, including shaft/hardware positions through6 mm pull. Full band/string/knot checks cover the illustrated1.5 mm travel only. Actual full-squeeze cord travel, band tension, physical sliding and printed fit remain unverified. Final auto-support PETG slice `2026-10-30-forward-handle-1mm-b-petg` has0 support/interface,6.4812 g/58.17 min; exact source hashes match. No print or active V3 promotion.
+
+
+### Single-bolt anti-rotation saddle — October 30
+
+User reports actuator rotating both ways under string load and requests a single-bolt solution with no additional supports. Checkpoint before this study is `a14d4e5`. Candidate `review/concepts/rail-saddle-b/` adds two integral bed-reaching cheeks that straddle the unchanged cap rail's20 mm width, with20.4 mm internal span (0.2 mm each side),2.5 mm engagement and19.8 mm longitudinal bearing length. Small rear shoulders join them to the mounting plate without refilling its screw bore. Same common TPU screw/nut; no extra part or shaft-cap revision. The cheeks provide positive anti-rotation contact; preload still clamps the face and resists longitudinal movement. Clearance allows some angular play; not a claim of zero loaded deflection.
+
+Full bracket/cap seating clears all eight recorded phone/side configurations. At±3° rotation around the bolt, cheek/rail overlap establishes a mechanical obstruction in both directions, tested near and far. Cheeks clear fixed jaw and existing fasteners. Outward removal samples0/1/2.6/5 mm clear cap after fastener removal. All21 nominal band/string/knot route frames are separated from the added material by conservative AABBs; plunger motion through6 mm remains clear. Actual full-squeeze travel and loaded physical strength are still unknown.
+
+The mating audit also identified a pre-existing1 mm base-edge overlap with the rail in the compact study: remove1.2 mm from that small forward base strip to leave0.2 mm clearance. Foot/plunger/guide/pulley unchanged. Fresh auto-support PETG job `2026-10-30-rail-saddle-b-petg` has zero support/interface,6.8240 g/61.59 min, versus6.4812 g/58.17 min previously. Source meshes match. No print or active V3 promotion.
+
+
+### Rounded, reinforced single-bolt saddle — October 30
+
+User accepts the rail-straddling bracket concept and requests increased security, smoother appearance and zero supports, with changes restricted to actuator components. `review/concepts/smooth-rail-saddle-b/` changes the bracket only: cheeks1.8→2.4 mm thick, rail engagement2.5→3.2 mm, joining shoulders1.2→1.8 mm. Outside cornersR0.7, concave root websR0.8 and top bevel0.5 mm soften edges. Retain20.4 mm inside width around the20 mm rail (0.2 mm per side) and19.8 mm bearing length. A25.8 mm extension collided with the existing cap crossbar and was rejected. Plunger, pulley, axle, key, rail, shaft cap and screw/nut meshes are unchanged.
+
+Mating checks clear all eight recorded configurations; ±3° tests meet the rail both ways. Fasteners and outward removal clear. Nominal band/string bounds and exact reserved knot sphere clear added geometry; sampled rigid plunger travel through6 mm clears. Printed stiffness, fit, loaded retention, band behavior and actual full-squeeze travel remain unverified. Root fillets are built explicitly as constant-section webs to avoid invalid CAD fillets across existing base steps.
+
+Fresh PETG job `2026-10-30-smooth-rail-saddle-b-petg` generates **zero support/interface** with auto supports ON and bridge suppression OFF. Two-piece total7.0789 g/62.05 min, about0.255 g more than the first saddle. Source meshes match exactly. Initial sandboxed slicer launch failed before slicing; successful offline retry preserved the record. No print or active V3 promotion.
+
+
+### Deep wraparound actuator saddle — October 30
+
+User requests deeper engagement and wrapping behind the unchanged rail. Review `review/concepts/wrap-rail-saddle-b/` changes only the bracket. Cheeks cover the full4.2 mm rail thickness; two2 mm return lips overlap its back edges with0.25 mm back clearance. Side clearance0.2 mm,2.4 mm walls,19.8 mm bearing length and rounded exterior remain. The16 mm opening between lips clears the unchanged14 mm screw head. Lips grow from the print bed in the channel-axis orientation.
+
+All eight seated configurations and25 sampled bare-bracket end-on installation positions per configuration clear the cap and fixed jaw. Install from the free rail end before fitting bolt and cords; the lips prevent direct outward removal. Do not snap rigid PETG lips over the rail. ±3° rotation meets the rail both ways, and1 mm outward motion intersects it after the back clearance closes. Existing bolt still resists rail-axis sliding. Nominal routes and sampled rigid plunger travel clear. Physical fit, strength, preload and actual full-squeeze travel remain unverified.
+
+Fresh auto-support PETG job `2026-10-30-wrap-rail-saddle-b-petg` has zero support/interface paths with bridge suppression OFF:7.5775 g/65.42 min for bracket and unchanged plunger (about0.499 g more than the smooth saddle). Source meshes match. No print or active V3 promotion.
+
+
+### Enclosed single-bolt actuator sleeve — October 30
+
+User proposes joining the green sides fully around the rail with two screw holes. Review `review/concepts/closed-rail-sleeve-b/` joins the back lips with a1.75 mm wall, keeping0.25 mm back clearance and0.2 mm side clearance. A second8.8 mm screw passage has a tangent45° roof and aligns with the existing hole/rail slot. Same common screw and nut; head moves2 mm outward, leaving full6 mm nut engagement. Only bracket manufacturing geometry changes. Slide bare bracket on/off the rail's free end before fitting hardware and wraps.
+
+Single solid, all8 seating configurations and25 sampled installation poses each clear; anti-rotation and pull-off obstruction remain. Existing mechanism paths and sampled plunger motion clear. The closed sleeve must elastically close its0.25 mm clearance under screw load to clamp the rail. Do not equate rigid capture with proven axial sliding resistance; wall flexure, TPU preload and strength require a physical test.
+
+Fresh PETG slice `2026-10-30-closed-rail-sleeve-b-petg`:0 support/interface with automatic supports ON/bridge suppression OFF; bracket+plunger8.0884 g/69.98 min. About0.511 g more than open wrap. Exact source meshes verified. No print or active V3 promotion.
+
+
+### Uniform actuator sleeve walls — October 30
+
+User approves the enclosed sleeve direction and requests consistent thickness and appearance between green sleeve and original screw-hole region. Review `uniform-rail-sleeve-b/` uses2.4 mm front/back/side walls and a shared25.2×19.8 mm face outline. Original front mounting plate reduced7.8→2.4 mm; rear wall increased1.75→2.4 mm. Keep existing rail opening/clearance and8.8 mm bores with45° tangent roofs. Existing nut moves5.4 mm inward; existing head moves0.65 mm outward relative to preceding sleeve. All changes remain within actuator components. Whole sleeve highlighted green to show the unified shape.
+
+Eight seated and sampled end-on assembly cases pass; moved screw head clears cap/jaw,8.4 mm passage clears both holes, nut retains6 mm full nominal engagement. Reserved18.6 mm nut-turning cylinder clears the bracket and sampled plunger motion; conservative nominal band/string route gap2.967 mm, provisional band width3 mm. No claim of clamp stiffness, strength or real full-squeeze qualification. End-on installation and0.25 mm flex-to-clamp gap remain.
+
+Fresh PETG job `2026-10-30-uniform-rail-sleeve-b-petg` generates0 support/interface with auto supports ON/bridge suppression OFF. Exact source meshes match; pair7.5492 g/62.62 min,0.5392 g less than prior sleeve. No print/promotion.

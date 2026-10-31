@@ -1,0 +1,24 @@
+{
+  "retained_clearance_per_side_mm": 0.2,
+  "rejected_extension": {
+    "bearing_length_mm": 25.8,
+    "reason": "Collides with unchanged cap crossbar",
+    "wallet_near_intersection_mm3": 76.80228286376772
+  },
+  "final_length_mm": 19.8,
+  "physical_strength_claim": false,
+  "unchanged_meshes": [
+    "plunger",
+    "pulley",
+    "axle",
+    "key",
+    "screw",
+    "nut",
+    "shaft cap"
+  ],
+  "notes": [
+    "Thicker walls1.8\u21922.4 mm; engagement2.5\u21923.2 mm; connecting shoulders1.2\u21921.8 mm.",
+    "Exposed outer cornersR0.7, root blendsR0.8, top bevel0.5 mm.",
+    "All added material grows from existing bed plane; unchanged screw bore and triangle tunnel."
+  ]
+}

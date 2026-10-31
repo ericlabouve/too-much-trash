@@ -1,0 +1,14 @@
+{
+  "job": "../../../print/jobs/2026-10-30-wrap-rail-saddle-b-petg/",
+  "exact_source_meshes_match": true,
+  "automatic_supports_enabled": true,
+  "bridge_suppression": false,
+  "support_g": 0,
+  "interface_g": 0,
+  "total_g": 7.577527046203613,
+  "minutes": 65.41987711588541,
+  "physical_fit_verified": false,
+  "changed_manufacturing_parts": [
+    "actuator bracket"
+  ]
+}

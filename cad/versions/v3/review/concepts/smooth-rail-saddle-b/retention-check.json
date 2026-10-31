@@ -1,0 +1,40 @@
+{
+  "guide_span_mm": [
+    21.25,
+    41.4
+  ],
+  "guide_length_mm": 20.15,
+  "prior_main_guide_length_mm": 9.15,
+  "rows": [
+    {
+      "pull_mm": 0,
+      "straight_motion_overlap_mm3": 0.0,
+      "captured_axial_overlap_mm": 19.75,
+      "overlap_after_0_8mm_upward_lift_mm3": 24.830894495306318
+    },
+    {
+      "pull_mm": 1.5,
+      "straight_motion_overlap_mm3": 0.0,
+      "captured_axial_overlap_mm": 18.25,
+      "overlap_after_0_8mm_upward_lift_mm3": 22.945003774143807
+    },
+    {
+      "pull_mm": 3,
+      "straight_motion_overlap_mm3": 0.0,
+      "captured_axial_overlap_mm": 16.75,
+      "overlap_after_0_8mm_upward_lift_mm3": 21.0591130529813
+    },
+    {
+      "pull_mm": 6,
+      "straight_motion_overlap_mm3": 0.0,
+      "captured_axial_overlap_mm": 13.75,
+      "overlap_after_0_8mm_upward_lift_mm3": 17.287331610656295
+    }
+  ],
+  "limits": [
+    "Full grabber string travel is unknown.",
+    "An open assembly path remains; the guide does not impose a forward mechanical stop.",
+    "6 mm is an extra shaft-only capture check, not a verified operating stroke or force limit.",
+    "Physical clearance, tilt, bending, friction and band tension require a fit test."
+  ]
+}

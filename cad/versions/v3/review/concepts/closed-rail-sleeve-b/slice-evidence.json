@@ -1,0 +1,14 @@
+{
+  "exact_source_meshes_match": true,
+  "automatic_supports_enabled": true,
+  "bridge_suppression": false,
+  "support_g": 0,
+  "interface_g": 0,
+  "total_g": 8.08841323852539,
+  "minutes": 69.97550455729167,
+  "physical_fit_verified": false,
+  "changed_manufacturing_parts": [
+    "actuator bracket"
+  ],
+  "existing_screw_pose_shift_mm": 2
+}

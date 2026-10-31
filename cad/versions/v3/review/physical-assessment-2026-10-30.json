@@ -20,5 +20,13 @@
   "limits": "Approval is user assessment, not measured load qualification.",
   "clip_guide_feedback": "User approves straight-arm-roof45-fit-v1 design: 12.8 x 17.8 mm opening, original straight arm planes, 45-degree hole roof and matching stud. Earlier loose clip superseded. Revised guide has not been printed; approval is design acceptance, not physical fit validation.",
   "clip_guide_approved_revision": "straight-arm-roof45-fit-v1",
-  "clip_guide_approved_review": "review/concepts/straight-arm-clip-45/"
+  "clip_guide_approved_review": "review/concepts/straight-arm-clip-45/",
+  "actuator_mount_feedback": "User reports actuator rotates in both directions around its single bolt when string is tugged. Printed revision not specified. Current single-bolt friction-only retention is inadequate in that observed test.",
+  "actuator_design_checkpoint": {
+    "revision": "uniform-rail-sleeve-b-v1",
+    "review": "review/concepts/uniform-rail-sleeve-b/",
+    "user_design_accepted": true,
+    "physically_printed": false,
+    "note": "User accepts the uniform enclosed single-bolt sleeve and requests commit/push. Does not supersede the recorded failed physical actuator assessment; revised bracket/plunger need physical checks."
+  }
 }
