@@ -1,0 +1,26 @@
+{
+  "revision": "bend-only-closure-pair-v1",
+  "nominal_inside_mm": [
+    12.8,
+    17.8
+  ],
+  "band_mm": [
+    6,
+    1.6
+  ],
+  "developed_length_mm": 73.6,
+  "assembly_twist_deg": 0,
+  "overlap_mm": 6,
+  "limits": [
+    "Developed-length target is provisional: TPU bend radius, tension, closure fit and retention need physical checks.",
+    "No print requested. Active guide unchanged."
+  ],
+  "option-a": {
+    "valid_single_solid": true,
+    "volume_mm3": 748.4271918816337
+  },
+  "option-b": {
+    "valid_single_solid": true,
+    "volume_mm3": 854.9585252149667
+  }
+}

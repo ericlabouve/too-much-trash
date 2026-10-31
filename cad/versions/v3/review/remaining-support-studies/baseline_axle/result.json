@@ -1,0 +1,68 @@
+{
+    "error_string": "Success.",
+    "export_time": 424,
+    "layer_height": 0.11999999731779099,
+    "plate_index": 0,
+    "prepare_time": 25,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 6.366286277770996,
+                "Bridge": 6.096967697143555,
+                "Custom": 407.9839172363281,
+                "Flush": 28.0,
+                "Gap infill": 14.896810531616211,
+                "Inner wall": 322.9543151855469,
+                "Internal solid infill": 93.7066421508789,
+                "Outer wall": 238.30445861816406,
+                "Overhang wall": 1.8595174551010132,
+                "Sparse infill": 77.743896484375,
+                "Support": 6.458003044128418,
+                "Support interface": 6.988755226135254,
+                "Support transition": 1.388910174369812,
+                "Top surface": 15.075345039367676,
+                "Travel": 485.3725891113281,
+                "Undefined": 466.9884033203125
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFL99",
+                    "id": 1,
+                    "main_used_g": 1.0290924310684204,
+                    "total_used_g": 1.0290924310684204
+                }
+            ],
+            "generate_support_material_time": 53,
+            "id": 1,
+            "infill_time": 29,
+            "layer_filament_change": 0,
+            "main_predication": 1249.2857666015625,
+            "make_perimeters_time": 39,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 11.0,
+                        "height": 20.600000381469727,
+                        "width": 10.99658203125,
+                        "x": 84.501708984375,
+                        "y": 84.5,
+                        "z": 0.0
+                    },
+                    "id": 5,
+                    "name": "part.stl",
+                    "triangle_count": 17288
+                }
+            ],
+            "sliced_time": 358,
+            "sliced_time_with_cache": 230,
+            "total_predication": 1694.885498046875,
+            "triangle_count": 17288,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 15.0,
+    "wall_loops": 3
+}

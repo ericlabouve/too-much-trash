@@ -1,0 +1,48 @@
+{
+  "revision": "opposed-slots-restored-base-v3",
+  "configurations": {
+    "wallet": {
+      "band_levels_z_mm": [
+        40.5,
+        43.0
+      ],
+      "symmetric_force_center_y_mm": 0,
+      "post_span_x_mm": 75.4,
+      "collisions": {}
+    },
+    "bare": {
+      "band_levels_z_mm": [
+        40.5,
+        43.0
+      ],
+      "symmetric_force_center_y_mm": 0,
+      "post_span_x_mm": 75.4,
+      "collisions": {}
+    },
+    "small": {
+      "band_levels_z_mm": [
+        40.5,
+        43.0
+      ],
+      "symmetric_force_center_y_mm": 0,
+      "post_span_x_mm": 65.4,
+      "collisions": {}
+    },
+    "large": {
+      "band_levels_z_mm": [
+        40.5,
+        43.0
+      ],
+      "symmetric_force_center_y_mm": 0,
+      "post_span_x_mm": 85.4,
+      "collisions": {}
+    }
+  },
+  "passed": true,
+  "limitations": [
+    "1.4 mm circular band visualization is provisional; real width/thickness and stretched cross-section unknown.",
+    "Equal band tension is an assumption, not a measured force balance.",
+    "No claim of preload, jaw friction, fatigue or loaded retention.",
+    "Rounded rectangular paths run through opposed V seats without square caps; actual seating, escape resistance and preload need physical validation."
+  ]
+}

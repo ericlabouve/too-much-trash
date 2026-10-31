@@ -1,0 +1,12 @@
+{
+  "revision": "symmetric-tail-b",
+  "removed_volume_mm3": 187.1060812580483,
+  "subtraction_only": true,
+  "tail_outline_matches_opposite": true,
+  "unchanged_plunger": true,
+  "unchanged_mount": true,
+  "limits": [
+    "Printed strength and band retention remain untested.",
+    "Subtraction cannot introduce a new rigid plunger collision; previous 91-position clearance check retained."
+  ]
+}

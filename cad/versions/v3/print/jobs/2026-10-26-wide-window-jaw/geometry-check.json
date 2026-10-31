@@ -1,0 +1,18 @@
+{
+  "revision": "light-sliding-jaw-study",
+  "old_volume_mm3": 18272.00086144629,
+  "new_volume_mm3": 14967.288658566466,
+  "removed_percent": 18.086208663949492,
+  "valid_single_solid": true,
+  "window_dimensions_mm": [
+    31,
+    7.0
+  ],
+  "minimum_beam_edge_rail_mm": 2.3,
+  "central_connection_and_stud_islands_unchanged": true,
+  "source_sha256": "cbf6679ed9224c6cb7d6227252634c6342aa40277578cc76b1e3768a66ae411b",
+  "limits": [
+    "Subtractive change preserves the existing collision envelope; bending stiffness and retention need physical testing.",
+    "Existing tongue slot retained; do not merge the windows through the central load connection."
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "revision": "flush-width-fins-study",
+  "valid_single_solid": true,
+  "fin_outer_y_mm": 13.8,
+  "wraparound": false,
+  "top_clearance_mm": 0.4,
+  "roof_angle_from_bed_degrees": 35,
+  "added_volume_mm3": 183.81752561691064,
+  "sweep": [
+    {
+      "x_offset": -160,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -158,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -156,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -154,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -152,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -150,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -148,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -146,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -144,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -142,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -140,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -138,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -136,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -134,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -132,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -130,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -128,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -126,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -124,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -122,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -120,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -118,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -116,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -114,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -112,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -110,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -108,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -106,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -104,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -102,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -100,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -98,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -96,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -94,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -92,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -90,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -88,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -86,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -84,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -82,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -80,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -78,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -76,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -74,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -72,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -70,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -68,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -66,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -64,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -62,
+      "added_overlap_mm3": 0
+    },
+    {
+      "x_offset": -60,
+      "added_overlap_mm3": 0
+    }
+  ],
+  "continuous_rail_envelope_overlap_mm3": 0,
+  "limits": [
+    "Nominal CAD clearance only; sliding friction, PETG fit and roof print quality need physical testing.",
+    "Wraparound skirts removed; existing tongue/lips provide capture."
+  ]
+}

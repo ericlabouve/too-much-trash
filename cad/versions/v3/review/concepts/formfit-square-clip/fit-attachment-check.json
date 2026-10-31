@@ -1,0 +1,25 @@
+{
+  "revision": "formfit-square-snap-v1",
+  "nominal_inside_mm": [
+    12.8,
+    17.8
+  ],
+  "body_depth_mm": 6,
+  "wall_mm": 1.6,
+  "closure_section_mm": [
+    6,
+    1.6
+  ],
+  "hole_mm": 3,
+  "peg_mm": 2.6,
+  "lip_mm": 3.2,
+  "receiver_print_angle_deg": 55,
+  "assembly_twist_deg": 0,
+  "valid_single_solid": true,
+  "seated_latch_intersection_mm3": 0,
+  "limits": [
+    "Closed receiver placement is schematic bending, not an elastic deformation simulation.",
+    "Local closure ends are flat 6x1.6 tabs outside the neck; body retains original C shape.",
+    "Fit, flex force, retention and creep untested. No print."
+  ]
+}

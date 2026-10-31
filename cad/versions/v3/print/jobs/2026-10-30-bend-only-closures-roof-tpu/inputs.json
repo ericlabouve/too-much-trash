@@ -1,0 +1,127 @@
+{
+  "revision": "bend-only-closure-pair-v2",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "option-a",
+      "quantity": 1,
+      "source": "review/concepts/closure-pair/option-a.stl",
+      "input_sha256": "99a0a7d105257357ab214086effa0b5b1cd257f05a3e05319fc886df2f4a6c79",
+      "center_xy_mm": [
+        90,
+        70
+      ],
+      "bounds_mm": [
+        73.5999984741211,
+        11.998430252075195,
+        4.400000095367432
+      ],
+      "orientation": "Developed strap broad face on bed; vertical square hole and peg.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -2.9992151260375977,
+        -0.0
+      ]
+    },
+    {
+      "name": "option-b",
+      "quantity": 1,
+      "source": "review/concepts/closure-pair/option-b.stl",
+      "input_sha256": "4b0c8b49ef43d0372b91553a9702987401b54421eb0322d629072cbed8cca0a9",
+      "center_xy_mm": [
+        90,
+        100
+      ],
+      "bounds_mm": [
+        73.5999984741211,
+        13.398430347442627,
+        6.300000190734863
+      ],
+      "orientation": "Developed strap broad face on bed; short sleeve with sloping internal roof.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -2.299215078353882,
+        -0.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "option-a",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "option-b",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-material-tpu",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "a8ae157dd9157846f8aaf3b73df950bdbc7d811ec4a8de6e8259437a2811610b",
+    "filament": "ee2c9caab7bcecbbceba3dda6ca7a5420afc9163296ed42a3a13780f1af7333c"
+  },
+  "material_status": "Saved ELEGOO TPU95A recipe. Offline only; no print.",
+  "geometry_check_sha256": "d660ed7fd9ebd9b2b720c67d44b83200865511eb97c92e3738c07f38c35791d3",
+  "scope": "Selected standalone fit-test pieces: option-a, option-b. NOT complete jaws; consult geometry check for retention limitations."
+}

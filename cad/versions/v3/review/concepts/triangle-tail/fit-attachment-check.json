@@ -1,0 +1,119 @@
+{
+  "revision": "triangle-tail-clearance-v1",
+  "scope": "Selected B with original shared cleat, mount, pulley bearing and rear return stop/anchor.",
+  "variants": {
+    "b": {
+      "foot_symmetric_difference_mm3": 0.0,
+      "sampled_stroke_intersections_mm3": {
+        "-1.5": 0.0,
+        "0": 0.0,
+        "1.5": 0.0
+      },
+      "guide_length_mm": 28,
+      "guide_slot_mm": 2.4,
+      "plunger_volume_mm3": 1484.473121152302,
+      "guide_volume_mm3": 1615.0060606060604,
+      "limits": [
+        "No end stop yet; can slide out longitudinally.",
+        "Sampled \u00b11.5 mm travel is geometric only, not a safe button stroke.",
+        "Support and physical sliding/strength require verification."
+      ]
+    }
+  },
+  "wrap_check": {
+    "band_thickness_mm": 1,
+    "band_width_provisional_mm": 3,
+    "string_diameter_mm": 1,
+    "knot_envelope_diameter_mm": 3,
+    "samples": [
+      {
+        "travel_mm": -1.5,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": -1.0,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": -0.5,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": 0.0,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": 0.5,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": 1.0,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      },
+      {
+        "travel_mm": 1.5,
+        "plunger_bracket_intersection_mm3": 0.0,
+        "band_bracket_intersection_mm3": 0.0,
+        "string_bracket_intersection_mm3": 0.0,
+        "knot_bracket_intersection_mm3": 0.0,
+        "lead_bracket_intersection_mm3": 0.0,
+        "band_plunger_intersection_mm3": 0.0,
+        "string_plunger_intersection_mm3": 0.0,
+        "knot_plunger_intersection_mm3": 0.0,
+        "lead_plunger_intersection_mm3": 0.0
+      }
+    ],
+    "limits": [
+      "Band width provisional; tube sweep approximates flat elastic band.",
+      "Pulley approach is nominal: tension, knot, wear and slack need physical testing."
+    ]
+  }
+}

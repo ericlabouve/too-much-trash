@@ -1,0 +1,73 @@
+{
+  "revision": "tpu-tv-axle-key-v3",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "carrier",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-fixed-jaw-petg-source/carrier.stl",
+      "input_sha256": "96ada1d54a75f84e39231e7a6f66919cbdc0c60ee7171bb6963e080c424df261",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        110.0,
+        48.992095947265625,
+        109.80000305175781
+      ],
+      "orientation": "Approved CAD Y+90 export; collar face down, track upright.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -0.0,
+        -0.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "carrier",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "117691c93c27d9ddd346b359b10d9b5ab38c8a794679c3818dd3102fad52286f",
+  "scope": "One complete current fixed jaw; PETG automatic-support measurement only."
+}

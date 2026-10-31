@@ -1,0 +1,1177 @@
+{
+  "revision": "material-set-ramped-fixed-v3",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 15,
+  "plates": 1,
+  "total_g": 18.922273635864258,
+  "total_minutes": 256.54259440104164,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 18.8515
+  },
+  "objects": {
+    "phone_cuff_1": {
+      "deposited_g_by_role": {
+        "model": 1.7234
+      },
+      "deposited_xy_bounds": [
+        [
+          31.458,
+          109.41
+        ],
+        [
+          48.542,
+          130.59
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "phone_cuff_2": {
+      "deposited_g_by_role": {
+        "model": 1.7234
+      },
+      "deposited_xy_bounds": [
+        [
+          71.458,
+          109.41
+        ],
+        [
+          88.542,
+          130.59
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "phone_cuff_3": {
+      "deposited_g_by_role": {
+        "model": 1.7234
+      },
+      "deposited_xy_bounds": [
+        [
+          111.458,
+          109.41
+        ],
+        [
+          128.542,
+          130.59
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "collar_screw_1": {
+      "deposited_g_by_role": {
+        "model": 1.5284
+      },
+      "deposited_xy_bounds": [
+        [
+          23.212,
+          73.211
+        ],
+        [
+          36.788,
+          86.789
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "collar_screw_2": {
+      "deposited_g_by_role": {
+        "model": 1.5284
+      },
+      "deposited_xy_bounds": [
+        [
+          51.212,
+          73.211
+        ],
+        [
+          64.788,
+          86.789
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "collar_screw_3": {
+      "deposited_g_by_role": {
+        "model": 1.5284
+      },
+      "deposited_xy_bounds": [
+        [
+          79.212,
+          73.211
+        ],
+        [
+          92.788,
+          86.789
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "collar_screw_4": {
+      "deposited_g_by_role": {
+        "model": 1.5284
+      },
+      "deposited_xy_bounds": [
+        [
+          107.212,
+          73.211
+        ],
+        [
+          120.788,
+          86.789
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "collar_screw_5": {
+      "deposited_g_by_role": {
+        "model": 1.5284
+      },
+      "deposited_xy_bounds": [
+        [
+          135.212,
+          73.211
+        ],
+        [
+          148.788,
+          86.789
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "thumb_nut_1": {
+      "deposited_g_by_role": {
+        "model": 0.9713
+      },
+      "deposited_xy_bounds": [
+        [
+          21.242,
+          42.416
+        ],
+        [
+          38.758,
+          57.584
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "thumb_nut_2": {
+      "deposited_g_by_role": {
+        "model": 0.9713
+      },
+      "deposited_xy_bounds": [
+        [
+          49.242,
+          42.416
+        ],
+        [
+          66.758,
+          57.584
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "thumb_nut_3": {
+      "deposited_g_by_role": {
+        "model": 0.9713
+      },
+      "deposited_xy_bounds": [
+        [
+          77.242,
+          42.416
+        ],
+        [
+          94.758,
+          57.584
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "thumb_nut_4": {
+      "deposited_g_by_role": {
+        "model": 0.9713
+      },
+      "deposited_xy_bounds": [
+        [
+          105.242,
+          42.416
+        ],
+        [
+          122.758,
+          57.584
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "thumb_nut_5": {
+      "deposited_g_by_role": {
+        "model": 0.9713
+      },
+      "deposited_xy_bounds": [
+        [
+          133.242,
+          42.416
+        ],
+        [
+          150.758,
+          57.584
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "pulley_key": {
+      "deposited_g_by_role": {
+        "model": 0.1638
+      },
+      "deposited_xy_bounds": [
+        [
+          51.711,
+          18.005
+        ],
+        [
+          58.288,
+          32.135
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "clip_string_guide": {
+      "deposited_g_by_role": {
+        "model": 1.0188
+      },
+      "deposited_xy_bounds": [
+        [
+          91.71,
+          10.111
+        ],
+        [
+          108.29,
+          39.889
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [
+    {
+      "objects": [
+        "phone_cuff_1",
+        "phone_cuff_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.315999999999995
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "phone_cuff_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 62.315999999999995
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "collar_screw_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.020999999999994
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "collar_screw_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.020999999999994
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "collar_screw_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 30.07
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "collar_screw_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 58.07
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "collar_screw_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 86.07
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "thumb_nut_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "thumb_nut_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 56.1
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 84.1
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 76.67500000000001
+    },
+    {
+      "objects": [
+        "phone_cuff_1",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 68.92099999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "phone_cuff_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.315999999999995
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "collar_screw_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 34.07
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "collar_screw_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.020999999999994
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "collar_screw_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.020999999999994
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "collar_screw_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.020999999999994
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "collar_screw_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 46.069999999999986
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "thumb_nut_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "thumb_nut_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 76.67500000000001
+    },
+    {
+      "objects": [
+        "phone_cuff_2",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 68.92099999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "collar_screw_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 74.07000000000001
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "collar_screw_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 46.07
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "collar_screw_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.020999999999994
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "collar_screw_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.020999999999994
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "collar_screw_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.020999999999994
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "thumb_nut_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 72.1
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "thumb_nut_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 51.22599999999999
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 76.67500000000001
+    },
+    {
+      "objects": [
+        "phone_cuff_3",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 68.92099999999999
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "collar_screw_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 13.824000000000007
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "collar_screw_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 41.824000000000005
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "collar_screw_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 69.82400000000001
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "collar_screw_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 97.824
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "thumb_nut_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "thumb_nut_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 39.854000000000006
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 67.85400000000001
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 95.854
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 40.476
+    },
+    {
+      "objects": [
+        "collar_screw_1",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 54.321999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "collar_screw_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 13.824000000000007
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "collar_screw_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 41.824000000000005
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "collar_screw_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 69.824
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "thumb_nut_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "thumb_nut_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 39.854000000000006
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 67.854
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 40.476
+    },
+    {
+      "objects": [
+        "collar_screw_2",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 32.721999999999994
+    },
+    {
+      "objects": [
+        "collar_screw_3",
+        "collar_screw_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 13.824000000000007
+    },
+    {
+      "objects": [
+        "collar_screw_3",
+        "collar_screw_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 41.82399999999999
+    },
+    {
+      "objects": [
+        "collar_screw_3",
+        "thumb_nut_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 39.854
+    },
+    {
+      "objects": [
+        "collar_screw_3",
+        "thumb_nut_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_3",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_3",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_3",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 39.85399999999999
+    },
+    {
+      "objects": [
+        "collar_screw_3",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 40.476
+    },
+    {
+      "objects": [
+        "collar_screw_3",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 32.721999999999994
+    },
+    {
+      "objects": [
+        "collar_screw_4",
+        "collar_screw_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 13.823999999999993
+    },
+    {
+      "objects": [
+        "collar_screw_4",
+        "thumb_nut_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 67.85400000000001
+    },
+    {
+      "objects": [
+        "collar_screw_4",
+        "thumb_nut_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 39.854000000000006
+    },
+    {
+      "objects": [
+        "collar_screw_4",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_4",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_4",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_4",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 48.324000000000005
+    },
+    {
+      "objects": [
+        "collar_screw_4",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 32.721999999999994
+    },
+    {
+      "objects": [
+        "collar_screw_5",
+        "thumb_nut_1"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 95.85399999999998
+    },
+    {
+      "objects": [
+        "collar_screw_5",
+        "thumb_nut_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 67.854
+    },
+    {
+      "objects": [
+        "collar_screw_5",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 39.85399999999999
+    },
+    {
+      "objects": [
+        "collar_screw_5",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_5",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.026999999999996
+    },
+    {
+      "objects": [
+        "collar_screw_5",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 76.324
+    },
+    {
+      "objects": [
+        "collar_screw_5",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 32.721999999999994
+    },
+    {
+      "objects": [
+        "thumb_nut_1",
+        "thumb_nut_2"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 9.883999999999995
+    },
+    {
+      "objects": [
+        "thumb_nut_1",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 37.884
+    },
+    {
+      "objects": [
+        "thumb_nut_1",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 65.88400000000001
+    },
+    {
+      "objects": [
+        "thumb_nut_1",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 93.88399999999999
+    },
+    {
+      "objects": [
+        "thumb_nut_1",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 12.352999999999996
+    },
+    {
+      "objects": [
+        "thumb_nut_1",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 52.35199999999999
+    },
+    {
+      "objects": [
+        "thumb_nut_2",
+        "thumb_nut_3"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 9.88400000000001
+    },
+    {
+      "objects": [
+        "thumb_nut_2",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 37.88400000000001
+    },
+    {
+      "objects": [
+        "thumb_nut_2",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 65.884
+    },
+    {
+      "objects": [
+        "thumb_nut_2",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 9.681
+    },
+    {
+      "objects": [
+        "thumb_nut_2",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 24.351999999999997
+    },
+    {
+      "objects": [
+        "thumb_nut_3",
+        "thumb_nut_4"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 9.88400000000001
+    },
+    {
+      "objects": [
+        "thumb_nut_3",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 37.88399999999999
+    },
+    {
+      "objects": [
+        "thumb_nut_3",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 18.354000000000006
+    },
+    {
+      "objects": [
+        "thumb_nut_3",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 1.9269999999999938
+    },
+    {
+      "objects": [
+        "thumb_nut_4",
+        "thumb_nut_5"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 9.883999999999995
+    },
+    {
+      "objects": [
+        "thumb_nut_4",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 46.354000000000006
+    },
+    {
+      "objects": [
+        "thumb_nut_4",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 1.9269999999999938
+    },
+    {
+      "objects": [
+        "thumb_nut_5",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 74.354
+    },
+    {
+      "objects": [
+        "thumb_nut_5",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 24.351999999999983
+    },
+    {
+      "objects": [
+        "pulley_key",
+        "clip_string_guide"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 32.821999999999996
+    }
+  ],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "230"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "230"
+    ],
+    "textured_plate_temp": [
+      "35"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "35"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "phone_cuff_1",
+      "enable_support": "0",
+      "extruder": "1",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "phone_cuff_2",
+      "enable_support": "0",
+      "extruder": "1",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "phone_cuff_3",
+      "enable_support": "0",
+      "extruder": "1",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "collar_screw_1",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "collar_screw_2",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "collar_screw_3",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "collar_screw_4",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "collar_screw_5",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "thumb_nut_1",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "thumb_nut_2",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "thumb_nut_3",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "thumb_nut_4",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "thumb_nut_5",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "pulley_key",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "clip_string_guide",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 35,
+    "nozzle": 230
+  },
+  "gcode_md5": "64d8b844ce4a37a724260c99542cf7e0",
+  "hashes": {
+    "cuff-fit-input.3mf": "b284a2096a55f291872fe0d4db7d49556f65b864578dd36a6b6a6e4a42cd895a",
+    "cuff-fit.gcode.3mf": "e5d60417b66e8dc603eae79c1b3c469a9235da378cfa415b3f368763f8c36f89",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "a8ae157dd9157846f8aaf3b73df950bdbc7d811ec4a8de6e8259437a2811610b",
+    "filament.json": "ee2c9caab7bcecbbceba3dda6ca7a5420afc9163296ed42a3a13780f1af7333c"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Full required quantities at 100% scale; one material per plate. No printer contacted.",
+    "Cuffs use the physically successful support-disabled recipe; axle cross-slot is bridged. Automatic supports enabled for other parts.",
+    "Support masses include scaffold and interface. Model mass excludes startup purge and adhesion. Physical fit, strength and 35-degree quality still require testing."
+  ]
+}

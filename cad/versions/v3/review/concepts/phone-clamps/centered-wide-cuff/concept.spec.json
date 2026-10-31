@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-17",
+  "scope": "Three review-only alternatives, not active manufacturing geometry",
+  "user_constraints": [
+    "Revoke the fixed cuff offset of 16 mm; center a wider fixed cuff in front of the neck",
+    "Superseding constraint: do not exceed the green fixed-contact width; wider material crowds volume buttons and actuator",
+    "Current C uses three identical 21.6 mm cuffs including the T opening; fixed retention unresolved",
+    "Carry forward one pierced T plus existing transverse key on each opposite smaller cuff (two crosslocked assemblies total)",
+    "Replace the red highlighted jagged side junction with one clean right angle from the neck",
+    "Explore shaft cap, fixed jaw and sliding jaw together",
+    "Permit a new larger pierced T retained by the existing shared T-key",
+    "Preserve the C phone pocket and avoid stock-neck intrusion"
+  ],
+  "study_choices_not_user_dimensions": {
+    "fixed_cuff_width_mm": 21.6,
+    "sliding_cuff_width_mm": 21.6,
+    "sliding_centers_y_mm": [-50, 50],
+    "additional_phone_standoff_mm": 0,
+    "stock_neck_mm": [14, 19],
+    "phone_proxy_mm": [76, 152, 8]
+  },
+  "options": {
+    "A": "Shallow broad T with sideways shared key",
+    "B": "Side-loading dovetail with shared-key end stop",
+    "C": "21.6 mm centered fixed cuff with unresolved attachment; crosslocked T at each 21.6 mm sliding cuff"
+  },
+  "unresolved": ["Fixed cuff attachment", "Cross-key drift", "TPU compliance, peel and creep", "Printed strength", "Actual phone retention", "Camera and screen clearance", "All-phone actuator travel and service", "Detailed collar fasteners and jaw stops", "Slicing and supports"]
+}

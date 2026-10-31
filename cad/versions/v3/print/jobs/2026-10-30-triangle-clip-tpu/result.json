@@ -1,0 +1,76 @@
+{
+    "error_string": "Success.",
+    "export_time": 51,
+    "layer_height": 0.11999999731779099,
+    "plate_index": 0,
+    "prepare_time": 14,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Custom": 474.7158508300781,
+                "Flush": 28.0,
+                "Gap infill": 49.844024658203125,
+                "Inner wall": 376.4173889160156,
+                "Outer wall": 381.1827392578125,
+                "Overhang wall": 0.2592996656894684,
+                "Top surface": 9.096237182617188,
+                "Travel": 165.81236267089844,
+                "Undefined": 147.46795654296875
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFU99",
+                    "id": 1,
+                    "main_used_g": 1.1693130731582642,
+                    "total_used_g": 1.1693130731582642
+                }
+            ],
+            "generate_support_material_time": 10,
+            "id": 1,
+            "infill_time": 14,
+            "layer_filament_change": 0,
+            "main_predication": 954.6219482421875,
+            "make_perimeters_time": 56,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 27.798234939575195,
+                        "height": 6.0,
+                        "width": 22.336734771728516,
+                        "x": 78.83163452148438,
+                        "y": 76.10088348388672,
+                        "z": 0.0
+                    },
+                    "id": 5,
+                    "name": "clip",
+                    "triangle_count": 1654
+                }
+            ],
+            "sliced_time": 213,
+            "sliced_time_with_cache": 113,
+            "total_predication": 1466.993408203125,
+            "triangle_count": 1654,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 15.0,
+    "upward_compatible_machine": [
+        "Bambu Lab P1S 0.4 nozzle",
+        "Bambu Lab P1P 0.4 nozzle",
+        "Bambu Lab X1 0.4 nozzle",
+        "Bambu Lab X1 Carbon 0.4 nozzle",
+        "Bambu Lab X1E 0.4 nozzle",
+        "Bambu Lab A1 0.4 nozzle",
+        "Bambu Lab H2D 0.4 nozzle",
+        "Bambu Lab H2D Pro 0.4 nozzle",
+        "Bambu Lab H2S 0.4 nozzle",
+        "Bambu Lab P2S 0.4 nozzle",
+        "Bambu Lab H2C 0.4 nozzle",
+        "Bambu Lab X2D 0.4 nozzle",
+        "Bambu Lab A2L 0.4 nozzle"
+    ],
+    "wall_loops": 3
+}

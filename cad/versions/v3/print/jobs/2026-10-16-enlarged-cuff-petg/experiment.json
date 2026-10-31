@@ -1,0 +1,32 @@
+{
+  "date_local": "2026-10-16",
+  "revision": "enlarged-cuff-v1",
+  "purpose": "User-requested replacement of successful but undersized/thin-backed cuff",
+  "parts": ["fit-cuff"],
+  "changes": {
+    "cuff_arms_and_seats_scale": 1.2,
+    "width_mm": 12,
+    "reinforced_flat_back_shoulder_mm": 1.7,
+    "stem_opening_mm": [3.4, 3.4],
+    "head_recess_mm": [7.4, 3.4],
+    "key_geometry_changed": false
+  },
+  "recipe": {
+    "matches_successful_retry_profiles_byte_for_byte": true,
+    "reference": "2026-10-16-cuff-only-retry",
+    "filament": "Bambu PETG Translucent Blue",
+    "bed": "Textured PEI",
+    "nozzle_mm": 0.4,
+    "layer_mm": 0.12,
+    "first_layer_mm": 0.2,
+    "nozzle_first_then_other_c": [250,245],
+    "bed_c": 70,
+    "walls": 3,
+    "infill": "15% gyroid",
+    "support": "Automatic Normal Snug enabled; zero generated",
+    "orientation": "Source Y -90 degrees; flat back on bed; opening vertical"
+  },
+  "review": {"browser_passed": true, "pieces": 1, "layers": 74, "errors": [], "minutes": 19.77558, "grams": 1.07315},
+  "authorization": "User requested printing when able and confirmed old cuff removed, clear bed, PETG blue on external spool",
+  "limits": ["No designed pull-out latch", "No TPU grip qualification", "Physical result pending; startup is recorded separately"]
+}

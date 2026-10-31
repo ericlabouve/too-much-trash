@@ -1,0 +1,58 @@
+{
+  "handle_center_v_mm": 31,
+  "cord_tangent_v_mm": 16.3,
+  "handle_center_to_tangent_mm": 14.7,
+  "cord_attachment_to_tangent_mm": 11.6,
+  "samples": [
+    {
+      "pull_mm": 0,
+      "handle_wheel_gap_mm": 4.54312463889286,
+      "handle_green_gap_mm": 3.453882032022074,
+      "full_plunger_wheel_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 6,
+      "handle_wheel_gap_mm": 0.8320410348395139,
+      "handle_green_gap_mm": 0.8999999999999986,
+      "full_plunger_wheel_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 7,
+      "handle_wheel_gap_mm": 0.34895251863625215,
+      "handle_green_gap_mm": 0.8999999999999986,
+      "full_plunger_wheel_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 8,
+      "handle_wheel_gap_mm": 0.0,
+      "handle_green_gap_mm": 0.8999999999999986,
+      "full_plunger_wheel_overlap_mm3": 0.0014273303363225602
+    },
+    {
+      "pull_mm": 10,
+      "handle_wheel_gap_mm": 0.0,
+      "handle_green_gap_mm": 0.8999999999999986,
+      "full_plunger_wheel_overlap_mm3": 0.33590156173786284
+    },
+    {
+      "pull_mm": 11.6,
+      "handle_wheel_gap_mm": 0.0,
+      "handle_green_gap_mm": 0.8999999999999986,
+      "full_plunger_wheel_overlap_mm3": 1.2581077104192941
+    },
+    {
+      "pull_mm": 14.7,
+      "handle_wheel_gap_mm": 0.0,
+      "handle_green_gap_mm": 0.8999999999999986,
+      "full_plunger_wheel_overlap_mm3": 3.4024023157985197
+    }
+  ],
+  "wheel_first_contact_pull_mm": 7.800437927246094,
+  "bracket_first_contact_pull_mm": null,
+  "axle_first_contact_pull_mm": null,
+  "guide_overlap_at_wheel_contact_mm": 11.949562072753906,
+  "limits": [
+    "Rigid CAD contact threshold only; band, string, knot, phone/button and actual squeeze stroke may reduce usable travel.",
+    "Center-to-tangent distance is not the available mechanical stroke."
+  ]
+}

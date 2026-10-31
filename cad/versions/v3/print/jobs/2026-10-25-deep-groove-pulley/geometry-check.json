@@ -1,0 +1,16 @@
+{
+  "revision": "deep-groove-pulley-v3",
+  "nominal_groove_depth_mm": 2.2,
+  "previous_depth_mm": 1.1,
+  "outer_diameter_mm": 18,
+  "bore_mm": 8.6,
+  "axial_width_mm": 4,
+  "flank_angle_from_bed_degrees": 36.027,
+  "minimum_radial_web_mm": 2.5,
+  "valid": true,
+  "source_sha256": "2026a80b5cea8cc387037b54f96e4482370b43326acdee9812929c345ce59e7f",
+  "limits": [
+    "Digital fit and slice only; retention, wear and print quality require physical checks.",
+    "Only pulley changes; axle/bracket bearing envelope preserved."
+  ]
+}

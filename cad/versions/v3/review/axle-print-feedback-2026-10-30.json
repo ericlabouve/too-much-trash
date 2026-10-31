@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-30",
+  "source": "User physical print feedback",
+  "part": "pulley_axle",
+  "job": "2026-10-26-flush-fins-petg",
+  "result": "Upper material above square cross-key hole did not print correctly",
+  "suspected_cause": "Unsupported flat roof over key opening; not experimentally isolated",
+  "supersedes": "Support-disabled slice alone was not proof of successful bridging",
+  "requested_revision": "45 degree diamond-shaped key passage, preview and slice before print approval"
+}

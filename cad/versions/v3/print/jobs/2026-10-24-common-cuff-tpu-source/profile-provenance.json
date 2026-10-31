@@ -1,0 +1,31 @@
+{
+  "inheritance": [
+    {
+      "name": "fdm_filament_common",
+      "sha256": "8c7105b7d59a28f600c43a946f067b8b4d707b9711c0bf6b88e9166e48878548",
+      "path": "/Applications/BambuStudio.app/Contents/Resources/profiles/BBL/filament/fdm_filament_common.json"
+    },
+    {
+      "name": "fdm_filament_tpu",
+      "sha256": "8fc12ed3883ae4419cad7300c28b7d9492c32c20831a820b4c030670fa1bdb49",
+      "path": "/Applications/BambuStudio.app/Contents/Resources/profiles/BBL/filament/fdm_filament_tpu.json"
+    },
+    {
+      "name": "Generic TPU @base",
+      "sha256": "f17274cec89cd75aee576ec02c3fbd6e34bcacc452e673547b171fbac844fb53",
+      "path": "/Applications/BambuStudio.app/Contents/Resources/profiles/BBL/filament/Generic TPU @base.json"
+    },
+    {
+      "name": "Generic TPU",
+      "sha256": "d88044c664414ce28c49d22f6248cfdf038973c9354508a1ea94cd68e9dba74c",
+      "path": "/Applications/BambuStudio.app/Contents/Resources/profiles/BBL/filament/Generic TPU.json"
+    },
+    {
+      "name": "Generic TPU @BBL A1M",
+      "sha256": "555c11d89f8cbea37e7cdc08fad437b493779551b068fec4bd05e4ea8b351438",
+      "path": "/Applications/BambuStudio.app/Contents/Resources/profiles/BBL/filament/Generic TPU @BBL A1M.json"
+    }
+  ],
+  "manufacturer_reference": "https://us.elegoo.com/products/tpu-filament-1-75mm-colored-1kg",
+  "note": "Generic TPU A1 mini base, conservative uncalibrated ELEGOO95A trial: 230C nozzle/35C bed, 2 mm3/s limit."
+}

@@ -1,0 +1,4 @@
+{
+  "status": "Superseded; do not print",
+  "reason": "2 mm handle move leaves only0.0905 mm beyond radius9.3 mm reserved nut-turning envelope. Reduce move to1 mm."
+}

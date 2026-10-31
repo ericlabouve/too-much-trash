@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-14",
+  "source": "User reports printing the actuator bracket and all other actuator parts; six highlighted screenshots accompany revision requests",
+  "completion_evidence": "User-reported physical print, not remotely observed terminal state",
+  "approved": ["pulley", "thumb_screw", "thumb_nut", "pulley_key"],
+  "pulley_axle": "No separate explicit approval given; preserve geometry unless required by revised support",
+  "actuator_bracket": "Initially listed as approved, then explicitly not approved with five detailed revision requests; detailed requests supersede general approval",
+  "plunger": "Not approved: neck must be uniform width with gradual curved boot transition",
+  "bracket_requests": [
+    "Remove highlighted outer bearing ring and its arm",
+    "Raise remaining bearing boss about 2 mm and retain at least 1 mm wheel wiggle clearance",
+    "Remove raised rectangular ledge around bearing boss to main base level",
+    "Widen highlighted guide to outer wall; extend toward band end with curved taper",
+    "Add an independent stop before the fixed return-band anchor"
+  ],
+  "limits": "Approvals are user-reported part acceptance, not measured loaded strength, button safety or broad material qualification",
+  "sliced_3mf_sha256": "2bd7d71f74bea95c71771465a30f2f012b6a407b06fe0128a4c1301128364c76",
+  "historical_files_preserved": true
+}

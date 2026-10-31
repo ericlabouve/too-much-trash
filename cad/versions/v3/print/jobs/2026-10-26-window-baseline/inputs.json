@@ -1,0 +1,73 @@
+{
+  "revision": "matched-jaw-baseline",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "sliding_jaw",
+      "quantity": 1,
+      "source": "review/light-sliding-jaw-baseline/sliding_jaw.stl",
+      "input_sha256": "e608c70be5abf16765c9a4cdd562f9588dbdfce99c47f08dbd2fc430fe60756b",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        121.5999984741211,
+        39.52000045776367,
+        58.5
+      ],
+      "orientation": "Matched baseline orientation",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          6.123233995736766e-17,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -1.7763568394002505e-15,
+        -0.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "sliding_jaw",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "feb7b3d17ee3ea6527c3ff1d04b768d22d6a34e7dcde1274caccd5131ced087b",
+  "scope": "Selected standalone fit-test pieces: sliding_jaw. NOT complete jaws; consult geometry check for retention limitations."
+}

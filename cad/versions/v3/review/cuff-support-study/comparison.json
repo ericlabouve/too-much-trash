@@ -1,0 +1,61 @@
+{
+  "printer_contacted": false,
+  "geometry_changed": false,
+  "cases": [
+    {
+      "name": "Original side-down",
+      "job": "2026-10-16-cuff-fit-petg",
+      "total_g": 1.1316437721252441,
+      "total_minutes": 24.092769368489584,
+      "support_and_interface_g": 0.0182,
+      "cuff_first_layer_centerline_span_mm": [
+        6.372997283935547,
+        14.083000183105469
+      ],
+      "first_layer_z_mm": 0.2,
+      "warnings": "",
+      "gcode_md5": "a1f87de29b4e4327e91ff64d3d8fc59f"
+    },
+    {
+      "name": "Side-down / omit detected bridge supports",
+      "job": "2026-10-16-cuff-bridge-study",
+      "total_g": 1.1316437721252441,
+      "total_minutes": 24.092769368489584,
+      "support_and_interface_g": 0.0182,
+      "cuff_first_layer_centerline_span_mm": [
+        6.372997283935547,
+        14.083000183105469
+      ],
+      "first_layer_z_mm": 0.2,
+      "warnings": "",
+      "gcode_md5": "b63815a0e020d889031f28600537386e"
+    },
+    {
+      "name": "Curved back down / automatic supports",
+      "job": "2026-10-16-cuff-back-study",
+      "total_g": 1.1141297817230225,
+      "total_minutes": 20.06539306640625,
+      "support_and_interface_g": 0,
+      "cuff_first_layer_centerline_span_mm": [
+        4.635002136230469,
+        9.5
+      ],
+      "first_layer_z_mm": 0.2,
+      "warnings": "",
+      "gcode_md5": "27937a9beb0b410080ca939ce48c86ae"
+    }
+  ],
+  "bridge_option_paths_identical_to_baseline": true,
+  "source_sha256": {
+    "fit-cuff": "e031cf446d13e60fde263706f113f6921b70f1851fb661d0bf2ee6a6e4102d60",
+    "fit-jaw": "5474186792a95d6347ec34481dd8ddd61531b07e16b691365304c2c4c6900748",
+    "fit-key": "1868e29c6e54708b6ad5e75b581b4b1e4b2341059a40e2876ab0fa58d2722b48"
+  },
+  "limits": [
+    "No physical print; PETG fit, adhesion and curved-seat finish unqualified.",
+    "Existing 2.95 mm friction gap vs 3 mm rigid stem may jam; orientation does not fix this.",
+    "Cuff and shared 12.2 mm key CAD unchanged. No active-jaw or actuator promotion.",
+    "A sloped opening was not built because the back-down orientation generates zero supports.",
+    "Support masses exclude startup purge; total mass is slicer estimate for all three parts."
+  ]
+}

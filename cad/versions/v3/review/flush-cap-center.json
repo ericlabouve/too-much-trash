@@ -1,0 +1,28 @@
+{
+  "revision": "flush-cap-center-v3",
+  "passed": true,
+  "common_face_x_mm": 12,
+  "removed_step_height_mm": 1.8,
+  "removed_volume_mm3": 993.6000000000005,
+  "added_volume_mm3": 0,
+  "continuous_faces": [
+    {
+      "area_mm2": 2635.4041088253807,
+      "y": [
+        -13.800000000000011,
+        13.800000000000008
+      ],
+      "z": [
+        -40.0,
+        70.0
+      ]
+    }
+  ],
+  "solid_count": 1,
+  "valid": true,
+  "slotted_wings_and_fastener_bosses_unchanged": true,
+  "validation_basis": "Pure subtraction confined to central collar crossing; no new rigid collisions or service obstructions can be introduced. Rail slots, mounting faces and neck opening unchanged.",
+  "limits": [
+    "CAD continuity is not measured stiffness or print qualification. Existing phone-fit and twine-routing issues remain."
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "revision": "closed-rail-sleeve-b-v1",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "b-bracket",
+      "quantity": 1,
+      "source": "review/concepts/closed-rail-sleeve-b/b-bracket.stl",
+      "input_sha256": "9b68c0850e70314bc4739041df7c895a86e6e2eba2ce67a46620a0eedcbab863",
+      "center_xy_mm": [
+        60,
+        80
+      ],
+      "bounds_mm": [
+        54.60000038146973,
+        35.14999961853027,
+        19.799999237060547
+      ],
+      "orientation": "Existing flat spine down; triangular guide apex open.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        3.3000001907348633,
+        -28.425000190734863,
+        2.4424907071149036e-16
+      ]
+    },
+    {
+      "name": "b-plunger",
+      "quantity": 1,
+      "source": "review/concepts/closed-rail-sleeve-b/b-plunger.stl",
+      "input_sha256": "a28be06ad8fbf0cf559fd837b7a23909a454e4cf548823e76ebb3eb95a31229e",
+      "center_xy_mm": [
+        110,
+        80
+      ],
+      "bounds_mm": [
+        16.0,
+        38.15000009536743,
+        12.899999141693115
+      ],
+      "orientation": "Foot and broad triangle base share the bed plane; existing cleat ramps upward.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -21.924999952316284,
+        -3.4000000953674316
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "b-bracket",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "b-plunger",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-compact-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Offline Bambu PETG Translucent recipe; no print.",
+  "geometry_check_sha256": "23c236591f3b77e6d6ba4843be4f64873345cc604387cf64863e517f3f960637",
+  "scope": "Selected standalone fit-test pieces: b-bracket, b-plunger. NOT complete jaws; consult geometry check for retention limitations."
+}

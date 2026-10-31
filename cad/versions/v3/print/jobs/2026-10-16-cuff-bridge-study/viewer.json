@@ -1,0 +1,29 @@
+{
+  "title": "Cuff study \u00b7 omit detected bridge supports \u00b7 single-plate slice review",
+  "subtitle": "3 separate pieces at 100% scale \u00b7 petg-friction-fit-v1",
+  "notes": [
+    "Unchanged PETG geometry and side-down orientation; only bridge_no_support changes. Friction ribs remain unqualified."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

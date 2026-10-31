@@ -1,0 +1,16 @@
+{
+  "revision": "plug-clip-review-v3",
+  "opening_mm": [
+    12.8,
+    17.8
+  ],
+  "thickness_mm": 6,
+  "eye_mm": 4,
+  "support_strategy": "Constant 6 mm extrusion, flat on bed; every cavity open through thickness.",
+  "closure": "External tapered mushroom plug, compressible socket cheeks; no loose fastener.",
+  "limits": [
+    "Closed pose illustrates tongue flex; not an elastic simulation.",
+    "Smaller neck fit, closing force, creep and pullout untested.",
+    "User explicitly declines printing this piece now."
+  ]
+}

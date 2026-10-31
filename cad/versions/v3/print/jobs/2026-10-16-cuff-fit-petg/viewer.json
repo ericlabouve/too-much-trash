@@ -1,0 +1,32 @@
+{
+  "title": "V3 cuff fit \u00b7 PETG \u00b7 single-plate slice review",
+  "subtitle": "3 separate pieces at 100% scale \u00b7 petg-friction-fit-v1",
+  "notes": [
+    "Supports occur only inside the cuff central key opening/recess (0.0182 g). Inspect removal access and clean the thin head-seat wall gently.",
+    "The two friction ribs are integral PETG geometry inside fit-jaw, not separate parts or removable supports. Jaw and key generated no support paths.",
+    "PETG is a rigid fit trial; intended later cuff material is ELEGOO TPU 95A. Use a dummy edge first and do not force a jammed key.",
+    "Current 12.2 mm shared key retained by user choice. Holding force and thin-head strength remain untested. No print sent."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

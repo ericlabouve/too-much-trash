@@ -1,0 +1,37 @@
+{
+  "job": "tmt-v3-full-fit-tpu-20261026.gcode.3mf",
+  "remote_path": "/tmt-v3-full-fit-tpu-20261026.gcode.3mf",
+  "plate": 1,
+  "printer": "tmt-a1-mini",
+  "gcode_md5": "64d8b844ce4a37a724260c99542cf7e0",
+  "file_sha256": "e5d60417b66e8dc603eae79c1b3c469a9235da378cfa415b3f368763f8c36f89",
+  "started_at_utc": "2026-10-26T20:13:12.065896+00:00",
+  "user_confirmation": "Bed clear and textured PEI installed; dried ELEGOO TPU95A ready on external spool. User authorized full fit-test, TPU first.",
+  "start_outcome": "verified",
+  "observed_state": "RUNNING",
+  "stage": "heatbed_preheating",
+  "print_error": 0,
+  "remaining_minutes": 256,
+  "physical_print_success": null,
+  "fit_validation": null,
+  "purpose": "Full assembly fit-test; outgoing twine/fixed-jaw contact explicitly accepted for physical testing.",
+  "latest_status": {
+    "gcode_state": "RUNNING",
+    "subtask_name": "tmt-v3-full-fit-tpu-20261026.gcode.3mf",
+    "stage": "auto_bed_leveling",
+    "mc_percent": 2,
+    "layer_num": 0,
+    "remaining_time_min": 250,
+    "print_error": 0,
+    "error": null
+  },
+  "completion": {
+    "observed_at_utc": "2026-10-27T02:40:35.766882+00:00",
+    "printer_state": "FINISH",
+    "percent": 100,
+    "layers": 284,
+    "print_error": 0,
+    "user_report": "TPU plate finished; removed and bed clear",
+    "physical_fit_validated": false
+  }
+}

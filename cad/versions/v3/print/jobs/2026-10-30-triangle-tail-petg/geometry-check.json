@@ -1,0 +1,23 @@
+{
+  "revision": "triangle-tail-clearance-v1",
+  "scope": "Guide cartridge and plunger studies only; mount, pulley, return anchor and removable end-stop integration deferred until selection.",
+  "variants": {
+    "b": {
+      "foot_symmetric_difference_mm3": 0.0,
+      "sampled_stroke_intersections_mm3": {
+        "-1.5": 0.0,
+        "0": 0.0,
+        "1.5": 0.0
+      },
+      "guide_length_mm": 28,
+      "guide_slot_mm": 2.4,
+      "plunger_volume_mm3": 1484.473121152302,
+      "guide_volume_mm3": 1615.0060606060604,
+      "limits": [
+        "No end stop yet; can slide out longitudinally.",
+        "Sampled \u00b11.5 mm travel is geometric only, not a safe button stroke.",
+        "Support and physical sliding/strength require verification."
+      ]
+    }
+  }
+}

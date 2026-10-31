@@ -1,0 +1,24 @@
+{
+  "status": "proposal, not implemented or print-qualified",
+  "current_internal_mm": [
+    13.8,
+    18.8
+  ],
+  "target_internal_mm": [
+    12.8,
+    17.8
+  ],
+  "closure": "Flexible tongue across open side, mushroom button at free end engaging an elongated keyhole in opposite end. Stretch tongue, push button through larger entry, then let preload seat narrow stem in retaining slot.",
+  "preserve": [
+    "single reversible guide",
+    "4 mm twine eye",
+    "6 mm axial width",
+    "no rubber band or band grooves"
+  ],
+  "checks_needed": [
+    "actual neck fit and closure force",
+    "keeper does not press against neck or foul cord",
+    "support-free orientation and slice",
+    "TPU creep and repeated release"
+  ]
+}

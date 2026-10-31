@@ -1,0 +1,54 @@
+{
+  "revision": "flat-bed-shaft-cap-v3",
+  "passed": true,
+  "fixed_cuff_x_mm": -18.2,
+  "clamp_exterior_and_stud_base_x_mm": -11.3,
+  "phone_and_actuator_shift_mm": 1.8,
+  "unwanted_raised_wall_or_platform_mm3": 0,
+  "missing_right_angle_junction_mm3": 0,
+  "carrier_valid": true,
+  "carrier_solids": 1,
+  "configurations": {
+    "wallet-near": {
+      "rail_bracket_plane_x_mm": 12,
+      "released_shoe_gap_mm": 0.34999999999999787
+    },
+    "wallet-far": {
+      "rail_bracket_plane_x_mm": 12,
+      "released_shoe_gap_mm": 0.34999999999999787
+    },
+    "bare-near": {
+      "rail_bracket_plane_x_mm": 12,
+      "released_shoe_gap_mm": 0.34999999999999787
+    },
+    "bare-far": {
+      "rail_bracket_plane_x_mm": 12,
+      "released_shoe_gap_mm": 0.34999999999999787
+    },
+    "small-near": {
+      "rail_bracket_plane_x_mm": 12,
+      "released_shoe_gap_mm": 0.34999999999999787
+    },
+    "small-far": {
+      "rail_bracket_plane_x_mm": 12,
+      "released_shoe_gap_mm": 0.34999999999999787
+    },
+    "large-near": {
+      "rail_bracket_plane_x_mm": 12,
+      "released_shoe_gap_mm": 0.34999999999999787
+    },
+    "large-far": {
+      "rail_bracket_plane_x_mm": 12,
+      "released_shoe_gap_mm": 0.34999999999999787
+    }
+  },
+  "changed_print_designs": [
+    "shaft_cap",
+    "collar_screw",
+    "actuator_bracket"
+  ],
+  "limits": [
+    "Original cuff, stud and plunger retained; bracket bearing plate extends to the flat cap face.",
+    "Stiffness, physical grip, TPU compliance, actual button force and camera framing remain untested."
+  ]
+}

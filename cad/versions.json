@@ -1,5 +1,5 @@
 {
-  "default": "v2",
+  "default": "v3",
   "versions": [
     {
       "id": "v1",
@@ -12,6 +12,12 @@
       "label": "Version 2 \u00b7 compact shaft-side rails",
       "viewer": "versions/v2/viewer.html",
       "note": "Rotate phone end-for-end for outer-edge buttons. Both actuator positions now near shaft; rotated camera framing unresolved."
+    },
+    {
+      "id": "v3",
+      "label": "Version 3 \u00b7 removable cuffs and sliding plunger",
+      "viewer": "versions/v3/viewer.html",
+      "note": "TPU T/V axle-key prototype: flexible V tip and retained T stop, unchanged axle slot. Keeper remains until physical snap/retention qualification. Flush jaws and interchangeable cuffs unchanged."
     }
   ]
 }

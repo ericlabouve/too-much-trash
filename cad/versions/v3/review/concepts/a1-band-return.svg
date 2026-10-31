@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1040" viewBox="0 0 1440 1040">
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="context-stroke" stroke-width="1.6"/></marker></defs>
+<rect width="1440" height="1040" fill="#f4f6f7"/>
+<g font-family="Arial,Helvetica,sans-serif" fill="#263747" stroke-linejoin="round" stroke-linecap="round">
+<text x="32" y="47" font-size="32" font-weight="700">A1 refinement: band-return plunger in a covered tray</text>
+<text x="32" y="80" font-size="19">Broad supports • captive moving parts • four printed parts plus fasteners • separate-part printing</text>
+<text x="32" y="111" font-size="17">Concept only; unscaled. Orange = printed structure, purple = twine, teal = rubber band. Cover omitted in the main view.</text>
+<rect x="25" y="137" width="680" height="691" rx="12" fill="white" stroke="#d8e0e5"/>
+<text x="48" y="177" font-size="23" font-weight="700">01  Balanced return, straight press</text>
+<!-- Open tray with backplate, upper crossbar and side walls -->
+<path d="M228 220H398V680H228Z M249 278V650H377V278Z" fill="#fff0de" fill-rule="evenodd" stroke="#bc651f" stroke-width="3"/>
+<rect x="242" y="235" width="142" height="28" rx="8" fill="#dc8137" stroke="#9b4a16" stroke-width="2"/>
+<!-- Plunger: short, broad section with yoke and stop shoulders -->
+<path d="M274 318H350V342H330V548H351V563H330V679H294V563H273V548H294V342H274Z" fill="#ffc782" stroke="#9b4a16" stroke-width="2.5"/>
+<!-- One closed band loop around rounded crossbar and lower yoke -->
+<path d="M278 241Q266 241 266 253V332Q266 345 279 345H345Q358 345 358 332V253Q358 241 345 241Z" fill="none" stroke="#168773" stroke-width="6"/>
+<path d="M271 316V285 M353 316V285" fill="none" stroke="#168773" stroke-width="2.5" marker-end="url(#arrow)"/>
+<!-- Separate bearing lands: laterally depicted, front/back omitted -->
+<g fill="#dc8137" stroke="#9b4a16" stroke-width="2">
+<rect x="273" y="373" width="16" height="32" rx="2"/><rect x="335" y="373" width="16" height="32" rx="2"/>
+<rect x="273" y="497" width="16" height="32" rx="2"/><rect x="335" y="497" width="16" height="32" rx="2"/>
+<rect x="268" y="574" width="24" height="18" rx="2"/><rect x="332" y="574" width="24" height="18" rx="2"/>
+</g>
+<!-- Pulley is ahead of slider in depth -->
+<circle cx="341" cy="448" r="29" fill="#e9904f" stroke="#9b4a16" stroke-width="2.5"/>
+<circle cx="341" cy="448" r="7" fill="#9b4a16"/>
+<path d="M312 351V448A29 29 0 0 0 341 477H620" fill="none" stroke="#7754a6" stroke-width="5" marker-end="url(#arrow)"/>
+<circle cx="312" cy="351" r="5" fill="#7754a6"/>
+<text x="504" y="460" font-size="16" fill="#7754a6">TWINE PULL</text>
+<!-- Phone, release gap, output -->
+<rect x="174" y="710" width="305" height="42" rx="9" fill="#e4e9ed" stroke="#8394a1" stroke-width="2"/>
+<rect x="294" y="696" width="36" height="14" rx="4" fill="#a0adb7"/>
+<text x="360" y="737" font-size="17">PHONE</text>
+<path d="M363 643V683" fill="none" stroke="#263747" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="379" y="666" font-size="16">PRESS</text>
+<!-- Leaders -->
+<g fill="none" stroke="#647583" stroke-width="1.5"><path d="M455 252H389"/><path d="M449 308L363 294"/><path d="M165 383H264"/><path d="M452 408L365 431"/><path d="M161 570H262"/><path d="M162 687H285"/></g>
+<g font-size="17"><text x="466" y="244">Wide, rounded</text><text x="466" y="267">fixed crossbar</text><text x="458" y="304">One small band;</text><text x="458" y="327">two balanced legs</text><text x="51" y="373">Short guide</text><text x="51" y="396">surfaces</text><text x="460" y="399">Pulley sits ahead</text><text x="460" y="422">of slider in depth</text><text x="51" y="557">Broad frame</text><text x="51" y="580">press stops</text><text x="51" y="678">Release gap</text><text x="51" y="701">(exaggerated)</text></g>
+<text x="48" y="788" font-size="18">Band routed behind the center cord; keeper lips retain it.</text>
+<rect x="735" y="137" width="680" height="321" rx="12" fill="white" stroke="#d8e0e5"/>
+<text x="760" y="177" font-size="23" font-weight="700">02  Support the axle at both ends</text>
+<text x="760" y="205" font-size="17">Section through pulley axis; cord groove simplified.</text>
+<!-- Double-supported axle sectional schematic -->
+<path d="M800 236H833V354H800Z" fill="#dc8137" stroke="#9b4a16" stroke-width="2"/>
+<path d="M1161 236H1194V354H1161Z" fill="#dc8137" stroke="#9b4a16" stroke-width="2"/>
+<path d="M833 283H1176V307H833Z" fill="#e9904f" stroke="#9b4a16" stroke-width="2"/>
+<path d="M941 243H968V255H1058V243H1085V347H1058V335H968V347H941Z" fill="#ffc782" stroke="#9b4a16" stroke-width="2"/>
+<rect x="941" y="279" width="144" height="32" fill="#f4f6f7"/>
+<rect x="941" y="283" width="144" height="24" fill="#e9904f" stroke="#9b4a16" stroke-width="2"/>
+<text x="782" y="381" font-size="16">Tray back</text><text x="967" y="381" font-size="16">Pulley</text><text x="1119" y="381" font-size="16">Cover socket</text>
+<text x="760" y="417" font-size="17">Axle integral with tray; cover supports and captures its tip.</text>
+<rect x="735" y="478" width="680" height="350" rx="12" fill="white" stroke="#d8e0e5"/>
+<text x="760" y="518" font-size="23" font-weight="700">03  Print as four separate, flat-based parts</text>
+<!-- print parts, represented top-down -->
+<rect x="781" y="567" width="115" height="113" rx="8" fill="#fff0de" stroke="#9b4a16" stroke-width="3"/>
+<rect x="794" y="580" width="89" height="86" rx="5" fill="#f4f6f7" stroke="#9b4a16" stroke-width="2"/>
+<circle cx="858" cy="642" r="9" fill="#dc8137"/>
+<path d="M936 572H995V591H980V650H995V667H936V650H951V591H936Z" fill="#ffc782" stroke="#9b4a16" stroke-width="2"/>
+<circle cx="1079" cy="623" r="35" fill="#ffc782" stroke="#9b4a16" stroke-width="2"/><circle cx="1079" cy="623" r="8" fill="#f4f6f7" stroke="#9b4a16" stroke-width="2"/>
+<rect x="1180" y="567" width="115" height="113" rx="8" fill="#dc8137" stroke="#9b4a16" stroke-width="2"/>
+<rect x="1202" y="585" width="36" height="67" rx="5" fill="#f4f6f7"/><circle cx="1256" cy="646" r="10" fill="#fff0de"/>
+<g font-size="16"><text x="799" y="711">Tray body</text><text x="937" y="711">Plunger</text><text x="1051" y="711">Pulley</text><text x="1209" y="711">Cover</text></g>
+<text x="760" y="754" font-size="17">Open pockets / guide faces up. Pulley flat. Cover outer face down.</text>
+<text x="760" y="785" font-size="17">Chamfer groove edges; avoid supported sliding surfaces.</text>
+<text x="32" y="879" font-size="23" font-weight="700">Design decisions for this iteration</text>
+<text x="32" y="917" font-size="18">Use broad roots and fillets; keep the shoe close to the lower guide. Retain with screws, not delicate snap hooks.</text>
+<text x="32" y="949" font-size="18">Keep the existing 19 mm mounting-hole spacing as the interface target. Cover fastener placement still needs a CAD clearance check.</text>
+<text x="32" y="981" font-size="18">Return band only retracts the slider. Excess trigger pull still needs a separate solution; band size and tension are not yet specified.</text>
+<text x="32" y="1018" font-size="16" fill="#596b78">V3 concept study • no production geometry changed • support-free printing is a design target, not a slicing result</text>
+</g></svg>

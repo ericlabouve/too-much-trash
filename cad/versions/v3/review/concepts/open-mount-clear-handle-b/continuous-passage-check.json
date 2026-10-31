@@ -1,0 +1,15 @@
+{
+  "b-bracket": {
+    "min_sampled_clearance_mm": 0.39999969951551223,
+    "minimum_is_sampled_not_continuous": true
+  },
+  "pulley_axle": {
+    "min_sampled_clearance_mm": 2.475091906796001,
+    "minimum_is_sampled_not_continuous": true
+  },
+  "wheel": {
+    "min_sampled_clearance_mm": 0.475091906795965,
+    "continuous_clearance_lower_bound_mm": 0.225091906795965
+  },
+  "method": "Targeted exact-distance checks at0,1,5,10,14,20,30,45 mm. Separate rigid overlap sweep uses1 mm intervals. Wheel sampled every0.5 mm; its stated lower bound applies only to wheel clearance."
+}

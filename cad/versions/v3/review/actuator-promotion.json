@@ -1,0 +1,26 @@
+{
+  "revision": "braced-triangle-actuator-v3",
+  "parts": {
+    "actuator_bracket": {
+      "source": "cad/versions/v3/review/concepts/braced-tail-b/b-bracket.step",
+      "sha256": "4db631ca9b30b99c2a4b9360676bab7dbc2b4992be3557e1377c380e143af257",
+      "transformed_volume_difference_mm3": 0.0,
+      "source_bytes_identical": true
+    },
+    "plunger": {
+      "source": "cad/versions/v3/review/concepts/braced-tail-b/b-plunger.step",
+      "sha256": "99a02ba17fd9102c84a7adfc6c744a33bf92f060983d1dd2fe276f4a48029b8f",
+      "transformed_volume_difference_mm3": 0.0,
+      "source_bytes_identical": true
+    },
+    "pulley_axle": {
+      "source": "cad/versions/v3/review/concepts/braced-tail-b/pulley_axle.step",
+      "sha256": "7fc677e101160179333c259530c7b17c5167648ece3ce0ad3d1965808e133788",
+      "transformed_volume_difference_mm3": 0.0,
+      "source_bytes_identical": true
+    }
+  },
+  "print_job": "2026-10-31-actuator-reuse-pulley-petg",
+  "support_interface_paths": 0,
+  "physical_status": "Current three-part print awaiting user assessment; reused pulley unchanged"
+}

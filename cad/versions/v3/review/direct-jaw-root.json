@@ -1,0 +1,29 @@
+{
+  "revision": "flush-side-fixed-jaw-v3",
+  "passed": true,
+  "track_shift_x_mm": 2.7,
+  "full_depth_root_mm": 12,
+  "root_width_at_clamp_mm": 27.6,
+  "missing_root_mm3": 0,
+  "fixed_cleat_x_mm": -24.3,
+  "closed_jaw_x_mm": -66.5,
+  "stop_overtravel_0p2_overlap_mm3": 16.000000000000227,
+  "added_stop_wall_cord_hits": [],
+  "valid": true,
+  "solids": 1,
+  "changed_print_designs": [
+    "carrier"
+  ],
+  "unchanged": [
+    "phone",
+    "all three cuffs",
+    "sliding jaw",
+    "shaft cap",
+    "actuator",
+    "fasteners"
+  ],
+  "limits": [
+    "Direct solid continuity is not a strength or preload qualification.",
+    "Fixed band anchor moves with track; real band tension needs physical fitting."
+  ]
+}

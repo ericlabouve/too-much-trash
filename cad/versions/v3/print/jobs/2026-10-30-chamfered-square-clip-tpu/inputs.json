@@ -1,0 +1,73 @@
+{
+  "revision": "straight-arm-chamfered-square-clip-v3",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "clip",
+      "quantity": 1,
+      "source": "review/concepts/square-clip/clip.stl",
+      "input_sha256": "6e71fbf92b7636ac506442cfe469bee1d999b6dcc342c9e4dca235aba4b09d91",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        22.336735725402832,
+        27.798236846923828,
+        6.0
+      ],
+      "orientation": "Flat C-frame; upper arm angled out35 degrees; band6 mm wide; horizontal peg underside ramp35 degrees.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -3.168367862701416,
+        -3.399118423461914,
+        -0.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "clip",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-material-tpu",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "a8ae157dd9157846f8aaf3b73df950bdbc7d811ec4a8de6e8259437a2811610b",
+    "filament": "ee2c9caab7bcecbbceba3dda6ca7a5420afc9163296ed42a3a13780f1af7333c"
+  },
+  "material_status": "ELEGOO TPU95A saved recipe; offline slice only. No print.",
+  "geometry_check_sha256": "fcaa0778849c247baed1b9ad681e7397cacef86882cd9dc663b4298fca59a44b",
+  "scope": "Selected standalone fit-test pieces: clip. NOT complete jaws; consult geometry check for retention limitations."
+}

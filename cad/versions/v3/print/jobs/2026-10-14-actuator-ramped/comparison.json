@@ -1,0 +1,53 @@
+{
+  "baseline_revision": "plain-clamp-mount-v3",
+  "revision": "ramped-retainers-v3",
+  "matched_profiles_placement_scale_and_overrides": true,
+  "changed_source_meshes": [
+    "actuator_bracket",
+    "plunger",
+    "pulley"
+  ],
+  "support_by_part": {
+    "actuator_bracket": {
+      "before_g": 0.587,
+      "after_g": 0.45
+    },
+    "plunger": {
+      "before_g": 0.1453,
+      "after_g": 0
+    },
+    "pulley": {
+      "before_g": 0.0477,
+      "after_g": 0
+    },
+    "pulley_axle": {
+      "before_g": 0.030100000000000002,
+      "after_g": 0.030100000000000002
+    },
+    "pulley_key": {
+      "before_g": 0,
+      "after_g": 0
+    },
+    "thumb_screw": {
+      "before_g": 0,
+      "after_g": 0
+    },
+    "thumb_nut": {
+      "before_g": 0,
+      "after_g": 0
+    }
+  },
+  "support_before_g": 0.81,
+  "support_after_g": 0.4801,
+  "support_saved_g": 0.3299,
+  "support_reduction_percent": 40.72839506172839,
+  "total_before_g": 14.150532722473145,
+  "total_after_g": 13.778148651123047,
+  "minutes_before": 111.96638997395833,
+  "minutes_after": 107.59661458333333,
+  "limits": [
+    "Reference slices only; no print sent.",
+    "Reduced support does not validate band security, strength, fit or button force.",
+    "The wheel cavity remains open; upper cheek, mounting bore and axle slot are not redesigned."
+  ]
+}

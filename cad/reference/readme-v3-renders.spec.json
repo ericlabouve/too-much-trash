@@ -1,0 +1,12 @@
+{
+  "version": "v3",
+  "revision": "braced-triangle-actuator-v3",
+  "source": "cad/versions/v3/review/bare-near/manifest.json",
+  "views": [
+    "readme-v3-front.png",
+    "readme-v3-back.png"
+  ],
+  "intent": "Full tool with all assembly components, plus enlarged phone mount detail. Stock geometry and phone remain illustrative.",
+  "renderer": "readme-v3-render.html",
+  "physical_status": "Revised actuator print pending assessment"
+}

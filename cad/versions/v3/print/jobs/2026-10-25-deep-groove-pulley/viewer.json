@@ -1,0 +1,31 @@
+{
+  "title": "Deeper redirect pulley \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 deep-groove-pulley-v3",
+  "notes": [
+    "Bambu PETG Translucent / A1 mini / 0.4 mm nozzle / 0.12 mm layers.",
+    "Automatic Normal Snug supports enabled. Groove depth doubled to 2.2 mm with 36-degree sides.",
+    "No printer contacted. String retention and support-free print quality remain physical checks."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "title": "PETG actuator \u2014 reuse existing pulley \u00b7 single-plate slice review",
+  "subtitle": "3 separate pieces at 100% scale \u00b7 braced-tail-b",
+  "notes": [
+    "Automatic supports ON; bridge suppression OFF.",
+    "Print bracket, plunger and 2.05 mm longer axle. Reuse existing redirect pulley, TPU screw, nut and key.",
+    "No print sent."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

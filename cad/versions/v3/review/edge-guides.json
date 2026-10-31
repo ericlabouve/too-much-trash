@@ -1,0 +1,60 @@
+{
+  "parts": {
+    "string_guide": {
+      "valid_single_solid": true,
+      "eye_translation_mm": [
+        0,
+        0,
+        -4
+      ],
+      "eye_lower_face_z_mm": -7,
+      "saddle_lower_face_z_mm": -7.000000000000001,
+      "bore_diameter_mm": 8,
+      "bore_axis": [
+        0,
+        0,
+        1
+      ],
+      "band_envelope_diameter_mm": 1.4,
+      "band_overlap_mm3": 0.0,
+      "eye_centers": [
+        [
+          -18,
+          0,
+          -4
+        ]
+      ]
+    },
+    "dual_string_guide": {
+      "valid_single_solid": true,
+      "eye_translation_mm": [
+        0,
+        0,
+        -4
+      ],
+      "eye_lower_face_z_mm": -7,
+      "saddle_lower_face_z_mm": -7.0,
+      "bore_diameter_mm": 8,
+      "bore_axis": [
+        0,
+        0,
+        1
+      ],
+      "band_envelope_diameter_mm": 1.4,
+      "band_overlap_mm3": 0.0,
+      "eye_centers": [
+        [
+          0,
+          -20,
+          -4
+        ],
+        [
+          0,
+          20,
+          -4
+        ]
+      ]
+    }
+  },
+  "limitations": "Illustrative 1.4 mm band envelope; actual band size, friction and strength unvalidated. No print requested."
+}

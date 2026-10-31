@@ -1,0 +1,28 @@
+{
+  "revision": "diamond-slot-axle-v3",
+  "study_only": true,
+  "active_assembly_unchanged": true,
+  "slot_square_side_mm": 3.4,
+  "slot_diagonal_mm": 4.8083261120685235,
+  "rotation_deg": 45,
+  "outboard_shift_mm": 2.0,
+  "tip_extension_mm": 2.704163056034262,
+  "roof_angle_to_bed_deg": 45,
+  "tip_ligament_mm": 2.2,
+  "old_tip_ligament_mm": 2.2,
+  "same_key_reused_rotated_deg": 45,
+  "seated_overlap_mm3": {
+    "actuator_bracket": 0.0,
+    "pulley": 0.0,
+    "plunger": 0.0,
+    "axle": 0.0
+  },
+  "compressed_insertion_max_overlap_mm3": 0.0,
+  "reverse_2mm_interference_mm3": 3.2289117016800906,
+  "limitations": [
+    "Ideal compressed key envelope; not elastic analysis.",
+    "Original flat-roof print physically failed per user; cause suspected, not proven.",
+    "Original tip ligament retained; rotated key/keeper access require physical check.",
+    "Keeper-band routing not qualified for rotated key. No print authorized."
+  ]
+}

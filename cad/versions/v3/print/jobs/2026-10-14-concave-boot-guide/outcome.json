@@ -1,0 +1,8 @@
+{
+  "recorded_date": "2026-10-15",
+  "outcome": "Interrupted; user reports filament ran out halfway through print",
+  "subsequent_telemetry": {"gcode_state": "FAILED", "print_type": "idle", "print_error": 0},
+  "completion_verified": false,
+  "replacement_job": "../2026-10-15-actuator-petg/",
+  "note": "Original geometry, profiles and toolpaths preserved. Replacement uses PETG Translucent, not PLA."
+}

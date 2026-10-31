@@ -1,0 +1,1150 @@
+{
+  "revision": "wrap-rail-saddle-b-v1",
+  "single_existing_bolt": true,
+  "cap_changed": false,
+  "cheek_engagement_mm": 4.2,
+  "rear_clearance_mm": 0.25,
+  "lip_overlap_mm": 2,
+  "lip_thickness_mm": 1.75,
+  "bearing_length_mm": 19.8,
+  "wall_thickness_mm": 2.4,
+  "outer_corner_radius_mm": 0.7,
+  "top_chamfer_mm": 0.5,
+  "root_blend_radius_mm": 0.8,
+  "rail_width_mm": 20,
+  "cheek_inner_width_mm": 20.4,
+  "clearance_per_side_mm": 0.2,
+  "added_volume_mm3": 889.1621580878464,
+  "existing_floor_relief_mm": 1.2,
+  "positions": {
+    "wallet-near": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "wallet-far": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "bare-near": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "bare-far": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "small-near": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "small-far": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "large-near": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "large-far": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    }
+  },
+  "rotation_checks": [
+    {
+      "side": "near",
+      "angle_deg": -3,
+      "cheek_rail_intersection_mm3": 8.398791054832648
+    },
+    {
+      "side": "near",
+      "angle_deg": 3,
+      "cheek_rail_intersection_mm3": 5.265069901672139
+    },
+    {
+      "side": "far",
+      "angle_deg": -3,
+      "cheek_rail_intersection_mm3": 8.39879105479785
+    },
+    {
+      "side": "far",
+      "angle_deg": 3,
+      "cheek_rail_intersection_mm3": 5.265069901655635
+    }
+  ],
+  "limits": [
+    "Positive edge restraint reduces rotation; 0.2 mm side clearance permits small angular play before edge contact.",
+    "Single bolt still supplies clamp preload and longitudinal sliding resistance.",
+    "Printed fit, TPU fastener preload, edge strength and loaded twist remain untested.",
+    "No full-squeeze stroke qualification or active V3 promotion.",
+    "Rigid wraparound lips require end-on sliding installation/removal; do not flex or snap PETG over the rail."
+  ],
+  "axial_assembly": [
+    {
+      "sample": "wallet-near",
+      "start_offset_mm": -45.900000000000006,
+      "samples": [
+        {
+          "shift_mm": -45.900000000000006,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -43.987500000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -42.075,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -40.16250000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -38.25000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -36.337500000000006,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -34.425000000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -32.5125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -30.6,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -28.687500000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -26.775000000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -24.8625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -22.950000000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -21.0375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -19.125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -17.212500000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -15.3,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -13.387500000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -11.475000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -9.5625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -7.649999999999999,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -5.737499999999997,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -3.8249999999999957,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -1.9125000000000014,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 0.0,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        }
+      ]
+    },
+    {
+      "sample": "wallet-far",
+      "start_offset_mm": 36.9,
+      "samples": [
+        {
+          "shift_mm": 36.9,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 35.3625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 33.824999999999996,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 32.2875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 30.75,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 29.2125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 27.674999999999997,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 26.1375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 24.6,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 23.0625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 21.525,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 19.9875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 18.45,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 16.9125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 15.375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 13.837500000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 12.3,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 10.7625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 9.225000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 7.6875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 6.150000000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 4.612500000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 3.075000000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 1.5375000000000014,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 0.0,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        }
+      ]
+    },
+    {
+      "sample": "bare-near",
+      "start_offset_mm": -45.900000000000006,
+      "samples": [
+        {
+          "shift_mm": -45.900000000000006,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -43.987500000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -42.075,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -40.16250000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -38.25000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -36.337500000000006,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -34.425000000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -32.5125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -30.6,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -28.687500000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -26.775000000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -24.8625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -22.950000000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -21.0375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -19.125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -17.212500000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -15.3,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -13.387500000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -11.475000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -9.5625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -7.649999999999999,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -5.737499999999997,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -3.8249999999999957,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -1.9125000000000014,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 0.0,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        }
+      ]
+    },
+    {
+      "sample": "bare-far",
+      "start_offset_mm": 36.9,
+      "samples": [
+        {
+          "shift_mm": 36.9,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 35.3625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 33.824999999999996,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 32.2875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 30.75,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 29.2125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 27.674999999999997,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 26.1375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 24.6,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 23.0625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 21.525,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 19.9875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 18.45,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 16.9125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 15.375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 13.837500000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 12.3,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 10.7625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 9.225000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 7.6875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 6.150000000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 4.612500000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 3.075000000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 1.5375000000000014,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 0.0,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        }
+      ]
+    },
+    {
+      "sample": "small-near",
+      "start_offset_mm": -45.900000000000006,
+      "samples": [
+        {
+          "shift_mm": -45.900000000000006,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -43.987500000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -42.075,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -40.16250000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -38.25000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -36.337500000000006,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -34.425000000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -32.5125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -30.6,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -28.687500000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -26.775000000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -24.8625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -22.950000000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -21.0375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -19.125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -17.212500000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -15.3,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -13.387500000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -11.475000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -9.5625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -7.649999999999999,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -5.737499999999997,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -3.8249999999999957,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -1.9125000000000014,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 0.0,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        }
+      ]
+    },
+    {
+      "sample": "small-far",
+      "start_offset_mm": 36.9,
+      "samples": [
+        {
+          "shift_mm": 36.9,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 35.3625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 33.824999999999996,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 32.2875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 30.75,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 29.2125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 27.674999999999997,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 26.1375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 24.6,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 23.0625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 21.525,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 19.9875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 18.45,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 16.9125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 15.375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 13.837500000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 12.3,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 10.7625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 9.225000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 7.6875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 6.150000000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 4.612500000000004,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 3.075000000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 1.5375000000000014,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 0.0,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        }
+      ]
+    },
+    {
+      "sample": "large-near",
+      "start_offset_mm": -30.900000000000002,
+      "samples": [
+        {
+          "shift_mm": -30.900000000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -29.6125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -28.325000000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -27.0375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -25.75,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -24.462500000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -23.175,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -21.887500000000003,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -20.6,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -19.3125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -18.025000000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -16.7375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -15.450000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -14.162500000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -12.875,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -11.587500000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -10.3,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -9.0125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -7.725000000000001,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -6.4375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -5.150000000000002,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -3.8625000000000007,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -2.5749999999999993,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": -1.2875000000000014,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 0.0,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        }
+      ]
+    },
+    {
+      "sample": "large-far",
+      "start_offset_mm": 21.9,
+      "samples": [
+        {
+          "shift_mm": 21.9,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 20.987499999999997,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 20.075,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 19.162499999999998,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 18.25,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 17.3375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 16.424999999999997,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 15.5125,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 14.599999999999998,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 13.687499999999998,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 12.774999999999999,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 11.862499999999999,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 10.95,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 10.0375,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 9.124999999999998,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 8.212499999999999,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 7.299999999999999,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 6.387499999999999,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 5.474999999999998,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 4.5625,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 3.6499999999999986,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 2.7375000000000007,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 1.8249999999999993,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 0.9124999999999979,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        },
+        {
+          "shift_mm": 0.0,
+          "cap_overlap_mm3": 0.0,
+          "jaw_overlap_mm3": 0.0
+        }
+      ]
+    }
+  ],
+  "outward_capture": [
+    {
+      "distance_mm": 0,
+      "cap_overlap_mm3": 0.0
+    },
+    {
+      "distance_mm": 0.2,
+      "cap_overlap_mm3": 0.0
+    },
+    {
+      "distance_mm": 0.5,
+      "cap_overlap_mm3": 19.419791666666512
+    },
+    {
+      "distance_mm": 1,
+      "cap_overlap_mm3": 58.79583333333318
+    }
+  ]
+}

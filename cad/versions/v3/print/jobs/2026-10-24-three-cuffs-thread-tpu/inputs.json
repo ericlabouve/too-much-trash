@@ -1,0 +1,289 @@
+{
+  "revision": "integral-stud-cuff-batch-tpu-v1",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "cuff-1",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-24-three-cuffs-thread-tpu-source/cuff-1.stl",
+      "input_sha256": "37aac8a460559a6414d5abf0bceef799bd5dcac66e0bdb91e5c07b4100e457fd",
+      "center_xy_mm": [
+        50,
+        95
+      ],
+      "bounds_mm": [
+        17.504212379455566,
+        21.600000381469727,
+        8.93999981880188
+      ],
+      "orientation": "Exact successful cuff back-down orientation",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        0.0003142356872558594,
+        -0.0,
+        6.71999979019165
+      ]
+    },
+    {
+      "name": "cuff-2",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-24-three-cuffs-thread-tpu-source/cuff-2.stl",
+      "input_sha256": "37aac8a460559a6414d5abf0bceef799bd5dcac66e0bdb91e5c07b4100e457fd",
+      "center_xy_mm": [
+        85,
+        95
+      ],
+      "bounds_mm": [
+        17.504212379455566,
+        21.600000381469727,
+        8.93999981880188
+      ],
+      "orientation": "Exact successful cuff back-down orientation",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        0.0003142356872558594,
+        -0.0,
+        6.71999979019165
+      ]
+    },
+    {
+      "name": "cuff-3",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-24-three-cuffs-thread-tpu-source/cuff-3.stl",
+      "input_sha256": "37aac8a460559a6414d5abf0bceef799bd5dcac66e0bdb91e5c07b4100e457fd",
+      "center_xy_mm": [
+        120,
+        95
+      ],
+      "bounds_mm": [
+        17.504212379455566,
+        21.600000381469727,
+        8.93999981880188
+      ],
+      "orientation": "Exact successful cuff back-down orientation",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        0.0003142356872558594,
+        -0.0,
+        6.71999979019165
+      ]
+    },
+    {
+      "name": "thumb_screw",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-24-three-cuffs-thread-tpu-source/thumb_screw.stl",
+      "input_sha256": "46232a23e05e7a3b50bca116517b5789d696bb0bd26a146c67e2849cd4a42662",
+      "center_xy_mm": [
+        65,
+        55
+      ],
+      "bounds_mm": [
+        13.996867179870605,
+        13.998433113098145,
+        22.0
+      ],
+      "orientation": "Existing bed-oriented screw: head down",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0015664100646972656,
+        -0.0,
+        8.571568438585613e-16
+      ]
+    },
+    {
+      "name": "thumb_nut",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-24-three-cuffs-thread-tpu-source/thumb_nut.stl",
+      "input_sha256": "a0a48fd7451b949e834e749556475b0da9ee472bb16faea41c09e3581fba27d8",
+      "center_xy_mm": [
+        105,
+        55
+      ],
+      "bounds_mm": [
+        18.0,
+        15.588457107543945,
+        5.999999899999999
+      ],
+      "orientation": "Existing bed-oriented nut: flat down",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -0.0,
+        -1.0000000116860974e-07
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "cuff-1",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "0"
+    },
+    {
+      "name": "cuff-2",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "0"
+    },
+    {
+      "name": "cuff-3",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "0"
+    },
+    {
+      "name": "thumb_screw",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "0"
+    },
+    {
+      "name": "thumb_nut",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "0"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-24-common-cuff-tpu",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "a8ae157dd9157846f8aaf3b73df950bdbc7d811ec4a8de6e8259437a2811610b",
+    "filament": "ee2c9caab7bcecbbceba3dda6ca7a5420afc9163296ed42a3a13780f1af7333c"
+  },
+  "material_status": "ELEGOO TPU95A white; same filament and speed recipe as successful single cuff. Threads are a new TPU trial.",
+  "geometry_check_sha256": "f9b32391489b70fc628b27c036fb465fc81d66ea8d37afda2d19dc29a7d9538e",
+  "scope": "Selected standalone fit-test pieces: cuff-1, cuff-2, cuff-3, thumb_screw, thumb_nut. NOT complete jaws; consult geometry check for retention limitations."
+}

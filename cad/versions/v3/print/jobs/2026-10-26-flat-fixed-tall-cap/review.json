@@ -1,0 +1,144 @@
+{
+  "revision": "flat-fixed-tall-cap-study",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 2,
+  "plates": 1,
+  "total_g": 54.305320739746094,
+  "total_minutes": 396.6899739583333,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 53.6921,
+    "support": 0.4412,
+    "interface": 0.1006
+  },
+  "objects": {
+    "carrier": {
+      "deposited_g_by_role": {
+        "support": 0.4412,
+        "model": 27.0462,
+        "interface": 0.1006
+      },
+      "deposited_xy_bounds": [
+        [
+          35.21,
+          10.713
+        ],
+        [
+          144.79,
+          59.287
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        15.2
+      ]
+    },
+    "shaft_cap": {
+      "deposited_g_by_role": {
+        "model": 26.6459
+      },
+      "deposited_xy_bounds": [
+        [
+          30.21,
+          66.71
+        ],
+        [
+          149.79,
+          173.29
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [
+    {
+      "objects": [
+        "carrier",
+        "shaft_cap"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 6.822999999999995
+    }
+  ],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "carrier",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "shaft_cap",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "8379deba5e3b1655bc7eeb21d6985ff4",
+  "hashes": {
+    "cuff-fit-input.3mf": "4ddf832d0912c849dc44ec24cc9bd1dd7953f3def682e0cebb79b462fcffee21",
+    "cuff-fit.gcode.3mf": "872856570138d1f0c58de699593967935f9d7ff159512741a228d8691886c460",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Two complete parts, same profiles and plate positions in both trials. Automatic Snug supports enabled.",
+    "Candidate transfers 5.3 mm of split depth to the cap, preserving neck opening, 1 mm split gap, screw axes and bearing planes.",
+    "Study only; not promoted into the assembly or sent to the printer. Physical stiffness and clamp fit remain unverified."
+  ]
+}

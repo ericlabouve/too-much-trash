@@ -1,0 +1,43 @@
+{
+  "revision": "material-set-ramped-fixed-v3",
+  "parts": {
+    "sliding_jaw": {
+      "design": "sliding_jaw",
+      "source": "print/sliding_jaw.stl",
+      "sha256": "b76d7e9a48679f2195f326bdd7234e6a219b8ac5b35a80c9c9a0abc31eedd055"
+    },
+    "carrier": {
+      "design": "carrier",
+      "source": "print/jobs/2026-10-26-ramped-fixed-hook-source/carrier.stl",
+      "sha256": "ce11bc0060628f7513997a2e9e9d78362e7755b0cb2eb45c8558eeacd0397695"
+    },
+    "shaft_cap": {
+      "design": "shaft_cap",
+      "source": "print/jobs/2026-10-26-side-window-cap-source/shaft_cap.stl",
+      "sha256": "079ea1a696a899688ec7516ef18f5dcec3a8b902c9b21fe63634ae47b5c7081e"
+    },
+    "pulley": {
+      "design": "pulley",
+      "source": "print/pulley.stl",
+      "sha256": "d5f0f999e143244667b9096c069d0987aee2dfc61a36136f727f68a45c0b69ec"
+    },
+    "actuator_bracket": {
+      "design": "actuator_bracket",
+      "source": "print/actuator_bracket.stl",
+      "sha256": "0063c154fd41780234070e61b5ff1965f9103ea3c2faf234681612377ba46bb1"
+    },
+    "plunger": {
+      "design": "plunger",
+      "source": "print/plunger.stl",
+      "sha256": "6046bdba52e2b89f50ac38c4a3194466746734623191095e6df5c2951535016e"
+    },
+    "pulley_axle": {
+      "design": "pulley_axle",
+      "source": "print/pulley_axle.stl",
+      "sha256": "68fa557470cbaac992cdf9fffa3ef708a3ca243008aa985c0dd565c67869103c"
+    }
+  },
+  "limits": [
+    "Accepted study geometry for cap/fixed jaw; remaining parts from current manufacturing exports. Physical assembly qualification pending."
+  ]
+}

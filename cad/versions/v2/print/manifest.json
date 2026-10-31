@@ -127,7 +127,7 @@
         27.6,
         14.0
       ],
-      "bed_z_min_mm": 0.0,
+      "bed_z_min_mm": 8.881784197001252e-16,
       "watertight": true,
       "layer_mm": 0.2,
       "supports": "Saddle end on bed; support eye underside/bridge if slicer requests."

@@ -1,0 +1,24 @@
+{
+  "revision": "local-roof-angle-study-v1",
+  "source": "print/jobs/2026-10-30-straight-arm-clip-tpu/clip-source.stl",
+  "candidates": [
+    {
+      "angle_from_bed_deg": 45,
+      "roof_rise_mm": 1.4999999999999998,
+      "modified_peak_vertices": 2,
+      "modified_stud_vertices": 31,
+      "all_other_vertices_unchanged": true
+    },
+    {
+      "angle_from_bed_deg": 35,
+      "roof_rise_mm": 1.0503113073145647,
+      "modified_peak_vertices": 2,
+      "modified_stud_vertices": 31,
+      "all_other_vertices_unchanged": true
+    }
+  ],
+  "limits": [
+    "Only local roof and stud mesh vertices changed; body and arms byte-identical coordinates.",
+    "Seated fit and retention require review and physical testing. No print."
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "method": "Bounded least-squares minimum distance between all segment pairs, continuous band width sweep; subtract both 0.5 mm radii. Nominal paths, no deformation or tension prediction.",
+  "band_width_mm": 3,
+  "band_thickness_mm": 1,
+  "string_diameter_mm": 1,
+  "samples": [
+    {
+      "travel_mm": -1.5,
+      "band_to_string_wrap_mm": 0.25,
+      "band_to_pulley_lead_mm": 1.9958717217731947
+    },
+    {
+      "travel_mm": -1.275,
+      "band_to_string_wrap_mm": 0.25,
+      "band_to_pulley_lead_mm": 2.004163845625895
+    },
+    {
+      "travel_mm": -0.975,
+      "band_to_string_wrap_mm": 0.25,
+      "band_to_pulley_lead_mm": 2.014670524942264
+    },
+    {
+      "travel_mm": -0.75,
+      "band_to_string_wrap_mm": 0.25,
+      "band_to_pulley_lead_mm": 2.0221497088874507
+    },
+    {
+      "travel_mm": -0.525,
+      "band_to_string_wrap_mm": 0.25,
+      "band_to_pulley_lead_mm": 2.029295061182429
+    },
+    {
+      "travel_mm": -0.2250000000000001,
+      "band_to_string_wrap_mm": 0.25,
+      "band_to_pulley_lead_mm": 2.038318089111741
+    },
+    {
+      "travel_mm": 0.0,
+      "band_to_string_wrap_mm": 0.25,
+      "band_to_pulley_lead_mm": 2.0447186659456817
+    }
+  ],
+  "minimum_band_to_nut_envelope_mm": 0.25484360010105633
+}

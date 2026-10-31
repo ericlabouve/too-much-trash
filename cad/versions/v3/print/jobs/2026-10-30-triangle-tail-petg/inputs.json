@@ -1,0 +1,181 @@
+{
+  "revision": "triangle-tail-clearance-v1",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "b-bracket",
+      "quantity": 1,
+      "source": "review/concepts/triangle-tail/b-bracket.stl",
+      "input_sha256": "bed173a197e82f48f9415558cf02f49f30b27ed34875c4ff3602396a4b0bfb0c",
+      "center_xy_mm": [
+        50,
+        75
+      ],
+      "bounds_mm": [
+        51.0,
+        66.0,
+        19.799999237060547
+      ],
+      "orientation": "Flat existing spine on bed; guide apex open.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        1.5,
+        -33.0,
+        2.4424907071149036e-16
+      ]
+    },
+    {
+      "name": "b-plunger",
+      "quantity": 1,
+      "source": "review/concepts/triangle-tail/b-plunger.stl",
+      "input_sha256": "7a346f01adc91ddf144d748f8b26e888a0a46cdb242d1d2b741b7933db31e9e7",
+      "center_xy_mm": [
+        110,
+        65
+      ],
+      "bounds_mm": [
+        16.0,
+        11.900000095367433,
+        58.0
+      ],
+      "orientation": "Foot-first end orientation.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.123233995736766e-17,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        9.350000143051146,
+        8.0
+      ]
+    },
+    {
+      "name": "tail-first",
+      "quantity": 1,
+      "source": "review/concepts/triangle-tail/tail-first.stl",
+      "input_sha256": "7a346f01adc91ddf144d748f8b26e888a0a46cdb242d1d2b741b7933db31e9e7",
+      "center_xy_mm": [
+        140,
+        65
+      ],
+      "bounds_mm": [
+        16.0,
+        11.900000095367435,
+        58.0
+      ],
+      "orientation": "Tail-first comparison; same plunger geometry.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          6.123233995736766e-17,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -9.35000014305115,
+        50.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "b-bracket",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "b-plunger",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "tail-first",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-compact-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Offline Bambu PETG Translucent recipe; no print.",
+  "geometry_check_sha256": "fb0a270291e0293df6c93f7c1477d5f01f9b251cb14f8e0f8d4cc4c060e9cd52",
+  "scope": "Selected standalone fit-test pieces: b-bracket, b-plunger, tail-first. NOT complete jaws; consult geometry check for retention limitations."
+}

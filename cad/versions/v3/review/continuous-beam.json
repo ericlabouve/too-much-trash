@@ -1,0 +1,26 @@
+{
+  "revision": "continuous-beam-sliding-jaw-v3",
+  "passed": true,
+  "valid": true,
+  "solid_count": 1,
+  "beam_mm": [
+    8,
+    121.6,
+    11.6
+  ],
+  "stud_centers_y_mm": [
+    -50,
+    50
+  ],
+  "cuff_and_stud_positions_unchanged": true,
+  "tongue_and_cleat_unchanged": true,
+  "rollback_snapshot_difference_mm3": 0,
+  "previous_volume_mm3": 14927.860061446294,
+  "new_volume_mm3": 18641.824861446286,
+  "bed_plane_x_mm": -15.2,
+  "previous_bed_plane_x_mm": -10,
+  "limits": [
+    "Fresh slice required; existing jobs do not qualify new support requirements.",
+    "Valid connected geometry is not strength or grip validation."
+  ]
+}

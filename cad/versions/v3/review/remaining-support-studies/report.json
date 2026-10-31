@@ -1,0 +1,87 @@
+{
+  "geometric": {
+    "remaining_top_ligament_mm": 3.7774603255583807,
+    "removed_volume_mm3": 24.928153837987338,
+    "valid": true,
+    "solids": 1
+  },
+  "slices": {
+    "baseline_bracket": {
+      "total_g": 8.401604652404785,
+      "support_g": 0.58559,
+      "roles_g": {
+        "Support": 0.39531,
+        "Inner wall": 2.69545,
+        "Outer wall": 1.46429,
+        "Bottom surface": 0.28274,
+        "Internal solid infill": 1.47288,
+        "Sparse infill": 0.81985,
+        "Support transition": 0.03832,
+        "Support interface": 0.15196,
+        "Floating vertical shell": 0.16084,
+        "Bridge": 0.50749,
+        "Overhang wall": 0.02362,
+        "Top surface": 0.24072,
+        "Gap infill": 0.07733
+      },
+      "warning": ""
+    },
+    "teardrop_bore": {
+      "total_g": 8.279614448547363,
+      "support_g": 0.48810000000000003,
+      "roles_g": {
+        "Support": 0.31963,
+        "Inner wall": 2.69618,
+        "Outer wall": 1.46934,
+        "Bottom surface": 0.28274,
+        "Internal solid infill": 1.46095,
+        "Sparse infill": 0.81612,
+        "Support transition": 0.0327,
+        "Support interface": 0.13577,
+        "Floating vertical shell": 0.15945,
+        "Bridge": 0.49517,
+        "Overhang wall": 0.0227,
+        "Top surface": 0.24072,
+        "Gap infill": 0.07733
+      },
+      "warning": ""
+    },
+    "baseline_axle": {
+      "total_g": 1.0290924310684204,
+      "support_g": 0.03027,
+      "roles_g": {
+        "Inner wall": 0.39451,
+        "Outer wall": 0.25008,
+        "Bottom surface": 0.0132,
+        "Internal solid infill": 0.10894,
+        "Sparse infill": 0.08535,
+        "Floating vertical shell": 0.00267,
+        "Bridge": 0.03781,
+        "Top surface": 0.01841,
+        "Gap infill": 0.01588,
+        "Support interface": 0.01367,
+        "Support": 0.01362,
+        "Support transition": 0.00298,
+        "Overhang wall": 0.00115
+      },
+      "warning": ""
+    },
+    "bridge_axle": {
+      "total_g": 0.9988139271736145,
+      "support_g": 0,
+      "roles_g": {
+        "Inner wall": 0.39451,
+        "Outer wall": 0.25008,
+        "Bottom surface": 0.0132,
+        "Internal solid infill": 0.10894,
+        "Sparse infill": 0.08535,
+        "Floating vertical shell": 0.00267,
+        "Bridge": 0.03781,
+        "Top surface": 0.01841,
+        "Gap infill": 0.01588,
+        "Overhang wall": 0.00115
+      },
+      "warning": ""
+    }
+  }
+}

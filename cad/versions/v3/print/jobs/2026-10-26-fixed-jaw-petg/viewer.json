@@ -1,0 +1,32 @@
+{
+  "title": "Fixed jaw \u00b7 PETG support review \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 tpu-tv-axle-key-v3",
+  "notes": [
+    "Current fixed jaw, approved collar-face-down orientation; track upright. Scale 100%.",
+    "A1 mini 0.4 / Bambu PETG Translucent / 0.12 mm / 3 walls / 15% gyroid; Normal Snug automatic supports.",
+    "Blue scaffold and purple interface show actual extrusion. Inspect cleanup access and residue on mating faces.",
+    "No printer contacted. Physical strength, sliding fit and support-free 35-degree roof quality remain unverified."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

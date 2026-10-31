@@ -1,0 +1,181 @@
+{
+  "revision": "petg-clearance-fit-v1",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "fit-cuff",
+      "quantity": 1,
+      "source": "review/concepts/phone-clamps/rounded-cuff/fit-cuff.stl",
+      "input_sha256": "e031cf446d13e60fde263706f113f6921b70f1851fb661d0bf2ee6a6e4102d60",
+      "center_xy_mm": [
+        65,
+        85
+      ],
+      "bounds_mm": [
+        14.587480545043945,
+        10.0,
+        6.8750001192092896
+      ],
+      "orientation": "C back down; key passage axis vertical, curved back has limited bed contact",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -0.0,
+        5.025000095367432
+      ]
+    },
+    {
+      "name": "fit-jaw",
+      "quantity": 1,
+      "source": "review/concepts/phone-clamps/rounded-cuff/fit-jaw.stl",
+      "input_sha256": "15619fb38051aa047b709a7b02503adaeaefa6e823181d794fca8ac7ff8af9e9",
+      "center_xy_mm": [
+        90,
+        85
+      ],
+      "bounds_mm": [
+        8.199999809265137,
+        10.800000190734863,
+        4.0
+      ],
+      "orientation": "Socket axis vertical; no friction ribs for PETG clearance test",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          -1.0,
+          0.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        4.440892098500626e-16,
+        -0.0,
+        -5.199999809265137
+      ]
+    },
+    {
+      "name": "fit-key",
+      "quantity": 1,
+      "source": "review/concepts/phone-clamps/rounded-cuff/fit-key.stl",
+      "input_sha256": "1868e29c6e54708b6ad5e75b581b4b1e4b2341059a40e2876ab0fa58d2722b48",
+      "center_xy_mm": [
+        115,
+        85
+      ],
+      "bounds_mm": [
+        12.200000286102295,
+        7.0,
+        3.0
+      ],
+      "orientation": "Uniform 3 mm thickness flat; T head and stem on bed",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        9.120000123977661,
+        -0.0,
+        1.5
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "fit-cuff",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "fit-jaw",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "fit-key",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "41aef0b77fefbb4c6e71ca36b3ba6c84ec387b44ad57ed810741bbb45f4c43ae",
+  "scope": "One standalone cuff + local jaw socket + shared T-key. NOT complete jaws; consult geometry check for retention limitations."
+}

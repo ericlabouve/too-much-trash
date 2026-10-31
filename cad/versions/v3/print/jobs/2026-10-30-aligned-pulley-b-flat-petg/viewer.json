@@ -1,0 +1,30 @@
+{
+  "title": "Aligned pulley B \u2014 bracket, plunger and axle \u00b7 single-plate slice review",
+  "subtitle": "3 separate pieces at 100% scale \u00b7 aligned-pulley-b-v2",
+  "notes": [
+    "Automatic supports ON, bridge suppression OFF.",
+    "Existing pulley and TPU key are reused. No print sent."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

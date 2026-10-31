@@ -1,0 +1,380 @@
+{
+  "revision": "lower-lip-handle-b",
+  "lip_top_w": 11.6,
+  "leftmost_u": -3.6,
+  "flank_projection_mm": 1.1,
+  "underside_degrees_from_bed": 34.992,
+  "mount_gap_mm": 1.8,
+  "upper_red_lip_removed": true,
+  "added_lip_insertion_samples": [
+    {
+      "pull_mm": 0.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 0.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 1.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 1.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 2.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 2.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 3.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 3.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 4.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 4.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 5.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 5.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 6.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 6.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 7.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 7.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 8.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 8.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 9.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 9.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 10.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 10.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 11.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 11.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 12.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 12.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 13.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 13.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 14.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 14.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 15.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 15.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 16.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 16.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 17.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 17.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 18.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 18.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 19.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 19.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 20.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 20.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 21.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 21.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 22.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 22.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 23.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 23.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 24.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 24.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 25.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 25.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 26.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 26.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 27.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 27.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 28.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 28.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 29.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 29.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 30.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 30.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 31.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 31.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 32.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 32.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 33.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 33.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 34.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 34.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 35.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 35.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 36.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 36.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 37.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 37.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 38.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 38.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 39.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 39.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 40.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 40.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 41.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 41.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 42.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 42.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 43.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 43.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 44.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 44.5,
+      "added_lip_bracket_overlap_mm3": 0.0
+    },
+    {
+      "pull_mm": 45.0,
+      "added_lip_bracket_overlap_mm3": 0.0
+    }
+  ],
+  "limits": [
+    "Wraps fitted after insertion; 45 mm is assembly travel, not operating stroke.",
+    "Band width and packed knot size unmeasured. Routes are schematic; physical seating and retention unverified.",
+    "Wheel and axle lie entirely right of added lip; screw/nut entirely left. Existing flat-face passage checks retained."
+  ]
+}

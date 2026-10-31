@@ -1,0 +1,1 @@
+Exact braced-tail-b STEP solids promoted to active V3 on 2026-10-31. Coordinates are the concept (u,v,w) frame; plunger_design.local_shape places them in the assembly. Source hashes and comparisons: ../../review/actuator-promotion.json. These match the current three-piece PETG print; physical assessment is pending. Reused pulley and TPU hardware retain their geometry.

@@ -1,0 +1,115 @@
+{
+  "revision": "single-tpu-clip-guide-v3",
+  "passed": true,
+  "bore_mm": 4.0,
+  "former_bore_mm": 8,
+  "axial_thickness_mm": 6,
+  "wall_mm": 1.6,
+  "mouth_mm": 13.0,
+  "nominal_neck_mm": [
+    14,
+    19
+  ],
+  "cavity_mm": [
+    13.8,
+    18.8
+  ],
+  "nominal_interference_per_face_mm": 0.1,
+  "volume_mm3": 819.7805184248637,
+  "configurations": {
+    "wallet-near": {
+      "neck_overlap_mm3": 32.3840710525537,
+      "cord_clip_overlap_mm3": 0.0,
+      "eye_center_mm": [
+        0,
+        15.2,
+        -190
+      ],
+      "guide_count": 1,
+      "band_count": 5
+    },
+    "wallet-far": {
+      "neck_overlap_mm3": 32.38407105255375,
+      "cord_clip_overlap_mm3": 0.0,
+      "eye_center_mm": [
+        0,
+        -15.2,
+        -190
+      ],
+      "guide_count": 1,
+      "band_count": 5
+    },
+    "bare-near": {
+      "neck_overlap_mm3": 32.3840710525537,
+      "cord_clip_overlap_mm3": 0.0,
+      "eye_center_mm": [
+        0,
+        15.2,
+        -190
+      ],
+      "guide_count": 1,
+      "band_count": 5
+    },
+    "bare-far": {
+      "neck_overlap_mm3": 32.38407105255375,
+      "cord_clip_overlap_mm3": 0.0,
+      "eye_center_mm": [
+        0,
+        -15.2,
+        -190
+      ],
+      "guide_count": 1,
+      "band_count": 5
+    },
+    "small-near": {
+      "neck_overlap_mm3": 32.3840710525537,
+      "cord_clip_overlap_mm3": 0.0,
+      "eye_center_mm": [
+        0,
+        15.2,
+        -190
+      ],
+      "guide_count": 1,
+      "band_count": 5
+    },
+    "small-far": {
+      "neck_overlap_mm3": 32.38407105255375,
+      "cord_clip_overlap_mm3": 0.0,
+      "eye_center_mm": [
+        0,
+        -15.2,
+        -190
+      ],
+      "guide_count": 1,
+      "band_count": 5
+    },
+    "large-near": {
+      "neck_overlap_mm3": 32.3840710525537,
+      "cord_clip_overlap_mm3": 0.0,
+      "eye_center_mm": [
+        0,
+        15.2,
+        -190
+      ],
+      "guide_count": 1,
+      "band_count": 5
+    },
+    "large-far": {
+      "neck_overlap_mm3": 32.38407105255375,
+      "cord_clip_overlap_mm3": 0.0,
+      "eye_center_mm": [
+        0,
+        -15.2,
+        -190
+      ],
+      "guide_count": 1,
+      "band_count": 5
+    }
+  },
+  "limitations": [
+    "Snap opening/deformation and sustained TPU grip are not simulated.",
+    "Intentional 0.1 mm per-face interference proposes preload; test axial sliding under actual cord pull.",
+    "Longer unsupported cord span, stock ribs and surface variation require physical checks.",
+    "Not sliced or printed. Existing upstream cord/carrier conflict is not resolved by this local check."
+  ]
+}

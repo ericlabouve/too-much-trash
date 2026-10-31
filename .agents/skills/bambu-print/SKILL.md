@@ -30,6 +30,12 @@ Read [tooling and setup](references/tooling.md) when installing on a new machine
 - Compare material estimates for model walls, sparse/solid infill, support and adhesion separately. Lower infill percentage may save little when walls or supports dominate. Review reductions in wall count against the part's loads; a low-material fit coupon does not validate a loaded structural part. Preserve failed settings and physical cleanup feedback alongside a separately versioned reprint.
 - Review effective settings, printer identity, object count and placement, layer paths, supports, temperatures and warnings. If plotting layer paths, account for G2/G3 arcs as well as G0/G1 lines. Check the actual sliced plate rather than only the profile JSON or slicer's exit code.
 
+## Preferred slice review presentation
+
+The user explicitly prefers the interactive actual-toolpath display first used for the 2026-10-14 V3 actuator-bridge plate. Reproduce it for future reviewed plates: faint orange model paths, blue support scaffold, purple interface, part framing, orbit/zoom, top/front/3D views, a cumulative-height slider and single-layer mode, plus per-part support amounts/heights, recipe, time/material estimates, warnings and exact source hashes. Show where supports contact parts, not just a total support mass or a model render.
+
+For this repository, use the shared `cad/slice_review/` exporter/viewer and its README rather than copying and editing a job-specific HTML page. Read [slice review workflow](references/slice-review.md) when generating a preview. Keep actual G-code/3MF and profiles immutable; generate changed previews in a new review directory. The viewer is offline evidence, not live print status, physical validation or permission to print.
+
 ## Send a print job
 
 1. Use existing authorization for the specific job. Check that the intended printer is idle, the correct material and plate are loaded, and the print area is clear. Resolve any changed file, scope or printer state before sending.

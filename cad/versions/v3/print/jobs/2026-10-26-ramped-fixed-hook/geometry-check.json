@@ -1,0 +1,12 @@
+{
+  "revision": "fixed-hook-ramp-study",
+  "valid_single_solid": true,
+  "angle_from_bed_degrees": 35,
+  "added_mm3": 140.52745323931944,
+  "band_seat_unchanged": true,
+  "travel_samples_clear": 91,
+  "source_sha256": "3b53d1738112643783662a216f9b3739a28e530991b8e2eb084a499684550189",
+  "limits": [
+    "35-degree print quality and loaded band-anchor strength still require physical tests."
+  ]
+}

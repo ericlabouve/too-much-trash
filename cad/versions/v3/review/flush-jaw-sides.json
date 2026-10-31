@@ -1,0 +1,25 @@
+{
+  "revision": "flush-side-fixed-jaw-v3",
+  "passed": true,
+  "continuous_side_faces": [
+    {
+      "y_mm": -13.8,
+      "area_mm2": 1965.5999999999995
+    },
+    {
+      "y_mm": 13.8,
+      "area_mm2": 1965.5999999999995
+    }
+  ],
+  "outer_width_mm": 27.6,
+  "removed_per_side_mm": 2.2,
+  "wall_thickness_mm": 3.5,
+  "inner_channel_width_mm": 20.6,
+  "lip_opening_mm": 15,
+  "changed_print_designs": [
+    "carrier"
+  ],
+  "limits": [
+    "Printed stiffness and strength unqualified."
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "revision": "integral-stud-coupon-v1",
+  "valid": true,
+  "solids": 1,
+  "cuff_width_mm": 21.6,
+  "head_width_mm": 9.2,
+  "cuff_opening_width_mm": 6.8,
+  "backing_dimensions_mm": [
+    2.3,
+    21.6,
+    11.6
+  ],
+  "volume_mm3": 719.6069973204567,
+  "seated_cuff_overlap_mm3": 0,
+  "pullout_after_1mm_obstruction_mm3": 14.7280213,
+  "source_sha256": {
+    "review/concepts/phone-clamps/centered-wide-cuff/build_fixed_retention.py": "4f1bc4d917fd652eb153970cc3dd4330b6070c64cc2f86e7b9f4d450e1d801d3",
+    "review/concepts/phone-clamps/centered-wide-cuff/build_concepts.py": "799c78c5fcbdec471b865358c65718ba713512a8d51f99bb0e26c7130b639856"
+  },
+  "limits": [
+    "Exact concept stud and backing only, not a complete fixed jaw or structural test.",
+    "Mate only with the common 21.6 mm TPU cuff; do not force a rigid PETG cuff over the stud.",
+    "Support residue under the retaining head must be removed before testing."
+  ]
+}

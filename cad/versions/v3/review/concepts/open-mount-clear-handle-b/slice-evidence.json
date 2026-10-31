@@ -1,0 +1,16 @@
+{
+  "job": "cad/versions/v3/print/jobs/2026-10-31-open-mount-clear-handle-petg",
+  "total_g": 7.747296333312988,
+  "minutes": 75.0634521484375,
+  "support_g": 0,
+  "automatic_supports": true,
+  "bridge_suppression": false,
+  "hashes": {
+    "cuff-fit-input.3mf": "f4f6638146d990b3422e1fefea99a14d3f99e0e48d97c7a796297790c32ea1ce",
+    "cuff-fit.gcode.3mf": "0a16a2e8798566d9c968ee5b309640c5be5b1c6afb71688117ab7b27ba4af4be",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "meshes_match": true
+}

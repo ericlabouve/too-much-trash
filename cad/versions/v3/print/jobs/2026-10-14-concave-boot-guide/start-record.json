@@ -1,0 +1,23 @@
+{
+  "start_observed_utc": "2026-10-15T04:34:44Z",
+  "printer_profile": "tmt-a1-mini",
+  "remote_file": "/tmt-v3-concave-guide-31963efc.gcode.3mf",
+  "sliced_3mf_sha256": "31963efc95d00b0f5316ed6d31942e4c0b92fb96db9ff0e143de1631d6b2b6b7",
+  "gcode_md5": "3aad72ab3362ccccfa3d14f10ed2b76d",
+  "plate": 1,
+  "bed_type": "textured_plate",
+  "use_ams": false,
+  "guards": {"expect_md5": "3aad72ab3362ccccfa3d14f10ed2b76d", "expect_plate": 1},
+  "initial_observed_state": "RUNNING",
+  "initial_stage": "heatbed_preheating",
+  "initial_layer": 0,
+  "total_layers": 181,
+  "estimated_minutes": 78,
+  "last_observed_state": "RUNNING",
+  "last_observed_stage": "calibrating_extrusion",
+  "last_observed_layer": 0,
+  "last_observed_progress_percent": 6,
+  "last_observed_remaining_minutes": 72,
+  "print_error": 0,
+  "outcome": "Started; completion and physical quality not verified"
+}

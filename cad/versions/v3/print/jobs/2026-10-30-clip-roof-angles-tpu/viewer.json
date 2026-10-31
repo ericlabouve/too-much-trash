@@ -1,0 +1,30 @@
+{
+  "title": "Local clip roof angles \u00b7 single-plate slice review",
+  "subtitle": "2 separate pieces at 100% scale \u00b7 local-roof-angle-study-v1",
+  "notes": [
+    "Original arms and body unchanged. Only roof/stud vertices changed.",
+    "Automatic supports enabled; no print."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

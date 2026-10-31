@@ -1,0 +1,10 @@
+{
+  "support_bytes": 0,
+  "interface_bytes": 0,
+  "source_meshes_match": true,
+  "total_g": 7.737794876098633,
+  "total_minutes": 75.02167154947917,
+  "automatic_supports": true,
+  "bridge_suppression": false,
+  "printer_contacted": false
+}

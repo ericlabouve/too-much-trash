@@ -1,0 +1,127 @@
+{
+  "revision": "local-roof-angle-study-v1",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "roof-45",
+      "quantity": 1,
+      "source": "review/concepts/clip-roof-angles/roof-45.stl",
+      "input_sha256": "0b013d2974d5394047aaef540d2d207dddf991b550198590b2bd75cdb51da0c4",
+      "center_xy_mm": [
+        65,
+        90
+      ],
+      "bounds_mm": [
+        22.336735725402832,
+        27.798236846923828,
+        6.0
+      ],
+      "orientation": "Unchanged original print orientation;45 degree hole roof.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -3.168367862701416,
+        -3.399118423461914,
+        -0.0
+      ]
+    },
+    {
+      "name": "roof-35",
+      "quantity": 1,
+      "source": "review/concepts/clip-roof-angles/roof-35.stl",
+      "input_sha256": "461b2a15c7cd5ac4f1e85653109a134737784805ca56e20a7af24a546c0dcada",
+      "center_xy_mm": [
+        110,
+        90
+      ],
+      "bounds_mm": [
+        22.336735725402832,
+        27.798236846923828,
+        6.0
+      ],
+      "orientation": "Unchanged original print orientation;35 degree hole roof.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -3.168367862701416,
+        -3.399118423461914,
+        -0.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "roof-45",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "roof-35",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-material-tpu",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "a8ae157dd9157846f8aaf3b73df950bdbc7d811ec4a8de6e8259437a2811610b",
+    "filament": "ee2c9caab7bcecbbceba3dda6ca7a5420afc9163296ed42a3a13780f1af7333c"
+  },
+  "material_status": "Offline TPU study; no print.",
+  "geometry_check_sha256": "9b335384a1657872036fa8ab32acfdba08075da32dd6f4d3089f8cda833abc66",
+  "scope": "Selected standalone fit-test pieces: roof-45, roof-35. NOT complete jaws; consult geometry check for retention limitations."
+}

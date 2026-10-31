@@ -1,0 +1,31 @@
+{
+  "title": "Common 21.6 mm cuff \u00b7 TPU 95A trial \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 common-cuff-21p6-tpu-trial-v1",
+  "notes": [
+    "One cuff with integral seating ribs, matching the PETG stud; unchanged common 21.6 mm concept geometry.",
+    "First ELEGOO95A trial: Generic TPU A1 mini base, 230C nozzle / 35C textured bed, 2 mm3/s flow limit, 25 mm/s primary print speeds.",
+    "Inspect support contact and TPU removal before approving. Actual stud retention, grip, creep and dimensional fit remain untested."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}
