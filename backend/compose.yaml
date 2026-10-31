@@ -1,0 +1,116 @@
+name: too-much-trash
+
+services:
+  caddy:
+    build:
+      context: ..
+      dockerfile: backend/caddy/Dockerfile
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      ADMIN_SITE_ADDRESS: ${ADMIN_SITE_ADDRESS:-:8081}
+      API_SITE_ADDRESS: ${API_SITE_ADDRESS:-:8082}
+    ports:
+      - "127.0.0.1:${HTTP_PORT:-8080}:80"
+      - "127.0.0.1:${ADMIN_PORT:-8081}:8081"
+      - "127.0.0.1:${API_PORT:-8082}:8082"
+      - "127.0.0.1:${HTTPS_PORT:-8443}:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    environment: &application_environment
+      DATABASE_URL: postgresql://${POSTGRES_USER:-trash}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-trash}
+      S3_ENDPOINT_URL: http://blob:8333
+      S3_BUCKET: ${S3_BUCKET:-captures}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?Set S3_ACCESS_KEY in backend/.env}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?Set S3_SECRET_KEY in backend/.env}
+      ADMIN_TOKEN_HASH_FILE: /run/secrets/admin-token.sha256
+      ADMIN_COOKIE_SECURE: ${ADMIN_COOKIE_SECURE:-false}
+    volumes:
+      - ./.secrets/admin-token.sha256:/run/secrets/admin-token.sha256:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      blob:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    build: ./api
+    command: ["uv", "run", "--no-sync", "alembic", "upgrade", "head"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-trash}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/${POSTGRES_DB:-trash}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  worker:
+    build: ./workflows
+    environment:
+      <<: *application_environment
+      PREFECT_API_URL: http://workflow:4200/api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      blob:
+        condition: service_started
+      workflow:
+        condition: service_started
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-trash}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-trash}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-trash} -d ${POSTGRES_DB:-trash}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  blob:
+    image: chrislusf/seaweedfs:latest
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:?Set S3_ACCESS_KEY in backend/.env}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:?Set S3_SECRET_KEY in backend/.env}
+      S3_BUCKET: ${S3_BUCKET:-captures}
+    volumes:
+      - blob_data:/data
+    restart: unless-stopped
+
+  workflow:
+    image: prefecthq/prefect:3-latest
+    command: prefect server start --host 0.0.0.0
+    environment:
+      PREFECT_SERVER_DATABASE_CONNECTION_URL: postgresql+asyncpg://${POSTGRES_USER:-trash}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/prefect
+      PREFECT_SERVER_API_HOST: 0.0.0.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  blob_data:
+  caddy_data:
+  caddy_config:

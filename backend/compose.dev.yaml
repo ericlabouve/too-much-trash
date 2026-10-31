@@ -1,0 +1,18 @@
+# Separate loopback-only Simulator stack. Never combine with the Tailscale overlay.
+# Use --env-file .secrets/dev/compose.env and -p too-much-trash-dev.
+name: too-much-trash-dev
+services:
+  caddy:
+    environment:
+      SITE_ADDRESS: ":80"
+      ADMIN_SITE_ADDRESS: ":8081"
+      API_SITE_ADDRESS: ":8082"
+    ports: !override
+      - "127.0.0.1:18080:80"
+      - "127.0.0.1:18081:8081"
+      - "127.0.0.1:18082:8082"
+  api:
+    environment:
+      ADMIN_COOKIE_SECURE: "false"
+    volumes: !override
+      - ./.secrets/dev/admin-token.sha256:/run/secrets/admin-token.sha256:ro

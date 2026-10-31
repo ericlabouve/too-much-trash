@@ -7,6 +7,7 @@ def inline(t):
  t=html.escape(t)
  t=re.sub(r'!\[([^]]*)\]\(cad/([^)]*)\)',r'<img alt="\1" src="\2">',t)
  t=re.sub(r'\[([^]]*)\]\(cad/([^)]*)\)',r'<a href="\2">\1</a>',t)
+ t=re.sub(r'\[([^]]*)\]\((https?://[^)]*)\)',r'<a href="\2">\1</a>',t)
  return re.sub(r'\*\*(.*?)\*\*',r'<strong>\1</strong>',t)
 blocks=[]
 for b in s.split('\n\n'):

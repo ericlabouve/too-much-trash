@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "test:unlock": "node tests/unlock.test.mjs",
+    "test:dashboard": "node tests/dashboard.test.mjs",
     "build": "tsc --noEmit && vite build",
-    "desktop": "electron ."
+    "test:session": "task_logout_dir=$(mktemp -d) && tsc src/admin-session.ts --target ES2022 --module ES2022 --moduleResolution bundler --outDir \"$task_logout_dir\" && node --experimental-default-type=module tests/admin-session.test.mjs \"$task_logout_dir/admin-session.js\""
   },
   "devDependencies": {
-    "electron": "^35.0.0",
     "typescript": "^5.8.0",
     "vite": "^6.2.0"
-  },
-  "main": "electron/main.cjs"
+  }
 }

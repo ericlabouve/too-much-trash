@@ -1,8 +1,11 @@
 # Byte-compiled / optimized / DLL files
 .env
+backend/.backups/
+backend/.secrets/
 .venv/
 node_modules/
 .DS_Store
+/.agents/handoff/
 ios/*.xcodeproj/
 ios/*.xcworkspace/
 ml/data/

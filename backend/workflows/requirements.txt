@@ -1,0 +1,5 @@
+boto3>=1.35,<2
+Pillow>=11,<13
+pillow-heif>=0.21,<2
+prefect>=3,<4
+psycopg[binary]>=3.2,<4

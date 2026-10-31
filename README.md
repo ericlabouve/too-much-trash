@@ -12,4 +12,6 @@ A lightweight, 3D-printed attachment holds a phone beside the grabber with three
 
 ![Reacher retrofit from the camera side showing the phone carrier and actuator](cad/reference/readme-v3-back.png)
 
+The [developer documentation](https://ericlabouve.github.io/too-much-trash/) covers the repository and local setup. The public project website is served by the hosted backend stack.
+
 The aspiration is simple: make it easier to gather honest examples of litter pickup at scale, learn from the awkward attempts as well as the clean ones, and help future robots do more of the work of keeping shared spaces clean.

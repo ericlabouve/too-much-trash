@@ -1,13 +1,60 @@
 {$SITE_ADDRESS} {
     encode zstd gzip
+    root * /srv/public
+    file_server
+}
+
+{$ADMIN_SITE_ADDRESS} {
+    encode zstd gzip
+    header Cache-Control "no-store"
+
+    handle /api/v1/admin/servers {
+        root * /etc/caddy
+        rewrite * /server-catalog.json
+        file_server
+    }
 
     handle /api/* {
         reverse_proxy api:8000
     }
 
+    handle /unlock {
+        root * /srv/admin
+        rewrite * /unlock.html
+        file_server
+    }
+
     handle {
-        root * /srv
+        forward_auth api:8000 {
+            uri /api/v1/admin/auth/check
+        }
+        root * /srv/app
         try_files {path} /index.html
         file_server
+    }
+}
+
+{$API_SITE_ADDRESS} {
+    request_body {
+        max_size 201MiB
+    }
+    @auth path /api/v1/auth/*
+    request_body @auth {
+        max_size 16KiB
+    }
+    handle /api/v1/admin/* {
+        respond "Not found" 404
+    }
+    handle /docs* {
+        respond "Not found" 404
+    }
+    handle /openapi.json {
+        respond "Not found" 404
+    }
+    handle /api/* {
+        reverse_proxy api:8000
+    }
+    handle {
+        respond "Not found" 404
     }
 }
