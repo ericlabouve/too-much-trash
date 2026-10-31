@@ -1,0 +1,114 @@
+{
+  "revision": "forward-handle-b-v1",
+  "scope": "Handle and its wrap paths moved 1 mm toward boot. Foot, triangle shaft, guide, rear socket and mounting unchanged. Review only.",
+  "dimensions": {
+    "bracket_length_before_mm": 46,
+    "bracket_length_after_mm": 35.15,
+    "plunger_length_before_mm": 49,
+    "plunger_length_after_mm": 38.15,
+    "cleat_forward_shift_mm": 15,
+    "handle_shift_from_previous_mm": 1,
+    "anchor_forward_shift_mm": 20,
+    "cleat_height_increase_mm": 1,
+    "mount_hole_position_changed": false,
+    "foot_position_changed": true,
+    "foot_retraction_mm": 10.85,
+    "foot_contact_global_x_mm": -7,
+    "previous_contact_global_x_mm": -17.85,
+    "pulley_shift_mm": 10.85,
+    "guide_length_mm": 20.15,
+    "guide_start_v_mm": 21.25,
+    "guide_end_v_mm": 41.4,
+    "continuous_engagement_rest_mm": 19.75,
+    "continuous_engagement_at_1_5mm_pull_mm": 18.25,
+    "tail_socket_engagement_rest_mm": 2,
+    "socket_back_clearance_rest_mm": 0.4,
+    "minimum_socket_back_wall_mm": 1.6,
+    "socket_sloping_face_clearance_mm": 0.4,
+    "separate_tail_stop_removed": true
+  },
+  "motion": [
+    {
+      "travel": -6,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -3,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -1.5,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -0.75,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0.39,
+      "intersection_mm3": 0.0
+    }
+  ],
+  "insertion": [
+    {
+      "travel": -26,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -20,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -12,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -6,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0,
+      "intersection_mm3": 0.0
+    }
+  ],
+  "route_checks": [
+    {
+      "travel_mm": -1.5,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "string_bracket_mm3": 0.0,
+      "string_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0,
+      "knot_bracket_mm3": 0.0,
+      "knot_plunger_mm3": 0.0
+    },
+    {
+      "travel_mm": -0.75,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "string_bracket_mm3": 0.0,
+      "string_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0,
+      "knot_bracket_mm3": 0.0,
+      "knot_plunger_mm3": 0.0
+    },
+    {
+      "travel_mm": 0.0,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "string_bracket_mm3": 0.0,
+      "string_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0,
+      "knot_bracket_mm3": 0.0,
+      "knot_plunger_mm3": 0.0
+    }
+  ],
+  "anchor_stop_overlap_at_plus_0_5_mm3": 1.5360000000002025
+}

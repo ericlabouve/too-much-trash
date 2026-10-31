@@ -1,0 +1,53 @@
+{
+  "selected": "lowered-cleat",
+  "matched_profiles": true,
+  "rows": [
+    {
+      "variant": "baseline",
+      "support_g": 0.514,
+      "total_g": 12.130146026611328,
+      "minutes": 121.01449381510416,
+      "hashes": {
+        "cuff-fit-input.3mf": "e2d23cabf585e5ae896c88a922b510295f1de1374fd78599b1a877750b274b08",
+        "cuff-fit.gcode.3mf": "9ccbad90a80d61714315301dabe2155227af71c21d31bc928bd61517e0c8ed79",
+        "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+        "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+        "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+      },
+      "review": "print/jobs/2026-10-25-sliding-jaw-baseline/index.html"
+    },
+    {
+      "variant": "flush-back",
+      "support_g": 0.4354,
+      "total_g": 12.192237854003906,
+      "minutes": 120.721533203125,
+      "hashes": {
+        "cuff-fit-input.3mf": "9354db37c8c6d572a9a8d05b2064ce2d6153872bb4f8822d7ed5023e469a8dbf",
+        "cuff-fit.gcode.3mf": "01ec7bfc693c47db078546765afc420bb7824d0dfd95abe05ed18b8bb5f672b5",
+        "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+        "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+        "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+      },
+      "review": "print/jobs/2026-10-25-sliding-jaw-flush-back/index.html"
+    },
+    {
+      "variant": "lowered-cleat",
+      "support_g": 0.1543,
+      "total_g": 11.742443084716797,
+      "minutes": 119.64532877604167,
+      "hashes": {
+        "cuff-fit-input.3mf": "5b1073b3b73d6c85101cf92180134029a4b6a4b568808b55810c3c546b38dc89",
+        "cuff-fit.gcode.3mf": "85238c7d067625375b0fed17c78dace47796ae45bdb5ecc2804a81ec27611992",
+        "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+        "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+        "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+      },
+      "review": "print/jobs/2026-10-25-sliding-jaw-lowered-cleat/index.html"
+    }
+  ],
+  "support_reduction_percent": 69.98054474708171,
+  "limits": [
+    "Support enabled in all slices; comparison is not proof of print quality or global minimum.",
+    "Only one full refinement/review round after the initial flat-back candidate. No printer contacted."
+  ]
+}

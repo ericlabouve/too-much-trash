@@ -1,0 +1,161 @@
+{
+    "error_string": "Success.",
+    "export_time": 1627,
+    "layer_height": 0.11999999731779099,
+    "plate_index": 0,
+    "prepare_time": 277,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 438.58819580078125,
+                "Bridge": 403.2314758300781,
+                "Custom": 415.8287353515625,
+                "Flush": 28.0,
+                "Gap infill": 104.38655853271484,
+                "Inner wall": 10192.2060546875,
+                "Internal solid infill": 2959.654052734375,
+                "Outer wall": 10385.9375,
+                "Overhang wall": 9.037348747253418,
+                "Sparse infill": 3277.71435546875,
+                "Support": 61.06556701660156,
+                "Support interface": 16.958904266357422,
+                "Support transition": 2.528482437133789,
+                "Top surface": 501.37774658203125,
+                "Travel": 4195.38232421875,
+                "Undefined": 4179.82421875
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFG01",
+                    "id": 1,
+                    "main_used_g": 78.31851196289063,
+                    "total_used_g": 78.31851196289063
+                }
+            ],
+            "generate_support_material_time": 231,
+            "id": 1,
+            "infill_time": 882,
+            "layer_filament_change": 0,
+            "main_predication": 32547.251953125,
+            "make_perimeters_time": 997,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 39.52000427246094,
+                        "height": 58.5,
+                        "width": 121.5999984741211,
+                        "x": 5.199999809265137,
+                        "y": 135.1999969482422,
+                        "z": 0.0
+                    },
+                    "id": 5,
+                    "name": "sliding_jaw",
+                    "triangle_count": 1248
+                },
+                {
+                    "bbox": {
+                        "depth": 48.994407653808594,
+                        "height": 104.5,
+                        "width": 110.0,
+                        "x": 5.199999809265137,
+                        "y": 92.19999694824219,
+                        "z": 0.0
+                    },
+                    "id": 9,
+                    "name": "carrier",
+                    "triangle_count": 5064
+                },
+                {
+                    "bbox": {
+                        "depth": 120.0,
+                        "height": 16.80000114440918,
+                        "width": 107.0,
+                        "x": 64.19999694824219,
+                        "y": 14.199999809265137,
+                        "z": -2.2045902881018264e-09
+                    },
+                    "id": 13,
+                    "name": "shaft_cap",
+                    "triangle_count": 5096
+                },
+                {
+                    "bbox": {
+                        "depth": 17.999122619628906,
+                        "height": 4.0,
+                        "width": 17.99886131286621,
+                        "x": 19.199974060058594,
+                        "y": 141.19993591308594,
+                        "z": 0.0
+                    },
+                    "id": 17,
+                    "name": "pulley",
+                    "triangle_count": 51506
+                },
+                {
+                    "bbox": {
+                        "depth": 66.0,
+                        "height": 19.799999237060547,
+                        "width": 51.0,
+                        "x": 10.199999809265137,
+                        "y": 33.20000076293945,
+                        "z": 1.469725674496658e-09
+                    },
+                    "id": 21,
+                    "name": "actuator_bracket",
+                    "triangle_count": 51500
+                },
+                {
+                    "bbox": {
+                        "depth": 16.000003814697266,
+                        "height": 11.90000057220459,
+                        "width": 58.000003814697266,
+                        "x": 80.19999694824219,
+                        "y": 146.1999969482422,
+                        "z": 3.897705269650942e-09
+                    },
+                    "id": 25,
+                    "name": "plunger",
+                    "triangle_count": 32312
+                },
+                {
+                    "bbox": {
+                        "depth": 10.998769760131836,
+                        "height": 20.600000381469727,
+                        "width": 10.997537612915039,
+                        "x": 41.19901657104492,
+                        "y": 148.1997528076172,
+                        "z": 9.265136213798542e-09
+                    },
+                    "id": 29,
+                    "name": "pulley_axle",
+                    "triangle_count": 12312
+                }
+            ],
+            "sliced_time": 5704,
+            "sliced_time_with_cache": 3342,
+            "total_predication": 33003.5234375,
+            "triangle_count": 159038,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 15.0,
+    "upward_compatible_machine": [
+        "Bambu Lab P1S 0.4 nozzle",
+        "Bambu Lab P1P 0.4 nozzle",
+        "Bambu Lab X1 0.4 nozzle",
+        "Bambu Lab X1 Carbon 0.4 nozzle",
+        "Bambu Lab X1E 0.4 nozzle",
+        "Bambu Lab A1 0.4 nozzle",
+        "Bambu Lab H2D 0.4 nozzle",
+        "Bambu Lab H2D Pro 0.4 nozzle",
+        "Bambu Lab H2S 0.4 nozzle",
+        "Bambu Lab P2S 0.4 nozzle",
+        "Bambu Lab H2C 0.4 nozzle",
+        "Bambu Lab X2D 0.4 nozzle",
+        "Bambu Lab A2L 0.4 nozzle"
+    ],
+    "wall_loops": 3
+}

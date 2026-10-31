@@ -1,0 +1,49 @@
+{
+  "head_envelope_diameter_mm": 14,
+  "head_shift_v_mm": -2,
+  "head_bracket_intersection_mm3": 0,
+  "diameter_8p4_passage_through_both_holes_mm3": 0,
+  "head_context_intersections_mm3": {
+    "wallet-near": {
+      "cap": 0.0,
+      "jaw": 0.0
+    },
+    "wallet-far": {
+      "cap": 0.0,
+      "jaw": 0.0
+    },
+    "bare-near": {
+      "cap": 0.0,
+      "jaw": 0.0
+    },
+    "bare-far": {
+      "cap": 0.0,
+      "jaw": 0.0
+    },
+    "small-near": {
+      "cap": 0.0,
+      "jaw": 0.0
+    },
+    "small-far": {
+      "cap": 0.0,
+      "jaw": 0.0
+    },
+    "large-near": {
+      "cap": 0.0,
+      "jaw": 0.0
+    },
+    "large-far": {
+      "cap": 0.0,
+      "jaw": 0.0
+    }
+  },
+  "tip_v_mm": 45.85,
+  "nut_v_range_mm": [
+    29.65,
+    35.65
+  ],
+  "nominal_full_nut_engagement_mm": 6,
+  "limits": [
+    "Threaded hardware shape unchanged; screw/nut turn to engage at new axial position. No torque or clamp-force validation."
+  ]
+}

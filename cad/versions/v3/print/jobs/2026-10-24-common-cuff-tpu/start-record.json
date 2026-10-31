@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-24",
+  "printer": "tmt-a1-mini",
+  "authorization": "User said proceed and confirmed previous coupon removed and textured PEI bed clear. Previously confirmed dry TPU on external spool.",
+  "remote_file": "/tmt-cuff-tpu-4ba35e88.gcode.3mf",
+  "uploaded_bytes": 362541,
+  "plate": 1,
+  "bed_type": "textured_plate",
+  "use_ams": false,
+  "gcode_md5": "4ba35e8830a6528ee6b8da9c6f6189eb",
+  "remote_download_hash_verified": true,
+  "start_command_outcome": "verified",
+  "observed_state": "RUNNING",
+  "observed_stage": "heatbed_preheating",
+  "observed_job_name": "tmt-cuff-tpu-4ba35e88.gcode.3mf",
+  "observed_material": "TPU, white, external",
+  "print_error": 0,
+  "remaining_minutes": 33,
+  "bed_target_c": 35,
+  "completion": "Not observed",
+  "physical_result": "Pending"
+}

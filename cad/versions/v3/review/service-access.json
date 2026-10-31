@@ -1,0 +1,85 @@
+{
+  "axial_retention": {
+    "head_obstruction_after_6mm_mm3": 36.650894807199876,
+    "key_obstruction_mm3": 23.643757504989384
+  },
+  "revision": "common-tpu-fasteners-v3",
+  "configurations": {
+    "wallet-near": {
+      "collisions": [],
+      "rail_slot_service_y_mm": 50,
+      "slide_delta_y_mm": 25.4,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    },
+    "wallet-far": {
+      "collisions": [],
+      "rail_slot_service_y_mm": -50,
+      "slide_delta_y_mm": -16.6,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    },
+    "bare-near": {
+      "collisions": [],
+      "rail_slot_service_y_mm": 50,
+      "slide_delta_y_mm": 25.4,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    },
+    "bare-far": {
+      "collisions": [],
+      "rail_slot_service_y_mm": -50,
+      "slide_delta_y_mm": -16.6,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    },
+    "small-near": {
+      "collisions": [],
+      "rail_slot_service_y_mm": 50,
+      "slide_delta_y_mm": 25.4,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    },
+    "small-far": {
+      "collisions": [],
+      "rail_slot_service_y_mm": -50,
+      "slide_delta_y_mm": -16.6,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    },
+    "large-near": {
+      "collisions": [],
+      "rail_slot_service_y_mm": 50,
+      "slide_delta_y_mm": 10.399999999999999,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    },
+    "large-far": {
+      "collisions": [],
+      "rail_slot_service_y_mm": -50,
+      "slide_delta_y_mm": -1.6000000000000014,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    },
+    "inward-28.5-near": {
+      "collisions": [],
+      "rail_slot_service_y_mm": 50,
+      "slide_delta_y_mm": 25.9,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    },
+    "inward-28.5-far": {
+      "collisions": [],
+      "rail_slot_service_y_mm": -50,
+      "slide_delta_y_mm": -17.1,
+      "former_direct_screw_withdrawal_hits_at_14mm": {}
+    }
+  },
+  "off_tool_axle_key_collisions": [],
+  "passed": true,
+  "sequence": [
+    "Remove phone and release twine tension.",
+    "Loosen rail nut enough to slide, retaining screw and nut. Support the module.",
+    "Slide toward the OUTER end of its current rail wing, to screw center Y+50 near / Y-50 far. Do not cross the solid center.",
+    "Fully remove the rail nut toward +X, then withdraw the screw toward -X.",
+    "Pull complete module +X 4.5 mm along the conservative clearance path.",
+    "Lower module 2 mm along -Z, then continue withdrawal toward +X.",
+    "Off tool, remove keeper band, slide cross-key -Z, then pull axle -Y. Reverse for assembly."
+  ],
+  "limits": [
+    "Sampled rigid clearance only. Nut rotation uses a cylindrical envelope; thread engagement excluded.",
+    "Loosening/preload/friction and human access are not simulated. Verify the procedure on the printed assembly.",
+    "Former direct screw withdrawal is obstructed by the new fixed socket at near-side positions; do not force it."
+  ]
+}

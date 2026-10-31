@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-14",
+  "requested_action": "Print the reviewed seven-piece actuator plate, retaining the single-piece bracket",
+  "user_authorized_start": true,
+  "user_confirmed_textured_pei_bed_installed_and_clear": true,
+  "material_check": "Printer reports external PLA, no AMS installed; user said proceed after being told the reviewed PLA recipe is 220 C nozzle / 65 C bed. Brand not supplied; telemetry does not physically identify the spool.",
+  "camera_check": "Textured plate visible and no leftover parts visible; user confirmed installed and clear",
+  "reviewed_hashes_verified": true,
+  "gcode_md5": "fefa2425f1c85b78d36647dbc9392e49",
+  "sliced_3mf_sha256": "2bd7d71f74bea95c71771465a30f2f012b6a407b06fe0128a4c1301128364c76",
+  "printer_profile": "tmt-a1-mini",
+  "connection_result": "Reachable after user powered on; A1 mini IDLE, print_error 0, HMS empty, 0.4 mm stainless steel nozzle and SD present",
+  "remote_file": "/tmt-v3-actuator-bridge-2bd7d71f.gcode.3mf",
+  "uploaded": true,
+  "remote_dry_run": {"plate": 1, "bed_type": "textured_plate", "use_ams": false, "gcode_md5": "fefa2425f1c85b78d36647dbc9392e49", "sidecar_matches": true, "warnings": []},
+  "start_command_sent": true,
+  "outcome": "Job accepted, then PAUSE during changing_filament at layer 0/200, error 0x07FF8007. Awaiting touchscreen prompt; no resume sent. Completion and physical quality not verified."
+}

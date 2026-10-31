@@ -1,0 +1,15 @@
+{
+  "revision": "common-cuff-21p6-tpu-trial-v1",
+  "width_mm": 21.6,
+  "opening_mm": 6.8,
+  "head_recess_mm": 9.6,
+  "valid": true,
+  "solids": 1,
+  "unchanged_concept_geometry": true,
+  "volume_mm3": 1667.747686815329,
+  "source_sha256": "799c78c5fcbdec471b865358c65718ba713512a8d51f99bb0e26c7130b639856",
+  "limits": [
+    "First TPU material/fit trial; no grip or pull-off force qualification.",
+    "One-piece cuff includes both adaptable seats; do not use the obsolete 12 mm cuff."
+  ]
+}

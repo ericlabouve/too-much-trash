@@ -1,0 +1,5 @@
+{
+  "status": "rejected",
+  "reason": "Deposited-path gap between sliding_jaw and plunger 0.406 mm is below required0.6 mm. Do not print.",
+  "replacement": "2026-10-26-keeper-petg-spaced"
+}

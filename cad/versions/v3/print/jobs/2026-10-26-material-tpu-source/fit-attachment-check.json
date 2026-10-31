@@ -1,0 +1,83 @@
+{
+  "revision": "material-set-ramped-fixed-v3",
+  "parts": {
+    "phone_cuff_1": {
+      "design": "phone_cuff",
+      "source": "print/jobs/2026-10-24-three-cuffs-thread-tpu/cuff-1-bed.stl",
+      "sha256": "9da79de1eefe3f7e490b873110c3630602eeeb706cd33e81143e79591052c5b8"
+    },
+    "phone_cuff_2": {
+      "design": "phone_cuff",
+      "source": "print/jobs/2026-10-24-three-cuffs-thread-tpu/cuff-1-bed.stl",
+      "sha256": "9da79de1eefe3f7e490b873110c3630602eeeb706cd33e81143e79591052c5b8"
+    },
+    "phone_cuff_3": {
+      "design": "phone_cuff",
+      "source": "print/jobs/2026-10-24-three-cuffs-thread-tpu/cuff-1-bed.stl",
+      "sha256": "9da79de1eefe3f7e490b873110c3630602eeeb706cd33e81143e79591052c5b8"
+    },
+    "collar_screw_1": {
+      "design": "collar_screw",
+      "source": "print/collar_screw.stl",
+      "sha256": "10e700d2daaf6049b391c1110c44e4b22cf00452cdee357d1acd4fc4a70fefa7"
+    },
+    "collar_screw_2": {
+      "design": "collar_screw",
+      "source": "print/collar_screw.stl",
+      "sha256": "10e700d2daaf6049b391c1110c44e4b22cf00452cdee357d1acd4fc4a70fefa7"
+    },
+    "collar_screw_3": {
+      "design": "collar_screw",
+      "source": "print/collar_screw.stl",
+      "sha256": "10e700d2daaf6049b391c1110c44e4b22cf00452cdee357d1acd4fc4a70fefa7"
+    },
+    "collar_screw_4": {
+      "design": "collar_screw",
+      "source": "print/collar_screw.stl",
+      "sha256": "10e700d2daaf6049b391c1110c44e4b22cf00452cdee357d1acd4fc4a70fefa7"
+    },
+    "collar_screw_5": {
+      "design": "collar_screw",
+      "source": "print/collar_screw.stl",
+      "sha256": "10e700d2daaf6049b391c1110c44e4b22cf00452cdee357d1acd4fc4a70fefa7"
+    },
+    "thumb_nut_1": {
+      "design": "thumb_nut",
+      "source": "print/thumb_nut.stl",
+      "sha256": "a0a48fd7451b949e834e749556475b0da9ee472bb16faea41c09e3581fba27d8"
+    },
+    "thumb_nut_2": {
+      "design": "thumb_nut",
+      "source": "print/thumb_nut.stl",
+      "sha256": "a0a48fd7451b949e834e749556475b0da9ee472bb16faea41c09e3581fba27d8"
+    },
+    "thumb_nut_3": {
+      "design": "thumb_nut",
+      "source": "print/thumb_nut.stl",
+      "sha256": "a0a48fd7451b949e834e749556475b0da9ee472bb16faea41c09e3581fba27d8"
+    },
+    "thumb_nut_4": {
+      "design": "thumb_nut",
+      "source": "print/thumb_nut.stl",
+      "sha256": "a0a48fd7451b949e834e749556475b0da9ee472bb16faea41c09e3581fba27d8"
+    },
+    "thumb_nut_5": {
+      "design": "thumb_nut",
+      "source": "print/thumb_nut.stl",
+      "sha256": "a0a48fd7451b949e834e749556475b0da9ee472bb16faea41c09e3581fba27d8"
+    },
+    "pulley_key": {
+      "design": "pulley_key",
+      "source": "print/pulley_key.stl",
+      "sha256": "4f8aa46895adf3e2a6e87c76cb0ae6f8c09a8fc5053783a10886f6604b23d2fe"
+    },
+    "clip_string_guide": {
+      "design": "clip_string_guide",
+      "source": "print/clip_string_guide.stl",
+      "sha256": "9e52e7791f853bcaebf2bf925e53f0f6d08c2301b7d6a8f5733720afb9f0cbb3"
+    }
+  },
+  "limits": [
+    "Accepted study geometry for cap/fixed jaw; remaining parts from current manufacturing exports. Physical assembly qualification pending."
+  ]
+}

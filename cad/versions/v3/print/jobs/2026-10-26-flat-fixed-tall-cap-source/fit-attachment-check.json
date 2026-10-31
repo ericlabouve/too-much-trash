@@ -1,0 +1,30 @@
+{
+  "revision": "flat-fixed-tall-cap-study",
+  "candidate": true,
+  "split_gap_mm": 1,
+  "neck_opening_mm": [
+    11.6,
+    17.6
+  ],
+  "parts": {
+    "carrier": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 33330.05769000449,
+      "baseline_mm3": 41216.738986378514
+    },
+    "shaft_cap": {
+      "valid": true,
+      "solids": 1,
+      "volume_mm3": 34691.13384954197,
+      "baseline_mm3": 27002.49500057534
+    }
+  },
+  "source_sha256": {
+    "model.py": "1d413c3b6f89ebbdc0fc9a8c6af011aefe2ff8635a43f24219a352817c841c3a",
+    "study_flat_fixed_pair.py": "be33881078f66fc12d66a9124e9a68e7bd867e722c6c38f0359c7e1eeb54ba30"
+  },
+  "limits": [
+    "Study only; active assembly unchanged. Taller cap walls and thinner fixed collar require physical strength and clamping checks."
+  ]
+}

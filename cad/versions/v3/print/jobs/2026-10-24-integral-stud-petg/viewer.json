@@ -1,0 +1,31 @@
+{
+  "title": "Integral T-stud \u00b7 PETG fit coupon \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 integral-stud-coupon-v1",
+  "notes": [
+    "One rigid stud/backing coupon only; the common 21.6 mm TPU cuff will be printed separately.",
+    "Inspect and remove support/interface under the T-head shoulders before fitting TPU. Do not force a PETG cuff onto this stud.",
+    "Fit coupon does not validate the full jaw, phone grip, creep or loaded strength."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

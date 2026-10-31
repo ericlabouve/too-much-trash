@@ -1,0 +1,29 @@
+{
+  "revision": "concave-boot-guide-v3",
+  "passed": true,
+  "shoe_and_plain_stem_y_bounds_mm": [
+    -2.000000100000007,
+    2.0000001000000043
+  ],
+  "shoe_z_span_mm": 16.000000200000002,
+  "key_thickness_mm": 3.0000002000000023,
+  "key_retaining_head_width_mm": 7.0,
+  "flush_pulley_back": {
+    "plane_y_mm": 5.4,
+    "missing_fill_mm3": 0.0,
+    "key_clearance_to_back_mm": 0.3999998999999974,
+    "retention_outboard_shift_mm": 2.2,
+    "axle_span_mm": 20.6
+  },
+  "removed_tab_region_remaining_mm3": 0.0,
+  "rail_screw_z_bounds_mm": [
+    1.999999899999999,
+    24.0
+  ],
+  "thread_and_head_stations_unchanged": true,
+  "limits": [
+    "No slicing or printing performed for this cleanup.",
+    "Rounded corners, keeper-band retention and contact force remain physically unvalidated.",
+    "Earlier flat-back slice results apply to their saved inputs, not these modified parts."
+  ]
+}

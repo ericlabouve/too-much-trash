@@ -1,0 +1,43 @@
+{
+  "revision": "t-jaw-compact-actuator-v3",
+  "cord_diameter_mm": 3,
+  "samples_per_configuration": 11,
+  "intersection_threshold_mm3": 0.01,
+  "scope": "Moving first cord segment against rotated rocker, other rigid assembly parts, phone and all stock proxies.",
+  "limitations": "Finite rest-to-stop samples; no physical friction, abrasion, knot security, force or strength validation.",
+  "configurations": {
+    "wallet-near": {
+      "intersections_mm3": {},
+      "bracket_intersections_mm3": {}
+    },
+    "wallet-far": {
+      "intersections_mm3": {},
+      "bracket_intersections_mm3": {}
+    },
+    "bare-near": {
+      "intersections_mm3": {},
+      "bracket_intersections_mm3": {}
+    },
+    "bare-far": {
+      "intersections_mm3": {},
+      "bracket_intersections_mm3": {}
+    },
+    "small-near": {
+      "intersections_mm3": {},
+      "bracket_intersections_mm3": {}
+    },
+    "small-far": {
+      "intersections_mm3": {},
+      "bracket_intersections_mm3": {}
+    },
+    "large-near": {
+      "intersections_mm3": {},
+      "bracket_intersections_mm3": {}
+    },
+    "large-far": {
+      "intersections_mm3": {},
+      "bracket_intersections_mm3": {}
+    }
+  },
+  "passed": true
+}

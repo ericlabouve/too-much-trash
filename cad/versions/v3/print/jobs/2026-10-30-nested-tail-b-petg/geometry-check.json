@@ -1,0 +1,60 @@
+{
+  "revision": "nested-tail-b-v1",
+  "scope": "Separate return block removed. Tail extends into blind triangular socket in band anchor. Review only.",
+  "dimensions": {
+    "bracket_length_before_mm": 66,
+    "bracket_length_after_mm": 46,
+    "plunger_length_before_mm": 58,
+    "plunger_length_after_mm": 49,
+    "cleat_forward_shift_mm": 14,
+    "anchor_forward_shift_mm": 20,
+    "cleat_height_increase_mm": 1,
+    "mount_hole_position_changed": false,
+    "foot_position_changed": false,
+    "tail_socket_engagement_rest_mm": 2,
+    "socket_back_clearance_rest_mm": 0.4,
+    "minimum_socket_back_wall_mm": 1.6,
+    "socket_sloping_face_clearance_mm": 0.4,
+    "separate_tail_stop_removed": true
+  },
+  "motion": [
+    {
+      "travel": -1.5,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -0.75,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0.39,
+      "intersection_mm3": 0.0
+    }
+  ],
+  "insertion": [
+    {
+      "travel": -26,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -20,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -12,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -6,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0,
+      "intersection_mm3": 0.0
+    }
+  ]
+}

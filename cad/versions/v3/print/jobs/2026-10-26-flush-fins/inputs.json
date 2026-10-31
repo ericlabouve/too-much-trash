@@ -1,0 +1,73 @@
+{
+  "revision": "flush-width-fins-study",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "sliding_jaw",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-flush-fins-source/sliding_jaw.stl",
+      "input_sha256": "7aecf1f7cf998ff37eee5f1a999a23cb708563d0147240af40c654e21d17f237",
+      "center_xy_mm": [
+        66,
+        154.96
+      ],
+      "bounds_mm": [
+        121.5999984741211,
+        39.519999980926514,
+        58.5
+      ],
+      "orientation": "Existing X-10 bed face; same compact-plate position.",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          6.123233995736766e-17,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        25.240000009536743,
+        10.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "sliding_jaw",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "c7e8bfbe654c310fb88c70981d8ad71475726e2658dd360ed0570cf9c85b4966",
+  "scope": "Selected standalone fit-test pieces: sliding_jaw. NOT complete jaws; consult geometry check for retention limitations."
+}

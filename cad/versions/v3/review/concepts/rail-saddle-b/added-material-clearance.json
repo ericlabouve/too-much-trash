@@ -1,0 +1,433 @@
+{
+  "method": "Disjoint conservative AABBs prove nominal wraps do not touch added cheeks; existing bracket only trimmed elsewhere. Not elastic-band validation.",
+  "minimum_route_aabb_gap_mm": 1.0,
+  "rows": [
+    {
+      "travel": -1.5,
+      "route": "band",
+      "aabb_separation_mm": 2.9499999999999993
+    },
+    {
+      "travel": -1.5,
+      "route": "attachment",
+      "aabb_separation_mm": 1.6800297616411426
+    },
+    {
+      "travel": -1.5,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -1.5,
+      "route": "knot",
+      "aabb_separation_mm": 1.3499999999999979
+    },
+    {
+      "travel": -1.425,
+      "route": "band",
+      "aabb_separation_mm": 3.025000000000002
+    },
+    {
+      "travel": -1.425,
+      "route": "attachment",
+      "aabb_separation_mm": 1.740869035855369
+    },
+    {
+      "travel": -1.425,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -1.425,
+      "route": "knot",
+      "aabb_separation_mm": 1.4249999999999972
+    },
+    {
+      "travel": -1.35,
+      "route": "band",
+      "aabb_separation_mm": 3.099999999999998
+    },
+    {
+      "travel": -1.35,
+      "route": "attachment",
+      "aabb_separation_mm": 1.8027756377319917
+    },
+    {
+      "travel": -1.35,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -1.35,
+      "route": "knot",
+      "aabb_separation_mm": 1.4999999999999964
+    },
+    {
+      "travel": -1.275,
+      "route": "band",
+      "aabb_separation_mm": 3.1750000000000007
+    },
+    {
+      "travel": -1.275,
+      "route": "attachment",
+      "aabb_separation_mm": 1.865643320680563
+    },
+    {
+      "travel": -1.275,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -1.275,
+      "route": "knot",
+      "aabb_separation_mm": 1.5749999999999993
+    },
+    {
+      "travel": -1.2,
+      "route": "band",
+      "aabb_separation_mm": 3.2499999999999964
+    },
+    {
+      "travel": -1.2,
+      "route": "attachment",
+      "aabb_separation_mm": 1.9293781381574695
+    },
+    {
+      "travel": -1.2,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -1.2,
+      "route": "knot",
+      "aabb_separation_mm": 1.6499999999999986
+    },
+    {
+      "travel": -1.125,
+      "route": "band",
+      "aabb_separation_mm": 3.3249999999999993
+    },
+    {
+      "travel": -1.125,
+      "route": "attachment",
+      "aabb_separation_mm": 1.9938969381590397
+    },
+    {
+      "travel": -1.125,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -1.125,
+      "route": "knot",
+      "aabb_separation_mm": 1.7249999999999979
+    },
+    {
+      "travel": -1.05,
+      "route": "band",
+      "aabb_separation_mm": 3.400000000000002
+    },
+    {
+      "travel": -1.05,
+      "route": "attachment",
+      "aabb_separation_mm": 2.0591260281974004
+    },
+    {
+      "travel": -1.05,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -1.05,
+      "route": "knot",
+      "aabb_separation_mm": 1.7999999999999972
+    },
+    {
+      "travel": -0.975,
+      "route": "band",
+      "aabb_separation_mm": 3.474999999999998
+    },
+    {
+      "travel": -0.975,
+      "route": "attachment",
+      "aabb_separation_mm": 2.124999999999997
+    },
+    {
+      "travel": -0.975,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.975,
+      "route": "knot",
+      "aabb_separation_mm": 1.8749999999999964
+    },
+    {
+      "travel": -0.9,
+      "route": "band",
+      "aabb_separation_mm": 3.5500000000000007
+    },
+    {
+      "travel": -0.9,
+      "route": "attachment",
+      "aabb_separation_mm": 2.191460700081112
+    },
+    {
+      "travel": -0.9,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.9,
+      "route": "knot",
+      "aabb_separation_mm": 1.9499999999999993
+    },
+    {
+      "travel": -0.8250000000000001,
+      "route": "band",
+      "aabb_separation_mm": 3.6249999999999964
+    },
+    {
+      "travel": -0.8250000000000001,
+      "route": "attachment",
+      "aabb_separation_mm": 2.2584563312138624
+    },
+    {
+      "travel": -0.8250000000000001,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.8250000000000001,
+      "route": "knot",
+      "aabb_separation_mm": 2.0249999999999986
+    },
+    {
+      "travel": -0.75,
+      "route": "band",
+      "aabb_separation_mm": 3.6999999999999993
+    },
+    {
+      "travel": -0.75,
+      "route": "attachment",
+      "aabb_separation_mm": 2.3259406699225997
+    },
+    {
+      "travel": -0.75,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.75,
+      "route": "knot",
+      "aabb_separation_mm": 2.099999999999998
+    },
+    {
+      "travel": -0.675,
+      "route": "band",
+      "aabb_separation_mm": 3.775000000000002
+    },
+    {
+      "travel": -0.675,
+      "route": "attachment",
+      "aabb_separation_mm": 2.3938723859053144
+    },
+    {
+      "travel": -0.675,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.675,
+      "route": "knot",
+      "aabb_separation_mm": 2.174999999999997
+    },
+    {
+      "travel": -0.6000000000000001,
+      "route": "band",
+      "aabb_separation_mm": 3.849999999999998
+    },
+    {
+      "travel": -0.6000000000000001,
+      "route": "attachment",
+      "aabb_separation_mm": 2.462214450449023
+    },
+    {
+      "travel": -0.6000000000000001,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.6000000000000001,
+      "route": "knot",
+      "aabb_separation_mm": 2.2499999999999964
+    },
+    {
+      "travel": -0.525,
+      "route": "band",
+      "aabb_separation_mm": 3.9250000000000007
+    },
+    {
+      "travel": -0.525,
+      "route": "attachment",
+      "aabb_separation_mm": 2.5309336222034737
+    },
+    {
+      "travel": -0.525,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.525,
+      "route": "knot",
+      "aabb_separation_mm": 2.3249999999999993
+    },
+    {
+      "travel": -0.44999999999999996,
+      "route": "band",
+      "aabb_separation_mm": 3.9999999999999964
+    },
+    {
+      "travel": -0.44999999999999996,
+      "route": "attachment",
+      "aabb_separation_mm": 2.599999999999995
+    },
+    {
+      "travel": -0.44999999999999996,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.44999999999999996,
+      "route": "knot",
+      "aabb_separation_mm": 2.3999999999999986
+    },
+    {
+      "travel": -0.375,
+      "route": "band",
+      "aabb_separation_mm": 4.074999999999999
+    },
+    {
+      "travel": -0.375,
+      "route": "attachment",
+      "aabb_separation_mm": 2.6693866336669907
+    },
+    {
+      "travel": -0.375,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.375,
+      "route": "knot",
+      "aabb_separation_mm": 2.474999999999998
+    },
+    {
+      "travel": -0.30000000000000004,
+      "route": "band",
+      "aabb_separation_mm": 4.150000000000002
+    },
+    {
+      "travel": -0.30000000000000004,
+      "route": "attachment",
+      "aabb_separation_mm": 2.7390691849604685
+    },
+    {
+      "travel": -0.30000000000000004,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.30000000000000004,
+      "route": "knot",
+      "aabb_separation_mm": 2.549999999999997
+    },
+    {
+      "travel": -0.2250000000000001,
+      "route": "band",
+      "aabb_separation_mm": 4.224999999999998
+    },
+    {
+      "travel": -0.2250000000000001,
+      "route": "attachment",
+      "aabb_separation_mm": 2.809025631780526
+    },
+    {
+      "travel": -0.2250000000000001,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.2250000000000001,
+      "route": "knot",
+      "aabb_separation_mm": 2.6249999999999964
+    },
+    {
+      "travel": -0.15000000000000013,
+      "route": "band",
+      "aabb_separation_mm": 4.300000000000001
+    },
+    {
+      "travel": -0.15000000000000013,
+      "route": "attachment",
+      "aabb_separation_mm": 2.879236009777593
+    },
+    {
+      "travel": -0.15000000000000013,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.15000000000000013,
+      "route": "knot",
+      "aabb_separation_mm": 2.6999999999999993
+    },
+    {
+      "travel": -0.07499999999999996,
+      "route": "band",
+      "aabb_separation_mm": 4.3749999999999964
+    },
+    {
+      "travel": -0.07499999999999996,
+      "route": "attachment",
+      "aabb_separation_mm": 2.949682186270238
+    },
+    {
+      "travel": -0.07499999999999996,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": -0.07499999999999996,
+      "route": "knot",
+      "aabb_separation_mm": 2.7749999999999986
+    },
+    {
+      "travel": 0.0,
+      "route": "band",
+      "aabb_separation_mm": 4.449999999999999
+    },
+    {
+      "travel": 0.0,
+      "route": "attachment",
+      "aabb_separation_mm": 3.020347662107789
+    },
+    {
+      "travel": 0.0,
+      "route": "lead",
+      "aabb_separation_mm": 1.0
+    },
+    {
+      "travel": 0.0,
+      "route": "knot",
+      "aabb_separation_mm": 2.849999999999998
+    }
+  ],
+  "plunger_motion_mm3": {
+    "-6": 0.0,
+    "-3": 0.0,
+    "-1.5": 0.0,
+    "0": 0.0,
+    "0.39": 0.0
+  }
+}

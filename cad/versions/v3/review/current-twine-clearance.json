@@ -1,0 +1,60 @@
+{
+  "revision": "flush-width-fins-v3",
+  "scope": "Outgoing twine against fixed jaw only; nominal2 mm cord, all recorded phone configurations",
+  "hits": {
+    "wallet-near": [
+      {
+        "segment": 33,
+        "overlap_mm3": 33.82838,
+        "from": [
+          -10.187236925949227,
+          23.8,
+          -5.961498039636888
+        ],
+        "to": [
+          0,
+          15.2,
+          -190
+        ]
+      }
+    ],
+    "wallet-far": [],
+    "bare-near": [
+      {
+        "segment": 33,
+        "overlap_mm3": 33.82838,
+        "from": [
+          -10.187236925949227,
+          23.8,
+          -5.961498039636888
+        ],
+        "to": [
+          0,
+          15.2,
+          -190
+        ]
+      }
+    ],
+    "bare-far": [],
+    "small-near": [
+      {
+        "segment": 33,
+        "overlap_mm3": 33.82838,
+        "from": [
+          -10.187236925949227,
+          23.8,
+          -5.961498039636888
+        ],
+        "to": [
+          0,
+          15.2,
+          -190
+        ]
+      }
+    ],
+    "small-far": [],
+    "large-near": [],
+    "large-far": []
+  },
+  "clear": false
+}

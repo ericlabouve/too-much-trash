@@ -1,0 +1,16 @@
+{
+  "exact_source_meshes_match": true,
+  "automatic_supports_enabled": true,
+  "bridge_suppression": false,
+  "support_g": 0,
+  "interface_g": 0,
+  "total_g": 7.5492024421691895,
+  "minutes": 62.62344156901042,
+  "physical_fit_verified": false,
+  "changed_manufacturing_parts": [
+    "actuator bracket"
+  ],
+  "wall_mm": 2.4,
+  "screw_head_outward_shift_vs_previous_mm": 0.65,
+  "nut_inward_shift_vs_previous_mm": 5.4
+}

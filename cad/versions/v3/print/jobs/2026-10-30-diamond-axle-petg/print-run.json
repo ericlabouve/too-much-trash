@@ -1,0 +1,27 @@
+{
+  "observed_at_utc": "2026-10-30T18:40:24.241412+00:00",
+  "user_authorization": "Approved design and send; bed clear and PETG loaded",
+  "gcode_md5": "10a057dd1f7f95b16b4f27a494a58cde",
+  "remote_inspection": "matched MD5 and sidecar; plate 1; external spool; textured PEI; no warnings",
+  "start_outcome": "verified",
+  "latest_status": {
+    "gcode_state": "RUNNING",
+    "subtask_name": "tmt-diamond-axle-petg-20261030.gcode.3mf",
+    "stage": "heatbed_preheating",
+    "print_error": 0,
+    "remaining_time_min": 38,
+    "filament": {
+      "location": "external",
+      "material": "PETG",
+      "name": null,
+      "color": "0085D5FF"
+    },
+    "bed_target": 70.0,
+    "nozzle_target": 100.0
+  },
+  "physical_feedback_pending": [
+    "diamond roof print quality",
+    "rotated existing TPU key fit and spring-back",
+    "keeper band fit"
+  ]
+}

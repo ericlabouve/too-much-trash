@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V3 actuator · single-plate slice review</title>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.180.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.180.0/examples/jsm/"}}</script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#faf9f5;color:#24373c;font:16px system-ui,sans-serif}header,main{max-width:1350px;margin:auto;padding:24px}h1{margin:5px 0 12px;font-size:30px}h2{font-size:20px}.eyebrow{color:#956326;letter-spacing:.13em;font-size:12px;font-weight:700}.summary{display:flex;gap:24px;flex-wrap:wrap}.metric{font-size:24px;font-weight:650}.metric small{font-size:13px;font-weight:400;display:block}.notice{background:#fff0db;padding:14px;border-left:4px solid #cc8c3c;line-height:1.5}.toolbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px;background:white;border:1px solid #ddd}button,select{font:inherit;padding:7px;border:1px solid #bdc6c6;border-radius:4px;background:white;color:inherit}label{display:flex;gap:6px;align-items:center}#layer{width:220px}.stage{height:560px;position:relative;background:#fff;border:1px solid #ddd}canvas{display:block;width:100%;height:100%;touch-action:none}#status{position:absolute;bottom:12px;left:14px;font-size:13px;background:#ffffffdd;padding:6px}.legend{padding:12px;display:flex;gap:20px;flex-wrap:wrap}.model{color:#bd742e}.support{color:#1786cf}.interface{color:#953bc2}.columns{display:grid;grid-template-columns:1fr 1fr;gap:25px;line-height:1.6}table{border-collapse:collapse;width:100%;font-size:14px}td,th{text-align:left;padding:9px;border-bottom:1px solid #d8dddd}img{max-width:100%;border:1px solid #ddd}a{color:#126b95}li{margin-bottom:8px}#error{color:#a00}details{margin:18px 0}footer{padding:24px;font-size:13px;color:#586568}@media(max-width:750px){.columns{grid-template-columns:1fr}.stage{height:440px}header,main{padding:15px}}
+</style></head><body>
+<header><div class="eyebrow">TOO MUCH TRASH / V3 / OFFLINE SLICE REVIEW</div><h1>One actuator. One plate.</h1>
+<p>Seven separate pieces at 100% scale · bridged axle slot · ramped-retainers-v3 · 14 October 2026</p>
+<div class="summary" id="summary">Loading slice estimates…</div>
+<p class="notice">Review only — nothing uploaded or started. A1 mini / 0.4 mm / Textured PEI / Generic PLA reference recipe. Confirm the actual material and bed before printing. First-print fit, retention and strength remain untested.</p></header>
+<main><h2>Axle slot: bridge instead of support</h2><p>Same geometry, orientations, placements and profiles; only axle supports are disabled. Support/interface: <b>0.480 → 0.450 g</b>. The mounting hole remains round. Square slot retention faces remain unchanged. <a href="comparison.json">Verification report</a> · <a href="../2026-10-14-actuator-ramped/">Previous supported-axle plate</a></p><h2>Inspect the actual supports</h2>
+<div class="toolbar"><label>Focus <select id="focus"><option value="all">Whole plate</option></select></label><button id="iso">3D view</button><button id="top">Top view</button><button id="front">Front view</button><label><input id="model" type="checkbox" checked>Faint model paths</label><label><input id="support" type="checkbox" checked>Supports</label></div>
+<div class="toolbar"><label>Height <input id="layer" type="range" min="0" max="1" value="1"><output id="height">—</output></label><label><input id="single" type="checkbox">Single layer only</label><button id="all">All layers</button></div>
+<div class="stage"><canvas id="view" aria-label="Interactive actual sliced extrusion paths"></canvas><div id="status">Loading toolpaths…</div></div>
+<div class="legend"><span class="model">● Model (faint orange)</span><span class="support">● Support scaffold (blue)</span><span class="interface">● Support interface (purple)</span></div>
+<p>Drag to orbit; scroll to zoom. Select a part to inspect it closely. Use the height slider to expose supports hidden by higher layers. These are extrusion centerlines, not a simulated solid bead.</p><p id="error"></p>
+<div class="columns"><section><h2>Recipe and plate contents</h2><p>0.12 mm layers, 0.20 mm first layer; by-layer printing. Mechanism parts: 3 walls / 15% gyroid. Screw and nut: 2 walls / 15% grid, supports off. Normal Snug 30°; top/bottom gaps 0.24 mm, XY separation 0.4 mm, two interface layers. No brim or raft.</p>
+<table><thead><tr><th>Piece ×1</th><th>Support + interface</th><th>Support heights</th></tr></thead><tbody id="parts"></tbody></table></section>
+<section><h2>What to inspect before printing</h2><ul>
+<li><b>Bracket:</b> check remaining support inside the pulley fork and mounting screw bore. The outer fork leg now reaches the bed and the fixed-band lip has a ramped underside. Its new common back sits on the bed; the entire bracket does not need an underside support raft.</li>
+<li><b>Plunger:</b> inspect the shared cleat’s ramped cap; its broad retaining rim remains. Preserve the flat stem/shoe face and clean support residue without gouging the sliding surfaces.</li>
+<li><b>Pulley and axle:</b> neither receives support in this slice. The axle slot roof uses the same bridge paths as the previous supported slice. Check for sag and free cross-key insertion after printing; do not force the key.</li>
+<li><b>Fasteners and cross-key:</b> supports are disabled. The existing 0.12 mm thread recipe is retained; changed geometry and loaded behavior still need testing.</li>
+</ul><p>Support mass is not proof of easy removal. The separate inline rubber band still needs a physical button-force/overtravel check. This plate excludes the shaft cap, jaws, collar screws, shaft guides, twine and bands.</p>
+<p><a href="actuator.gcode.3mf" download>Sliced Bambu Studio project (.gcode.3mf)</a><br><a href="actuator-input.3mf" download>Editable arranged plate (.3mf)</a><br><a href="review.json">Detailed slice report and hashes</a> · <a href="inputs.json">Source geometry and object settings</a></p></section></div>
+<h2>Axle bridge close-up</h2><img src="axle-bridge.png" alt="Actual first bridge layer spanning the axle slot"><p>The bridge spans the nominal 3.4 mm slot, with longer paths including anchored ends. This view does not predict sag or printed fit.</p><details open><summary>Static support projections</summary><p>Actual toolpaths, with the model faintly shown behind the support paths.</p><img src="support-details.png" alt="Top, front and side support paths for bracket and plunger"></details>
+<details><summary>Whole-plate overhead layout</summary><img src="plate-overview.png" alt="All seven parts arranged on the A1 mini bed"></details>
+</main><footer>Support-role mass is calculated from positive moving extrusion inside labeled objects, excluding startup purge. Time and total mass are Bambu Studio estimates. Current geometry is unprinted.</footer>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const $=s=>document.querySelector(s);
+try{
+ const [report,data]=await Promise.all(['review.json','paths.json'].map(async url=>{const r=await fetch(url);if(!r.ok)throw Error(url);return r.json()}));
+ const grams=(report.deposited_g_by_role.support||0)+(report.deposited_g_by_role.interface||0);
+ const minutes=Math.round(report.total_minutes);
+ $('#summary').innerHTML=`<div class="metric">${Math.floor(minutes/60)} h ${minutes%60} min<small>slicer estimate</small></div><div class="metric">${report.total_g.toFixed(2)} g<small>total filament estimate</small></div><div class="metric">${grams.toFixed(2)} g<small>support + interface paths</small></div><div class="metric">7<small>pieces on one plate</small></div><div class="metric">${report.warning?'Review warning':'No warnings'}<small>slicer result</small></div>`;
+ const label=n=>n.replaceAll('_',' ');
+ for(const [name,r] of Object.entries(report.objects)){
+  const option=document.createElement('option');option.value=name;option.textContent=label(name);$('#focus').append(option);
+  const row=document.createElement('tr');const mass=(r.deposited_g_by_role.support||0)+(r.deposited_g_by_role.interface||0);
+  row.innerHTML=`<td>${label(name)}</td><td>${mass.toFixed(3)} g</td><td>${r.support_z_mm?r.support_z_mm.map(v=>v.toFixed(2)).join('–')+' mm':'None generated'}</td>`;$('#parts').append(row);
+ }
+ const canvas=$('#view'),renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor('#fcfcfa');
+ const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(40,1,.1,2000);camera.up.set(0,0,1);
+ const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;
+ const grid=new THREE.GridHelper(180,18,0xc5cdcd,0xe5e8e8);grid.rotation.x=Math.PI/2;grid.position.set(90,90,-.3);scene.add(grid);
+ const lines={};
+ await Promise.all(Object.entries(data.paths).map(async([kind,p])=>{
+  const response=await fetch(p.file);if(!response.ok)throw Error(p.file);
+  const positions=new Float32Array(await response.arrayBuffer());
+  const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  const material=new THREE.LineBasicMaterial({color:p.color,transparent:kind==='model',opacity:kind==='model'?.20:1,depthWrite:kind!=='model'});
+  const line=new THREE.LineSegments(geometry,material);line.renderOrder=kind==='model'?0:1;scene.add(line);lines[kind]=line;
+ }));
+ $('#layer').max=data.heights.length-1;$('#layer').value=data.heights.length-1;
+ function range(){const i=Number($('#layer').value);$('#height').textContent=`${data.heights[i].toFixed(2)} mm`;for(const[k,p]of Object.entries(data.paths)){const start=$('#single').checked&&i?p.ends[i-1]:0;lines[k].geometry.setDrawRange(start,p.ends[i]-start)}lines.model.visible=$('#model').checked;lines.support.visible=lines.interface.visible=$('#support').checked;canvas.dataset.layer=String(i)}
+ let direction='iso';
+ function frame(){const b=data.objects[$('#focus').value];const target=b?new THREE.Vector3(b.x+b.width/2,b.y+b.depth/2,b.height/2):new THREE.Vector3(90,99,3);const span=b?Math.max(b.width,b.depth,b.height)*1.9:245;const offset=direction==='top'?new THREE.Vector3(0,-.001,1):direction==='front'?new THREE.Vector3(0,-1,.02):new THREE.Vector3(.45,-.9,.85).normalize();camera.position.copy(target).addScaledVector(offset,span);controls.target.copy(target);controls.update()}
+ for(const id of ['iso','top','front'])$('#'+id).onclick=()=>{direction=id;frame()};$('#focus').onchange=frame;
+ for(const id of ['layer','single','model','support'])$('#'+id).oninput=range;
+ $('#all').onclick=()=>{$('#layer').value=data.heights.length-1;$('#single').checked=false;range()};
+ function resize(){const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}
+ new ResizeObserver(resize).observe(canvas.parentElement);resize();frame();range();
+ renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});
+ $('#status').textContent='Actual sliced toolpaths · drag to orbit · scroll to zoom';canvas.dataset.ready='true';
+}catch(e){$('#error').textContent='Preview could not load: '+e.message;$('#status').textContent='Use the static previews or open the sliced project in Bambu Studio.';console.error(e)}
+</script></body></html>

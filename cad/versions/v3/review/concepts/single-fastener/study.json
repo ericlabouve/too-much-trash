@@ -1,0 +1,234 @@
+{
+  "study_only": true,
+  "active_v3_unchanged": true,
+  "key_mm": {
+    "length_y": 16,
+    "width_z": 8.2,
+    "engagement_x": 4,
+    "slot_width": 8.8
+  },
+  "bracket_volume_mm3": 7840.067316218229,
+  "positions": {
+    "29": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "28": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "26": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "25.75": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "25.5": {
+      "rigid_collisions_mm3": {
+        "pulley_axle/shaft_cap": 0.9377,
+        "pulley_axle/carrier": 8.7965
+      },
+      "clear": false
+    },
+    "25": {
+      "rigid_collisions_mm3": {
+        "pulley_axle/shaft_cap": 6.394,
+        "pulley_axle/carrier": 54.8556
+      },
+      "clear": false
+    },
+    "24": {
+      "rigid_collisions_mm3": {
+        "pulley_axle/shaft_cap": 17.4629,
+        "pulley_axle/carrier": 147.3879
+      },
+      "clear": false
+    },
+    "23": {
+      "rigid_collisions_mm3": {
+        "actuator_bracket/shaft_cap": 6.3443,
+        "pulley_axle/shaft_cap": 28.5158,
+        "pulley_axle/carrier": 239.878
+      },
+      "clear": false
+    },
+    "22": {
+      "rigid_collisions_mm3": {
+        "actuator_bracket/shaft_cap": 32.5066,
+        "actuator_bracket/carrier": 39.056,
+        "pulley_axle/shaft_cap": 30.4983,
+        "pulley_axle/carrier": 295.6878
+      },
+      "clear": false
+    },
+    "20": {
+      "rigid_collisions_mm3": {
+        "actuator_bracket/shaft_cap": 130.348,
+        "actuator_bracket/carrier": 234.3362,
+        "pulley_axle/shaft_cap": 24.1042,
+        "pulley_axle/carrier": 354.0583
+      },
+      "clear": false
+    },
+    "18.5": {
+      "rigid_collisions_mm3": {
+        "actuator_bracket/shaft_cap": 189.2205,
+        "actuator_bracket/carrier": 312.1635,
+        "pulley/shaft_cap": 27.3466,
+        "pulley/carrier": 64.2194,
+        "pulley_axle/shaft_cap": 7.5009,
+        "pulley_axle/carrier": 333.3372
+      },
+      "clear": false
+    },
+    "-29": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "-28": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "-26": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "-25.75": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "-25.5": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "-25": {
+      "rigid_collisions_mm3": {},
+      "clear": true
+    },
+    "-24": {
+      "rigid_collisions_mm3": {
+        "pulley_axle/carrier": 47.4062
+      },
+      "clear": false
+    },
+    "-23": {
+      "rigid_collisions_mm3": {
+        "actuator_bracket/shaft_cap": 6.3443,
+        "pulley_axle/carrier": 94.8124,
+        "pulley_key/carrier": 3.5918
+      },
+      "clear": false
+    },
+    "-22": {
+      "rigid_collisions_mm3": {
+        "actuator_bracket/shaft_cap": 26.0583,
+        "pulley_axle/carrier": 121.1326,
+        "pulley_key/carrier": 56.6004
+      },
+      "clear": false
+    },
+    "-20": {
+      "rigid_collisions_mm3": {
+        "actuator_bracket/shaft_cap": 91.6583,
+        "pulley_axle/carrier": 163.2301,
+        "pulley_key/carrier": 207.9609
+      },
+      "clear": false
+    },
+    "-18.5": {
+      "rigid_collisions_mm3": {
+        "actuator_bracket/shaft_cap": 336.8355,
+        "actuator_bracket/carrier": 202.171,
+        "pulley_axle/carrier": 160.6174,
+        "pulley_key/carrier": 241.4708
+      },
+      "clear": false
+    }
+  },
+  "unclamped_rotation": {
+    "0.5": {
+      "key_rail_overlap_mm3": [
+        0.0,
+        0.0
+      ],
+      "contact_pad_center_lateral_shift_mm": 0.157
+    },
+    "1": {
+      "key_rail_overlap_mm3": [
+        0.0,
+        0.0
+      ],
+      "contact_pad_center_lateral_shift_mm": 0.314
+    },
+    "1.5": {
+      "key_rail_overlap_mm3": [
+        0.0,
+        0.0
+      ],
+      "contact_pad_center_lateral_shift_mm": 0.471
+    },
+    "2": {
+      "key_rail_overlap_mm3": [
+        0.0,
+        0.0
+      ],
+      "contact_pad_center_lateral_shift_mm": 0.628
+    },
+    "2.5": {
+      "key_rail_overlap_mm3": [
+        0.0,
+        0.0
+      ],
+      "contact_pad_center_lateral_shift_mm": 0.785
+    },
+    "3": {
+      "key_rail_overlap_mm3": [
+        0.31573,
+        0.31573
+      ],
+      "contact_pad_center_lateral_shift_mm": 0.942
+    },
+    "4": {
+      "key_rail_overlap_mm3": [
+        2.20991,
+        2.20991
+      ],
+      "contact_pad_center_lateral_shift_mm": 1.256
+    }
+  },
+  "service_at_26_mm": {
+    "near": {
+      "collisions": [],
+      "clear": true
+    },
+    "far": {
+      "collisions": [],
+      "clear": true
+    }
+  },
+  "limits": [
+    "Rigid CAD study only. No print, force, wear or stiffness qualification.",
+    "Loose-key rotation is not tightened-mount play: screw preload is required. No zero-wiggle claim.",
+    "Phone removed during service. Coarse sampled paths, not continuous collision proof.",
+    "Full cord/band sweep and all phone configurations are not requalified for this candidate.",
+    "Active V3 remains the two-fastener flush-T assembly."
+  ],
+  "service_sequence": [
+    "Remove phone and release twine tension.",
+    "Remove the nut toward +X, then withdraw the screw toward -X.",
+    "Pull the complete module outward 4.5 mm to disengage the locating lugs.",
+    "Lower 2 mm, then continue outward. Reverse for assembly."
+  ],
+  "assessment": {
+    "current_two_screw_nominal_inward_center_mm": 28,
+    "candidate_conservative_evaluated_center_mm": 26,
+    "inward_gain_mm": 2,
+    "rail_length_unchanged_mm": 120,
+    "hypothetical_printed_piece_count": 21,
+    "main_reach_limit": "Axle head/end colliding with cap or carrier, not the second screw.",
+    "loose_key_result": "At the sampled 2.5 degrees both signs remain clear; at 3 degrees both signs intersect the slot wall. This is isolated-key motion, not measured tightened play.",
+    "recommendation": "Do not promote for reach alone. Investigate axle/collar clearance before further inward travel; qualify clamping/printed fit before replacing two fasteners."
+  }
+}

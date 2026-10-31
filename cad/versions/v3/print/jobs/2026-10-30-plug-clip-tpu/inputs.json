@@ -1,0 +1,73 @@
+{
+  "revision": "plug-clip-review-v3",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "clip",
+      "quantity": 1,
+      "source": "review/concepts/plug-clip/clip.stl",
+      "input_sha256": "699e2ff0023ec491354fbc7289d09e48ef1791f729a0f7165eb28d626203a70d",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        20.899999618530273,
+        29.198244094848633,
+        6.0
+      ],
+      "orientation": "Flat 6 mm extrusion; closure open on bed.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -2.4499998092651367,
+        -4.099122047424316,
+        -0.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "clip",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-26-material-tpu",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "a8ae157dd9157846f8aaf3b73df950bdbc7d811ec4a8de6e8259437a2811610b",
+    "filament": "ee2c9caab7bcecbbceba3dda6ca7a5420afc9163296ed42a3a13780f1af7333c"
+  },
+  "material_status": "ELEGOO TPU95A recipe; slice only, no print requested.",
+  "geometry_check_sha256": "9e480cecb2dee62b2d4b8f7f72e58db94c036f333e093074aebc7e3b8b9cebb9",
+  "scope": "Selected standalone fit-test pieces: clip. NOT complete jaws; consult geometry check for retention limitations."
+}

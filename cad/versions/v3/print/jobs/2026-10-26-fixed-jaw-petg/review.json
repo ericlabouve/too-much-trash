@@ -1,0 +1,113 @@
+{
+  "revision": "tpu-tv-axle-key-v3",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 1,
+  "plates": 1,
+  "total_g": 35.60747146606445,
+  "total_minutes": 280.3275390625,
+  "warning": "",
+  "deposited_g_by_role": {
+    "support": 2.1334,
+    "model": 32.7686,
+    "interface": 0.4501
+  },
+  "objects": {
+    "carrier": {
+      "deposited_g_by_role": {
+        "support": 2.1334,
+        "model": 32.7686,
+        "interface": 0.4501
+      },
+      "deposited_xy_bounds": [
+        [
+          33.25,
+          65.714
+        ],
+        [
+          146.75,
+          114.286
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        20.6
+      ]
+    }
+  },
+  "gaps": [],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "carrier",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "8ff7a34b30ee20a15e885919992742d9",
+  "hashes": {
+    "cuff-fit-input.3mf": "0b3d9b36039735082c011272980a35ce705886467b08e8e3bc3132418e1e0bbc",
+    "cuff-fit.gcode.3mf": "1f8cb4b579e548c70a423f36acc33fbd63f61ba7b79e7543a87e3a1193883843",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Current fixed jaw, approved collar-face-down orientation; track upright. Scale 100%.",
+    "A1 mini 0.4 / Bambu PETG Translucent / 0.12 mm / 3 walls / 15% gyroid; Normal Snug automatic supports.",
+    "Blue scaffold and purple interface show actual extrusion. Inspect cleanup access and residue on mating faces.",
+    "No printer contacted. Physical strength, sliding fit and support-free 35-degree roof quality remain unverified."
+  ]
+}

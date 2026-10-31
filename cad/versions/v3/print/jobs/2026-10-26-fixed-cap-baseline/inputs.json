@@ -1,0 +1,127 @@
+{
+  "revision": "current-fixed-cap-baseline",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "carrier",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-fixed-cap-baseline-source/carrier.stl",
+      "input_sha256": "db4a610808a3dbdbb75cf0ec06b7ceaf344681aa9dcb2b1baa5cba9c1bc28e76",
+      "center_xy_mm": [
+        90,
+        35
+      ],
+      "bounds_mm": [
+        110.0,
+        48.99440383911133,
+        109.80000305175781
+      ],
+      "orientation": "Collar underside down, track upright; CAD Y+90.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -15.0,
+        -0.0,
+        -0.5
+      ]
+    },
+    {
+      "name": "shaft_cap",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-fixed-cap-baseline-source/shaft_cap.stl",
+      "input_sha256": "47103079d8a260561179a6b32ae27246647cef7ae1f12001f078044f82c04fcd",
+      "center_xy_mm": [
+        90,
+        120
+      ],
+      "bounds_mm": [
+        120.0,
+        107.0,
+        11.5
+      ],
+      "orientation": "Existing flat exterior down; CAD Y+90 then bed Z+90.",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -15.0,
+        12.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "carrier",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    },
+    {
+      "name": "shaft_cap",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "b2849a46de4751fd81cc65d0a543d62428728c11db4a7e847bdc9713eb335cab",
+  "scope": "Matched fixed-jaw and shaft-cap study; active geometry unchanged."
+}

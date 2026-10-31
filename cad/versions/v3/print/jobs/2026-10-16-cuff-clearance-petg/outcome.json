@@ -1,0 +1,19 @@
+{
+  "job": "tmt-v3-cuff-petg-b4d32270.gcode.3mf",
+  "gcode_md5": "d310afec4b21e401fa571e34f28896f8",
+  "printer_terminal_state": "FINISH",
+  "printer_progress_percent": 100,
+  "layers_reported_on_followup": 57,
+  "total_layers": 57,
+  "print_error": 0,
+  "active_hms_alerts": [],
+  "physical_outcome": "Failed, user-reported",
+  "user_feedback": "items failed to print. the plate is clear for another try",
+  "bed_clear_for_retry": "User confirmed",
+  "failure_mode": "User reports cuff printed about halfway, then upper printing became tangled disconnected filament; the lower cuff remained firmly attached to the bed. Failed part discarded; no photo available. Root cause unknown.",
+  "bed_detachment": "User explicitly denies",
+  "loose_hotend": "User explicitly denies",
+  "retry_request": "User requests unchanged diagnostic retry of cuff only; no need to reprint jaw/key",
+  "retry_started": false,
+  "interpretation": "The printer completed the toolpath but the user reports failed physical parts. FINISH does not establish print success. Preserve this recipe as a failed physical attempt."
+}

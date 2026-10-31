@@ -1,0 +1,40 @@
+{
+  "jaw_pocket_depth_mm": 14,
+  "contact_centers_y_mm": [
+    -50,
+    50
+  ],
+  "sliding_jaw_outer_width_mm": 108,
+  "rail_length_mm": 120,
+  "previous_rail_length_mm": 160,
+  "bracket_plate_width_mm": 38,
+  "previous_bracket_plate_width_mm": 66,
+  "mount_screws_y_local_mm": [
+    -9.5,
+    9.5
+  ],
+  "rocker_rotation_degrees": 9.744994488713534,
+  "previous_rotation_degrees": 3.2483314962378445,
+  "contact_shoe_width_y_mm": 4,
+  "contact_shoe_height_z_mm": 16,
+  "contact_shoe_is_adjustable": false,
+  "free_contact_reference_advance_mm": 1.7620571836525691,
+  "nominal_gap_plus_button_stroke_mm": 0.6499999999999999,
+  "excess_over_nominal_gap_plus_stroke_mm": 1.112057183652569,
+  "print_ready": false,
+  "limitations": [
+    "Free rotation is tripled, not safe phone-button travel. Integral shoe is rigid and has no fine gap adjustment; physical contact position and force must be checked before loaded use.",
+    "A broad shoe can overlap neighboring buttons or the case; real button/case dimensions required to qualify it.",
+    "Recorded 18 and 20 mm phone envelopes do not fit the requested 14 mm pocket. Reference dimensions were preserved.",
+    "No mechanical strength, creep, preload or phone-retention validation."
+  ],
+  "contact_shoe_z_bounds_mm": [
+    0,
+    16
+  ],
+  "bracket_mount_hole_diameter_mm": 8.8,
+  "bracket_mount_hole_z_mm": -14,
+  "bracket_depth_adjustable": false,
+  "sliding_jaw_pad_width_mm": 8,
+  "sliding_jaw_contact_wall_mm": 6
+}

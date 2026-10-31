@@ -1,0 +1,17 @@
+{
+  "candidate_only": true,
+  "passed": true,
+  "valid": true,
+  "solid_count": 1,
+  "cleat_roof_angle_degrees": 45,
+  "tongue_shoulder_angle_degrees": 53.130102,
+  "tongue_and_studs_and_cleat_cap_unchanged": true,
+  "travel_samples": 91,
+  "assembly_configurations": 8,
+  "collisions": [],
+  "minimum_cleat_stem_x_thickness_mm": 3.75,
+  "limits": [
+    "Pitched stem has a smaller central section; strength, band seating and print quality require testing.",
+    "Active V3 unchanged pending review; screw success is a starting point, not validation of these overhangs."
+  ]
+}

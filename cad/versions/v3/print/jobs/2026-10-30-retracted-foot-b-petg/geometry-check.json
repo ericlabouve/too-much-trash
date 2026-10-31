@@ -1,0 +1,65 @@
+{
+  "revision": "retracted-foot-b-v1",
+  "scope": "Curved foot retracted10.85 mm to nearest neck plane. Front shortened and pulley shifted to match. Nested tail unchanged. Review only.",
+  "dimensions": {
+    "bracket_length_before_mm": 46,
+    "bracket_length_after_mm": 35.15,
+    "plunger_length_before_mm": 49,
+    "plunger_length_after_mm": 38.15,
+    "cleat_forward_shift_mm": 14,
+    "anchor_forward_shift_mm": 20,
+    "cleat_height_increase_mm": 1,
+    "mount_hole_position_changed": false,
+    "foot_position_changed": true,
+    "foot_retraction_mm": 10.85,
+    "foot_contact_global_x_mm": -7,
+    "previous_contact_global_x_mm": -17.85,
+    "pulley_shift_mm": 10.85,
+    "guide_length_mm": 9.15,
+    "tail_socket_engagement_rest_mm": 2,
+    "socket_back_clearance_rest_mm": 0.4,
+    "minimum_socket_back_wall_mm": 1.6,
+    "socket_sloping_face_clearance_mm": 0.4,
+    "separate_tail_stop_removed": true
+  },
+  "motion": [
+    {
+      "travel": -1.5,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -0.75,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0.39,
+      "intersection_mm3": 0.0
+    }
+  ],
+  "insertion": [
+    {
+      "travel": -26,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -20,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -12,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -6,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0,
+      "intersection_mm3": 0.0
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "revision": "thicker-cap-slot-ends-v3",
+  "previous_end_ligament_mm": 1.6,
+  "new_end_ligament_mm": 2.6,
+  "slot_width_mm": 8.8,
+  "outer_y_extent_mm": [
+    -60,
+    60
+  ],
+  "service_centers_y_mm": [
+    -50,
+    50
+  ],
+  "service_bores_clear": true,
+  "valid_single_solid": true,
+  "physical_strength_verified": false
+}

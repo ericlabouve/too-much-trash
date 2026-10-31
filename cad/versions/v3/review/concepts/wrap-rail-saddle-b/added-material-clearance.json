@@ -1,0 +1,433 @@
+{
+  "method": "Conservative AABBs separate band/string from added cheeks; exact 1.5 mm-radius knot sphere measured against complete bracket where combined bounds overlap. Not elastic-band validation.",
+  "minimum_route_aabb_gap_mm": 0.40000000000000036,
+  "rows": [
+    {
+      "travel": -1.5,
+      "route": "band",
+      "aabb_separation_mm": 1.5500000000000007
+    },
+    {
+      "travel": -1.5,
+      "route": "attachment",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -1.5,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -1.5,
+      "route": "knot",
+      "solid_separation_mm": 0.9847291878588327
+    },
+    {
+      "travel": -1.425,
+      "route": "band",
+      "aabb_separation_mm": 1.6250000000000036
+    },
+    {
+      "travel": -1.425,
+      "route": "attachment",
+      "aabb_separation_mm": 0.4007804885470354
+    },
+    {
+      "travel": -1.425,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -1.425,
+      "route": "knot",
+      "solid_separation_mm": 1.054324046557131
+    },
+    {
+      "travel": -1.35,
+      "route": "band",
+      "aabb_separation_mm": 1.6999999999999993
+    },
+    {
+      "travel": -1.35,
+      "route": "attachment",
+      "aabb_separation_mm": 0.41231056256176585
+    },
+    {
+      "travel": -1.35,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -1.35,
+      "route": "knot",
+      "solid_separation_mm": 1.1241540277189286
+    },
+    {
+      "travel": -1.275,
+      "route": "band",
+      "aabb_separation_mm": 1.7750000000000021
+    },
+    {
+      "travel": -1.275,
+      "route": "attachment",
+      "aabb_separation_mm": 0.43660622991432513
+    },
+    {
+      "travel": -1.275,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -1.275,
+      "route": "knot",
+      "solid_separation_mm": 1.1942046196421316
+    },
+    {
+      "travel": -1.2,
+      "route": "band",
+      "aabb_separation_mm": 1.8499999999999979
+    },
+    {
+      "travel": -1.2,
+      "route": "attachment",
+      "aabb_separation_mm": 0.4716990566028286
+    },
+    {
+      "travel": -1.2,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -1.2,
+      "route": "knot",
+      "solid_separation_mm": 1.264462440264034
+    },
+    {
+      "travel": -1.125,
+      "route": "band",
+      "aabb_separation_mm": 1.9250000000000007
+    },
+    {
+      "travel": -1.125,
+      "route": "attachment",
+      "aabb_separation_mm": 0.5153882032022075
+    },
+    {
+      "travel": -1.125,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -1.125,
+      "route": "knot",
+      "solid_separation_mm": 1.3349151333519318
+    },
+    {
+      "travel": -1.05,
+      "route": "band",
+      "aabb_separation_mm": 2.0000000000000036
+    },
+    {
+      "travel": -1.05,
+      "route": "attachment",
+      "aabb_separation_mm": 0.5656854249492398
+    },
+    {
+      "travel": -1.05,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -1.05,
+      "route": "knot",
+      "solid_separation_mm": 1.4055512754639858
+    },
+    {
+      "travel": -0.975,
+      "route": "band",
+      "aabb_separation_mm": 2.0749999999999993
+    },
+    {
+      "travel": -0.975,
+      "route": "attachment",
+      "aabb_separation_mm": 0.6209871174187096
+    },
+    {
+      "travel": -0.975,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.975,
+      "route": "knot",
+      "solid_separation_mm": 1.476360292463182
+    },
+    {
+      "travel": -0.9,
+      "route": "band",
+      "aabb_separation_mm": 2.150000000000002
+    },
+    {
+      "travel": -0.9,
+      "route": "attachment",
+      "aabb_separation_mm": 0.6800735254367729
+    },
+    {
+      "travel": -0.9,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.9,
+      "route": "knot",
+      "solid_separation_mm": 1.5473323845103442
+    },
+    {
+      "travel": -0.8250000000000001,
+      "route": "band",
+      "aabb_separation_mm": 2.224999999999998
+    },
+    {
+      "travel": -0.8250000000000001,
+      "route": "attachment",
+      "aabb_separation_mm": 0.7420411039827887
+    },
+    {
+      "travel": -0.8250000000000001,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.8250000000000001,
+      "route": "knot",
+      "solid_separation_mm": 1.6184584585929405
+    },
+    {
+      "travel": -0.75,
+      "route": "band",
+      "aabb_separation_mm": 2.3000000000000007
+    },
+    {
+      "travel": -0.75,
+      "route": "attachment",
+      "aabb_separation_mm": 0.8062257748298545
+    },
+    {
+      "travel": -0.75,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.75,
+      "route": "knot",
+      "solid_separation_mm": 1.6897300677553433
+    },
+    {
+      "travel": -0.675,
+      "route": "band",
+      "aabb_separation_mm": 2.3750000000000036
+    },
+    {
+      "travel": -0.675,
+      "route": "attachment",
+      "aabb_separation_mm": 0.8721381771256225
+    },
+    {
+      "travel": -0.675,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.675,
+      "route": "knot",
+      "solid_separation_mm": 1.7611393562963644
+    },
+    {
+      "travel": -0.6000000000000001,
+      "route": "band",
+      "aabb_separation_mm": 2.4499999999999993
+    },
+    {
+      "travel": -0.6000000000000001,
+      "route": "attachment",
+      "aabb_separation_mm": 0.939414711402795
+    },
+    {
+      "travel": -0.6000000000000001,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.6000000000000001,
+      "route": "knot",
+      "solid_separation_mm": 1.8326790102858377
+    },
+    {
+      "travel": -0.525,
+      "route": "band",
+      "aabb_separation_mm": 2.525000000000002
+    },
+    {
+      "travel": -0.525,
+      "route": "attachment",
+      "aabb_separation_mm": 1.0077822185373195
+    },
+    {
+      "travel": -0.525,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.525,
+      "route": "knot",
+      "solid_separation_mm": 1.9043422128277745
+    },
+    {
+      "travel": -0.44999999999999996,
+      "route": "band",
+      "aabb_separation_mm": 2.599999999999998
+    },
+    {
+      "travel": -0.44999999999999996,
+      "route": "attachment",
+      "aabb_separation_mm": 1.0770329614268976
+    },
+    {
+      "travel": -0.44999999999999996,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.44999999999999996,
+      "route": "knot",
+      "solid_separation_mm": 1.9761226035642205
+    },
+    {
+      "travel": -0.375,
+      "route": "band",
+      "aabb_separation_mm": 2.6750000000000007
+    },
+    {
+      "travel": -0.375,
+      "route": "attachment",
+      "aabb_separation_mm": 1.1470069746954457
+    },
+    {
+      "travel": -0.375,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.375,
+      "route": "knot",
+      "solid_separation_mm": 2.048014241972356
+    },
+    {
+      "travel": -0.30000000000000004,
+      "route": "band",
+      "aabb_separation_mm": 2.7500000000000036
+    },
+    {
+      "travel": -0.30000000000000004,
+      "route": "attachment",
+      "aabb_separation_mm": 1.2175795661885942
+    },
+    {
+      "travel": -0.30000000000000004,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.30000000000000004,
+      "route": "knot",
+      "solid_separation_mm": 2.1200115740585663
+    },
+    {
+      "travel": -0.2250000000000001,
+      "route": "band",
+      "aabb_separation_mm": 2.8249999999999993
+    },
+    {
+      "travel": -0.2250000000000001,
+      "route": "attachment",
+      "aabb_separation_mm": 1.2886523968859853
+    },
+    {
+      "travel": -0.2250000000000001,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.2250000000000001,
+      "route": "knot",
+      "solid_separation_mm": 2.1921094020982634
+    },
+    {
+      "travel": -0.15000000000000013,
+      "route": "band",
+      "aabb_separation_mm": 2.900000000000002
+    },
+    {
+      "travel": -0.15000000000000013,
+      "route": "attachment",
+      "aabb_separation_mm": 1.3601470508735451
+    },
+    {
+      "travel": -0.15000000000000013,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.15000000000000013,
+      "route": "knot",
+      "solid_separation_mm": 2.2643028571099415
+    },
+    {
+      "travel": -0.07499999999999996,
+      "route": "band",
+      "aabb_separation_mm": 2.974999999999998
+    },
+    {
+      "travel": -0.07499999999999996,
+      "route": "attachment",
+      "aabb_separation_mm": 1.4320003491619653
+    },
+    {
+      "travel": -0.07499999999999996,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": -0.07499999999999996,
+      "route": "knot",
+      "solid_separation_mm": 2.3365873737865974
+    },
+    {
+      "travel": 0.0,
+      "route": "band",
+      "aabb_separation_mm": 3.0500000000000007
+    },
+    {
+      "travel": 0.0,
+      "route": "attachment",
+      "aabb_separation_mm": 1.5041608956491317
+    },
+    {
+      "travel": 0.0,
+      "route": "lead",
+      "aabb_separation_mm": 0.40000000000000036
+    },
+    {
+      "travel": 0.0,
+      "route": "knot",
+      "solid_separation_mm": 2.408958667638491
+    }
+  ],
+  "plunger_motion_mm3": {
+    "-6": 0.0,
+    "-3": 0.0,
+    "-1.5": 0.0,
+    "0": 0.0,
+    "0.39": 0.0
+  }
+}

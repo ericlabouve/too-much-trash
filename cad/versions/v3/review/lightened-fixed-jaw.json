@@ -1,0 +1,37 @@
+{
+  "revision": "through-window-fixed-jaw-v3",
+  "passed": true,
+  "valid": true,
+  "solid_count": 1,
+  "baseline_volume_mm3": 44849.34914187713,
+  "volume_mm3": 41745.946457754035,
+  "removed_volume_mm3": 3103.4026841230952,
+  "solid_volume_reduction_percent": 6.919615877380392,
+  "window_width_mm": 11,
+  "window_z_intervals_mm": [
+    [
+      -30,
+      4
+    ],
+    [
+      38,
+      60
+    ]
+  ],
+  "preserved_bridge_z_mm": [
+    4,
+    38
+  ],
+  "side_rail_width_mm": 8.3,
+  "unchanged": [
+    "cuff stud and base",
+    "track root and interlock",
+    "four screw bosses",
+    "cap"
+  ],
+  "limits": [
+    "No new slice or print; CAD volume is not filament savings.",
+    "Perimeter frame stiffness, neck contact and loaded retention require physical testing.",
+    "Existing phone-fit and cord-routing issues remain unresolved."
+  ]
+}

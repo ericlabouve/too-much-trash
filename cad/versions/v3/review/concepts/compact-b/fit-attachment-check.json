@@ -1,0 +1,86 @@
+{
+  "revision": "compact-b-tail-v1",
+  "scope": "Tail shortened; foot unchanged pending neck-face clarification. Review only.",
+  "dimensions": {
+    "bracket_length_before_mm": 66,
+    "bracket_length_after_mm": 46,
+    "plunger_length_before_mm": 58,
+    "plunger_length_after_mm": 44,
+    "cleat_forward_shift_mm": 14,
+    "anchor_forward_shift_mm": 20,
+    "cleat_height_increase_mm": 1,
+    "mount_hole_position_changed": false,
+    "foot_position_changed": false
+  },
+  "motion": [
+    {
+      "travel": -1.5,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 1.5,
+      "intersection_mm3": 0.0
+    }
+  ],
+  "insertion": [
+    {
+      "travel": -26,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -20,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -12,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": -6,
+      "intersection_mm3": 0.0
+    },
+    {
+      "travel": 0,
+      "intersection_mm3": 0.0
+    }
+  ],
+  "route_checks": [
+    {
+      "travel_mm": -1.5,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "string_bracket_mm3": 0.0,
+      "string_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0,
+      "knot_bracket_mm3": 0.0,
+      "knot_plunger_mm3": 0.0
+    },
+    {
+      "travel_mm": 0.0,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "string_bracket_mm3": 0.0,
+      "string_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0,
+      "knot_bracket_mm3": 0.0,
+      "knot_plunger_mm3": 0.0
+    },
+    {
+      "travel_mm": 1.5,
+      "band_bracket_mm3": 0.0,
+      "band_plunger_mm3": 0.0,
+      "string_bracket_mm3": 0.0,
+      "string_plunger_mm3": 0.0,
+      "lead_bracket_mm3": 0.0,
+      "lead_plunger_mm3": 0.0,
+      "knot_bracket_mm3": 0.0,
+      "knot_plunger_mm3": 0.0
+    }
+  ]
+}

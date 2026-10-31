@@ -1,0 +1,174 @@
+{
+  "revision": "petg-clearance-fit-v1",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 3,
+  "plates": 1,
+  "total_g": 1.1124677658081055,
+  "total_minutes": 20.0261962890625,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 1.0411
+  },
+  "objects": {
+    "fit-cuff": {
+      "deposited_g_by_role": {
+        "model": 0.5344
+      },
+      "deposited_xy_bounds": [
+        [
+          57.917,
+          80.188
+        ],
+        [
+          72.084,
+          89.812
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "fit-jaw": {
+      "deposited_g_by_role": {
+        "model": 0.3684
+      },
+      "deposited_xy_bounds": [
+        [
+          86.11,
+          79.81
+        ],
+        [
+          93.89,
+          90.19
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "fit-key": {
+      "deposited_g_by_role": {
+        "model": 0.1383
+      },
+      "deposited_xy_bounds": [
+        [
+          109.111,
+          81.712
+        ],
+        [
+          120.889,
+          88.289
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [
+    {
+      "objects": [
+        "fit-cuff",
+        "fit-jaw"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 13.425999999999997
+    },
+    {
+      "objects": [
+        "fit-cuff",
+        "fit-key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 36.427
+    },
+    {
+      "objects": [
+        "fit-jaw",
+        "fit-key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 14.621000000000004
+    }
+  ],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "fit-cuff",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "fit-key",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "fit-jaw",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "d310afec4b21e401fa571e34f28896f8",
+  "hashes": {
+    "cuff-fit-input.3mf": "dd6c61abc7b338c1472184be993f22b671d9b1a5519b3ad8ef2e655cc0eb0127",
+    "cuff-fit.gcode.3mf": "b4d3227079400be42cf8cbf8243478d86f08c95400d2ec0e4e57cd2cf7bfc755",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Rib-free PETG dimensional fit test: 3.4 mm square passage around 3 mm stem, 0.2 mm nominal clearance per side. Key has no designed pull-out retention and may slide out; use a dummy edge, not a suspended phone.",
+    "Cuff back-down, jaw passage vertical, 12.2 mm key flat. Automatic supports enabled; inspect actual support amounts below. PETG does not qualify future TPU grip or cushioning."
+  ]
+}

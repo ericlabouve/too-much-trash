@@ -1,0 +1,137 @@
+{
+  "revision": "ramped-jaw-35-v3",
+  "passed": true,
+  "selected_angle_degrees": 35,
+  "selection_reason": "User rounds tested 34-degree functional minimum up to 35 for memorability.",
+  "slicer_only_minimum_degrees": 31,
+  "band_overlap_sweep_mm3": {
+    "31": 0.7160129608505001,
+    "32": 0.3794884837481578,
+    "33": 0.12252636559470674,
+    "34": 0.0,
+    "35": 0.0
+  },
+  "angle_reference": "From horizontal print bed; 55 degrees from build axis",
+  "resolution_degrees": 1,
+  "physical_minimum_known": false,
+  "slices": [
+    {
+      "angle_degrees": 30,
+      "support_g": 0.0598,
+      "interface_g": 0.0521,
+      "total_g": 11.775472640991211,
+      "minutes": 119.70687662760416,
+      "hashes": {
+        "cuff-fit-input.3mf": "9b3263b0769f6586c7efef13541f1e0953b65dd5045c1d07c174542b5c6980a1",
+        "cuff-fit.gcode.3mf": "032be6d4197a06046128e02ca95ea517685fcca1065f0ad2a0a4feb01e0de167",
+        "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+        "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+        "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+      }
+    },
+    {
+      "angle_degrees": 31,
+      "support_g": 0,
+      "interface_g": 0,
+      "total_g": 11.663522720336914,
+      "minutes": 118.83544108072917,
+      "hashes": {
+        "cuff-fit-input.3mf": "f199492dfe3f8c2cdd696bbe4d2705870d4b9007c228b84884794d038d9cb7c6",
+        "cuff-fit.gcode.3mf": "31612f219c52ded6d04797c97fd5ddfead15cfbe9f0fea1468ce35ab4c3ac48d",
+        "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+        "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+        "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+      }
+    },
+    {
+      "angle_degrees": 32,
+      "support_g": 0,
+      "interface_g": 0,
+      "total_g": 11.668862342834473,
+      "minutes": 118.82063802083333,
+      "hashes": {
+        "cuff-fit-input.3mf": "cc7cf7ba438685f041c0c14f12202d34117e3827e5e4dc79134b9310495996a1",
+        "cuff-fit.gcode.3mf": "fa9d8cf879b35057613d341441987eff22be80e429e402c020cc9ed3a0193e5f",
+        "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+        "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+        "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+      }
+    },
+    {
+      "angle_degrees": 34,
+      "support_g": 0,
+      "interface_g": 0,
+      "total_g": 11.669652938842773,
+      "minutes": 118.73565266927083,
+      "hashes": {
+        "cuff-fit-input.3mf": "99a013b1d811a3787515217cc6fec2649e0271e7343f0ab8c2e42d03d2ffc3ae",
+        "cuff-fit.gcode.3mf": "aa1b7a47eb2f5b18547e1e7956841509d9340b3715e0fbe07f8d504b1140ae9b",
+        "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+        "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+        "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+      }
+    },
+    {
+      "angle_degrees": 35,
+      "support_g": 0,
+      "interface_g": 0,
+      "total_g": 11.672087669372559,
+      "minutes": 118.78089192708333,
+      "hashes": {
+        "cuff-fit-input.3mf": "e6f08573f54da45fa740f9ab36971b641265441326f221db2ab306be526093f9",
+        "cuff-fit.gcode.3mf": "af13577c72f91e336e9884fc9f6edee5bc0b0c6add5077d60d447dfe8ab43b2c",
+        "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+        "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+        "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+      }
+    },
+    {
+      "angle_degrees": 40,
+      "support_g": 0,
+      "interface_g": 0,
+      "total_g": 11.674188613891602,
+      "minutes": 118.737158203125,
+      "hashes": {
+        "cuff-fit-input.3mf": "2bb1c27b5a46c222be30e9b496468a3616dca58898dce5acb263dd0943d09640",
+        "cuff-fit.gcode.3mf": "2d89cdd17bb2587ad19b5c5099a4060af8388ea80572f1851ac3fe194aea6c84",
+        "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+        "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+        "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+      }
+    }
+  ],
+  "fixed_stud_support_segment_counts": {
+    "support": 0,
+    "interface": 0
+  },
+  "fixed_stud_bed_bounds": [
+    [
+      83.08,
+      85.4,
+      10.3
+    ],
+    [
+      89.48,
+      94.6,
+      13.800000000000002
+    ]
+  ],
+  "fixed_jaw_slice": {
+    "support": 2.4313,
+    "model": 33.9661,
+    "interface": 0.6403
+  },
+  "head_width_mm": 9.2,
+  "passage_width_mm": 6.8,
+  "head_recess_width_mm": 9.6,
+  "seated_stud_cuff_overlap_mm3": 0,
+  "rigid_pullout_obstruction_at_1mm_mm3": 6.755849770479081,
+  "minimum_cleat_stem_x_mm": 4.724325500818443,
+  "limits": [
+    "31 degrees is the minimum whole-degree slicer result, not a measured PETG capability.",
+    "Supports enabled; exact recipe and mesh placement matter. No universal minimum is claimed.",
+    "Ramped retaining shoulders may lower pull-out resistance. Test existing TPU cuffs before phone use.",
+    "Full fixed jaw still requires unrelated neck-cavity and fixed-cleat supports.",
+    "Cuffs, sliding tongue and square cleat cap unchanged; existing routing/phone-fit limits remain."
+  ]
+}

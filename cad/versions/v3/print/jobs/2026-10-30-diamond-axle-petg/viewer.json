@@ -1,0 +1,31 @@
+{
+  "title": "PETG smooth axle \u00b7 diamond opening \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 diamond-slot-axle-v3",
+  "notes": [
+    "Existing TPU key reused, turned 45 degrees about insertion axis.",
+    "Automatic normal supports enabled; check actual generated paths.",
+    "Physical roof quality and key retention remain unverified. Preview only; not sent to printer."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

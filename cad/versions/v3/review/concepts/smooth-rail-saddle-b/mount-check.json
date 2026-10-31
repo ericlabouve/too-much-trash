@@ -1,0 +1,96 @@
+{
+  "revision": "smooth-rail-saddle-b-v1",
+  "single_existing_bolt": true,
+  "cap_changed": false,
+  "cheek_engagement_mm": 3.2,
+  "bearing_length_mm": 19.8,
+  "wall_thickness_mm": 2.4,
+  "outer_corner_radius_mm": 0.7,
+  "top_chamfer_mm": 0.5,
+  "root_blend_radius_mm": 0.8,
+  "rail_width_mm": 20,
+  "cheek_inner_width_mm": 20.4,
+  "clearance_per_side_mm": 0.2,
+  "added_volume_mm3": 475.7821595568039,
+  "existing_floor_relief_mm": 1.2,
+  "positions": {
+    "wallet-near": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "wallet-far": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "bare-near": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "bare-far": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "small-near": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "small-far": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "large-near": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    },
+    "large-far": {
+      "bracket_cap_mm3": 0.0,
+      "added_cheek_fixed_jaw_mm3": 0.0
+    }
+  },
+  "rotation_checks": [
+    {
+      "side": "near",
+      "angle_deg": -3,
+      "cheek_rail_intersection_mm3": 6.3934634161798245
+    },
+    {
+      "side": "near",
+      "angle_deg": 3,
+      "cheek_rail_intersection_mm3": 4.00586634710279
+    },
+    {
+      "side": "far",
+      "angle_deg": -3,
+      "cheek_rail_intersection_mm3": 6.393463416142793
+    },
+    {
+      "side": "far",
+      "angle_deg": 3,
+      "cheek_rail_intersection_mm3": 4.005866347082386
+    }
+  ],
+  "limits": [
+    "Positive edge restraint reduces rotation; 0.2 mm side clearance permits small angular play before edge contact.",
+    "Single bolt still supplies clamp preload and longitudinal sliding resistance.",
+    "Printed fit, TPU fastener preload, edge strength and loaded twist remain untested.",
+    "No full-squeeze stroke qualification or active V3 promotion."
+  ],
+  "outward_removal": [
+    {
+      "distance_mm": 0,
+      "cap_overlap_mm3": 0.0
+    },
+    {
+      "distance_mm": 1,
+      "cap_overlap_mm3": 0.0
+    },
+    {
+      "distance_mm": 3.3,
+      "cap_overlap_mm3": 0.0
+    },
+    {
+      "distance_mm": 5,
+      "cap_overlap_mm3": 0.0
+    }
+  ]
+}

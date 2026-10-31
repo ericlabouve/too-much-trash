@@ -1,0 +1,73 @@
+{
+  "revision": "integral-stud-coupon-v1",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "integral-stud",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-24-integral-stud-petg-source/integral-stud.stl",
+      "input_sha256": "7dda4c2882eea08c6207267ab415f613fdc1005f618b8c5563cbf2dba7fe6e4f",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        5.299999713897705,
+        21.600000381469727,
+        11.600000381469727
+      ],
+      "orientation": "Unchanged coupon on narrow backing edge; stud side faces parallel to bed",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        6.549999952316284,
+        -0.0,
+        5.800000190734863
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "integral-stud",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "6e981adb025bfc334cb81d2d46cbd842a17b731212d15c03d1ec3342a7674d06",
+  "scope": "Selected standalone fit-test pieces: integral-stud. NOT complete jaws; consult geometry check for retention limitations."
+}

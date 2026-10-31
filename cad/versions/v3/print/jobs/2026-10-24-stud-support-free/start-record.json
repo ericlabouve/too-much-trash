@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-24",
+  "printer": "tmt-a1-mini",
+  "authorization": "User requested sending the coupon and confirmed textured PEI bed clear/installed and Bambu PETG Translucent Blue ready on external spool.",
+  "remote_file": "/tmt-stud-petg-2306f5ba.gcode.3mf",
+  "plate": 1,
+  "bed_type": "textured_plate",
+  "use_ams": false,
+  "uploaded_bytes": 53311,
+  "gcode_md5": "2306f5ba3dd4ac4a02f3a480f56ec743",
+  "remote_download_hash_verified": true,
+  "start_command_outcome": "verified",
+  "observed_state": "PREPARE",
+  "observed_job_name": "tmt-stud-petg-2306f5ba.gcode.3mf",
+  "print_error": 0,
+  "completion": "Not observed; PREPARE telemetry still contained prior-job layer/progress values, which are not current-job completion evidence.",
+  "physical_result": "Pending user feedback"
+}

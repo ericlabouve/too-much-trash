@@ -1,0 +1,52 @@
+{
+  "revision": "flush-beam-sliding-jaw-v3",
+  "passed": true,
+  "valid": true,
+  "solid_count": 1,
+  "beam_mm": [
+    8,
+    121.6,
+    11.6
+  ],
+  "common_rear_plane_x_mm": -10,
+  "common_front_plane_x_mm": -2,
+  "local_beam_stud_shift_mm": 5.2,
+  "assembly_jaw_shift_mm": -5.2,
+  "assembled_cuff_positions_unchanged": true,
+  "tongue_and_cleat_design_unchanged": true,
+  "tongue_track_axial_overlap_mm": {
+    "wallet": 54.5,
+    "bare": 54.5,
+    "small": 54.5,
+    "large": 49.4
+  },
+  "nominal_moving_band_clear": true,
+  "band_envelope_diameter_mm": 1.4,
+  "previous_volume_mm3": 18641.824861446286,
+  "new_volume_mm3": 18272.00086144629,
+  "limits": [
+    "Geometric engagement only, not stiffness or loaded retention.",
+    "Jaw bands span5.2 mm farther; real preload/return need testing.",
+    "Band clearance uses historical1.4 mm envelope; a1.5 mm envelope intersects the moving cleat by about0.034 mm3 and is not cleared.",
+    "No print sent."
+  ],
+  "matched_slice": {
+    "profiles_identical": true,
+    "source_matches": true,
+    "previous_support_g": 0.6447,
+    "new_support_g": 0.0271,
+    "reduction_percent": 95.7964944935629,
+    "previous_total_g": 13.340078353881836,
+    "new_total_g": 12.422319412231445,
+    "previous_minutes": 133.13445638020832,
+    "new_minutes": 125.2093994140625,
+    "warnings": "",
+    "hashes": {
+      "cuff-fit-input.3mf": "57c6a5ba6fc843b23830c3a8420e8bcf842ada4b1910feeb8188a1c99da7e3ee",
+      "cuff-fit.gcode.3mf": "2ca05568a4478a25d95cab255045617d2c5e59fd8110507f77a9653bd2594ddc",
+      "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+      "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+      "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-07",
+  "status": "research concepts only; no replacement selected or CAD implemented",
+  "user_direction": "Develop Option A sliding-plunger alternatives; investigate phone-button return without rubber bands.",
+  "recommendation": "A1 first, with provision for optional A4 return leaves",
+  "orientation": "Schematic side projections, press toward phone downward; depth offsets are not dimensioned.",
+  "concepts": [
+    "A1 centered pull and fixed-axis rotating pulley",
+    "A2 centered pull and fixed rounded eye",
+    "A3 moving pulley with 2:1 stroke reduction",
+    "A4 A1 plus paired printed return leaves"
+  ],
+  "return_condition": "Button restoring force must exceed slider stiction, reflected cord/pulley resistance, residual input tension and adverse gravity throughout release. Button cannot restore a positive air gap by itself.",
+  "common_requirements": [
+    "Force applied near slider axis",
+    "Short separated guide lands and relieved non-bearing surfaces",
+    "Captured slider and retained twine",
+    "Removable access for cleaning",
+    "Settable gap independent of twine knot",
+    "Frame stop adjusted to measured button travel",
+    "Separate input travel accommodation; a hard stop alone is insufficient"
+  ],
+  "excess_pull_candidate": "A replaceable printed flexure at trigger-side twine attachment could take up remaining trigger displacement after the slider stop engages. Its stroke and force rise must be designed from measurements. This is not a constant-force limiter and must not bottom out in normal travel.",
+  "unknowns": [
+    "Actual phone model/case and return-force curve",
+    "Button operating and allowable travel",
+    "Trigger cord travel and residual tension",
+    "Twine diameter, stiffness and friction",
+    "Printed sliding and axle fit",
+    "Frame deflection under pull"
+  ],
+  "sources": [
+    {
+      "title": "igus: eccentric drive loads and binding",
+      "url": "https://www.igus.com/company/5-linear-guide-installation-tips-ca",
+      "finding": "Keep the drive near the guide axis and avoid overconstraining parallel guides. Their numeric 2:1 rule is specific to their bearings, not a PLA design limit."
+    },
+    {
+      "title": "OMRON: tactile switch precautions",
+      "url": "https://omronfs.omron.com/en_US/ecb/products/pdf/precautions_tactile.pdf",
+      "finding": "Straight actuation and avoidance of excess force after the switch stops. General design guidance only: not an iPhone switch specification."
+    },
+    {
+      "title": "MIT: capstan friction",
+      "url": "https://ocw.mit.edu/courses/2-141-modeling-and-simulation-of-dynamic-systems-fall-2006/09bbd00ad1a816a401f166e35fbaf231_capstan_amplifie.pdf",
+      "finding": "Cord sliding around a fixed surface incurs friction; unknown twine/PLA friction prevents a numerical return prediction."
+    },
+    {
+      "title": "Sava: pulley design",
+      "url": "https://www.savacable.com/sava-expertise/pulleys-design-information",
+      "finding": "Pulley bend diameter matters. Published wire-rope diameter ratios must not be transferred to unspecified textile twine."
+    },
+    {
+      "title": "Sharkey et al.: printed flexure translation stage",
+      "url": "https://arxiv.org/abs/1509.05394",
+      "finding": "Printed flexures are a demonstrated mechanism family. This does not validate these leaf dimensions or lifetime."
+    },
+    {
+      "title": "Fischbach and Weinberg: flexural creep of printed PLA",
+      "url": "https://arxiv.org/abs/2302.11240",
+      "finding": "PLA flexural creep and aging are experimentally relevant; permanent spring preload needs validation."
+    }
+  ]
+}

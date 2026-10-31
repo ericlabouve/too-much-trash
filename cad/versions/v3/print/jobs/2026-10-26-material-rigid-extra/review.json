@@ -1,0 +1,284 @@
+{
+  "revision": "material-set-ramped-fixed-v3",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 5,
+  "plates": 1,
+  "total_g": 23.947324752807617,
+  "total_minutes": 194.005712890625,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 23.7425,
+    "support": 0.096,
+    "interface": 0.0374
+  },
+  "objects": {
+    "sliding_jaw": {
+      "deposited_g_by_role": {
+        "support": 0.0142,
+        "interface": 0.0129,
+        "model": 12.3239
+      },
+      "deposited_xy_bounds": [
+        [
+          15.45,
+          29.41
+        ],
+        [
+          54.55,
+          150.59
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        1.4
+      ]
+    },
+    "actuator_bracket": {
+      "deposited_g_by_role": {
+        "model": 8.0118,
+        "interface": 0.0245,
+        "support": 0.0818
+      },
+      "deposited_xy_bounds": [
+        [
+          77.21,
+          89.71
+        ],
+        [
+          142.79,
+          140.29
+        ]
+      ],
+      "support_z_mm": [
+        5.84,
+        13.88
+      ]
+    },
+    "plunger": {
+      "deposited_g_by_role": {
+        "model": 1.8376
+      },
+      "deposited_xy_bounds": [
+        [
+          76.21,
+          57.211
+        ],
+        [
+          133.79,
+          72.79
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "pulley": {
+      "deposited_g_by_role": {
+        "model": 0.6603
+      },
+      "deposited_xy_bounds": [
+        [
+          81.211,
+          26.211
+        ],
+        [
+          98.789,
+          43.781
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "pulley_axle": {
+      "deposited_g_by_role": {
+        "model": 0.909
+      },
+      "deposited_xy_bounds": [
+        [
+          119.711,
+          29.711
+        ],
+        [
+          130.289,
+          40.289
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [
+    {
+      "objects": [
+        "sliding_jaw",
+        "actuator_bracket"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.059999999999995
+    },
+    {
+      "objects": [
+        "sliding_jaw",
+        "plunger"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 21.059999999999995
+    },
+    {
+      "objects": [
+        "sliding_jaw",
+        "pulley"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 26.061
+    },
+    {
+      "objects": [
+        "sliding_jaw",
+        "pulley_axle"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 64.561
+    },
+    {
+      "objects": [
+        "actuator_bracket",
+        "plunger"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 16.319999999999986
+    },
+    {
+      "objects": [
+        "actuator_bracket",
+        "pulley"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 45.32899999999999
+    },
+    {
+      "objects": [
+        "actuator_bracket",
+        "pulley_axle"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 48.82099999999999
+    },
+    {
+      "objects": [
+        "plunger",
+        "pulley"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 12.83
+    },
+    {
+      "objects": [
+        "plunger",
+        "pulley_axle"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 16.321999999999996
+    },
+    {
+      "objects": [
+        "pulley",
+        "pulley_axle"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 20.321999999999996
+    }
+  ],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "sliding_jaw",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "actuator_bracket",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "plunger",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "pulley",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    },
+    {
+      "name": "pulley_axle",
+      "enable_support": "0",
+      "extruder": "1",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "dc568871529f5fbdaf586a2de2c8bc2e",
+  "hashes": {
+    "cuff-fit-input.3mf": "6fa8a4f04836d71f139bf83ab4719bd45bcd495deae00ccd822152ecd3b011be",
+    "cuff-fit.gcode.3mf": "e0ad4e5db06cf20d169ce93b19b2e623a00863cba796ef8bf173e7f994da45d2",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Full required quantities at 100% scale; one material per plate. No printer contacted.",
+    "Cuffs use the physically successful support-disabled recipe; axle cross-slot is bridged. Automatic supports enabled for other parts.",
+    "Support masses include scaffold and interface. Model mass excludes startup purge and adhesion. Physical fit, strength and 35-degree quality still require testing."
+  ]
+}

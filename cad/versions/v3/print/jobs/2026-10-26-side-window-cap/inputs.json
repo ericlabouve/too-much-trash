@@ -1,0 +1,73 @@
+{
+  "revision": "side-window-cap-trial",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "shaft_cap",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-26-side-window-cap-source/shaft_cap.stl",
+      "input_sha256": "079ea1a696a899688ec7516ef18f5dcec3a8b902c9b21fe63634ae47b5c7081e",
+      "center_xy_mm": [
+        117.7,
+        74.2
+      ],
+      "bounds_mm": [
+        107.0,
+        120.0,
+        16.800000190734863
+      ],
+      "orientation": "Approved X12 bed face; same XY placement as compact plate.",
+      "rotation_matrix": [
+        [
+          -1.8369701987210297e-16,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          -1.0,
+          -1.8369701987210297e-16,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -15.0,
+        3.552713678800501e-15,
+        12.0
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "shaft_cap",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-15-actuator-petg",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "material_status": "Bambu PETG Translucent Blue recipe; current loaded spool not queried",
+  "geometry_check_sha256": "5272da04bc6415bb6257fdef95da0e90f539d5bbf2a3047e8a99f757a4322eb1",
+  "scope": "Selected standalone fit-test pieces: shaft_cap. NOT complete jaws; consult geometry check for retention limitations."
+}

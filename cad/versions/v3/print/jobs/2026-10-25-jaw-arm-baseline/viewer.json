@@ -1,0 +1,31 @@
+{
+  "title": "Jaw arm slots \u2014 baseline \u00b7 single-plate slice review",
+  "subtitle": "2 separate pieces at 100% scale \u00b7 through-window-fixed-jaw-v3",
+  "notes": [
+    "Exact approved orientations; A1 mini0.4 / Bambu PETG Translucent /0.12 mm /Normal Snug automatic supports.",
+    "Current jaws without new arm/tongue slots.",
+    "No printer contacted. Physical ramp quality, sliding fit and strength remain unverified."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

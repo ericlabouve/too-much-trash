@@ -1,0 +1,408 @@
+{
+  "revision": "plain-clamp-mount-v3",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 7,
+  "plates": 1,
+  "total_g": 14.150532722473145,
+  "total_minutes": 111.96638997395833,
+  "warning": "",
+  "deposited_g_by_role": {
+    "support": 0.5842,
+    "model": 13.2696,
+    "interface": 0.2258
+  },
+  "objects": {
+    "actuator_bracket": {
+      "deposited_g_by_role": {
+        "support": 0.4357,
+        "model": 7.7486,
+        "interface": 0.1513
+      },
+      "deposited_xy_bounds": [
+        [
+          26.913,
+          76.75
+        ],
+        [
+          94.684,
+          131.29
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        14.0
+      ]
+    },
+    "plunger": {
+      "deposited_g_by_role": {
+        "support": 0.1163,
+        "model": 1.8595,
+        "interface": 0.029
+      },
+      "deposited_xy_bounds": [
+        [
+          86.21,
+          142.211
+        ],
+        [
+          145.645,
+          157.79
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        9.2
+      ]
+    },
+    "pulley": {
+      "deposited_g_by_role": {
+        "model": 0.7039,
+        "interface": 0.0319,
+        "support": 0.0158
+      },
+      "deposited_xy_bounds": [
+        [
+          111.211,
+          91.211
+        ],
+        [
+          128.789,
+          108.789
+        ]
+      ],
+      "support_z_mm": [
+        1.16,
+        2.84
+      ]
+    },
+    "pulley_axle": {
+      "deposited_g_by_role": {
+        "model": 0.9302,
+        "interface": 0.0136,
+        "support": 0.0165
+      },
+      "deposited_xy_bounds": [
+        [
+          139.711,
+          94.711
+        ],
+        [
+          150.289,
+          105.289
+        ]
+      ],
+      "support_z_mm": [
+        15.32,
+        18.2
+      ]
+    },
+    "pulley_key": {
+      "deposited_g_by_role": {
+        "model": 0.1863
+      },
+      "deposited_xy_bounds": [
+        [
+          141.71,
+          58.213
+        ],
+        [
+          148.29,
+          71.789
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "thumb_screw": {
+      "deposited_g_by_role": {
+        "model": 0.9974
+      },
+      "deposited_xy_bounds": [
+        [
+          53.212,
+          43.211
+        ],
+        [
+          66.788,
+          56.789
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "thumb_nut": {
+      "deposited_g_by_role": {
+        "model": 0.8437
+      },
+      "deposited_xy_bounds": [
+        [
+          86.242,
+          42.416
+        ],
+        [
+          103.758,
+          57.584
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "gaps": [
+    {
+      "objects": [
+        "actuator_bracket",
+        "plunger"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 10.321000000000021
+    },
+    {
+      "objects": [
+        "actuator_bracket",
+        "pulley"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 15.927000000000001
+    },
+    {
+      "objects": [
+        "actuator_bracket",
+        "pulley_axle"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 44.427000000000014
+    },
+    {
+      "objects": [
+        "actuator_bracket",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 46.42600000000001
+    },
+    {
+      "objects": [
+        "actuator_bracket",
+        "thumb_screw"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 19.360999999999997
+    },
+    {
+      "objects": [
+        "actuator_bracket",
+        "thumb_nut"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 18.565999999999995
+    },
+    {
+      "objects": [
+        "plunger",
+        "pulley"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 32.82200000000001
+    },
+    {
+      "objects": [
+        "plunger",
+        "pulley_axle"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 36.32200000000001
+    },
+    {
+      "objects": [
+        "plunger",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 69.82200000000002
+    },
+    {
+      "objects": [
+        "plunger",
+        "thumb_screw"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 84.82200000000002
+    },
+    {
+      "objects": [
+        "plunger",
+        "thumb_nut"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 84.02700000000002
+    },
+    {
+      "objects": [
+        "pulley",
+        "pulley_axle"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 10.322000000000026
+    },
+    {
+      "objects": [
+        "pulley",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 18.821999999999996
+    },
+    {
+      "objects": [
+        "pulley",
+        "thumb_screw"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 43.823
+    },
+    {
+      "objects": [
+        "pulley",
+        "thumb_nut"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 33.026999999999994
+    },
+    {
+      "objects": [
+        "pulley_axle",
+        "pulley_key"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 22.321999999999996
+    },
+    {
+      "objects": [
+        "pulley_axle",
+        "thumb_screw"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 72.32300000000002
+    },
+    {
+      "objects": [
+        "pulley_axle",
+        "thumb_nut"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 36.526999999999994
+    },
+    {
+      "objects": [
+        "pulley_key",
+        "thumb_screw"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 74.32200000000002
+    },
+    {
+      "objects": [
+        "pulley_key",
+        "thumb_nut"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 37.35200000000001
+    },
+    {
+      "objects": [
+        "thumb_screw",
+        "thumb_nut"
+      ],
+      "bbox_gap_with_0_6mm_path_margin": 18.854000000000006
+    }
+  ],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "220"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "220"
+    ],
+    "textured_plate_temp": [
+      "65"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "65"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0"
+  },
+  "effective_object_settings": [
+    {
+      "name": "plunger",
+      "enable_support": "1",
+      "extruder": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "wall_loops": "3"
+    },
+    {
+      "name": "pulley",
+      "enable_support": "1",
+      "extruder": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "wall_loops": "3"
+    },
+    {
+      "name": "actuator_bracket",
+      "enable_support": "1",
+      "extruder": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "wall_loops": "3"
+    },
+    {
+      "name": "pulley_axle",
+      "enable_support": "1",
+      "extruder": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "wall_loops": "3"
+    },
+    {
+      "name": "pulley_key",
+      "enable_support": "0",
+      "extruder": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "wall_loops": "3"
+    },
+    {
+      "name": "thumb_screw",
+      "enable_support": "0",
+      "extruder": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "grid",
+      "wall_loops": "2"
+    },
+    {
+      "name": "thumb_nut",
+      "enable_support": "0",
+      "extruder": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "grid",
+      "wall_loops": "2"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 65,
+    "nozzle": 220
+  },
+  "gcode_md5": "6f1a59e90de50fd7e9f5320c809698d8",
+  "hashes": {
+    "actuator-input.3mf": "64352efb2207ddc8bfad5da1109e2a4395216da2896c999666746e371682bbf4",
+    "actuator.gcode.3mf": "cec875c332e74e03cb72396f1e3b391bb88f10d2b33fbae608abf8867e417b57",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament.json": "3ac5b21dffda0f43973f29f5242e69ae1210ba01a87ed9e9e4074c019af3bb43"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and safe button force need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability."
+  ]
+}

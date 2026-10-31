@@ -1,0 +1,73 @@
+{
+  "revision": "common-cuff-21p6-tpu-trial-v1",
+  "scale_percent": 100,
+  "parts": [
+    {
+      "name": "common-cuff",
+      "quantity": 1,
+      "source": "print/jobs/2026-10-24-common-cuff-tpu-source/common-cuff.stl",
+      "input_sha256": "37aac8a460559a6414d5abf0bceef799bd5dcac66e0bdb91e5c07b4100e457fd",
+      "center_xy_mm": [
+        90,
+        90
+      ],
+      "bounds_mm": [
+        17.504212379455566,
+        21.600000381469727,
+        8.93999981880188
+      ],
+      "orientation": "C back down; central T opening vertical; shape unmodified",
+      "rotation_matrix": [
+        [
+          6.123233995736766e-17,
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          6.123233995736766e-17,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        0.0003142356872558594,
+        -0.0,
+        6.71999979019165
+      ]
+    }
+  ],
+  "object_settings": [
+    {
+      "name": "common-cuff",
+      "wall_loops": "3",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid",
+      "enable_support": "1"
+    }
+  ],
+  "printer_contacted": false,
+  "slicer": "BambuStudio-02.07.01.62",
+  "profile_source": "print/jobs/2026-10-24-common-cuff-tpu-source",
+  "profile_source_sha256": {
+    "machine": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process": "e93c270ee30ecd692c165e873ee26ec6c602a778f9527da71cf4c131f8d87e92",
+    "filament": "ee2c9caab7bcecbbceba3dda6ca7a5420afc9163296ed42a3a13780f1af7333c"
+  },
+  "material_status": "ELEGOO TPU95A white trial based on Generic TPU A1 mini; user reports TPU loaded; not calibrated",
+  "geometry_check_sha256": "3e01ddc549e2a217a5013197dab070c667d6360ec2da27665d19a2844c46ee30",
+  "scope": "Selected standalone fit-test pieces: common-cuff. NOT complete jaws; consult geometry check for retention limitations."
+}

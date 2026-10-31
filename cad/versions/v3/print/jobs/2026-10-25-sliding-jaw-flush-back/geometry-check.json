@@ -1,0 +1,10 @@
+{
+  "revision": "sliding-jaw-flush-back",
+  "valid": true,
+  "solid_count": 1,
+  "bed_plane_x_mm": -10,
+  "cleat_shift_x_mm": 0,
+  "limits": [
+    "Offline PETG design study; strength and band preload unqualified."
+  ]
+}

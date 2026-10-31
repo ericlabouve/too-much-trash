@@ -1,0 +1,29 @@
+{
+  "cad_revision": "ramped-retainers-v3",
+  "slice_recipe": "bridged-axle-slot",
+  "geometry_placement_orientation_profiles_unchanged": true,
+  "only_setting_change": "pulley_axle enable_support 1 \u2192 0",
+  "mount_hole": "Round, unchanged. Teardrop rejected by user.",
+  "support_before_g": 0.4801,
+  "support_after_g": 0.45,
+  "support_saved_g": 0.030100000000000016,
+  "total_before_g": 13.778148651123047,
+  "total_after_g": 13.748059272766113,
+  "minutes_before": 107.59661458333333,
+  "minutes_after": 107.192041015625,
+  "axle_support_after_g": 0,
+  "bridge_paths_identical_to_supported_slice": true,
+  "bridge_segments": 147,
+  "slot_roof_bridge_heights_mm": [
+    18.56
+  ],
+  "slot_roof_bridge_segments": 40,
+  "nominal_slot_span_mm": 3.4,
+  "longest_slot_bridge_segment_with_anchors_mm": 5.196136738000663,
+  "bridge_paths_sha256": "0e94137769745a5900ec75e6e1da0450e70c25081893ad5033caa7fc5a410338",
+  "limits": [
+    "No printer contacted. Bridging success and cross-key fit remain untested.",
+    "Check for sag inside the slot before inserting the key; do not force it.",
+    "Existing mechanical checks remain applicable to unchanged geometry; this is not new physical validation."
+  ]
+}

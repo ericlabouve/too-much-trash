@@ -1,0 +1,802 @@
+{
+  "revision": "fixed-retention-pair-v1",
+  "options": [
+    {
+      "id": "stud",
+      "title": "1 \u00b7 Integral T-stud",
+      "parts": [
+        {
+          "name": "Fixed C cuff",
+          "file": "assets/c_fixed_c_cuff.stl",
+          "color": "#13a6b3",
+          "group": "cuff",
+          "explode": [
+            -12,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1428.423
+        },
+        {
+          "name": "Fixed adaptable seats",
+          "file": "assets/c_fixed_adaptable_seats.stl",
+          "color": "#96bc41",
+          "group": "cuff",
+          "explode": [
+            -12,
+            0,
+            0
+          ],
+          "solids": 2,
+          "volume_mm3": 317.685
+        },
+        {
+          "name": "Sliding lower C cuff",
+          "file": "assets/c_sliding_lower_c_cuff.stl",
+          "color": "#13a6b3",
+          "group": "cuff",
+          "explode": [
+            12,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1428.423
+        },
+        {
+          "name": "Sliding lower adaptable seats",
+          "file": "assets/c_sliding_lower_adaptable_seats.stl",
+          "color": "#96bc41",
+          "group": "cuff",
+          "explode": [
+            12,
+            0,
+            0
+          ],
+          "solids": 2,
+          "volume_mm3": 317.685
+        },
+        {
+          "name": "Sliding lower Pierced T +0",
+          "file": "assets/c_sliding_lower_pierced_t_plus_0.stl",
+          "color": "#dc792b",
+          "group": "key",
+          "explode": [
+            32,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 426.086
+        },
+        {
+          "name": "Sliding lower Existing axle key +0",
+          "file": "assets/c_sliding_lower_existing_axle_key_plus_0.stl",
+          "color": "#4389d6",
+          "group": "key",
+          "explode": [
+            0,
+            0,
+            15
+          ],
+          "solids": 1,
+          "volume_mm3": 119.834
+        },
+        {
+          "name": "Sliding upper C cuff",
+          "file": "assets/c_sliding_upper_c_cuff.stl",
+          "color": "#13a6b3",
+          "group": "cuff",
+          "explode": [
+            12,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1428.423
+        },
+        {
+          "name": "Sliding upper adaptable seats",
+          "file": "assets/c_sliding_upper_adaptable_seats.stl",
+          "color": "#96bc41",
+          "group": "cuff",
+          "explode": [
+            12,
+            0,
+            0
+          ],
+          "solids": 2,
+          "volume_mm3": 317.685
+        },
+        {
+          "name": "Sliding upper Pierced T +0",
+          "file": "assets/c_sliding_upper_pierced_t_plus_0.stl",
+          "color": "#dc792b",
+          "group": "key",
+          "explode": [
+            32,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 426.086
+        },
+        {
+          "name": "Sliding upper Existing axle key +0",
+          "file": "assets/c_sliding_upper_existing_axle_key_plus_0.stl",
+          "color": "#4389d6",
+          "group": "key",
+          "explode": [
+            0,
+            0,
+            15
+          ],
+          "solids": 1,
+          "volume_mm3": 119.834
+        },
+        {
+          "name": "Sliding jaw and interlocking tongue",
+          "file": "assets/c_sliding_jaw_and_interlocking_tongue.stl",
+          "color": "#efaa50",
+          "group": "sliding",
+          "explode": [
+            -18,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 6002.743
+        },
+        {
+          "name": "Removable shaft cap and 120 mm rail",
+          "file": "assets/c_removable_shaft_cap_and_120_mm_rail.stl",
+          "color": "#d79748",
+          "group": "cap",
+          "explode": [
+            18,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 20769.41
+        },
+        {
+          "name": "Stock neck",
+          "file": "assets/c_stock_neck.stl",
+          "color": "#a2adb4",
+          "group": "neck",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 31122.0
+        },
+        {
+          "name": "Phone envelope 76 \u00d7 152 \u00d7 8 mm",
+          "file": "assets/c_phone_envelope_76___152___8_mm.stl",
+          "color": "#35404a",
+          "group": "phone",
+          "explode": [
+            0,
+            0,
+            25
+          ],
+          "solids": 1,
+          "volume_mm3": 91267.629
+        },
+        {
+          "name": "Current actuator_bracket",
+          "file": "assets/c_current_actuator_bracket.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 9152.514
+        },
+        {
+          "name": "Current plunger",
+          "file": "assets/c_current_plunger.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 2177.355
+        },
+        {
+          "name": "Current pulley",
+          "file": "assets/c_current_pulley.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 643.545
+        },
+        {
+          "name": "Current pulley_axle",
+          "file": "assets/c_current_pulley_axle.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1016.894
+        },
+        {
+          "name": "Current pulley_key",
+          "file": "assets/c_current_pulley_key.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 119.834
+        },
+        {
+          "name": "Volume button \u00b7 bare near example",
+          "file": "assets/c_volume_button___bare_near_example.stl",
+          "color": "#dc4545",
+          "group": "button",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 2.366
+        },
+        {
+          "name": "Fixed jaw 1 \u00b7 Integral T-stud",
+          "file": "assets/fixed_stud_fixed_jaw_1___integral_tminus_stud.stl",
+          "color": "#efaa50",
+          "group": "fixed",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 18904.85
+        }
+      ],
+      "detail_parts": [
+        {
+          "name": "Fixed C cuff",
+          "file": "assets/c_fixed_c_cuff.stl",
+          "color": "#13a6b3",
+          "group": "cuff",
+          "explode": [
+            -13,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1428.423
+        },
+        {
+          "name": "Fixed adaptable seats",
+          "file": "assets/c_fixed_adaptable_seats.stl",
+          "color": "#96bc41",
+          "group": "cuff",
+          "explode": [
+            -13,
+            0,
+            0
+          ],
+          "solids": 2,
+          "volume_mm3": 317.685
+        },
+        {
+          "name": "Detail jaw 1 \u00b7 Integral T-stud",
+          "file": "assets/fixed_stud_detail_jaw_1___integral_tminus_stud.stl",
+          "color": "#efaa50",
+          "group": "fixed",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1603.813
+        },
+        {
+          "name": "Stock neck context",
+          "file": "assets/fixed_stud_stock_neck_context.stl",
+          "color": "#a2adb4",
+          "group": "neck",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 6384.0
+        }
+      ],
+      "checks": {
+        "jaw_valid": true,
+        "jaw_solids": 1,
+        "jaw_neck_overlap_mm3": 0,
+        "jaw_cuff_overlap_mm3": 0,
+        "common_cuff_unchanged": true,
+        "fixed_cuff_width_mm": 21.6,
+        "earlier_root_cuff_interference_mm3": 110.3800487,
+        "root_refinement": "Upright trimmed to the X=-13.1 backing face above Z0; cuff untouched, continuous L retained.",
+        "Current actuator_bracket_new_jaw_overlap_mm3": 0,
+        "Current plunger_new_jaw_overlap_mm3": 0,
+        "Current pulley_new_jaw_overlap_mm3": 0,
+        "Current pulley_axle_new_jaw_overlap_mm3": 0,
+        "Current pulley_key_new_jaw_overlap_mm3": 0,
+        "Volume button \u00b7 bare near example_new_jaw_overlap_mm3": 0,
+        "rigid_cuff_pullout_after_1mm_obstruction_mm3": 14.7280213,
+        "head_width_mm": 9.2,
+        "cuff_opening_width_mm": 6.8,
+        "required_behavior": "TPU must deform over the head; rigid PETG insertion is not possible without deformation. No strain or pull-off force simulation."
+      },
+      "notes": [
+        "T-stud is part of the rigid jaw: zero loose fixed-retainer parts.",
+        "Cuff flexes over the tapered head; same cuff opening and recess as both sliding cuffs.",
+        "No rear stem. TPU insertion effort, peeling, creep and pull-off retention remain untested. Do not force PETG over the stud."
+      ]
+    },
+    {
+      "id": "short",
+      "title": "2 \u00b7 Short T + sideways shared key",
+      "parts": [
+        {
+          "name": "Fixed C cuff",
+          "file": "assets/c_fixed_c_cuff.stl",
+          "color": "#13a6b3",
+          "group": "cuff",
+          "explode": [
+            -12,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1428.423
+        },
+        {
+          "name": "Fixed adaptable seats",
+          "file": "assets/c_fixed_adaptable_seats.stl",
+          "color": "#96bc41",
+          "group": "cuff",
+          "explode": [
+            -12,
+            0,
+            0
+          ],
+          "solids": 2,
+          "volume_mm3": 317.685
+        },
+        {
+          "name": "Sliding lower C cuff",
+          "file": "assets/c_sliding_lower_c_cuff.stl",
+          "color": "#13a6b3",
+          "group": "cuff",
+          "explode": [
+            12,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1428.423
+        },
+        {
+          "name": "Sliding lower adaptable seats",
+          "file": "assets/c_sliding_lower_adaptable_seats.stl",
+          "color": "#96bc41",
+          "group": "cuff",
+          "explode": [
+            12,
+            0,
+            0
+          ],
+          "solids": 2,
+          "volume_mm3": 317.685
+        },
+        {
+          "name": "Sliding lower Pierced T +0",
+          "file": "assets/c_sliding_lower_pierced_t_plus_0.stl",
+          "color": "#dc792b",
+          "group": "key",
+          "explode": [
+            32,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 426.086
+        },
+        {
+          "name": "Sliding lower Existing axle key +0",
+          "file": "assets/c_sliding_lower_existing_axle_key_plus_0.stl",
+          "color": "#4389d6",
+          "group": "key",
+          "explode": [
+            0,
+            0,
+            15
+          ],
+          "solids": 1,
+          "volume_mm3": 119.834
+        },
+        {
+          "name": "Sliding upper C cuff",
+          "file": "assets/c_sliding_upper_c_cuff.stl",
+          "color": "#13a6b3",
+          "group": "cuff",
+          "explode": [
+            12,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1428.423
+        },
+        {
+          "name": "Sliding upper adaptable seats",
+          "file": "assets/c_sliding_upper_adaptable_seats.stl",
+          "color": "#96bc41",
+          "group": "cuff",
+          "explode": [
+            12,
+            0,
+            0
+          ],
+          "solids": 2,
+          "volume_mm3": 317.685
+        },
+        {
+          "name": "Sliding upper Pierced T +0",
+          "file": "assets/c_sliding_upper_pierced_t_plus_0.stl",
+          "color": "#dc792b",
+          "group": "key",
+          "explode": [
+            32,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 426.086
+        },
+        {
+          "name": "Sliding upper Existing axle key +0",
+          "file": "assets/c_sliding_upper_existing_axle_key_plus_0.stl",
+          "color": "#4389d6",
+          "group": "key",
+          "explode": [
+            0,
+            0,
+            15
+          ],
+          "solids": 1,
+          "volume_mm3": 119.834
+        },
+        {
+          "name": "Sliding jaw and interlocking tongue",
+          "file": "assets/c_sliding_jaw_and_interlocking_tongue.stl",
+          "color": "#efaa50",
+          "group": "sliding",
+          "explode": [
+            -18,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 6002.743
+        },
+        {
+          "name": "Removable shaft cap and 120 mm rail",
+          "file": "assets/c_removable_shaft_cap_and_120_mm_rail.stl",
+          "color": "#d79748",
+          "group": "cap",
+          "explode": [
+            18,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 20769.41
+        },
+        {
+          "name": "Stock neck",
+          "file": "assets/c_stock_neck.stl",
+          "color": "#a2adb4",
+          "group": "neck",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 31122.0
+        },
+        {
+          "name": "Phone envelope 76 \u00d7 152 \u00d7 8 mm",
+          "file": "assets/c_phone_envelope_76___152___8_mm.stl",
+          "color": "#35404a",
+          "group": "phone",
+          "explode": [
+            0,
+            0,
+            25
+          ],
+          "solids": 1,
+          "volume_mm3": 91267.629
+        },
+        {
+          "name": "Current actuator_bracket",
+          "file": "assets/c_current_actuator_bracket.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 9152.514
+        },
+        {
+          "name": "Current plunger",
+          "file": "assets/c_current_plunger.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 2177.355
+        },
+        {
+          "name": "Current pulley",
+          "file": "assets/c_current_pulley.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 643.545
+        },
+        {
+          "name": "Current pulley_axle",
+          "file": "assets/c_current_pulley_axle.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1016.894
+        },
+        {
+          "name": "Current pulley_key",
+          "file": "assets/c_current_pulley_key.stl",
+          "color": "#efaa50",
+          "group": "actuator",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 119.834
+        },
+        {
+          "name": "Volume button \u00b7 bare near example",
+          "file": "assets/c_volume_button___bare_near_example.stl",
+          "color": "#dc4545",
+          "group": "button",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 2.366
+        },
+        {
+          "name": "Fixed jaw 2 \u00b7 Short T + sideways shared key",
+          "file": "assets/fixed_short_fixed_jaw_2___short_t_plus__sideways_shared_key.stl",
+          "color": "#efaa50",
+          "group": "fixed",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 18570.038
+        },
+        {
+          "name": "Short removable T",
+          "file": "assets/fixed_short_short_removable_t.stl",
+          "color": "#dc792b",
+          "group": "key",
+          "explode": [
+            -25,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 303.437
+        },
+        {
+          "name": "Existing 12.2 mm sideways keeper",
+          "file": "assets/fixed_short_existing_12_2_mm_sideways_keeper.stl",
+          "color": "#4389d6",
+          "group": "key",
+          "explode": [
+            0,
+            -20,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 119.834
+        }
+      ],
+      "detail_parts": [
+        {
+          "name": "Fixed C cuff",
+          "file": "assets/c_fixed_c_cuff.stl",
+          "color": "#13a6b3",
+          "group": "cuff",
+          "explode": [
+            -13,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1428.423
+        },
+        {
+          "name": "Fixed adaptable seats",
+          "file": "assets/c_fixed_adaptable_seats.stl",
+          "color": "#96bc41",
+          "group": "cuff",
+          "explode": [
+            -13,
+            0,
+            0
+          ],
+          "solids": 2,
+          "volume_mm3": 317.685
+        },
+        {
+          "name": "Detail jaw 2 \u00b7 Short T + sideways shared key",
+          "file": "assets/fixed_short_detail_jaw_2___short_t_plus__sideways_shared_key.stl",
+          "color": "#efaa50",
+          "group": "fixed",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 1273.285
+        },
+        {
+          "name": "Stock neck context",
+          "file": "assets/fixed_short_stock_neck_context.stl",
+          "color": "#a2adb4",
+          "group": "neck",
+          "explode": [
+            0,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 6384.0
+        },
+        {
+          "name": "Short removable T",
+          "file": "assets/fixed_short_short_removable_t.stl",
+          "color": "#dc792b",
+          "group": "key",
+          "explode": [
+            -25,
+            0,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 303.437
+        },
+        {
+          "name": "Existing 12.2 mm sideways keeper",
+          "file": "assets/fixed_short_existing_12_2_mm_sideways_keeper.stl",
+          "color": "#4389d6",
+          "group": "key",
+          "explode": [
+            0,
+            -20,
+            0
+          ],
+          "solids": 1,
+          "volume_mm3": 119.834
+        }
+      ],
+      "checks": {
+        "jaw_valid": true,
+        "jaw_solids": 1,
+        "jaw_neck_overlap_mm3": 0,
+        "jaw_cuff_overlap_mm3": 0,
+        "common_cuff_unchanged": true,
+        "fixed_cuff_width_mm": 21.6,
+        "earlier_root_cuff_interference_mm3": 110.3800487,
+        "root_refinement": "Upright trimmed to the X=-13.1 backing face above Z0; cuff untouched, continuous L retained.",
+        "Short removable T_neck_overlap_mm3": 0,
+        "Short removable T_jaw_overlap_mm3": 0,
+        "Short removable T_cuff_overlap_mm3": 0,
+        "Short removable T_neck_distance_mm": 0.5,
+        "Existing 12.2 mm sideways keeper_neck_overlap_mm3": 0,
+        "Existing 12.2 mm sideways keeper_jaw_overlap_mm3": 0,
+        "Existing 12.2 mm sideways keeper_cuff_overlap_mm3": 0,
+        "Existing 12.2 mm sideways keeper_neck_distance_mm": 1.8,
+        "Current actuator_bracket_new_jaw_overlap_mm3": 0,
+        "Current actuator_bracket / Short removable T_overlap_mm3": 0,
+        "Current actuator_bracket / Existing 12.2 mm sideways keeper_overlap_mm3": 0,
+        "Current plunger_new_jaw_overlap_mm3": 0,
+        "Current plunger / Short removable T_overlap_mm3": 0,
+        "Current plunger / Existing 12.2 mm sideways keeper_overlap_mm3": 0,
+        "Current pulley_new_jaw_overlap_mm3": 0,
+        "Current pulley / Short removable T_overlap_mm3": 0,
+        "Current pulley / Existing 12.2 mm sideways keeper_overlap_mm3": 0,
+        "Current pulley_axle_new_jaw_overlap_mm3": 0,
+        "Current pulley_axle / Short removable T_overlap_mm3": 0,
+        "Current pulley_axle / Existing 12.2 mm sideways keeper_overlap_mm3": 0,
+        "Current pulley_key_new_jaw_overlap_mm3": 0,
+        "Current pulley_key / Short removable T_overlap_mm3": 0,
+        "Current pulley_key / Existing 12.2 mm sideways keeper_overlap_mm3": 0,
+        "Volume button \u00b7 bare near example_new_jaw_overlap_mm3": 0,
+        "Volume button \u00b7 bare near example / Short removable T_overlap_mm3": 0,
+        "Volume button \u00b7 bare near example / Existing 12.2 mm sideways keeper_overlap_mm3": 0,
+        "short_T_keeper_overlap_mm3": 0,
+        "locked_T_pullout_after_1mm_obstruction_mm3": 15.6095811,
+        "short_T_total_length_mm": 8.6,
+        "nominal_tip_ligament_mm": 1.1,
+        "nominal_front_channel_wall_mm": 1.1,
+        "keeper_service_path_max_overlap_mm3": 0,
+        "T_service_without_keeper_max_overlap_mm3": 0
+      },
+      "notes": [
+        "New 8.6 mm short T; the sideways keeper is the exact existing 12.2 mm axle key, turned so its head does not point into the neck.",
+        "T tip stops 0.5 mm before the modeled neck. Nominal tip ligament and channel front wall are only 1.1 mm: marginal until printed/load-tested.",
+        "Remove phone, slide blue keeper out sideways, then withdraw amber T toward phone. Keeper drift, finger access and print tolerances remain unresolved."
+      ]
+    }
+  ],
+  "common": "Same three 21.6 mm cuffs and unchanged two sliding crosslocks. Neither fixed option selected. Review only; no print or production promotion.",
+  "limitations": [
+    "Static nominal geometry and sampled local paths, not strength/TPU validation.",
+    "Current bare-near actuator only; full travel, all phones, camera view, collar fasteners and twine remain unqualified.",
+    "Exploded views illustrate separation, not a deforming TPU insertion simulation."
+  ]
+}

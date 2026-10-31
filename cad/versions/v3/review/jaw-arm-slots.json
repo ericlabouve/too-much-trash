@@ -1,0 +1,129 @@
+{
+  "revision": "support-neutral-jaw-slots-v3",
+  "passed": true,
+  "geometry": {
+    "carrier": {
+      "valid": true,
+      "one_solid": true,
+      "removed_mm3": 529.207471375521,
+      "no_added_material": true,
+      "guide_edges_root_and_stop_preserved": true
+    },
+    "sliding_jaw": {
+      "valid": true,
+      "one_solid": true,
+      "removed_mm3": 625.2074713755501,
+      "no_added_material": true,
+      "guide_edges_root_and_stop_preserved": true
+    }
+  },
+  "identical_support_segments": true,
+  "identical_interface_segments": true,
+  "identical_profiles": true,
+  "baseline_total_g": 47.401004791259766,
+  "candidate_total_g": 46.87590408325195,
+  "saved_g": 0.5251007080078125,
+  "baseline_minutes": 351.30787760416666,
+  "candidate_minutes": 352.12024739583336,
+  "baseline_objects": {
+    "carrier": {
+      "deposited_g_by_role": {
+        "support": 2.1334,
+        "model": 33.3234,
+        "interface": 0.4501
+      },
+      "deposited_xy_bounds": [
+        [
+          33.25,
+          20.713
+        ],
+        [
+          146.75,
+          69.287
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        20.6
+      ]
+    },
+    "sliding_jaw": {
+      "deposited_g_by_role": {
+        "interface": 0.0125,
+        "support": 0.0167,
+        "model": 11.3935
+      },
+      "deposited_xy_bounds": [
+        [
+          29.41,
+          105.45
+        ],
+        [
+          150.59,
+          144.55
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        1.4
+      ]
+    }
+  },
+  "candidate_objects": {
+    "carrier": {
+      "deposited_g_by_role": {
+        "support": 2.1334,
+        "model": 32.9474,
+        "interface": 0.4501
+      },
+      "deposited_xy_bounds": [
+        [
+          33.25,
+          20.713
+        ],
+        [
+          146.75,
+          69.287
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        20.6
+      ]
+    },
+    "sliding_jaw": {
+      "deposited_g_by_role": {
+        "interface": 0.0125,
+        "support": 0.0167,
+        "model": 11.2445
+      },
+      "deposited_xy_bounds": [
+        [
+          29.41,
+          105.45
+        ],
+        [
+          150.59,
+          144.55
+        ]
+      ],
+      "support_z_mm": [
+        0.2,
+        1.4
+      ]
+    }
+  },
+  "job_paths": [
+    "print/jobs/2026-10-25-jaw-arm-baseline",
+    "print/jobs/2026-10-25-jaw-arm-slots"
+  ],
+  "hashes": {
+    "print/jobs/2026-10-25-jaw-arm-baseline/cuff-fit.gcode.3mf": "3594d0936c20d10b3048a109a46ca5a956d713e35212232e2a113f6c14d9917f",
+    "print/jobs/2026-10-25-jaw-arm-slots/cuff-fit.gcode.3mf": "41d0046e8801fb9992a998994b2d2a10f12dbafadf0e342871c688a2dd914798"
+  },
+  "limits": [
+    "Existing supports remain; no additional supports is not support-free.",
+    "Physical 35-degree roof quality, sliding catch/wear, bending and loaded retention unverified.",
+    "Existing phone-fit and whole-route failures remain. No print sent."
+  ]
+}

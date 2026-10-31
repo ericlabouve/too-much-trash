@@ -1,0 +1,27 @@
+{
+  "revision": "through-window-fixed-jaw-v3",
+  "candidate": false,
+  "parts": {
+    "carrier": {
+      "before_mm3": 41745.946457754035,
+      "after_mm3": 41745.946457754035,
+      "valid": true,
+      "solid_count": 1
+    },
+    "sliding_jaw": {
+      "before_mm3": 15553.067532821844,
+      "after_mm3": 15553.067532821844,
+      "valid": true,
+      "solid_count": 1
+    }
+  },
+  "roof_angle_from_bed_degrees": 35,
+  "source_sha256": {
+    "model.py": "d48e040c2342adbc0479b8ee85adeadaee6207ab4dea3b0d1bd58f690e0dd0e9",
+    "jaw_arm_slots.py": "5194bb36c00b285836ef190da01b2946640d7c1255c273f00e807cf342625e38"
+  },
+  "limits": [
+    "Slice comparison only. Not strength or retention validation.",
+    "Current printer and loaded spool not queried."
+  ]
+}

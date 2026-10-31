@@ -1,0 +1,106 @@
+{
+  "date": "2026-10-16",
+  "revision": "enlarged-cuff-v1",
+  "status": "20% enlarged cuff with thicker flat back; unprinted",
+  "intent": "One revised key design for actuator and cuff; direct T into original C backwall, no second pin or separate TPU T",
+  "materials": "All three pieces PETG for initial fit trial; ELEGOO TPU 95A White 1.75 mm cuff later. Viewer colors distinguish functions.",
+  "illustrative_case_mm": [
+    76,
+    154,
+    11
+  ],
+  "usable_screen_mm": [
+    70,
+    146
+  ],
+  "cuff_length_mm": 12,
+  "contact_stations": [
+    [
+      -38,
+      -50
+    ],
+    [
+      -38,
+      50
+    ],
+    [
+      38,
+      0
+    ]
+  ],
+  "constraints": [
+    "Preserve C pocket topology and green seats; enlarge both 20%, keep key holes unchanged",
+    "No camera or usable screen overlap in illustrative case",
+    "No second transverse key",
+    "No custom pink TPU T",
+    "One revised key geometry for BOTH roles",
+    "Do not change approved production actuator yet"
+  ],
+  "shared_key": {
+    "source": "build_shared_key.py",
+    "mesh": "fit-key.stl",
+    "length_mm": 12.2,
+    "head_width_mm": 7,
+    "head_axial_depth_mm": 1.2,
+    "stem_mm": [
+      3,
+      3
+    ],
+    "original_head_axial_depth_mm": 3,
+    "original_length_mm": 14,
+    "head_front_x_mm": -3.62,
+    "head_rear_x_mm": -4.82,
+    "stem_tip_x_mm": -15.82,
+    "production_changed": false,
+    "geometry_changed_from_previous_candidate": false
+  },
+  "cuff_interface": {
+    "head_pocket_yz_mm": [
+      7.4,
+      3.4
+    ],
+    "stem_passage_yz_mm": [
+      3.4,
+      3.4
+    ],
+    "pocket_step_x_mm": -5.02,
+    "jaw_x_mm": [
+      -10.8,
+      -6.8
+    ],
+    "pullout_latch": false,
+    "interference_fit": false,
+    "release": "Phone removed; key withdraws toward C opening",
+    "friction_ribs": {
+      "count": 0,
+      "removed_for": "Rigid PETG clearance-fit trial",
+      "passage_mm": 3.4,
+      "nominal_clearance_per_side_mm": 0.2,
+      "total_nominal_interference_mm": 0,
+      "positive_latch": false
+    }
+  },
+  "validation": [
+    "CAD valid single-solid candidate",
+    "41 actuator insertion samples",
+    "Axle axial obstruction and bracket clearance",
+    "81 cuff insertion positions",
+    "707 C wall rays",
+    "Illustrative keepouts both phone orientations",
+    "Independent view cubes and responsive viewer",
+    "Solid cuff/jaw/key CAD and watertight STL checks",
+    "41 insertion samples through rib-free socket: no solid overlap"
+  ],
+  "limits": [
+    "Cuff pull-out retention unresolved",
+    "Thinner key head and keeper-band behavior untested",
+    "No deformation/force simulation",
+    "Active 14 mm pocket and 18/20 mm conflicts unchanged",
+    "No print authorization",
+    "PETG is a rigid assembly check; no TPU grip/cushioning validation",
+    "No designed friction retention: key can slide out",
+    "Previous smaller cuff-only retry succeeded per user; this enlarged cuff needs new slicing and physical fit checks"
+  ],
+  "cuff_scale": 1.2,
+  "back_wall_behind_head_mm": 1.7
+}

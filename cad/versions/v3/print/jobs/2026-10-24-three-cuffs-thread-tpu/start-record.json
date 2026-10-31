@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-24",
+  "authorization": "User requested send to printer and confirmed bed clear and TPU ready.",
+  "printer": "tmt-a1-mini",
+  "remote_file": "/tmt-three-cuffs-tpu-abc60920.gcode.3mf",
+  "uploaded_bytes": 1529956,
+  "gcode_md5": "abc60920df0ab6b9f207f3672760d7c1",
+  "remote_download_hash_verified": true,
+  "plate": 1,
+  "bed_type": "textured_plate",
+  "use_ams": false,
+  "observed_state": "RUNNING",
+  "observed_stage": "heatbed_preheating",
+  "observed_material": "white TPU, external spool",
+  "print_error": 0,
+  "remaining_minutes": 111,
+  "completion": "Not observed",
+  "physical_result": "Pending"
+}

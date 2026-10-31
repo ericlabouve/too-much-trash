@@ -7,7 +7,12 @@ try{
  for(const v of versions.values())select.add(new Option(v.label,v.id));
  function show(id){
   const v=versions.get(id)||versions.get(registry.default);
-  select.value=v.id;const viewerUrl=new URL(v.viewer,location.href);viewerUrl.searchParams.set("load",Date.now());frame.src=viewerUrl.href;frame.title=v.label;note.textContent=v.note;
+  select.value=v.id;const viewerUrl=new URL(v.viewer,location.href);
+  if(v.id==='v3'){
+   const requested=new URLSearchParams(location.search);
+   for(const key of ['sample','side','revision','focus'])if(requested.has(key))viewerUrl.searchParams.set(key,requested.get(key));
+  }
+  viewerUrl.searchParams.set("load",Date.now());frame.src=viewerUrl.href;frame.title=v.label;note.textContent=v.note;
   const url=new URL(location.href);url.searchParams.set('version',v.id);history.replaceState(null,'',url);
   try{localStorage.setItem('tmt-design-version',v.id);}catch{}
  }

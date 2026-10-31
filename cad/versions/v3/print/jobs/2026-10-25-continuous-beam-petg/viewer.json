@@ -1,0 +1,32 @@
+{
+  "title": "Continuous-beam sliding jaw \u00b7 PETG support review \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 continuous-beam-sliding-jaw-v3",
+  "notes": [
+    "One complete jaw. Beam rear face down; tongue upright. No automatic reorientation.",
+    "A1 mini0.4 / Bambu PETG Translucent /0.12 mm /Normal Snug automatic supports enabled.",
+    "Blue scaffold and purple interface are actual G-code paths. Inspect contacts under the raised tongue root/cleat and remove residue from sliding faces.",
+    "Review only; printer not contacted. Physical strength, ramp quality and cuff retention unverified."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

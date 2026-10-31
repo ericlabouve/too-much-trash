@@ -1,0 +1,121 @@
+{
+  "passed": true,
+  "configurations": {
+    "wallet-near": [
+      {
+        "fastener": 1,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583743,
+        "slot_intersection_mm3": 0.0
+      },
+      {
+        "fastener": 2,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583743,
+        "slot_intersection_mm3": 0.0
+      }
+    ],
+    "wallet-far": [
+      {
+        "fastener": 1,
+        "nut_bearing_area_estimate_mm2": 149.62293934612234,
+        "head_bearing_area_estimate_mm2": 39.416450485837416,
+        "slot_intersection_mm3": 0.0
+      },
+      {
+        "fastener": 2,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583742,
+        "slot_intersection_mm3": 0.0
+      }
+    ],
+    "bare-near": [
+      {
+        "fastener": 1,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583743,
+        "slot_intersection_mm3": 0.0
+      },
+      {
+        "fastener": 2,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583743,
+        "slot_intersection_mm3": 0.0
+      }
+    ],
+    "bare-far": [
+      {
+        "fastener": 1,
+        "nut_bearing_area_estimate_mm2": 149.62293934612234,
+        "head_bearing_area_estimate_mm2": 39.416450485837416,
+        "slot_intersection_mm3": 0.0
+      },
+      {
+        "fastener": 2,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583742,
+        "slot_intersection_mm3": 0.0
+      }
+    ],
+    "small-near": [
+      {
+        "fastener": 1,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583743,
+        "slot_intersection_mm3": 0.0
+      },
+      {
+        "fastener": 2,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583743,
+        "slot_intersection_mm3": 0.0
+      }
+    ],
+    "small-far": [
+      {
+        "fastener": 1,
+        "nut_bearing_area_estimate_mm2": 149.62293934612234,
+        "head_bearing_area_estimate_mm2": 39.416450485837416,
+        "slot_intersection_mm3": 0.0
+      },
+      {
+        "fastener": 2,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583742,
+        "slot_intersection_mm3": 0.0
+      }
+    ],
+    "large-near": [
+      {
+        "fastener": 1,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 39.41645048583743,
+        "slot_intersection_mm3": 0.0
+      },
+      {
+        "fastener": 2,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 60.12181461496288,
+        "slot_intersection_mm3": 0.0
+      }
+    ],
+    "large-far": [
+      {
+        "fastener": 1,
+        "nut_bearing_area_estimate_mm2": 149.62293934612228,
+        "head_bearing_area_estimate_mm2": 60.12181461496272,
+        "slot_intersection_mm3": 0.0
+      },
+      {
+        "fastener": 2,
+        "nut_bearing_area_estimate_mm2": 149.62293934612234,
+        "head_bearing_area_estimate_mm2": 39.41645048583743,
+        "slot_intersection_mm3": 0.0
+      }
+    ]
+  },
+  "limitations": [
+    "Bearing estimated using 0.1 mm virtual penetration; not a strength, preload, wear or printed tolerance calculation.",
+    "14 mm pocket fit conflicts are separate and remain unresolved for the recorded wallet/large envelopes."
+  ]
+}

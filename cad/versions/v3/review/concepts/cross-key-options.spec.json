@@ -1,0 +1,28 @@
+{
+  "status": "Option B selected by user; no strength or print qualification",
+  "selected_option": "B",
+  "selection_date": "2026-10-14",
+  "request_date": "2026-10-14",
+  "A": {
+    "head_width_mm": 3,
+    "stem_width_mm": 3,
+    "thickness_mm": 3,
+    "warning": "Wide head stop removed; replacement retention not designed"
+  },
+  "B": {
+    "head_width_mm": 7,
+    "stem_width_mm": 3,
+    "thickness_mm": 3,
+    "warning": "Wide head retained; physical retention untested"
+  },
+  "unchanged": [
+    "14 mm key length",
+    "stem band notches"
+  ],
+  "views": [
+    "face",
+    "edge",
+    "orthographic 3D"
+  ],
+  "common_scale": true
+}

@@ -1,0 +1,110 @@
+{
+  "revision": "integral-stud-coupon-v1",
+  "reference_only": true,
+  "printer_contacted": false,
+  "pieces": 1,
+  "plates": 1,
+  "total_g": 0.7658194899559021,
+  "total_minutes": 15.216510009765624,
+  "warning": "",
+  "deposited_g_by_role": {
+    "model": 0.6801,
+    "interface": 0.005
+  },
+  "objects": {
+    "integral-stud": {
+      "deposited_g_by_role": {
+        "model": 0.6801,
+        "interface": 0.005
+      },
+      "deposited_xy_bounds": [
+        [
+          84.41,
+          79.41
+        ],
+        [
+          95.59,
+          100.59
+        ]
+      ],
+      "support_z_mm": [
+        2.6,
+        3.32
+      ]
+    }
+  },
+  "gaps": [],
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "effective_object_settings": [
+    {
+      "name": "integral-stud",
+      "extruder": "1",
+      "wall_loops": "3",
+      "enable_support": "1",
+      "sparse_infill_density": "15%",
+      "sparse_infill_pattern": "gyroid"
+    }
+  ],
+  "verified_gcode_heat_waits_c": {
+    "bed": 70,
+    "nozzle": 250
+  },
+  "gcode_md5": "6fa340da40e5dd879654257e29ec23cb",
+  "hashes": {
+    "cuff-fit-input.3mf": "6a3aa2bd6138bac4d6cb5e9030b060aaf9d0f43398163dc589a600d502948141",
+    "cuff-fit.gcode.3mf": "d7bd9bb6a22b750a584fb10e346b3ae0332daf6e2ff1ac6f0e359a7a42b78603",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "limits": [
+    "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "One rigid stud/backing coupon only; the common 21.6 mm TPU cuff will be printed separately.",
+    "Inspect and remove support/interface under the T-head shoulders before fitting TPU. Do not force a PETG cuff onto this stud.",
+    "Fit coupon does not validate the full jaw, phone grip, creep or loaded strength."
+  ]
+}

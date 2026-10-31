@@ -1,0 +1,73 @@
+{
+  "revision": "shared-cleat-softened-edges",
+  "date": "2026-10-07",
+  "user_constraints": [
+    "Remove cover and large tray",
+    "Move pulley to bottom",
+    "Remove stops nearest volume button",
+    "Move upper stops to immediately before pulley",
+    "Broad perpendicular plunger tip to tolerate misalignment",
+    "Add retaining lip at fixed return-band anchor",
+    "Replace string hole with wrap-and-tie attachment near top of plunger T",
+    "Smooth transition into tip; assess rounded rectangle as stronger alternative",
+    "Return band wraps the same capped cleat as the string",
+    "Round exposed edges throughout all printed pieces for a polished appearance"
+  ],
+  "interpretation": "Stops refers to paired slider guide/stop features. Lower pair and press shoulders removed. Remaining pair at Y18..25.5 immediately above pulley ending at Y17; upper guide edge shortened 0.5 mm to avoid the illustrated return loop at full stroke. Broad shoe spans Z (phone thickness), perpendicular to reference button long axis X.",
+  "dimensions_mm": {
+    "frame": [
+      29.5,
+      66,
+      18
+    ],
+    "pulley_center": [
+      8,
+      8
+    ],
+    "prior_pulley_center": [
+      8,
+      29
+    ],
+    "tip_contact_X_Z": [
+      6,
+      16
+    ],
+    "tip_corner_radius": 1.5,
+    "tip_axial_depth": 4,
+    "guide_Y": [
+      18,
+      25.5
+    ],
+    "fixed_band_lip": [
+      21,
+      6.5,
+      2
+    ],
+    "cleat_cap": [
+      9,
+      8,
+      2.5
+    ]
+  },
+  "superseding_geometry": "Rounded rectangular shoe with curved supports supersedes trapezoid. Nominal root area 24 vs 16 mm2. Contact plane shifts from Y-6 to Y-8 to fit blend below frame; phone reference translated by -2 mm without resizing. Rounded cap retains wrapped twine; no hole.",
+  "strength_conclusion": "Rounded edge treatment preserves nominal working dimensions; prior 24 mm2 root area is a nominal rectangular-envelope comparison, before edge rounds. No physical strength validation.",
+  "validation": "review.json: 73 rigid samples through 18 mm, band vs all rigid parts and string wrap vs frame at 0/9/18 mm. Flexible geometry illustrative.",
+  "unresolved": [
+    "Pulley axial retention following cover removal",
+    "Mount to V3 rail",
+    "Band and knot clearances under load",
+    "Physical stroke limit for actual button",
+    "Print orientation and strength"
+  ],
+  "inline_compliance": "User-selected rubber band joins split twine along grabber neck; not modeled inside actuator.",
+  "scope": "Isolated V3 study; not backported or integrated into full harness. Prior PNG depicts superseded covered-tray concept.",
+  "shared_cleat": "Removed separate band yoke. Return band lies at Z10.1 at cleat, string wrap at Z11.65, under same cap. Actual textile size and mutual rubbing unvalidated.",
+  "edge_radii_mm": {
+    "frame_outline": 1.2,
+    "frame_rim": 0.35,
+    "guide_edges": 0.25,
+    "plunger_edges": 0.3,
+    "pulley_edges": 0.25,
+    "cleat_cap_rim": 0.35
+  }
+}

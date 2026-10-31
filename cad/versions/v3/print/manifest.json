@@ -1,0 +1,190 @@
+{
+  "units": "mm",
+  "scale_percent": 100,
+  "nozzle_mm": 0.4,
+  "layer_mm": 0.2,
+  "revision": "verified-diamond-axle-v3",
+  "status": "Review prototype: consult current validation and service reports; physical fit, strength and force unvalidated",
+  "parts": [
+    {
+      "name": "shaft_cap",
+      "file": "shaft_cap.stl",
+      "quantity": 1,
+      "material": "PETG / PLA",
+      "bounds_mm": [
+        107.0,
+        120.0,
+        16.8
+      ],
+      "bed_z_min_mm": 8.539492889059869e-16,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Approved taller cap, X12 exterior down (CAD Y+90), 2.6 mm slot ends; matches final PETG plate."
+    },
+    {
+      "name": "carrier",
+      "file": "carrier.stl",
+      "quantity": 1,
+      "material": "PETG / PLA",
+      "bounds_mm": [
+        107.0,
+        48.997,
+        104.5
+      ],
+      "bed_z_min_mm": -3.422910763308116e-17,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Approved flat X-5.8 underside down (CAD Y+90), lower hook ramp; matches final PETG plate. Approved upright orientation; 6 mm arm/tongue slot with 35-degree roof. Matched PETG 0.12 mm automatic-support slice adds no support geometry; existing supports remain. See 2026-10-25-jaw-arm-slots. Physical roof quality, sliding fit and loaded strength unverified."
+    },
+    {
+      "name": "sliding_jaw",
+      "file": "sliding_jaw.stl",
+      "quantity": 1,
+      "material": "PETG / PLA",
+      "bounds_mm": [
+        39.52,
+        121.6,
+        58.5
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Two 31 x 4 mm beam windows leave 3.8 mm edge rails; tongue slot and central/stud islands retained. Fresh slice required. Continuous beam and root share X-10 rear bed face (CAD Y-90) and X-2 front face. Beam/studs shift5.2 mm; assembly slides outward5.2 mm to preserve cuff contacts. See flush-beam PETG slice; physical strength, engagement and band preload unverified."
+    },
+    {
+      "name": "phone_cuff",
+      "file": "phone_cuff.stl",
+      "quantity": 3,
+      "material": "ELEGOO TPU 95A",
+      "bounds_mm": [
+        17.505,
+        21.6,
+        8.94
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Common 21.6 mm TPU cuff, back down. User reports tiny first-layer supports unnecessary; cuff batch disables support. Not a complete-jaw qualification."
+    },
+    {
+      "name": "actuator_bracket",
+      "file": "actuator_bracket.stl",
+      "quantity": 1,
+      "material": "PETG / PLA",
+      "bounds_mm": [
+        66.0,
+        51.0,
+        19.8
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Common flat Y5.4 back face down (-90 degrees about X). Outer pulley cheek/arm and raised plinth removed; remaining boss raised 2 mm. Extended curved guide and independent return stop. Fresh slice required; support savings and cantilever strength unqualified."
+    },
+    {
+      "name": "plunger",
+      "file": "plunger.stl",
+      "quantity": 1,
+      "material": "PETG / PLA",
+      "bounds_mm": [
+        58.0,
+        16.0,
+        11.9
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Rounded shoe and cleat need slice review; keep supports off guide surfaces."
+    },
+    {
+      "name": "pulley",
+      "file": "pulley.stl",
+      "quantity": 1,
+      "material": "PETG / PLA",
+      "bounds_mm": [
+        17.999,
+        17.999,
+        4.0
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Axis vertical, flange on bed. Keep bore and cord groove clean; running clearance unvalidated."
+    },
+    {
+      "name": "pulley_axle",
+      "file": "pulley_axle.stl",
+      "quantity": 1,
+      "material": "PETG / PLA",
+      "bounds_mm": [
+        10.999,
+        10.998,
+        23.304
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "No thread. Head-down orientation provisional; cross-key slot needs slice review."
+    },
+    {
+      "name": "pulley_key",
+      "file": "pulley_key.stl",
+      "quantity": 1,
+      "material": "ELEGOO TPU 95A",
+      "bounds_mm": [
+        7.071,
+        14.7,
+        7.071
+      ],
+      "bed_z_min_mm": 8.881784197001252e-16,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "ELEGOO TPU95A T/V snap prototype, uniform3 mm thickness flat on bed. Fresh TPU slice and insertion/reopening/pull-out tests required. Keep channels open; retain keeper until qualified."
+    },
+    {
+      "name": "collar_screw",
+      "file": "collar_screw.stl",
+      "quantity": 5,
+      "material": "ELEGOO TPU 95A",
+      "bounds_mm": [
+        13.997,
+        13.998,
+        34.2
+      ],
+      "bed_z_min_mm": -8.571568438585613e-16,
+      "watertight": true,
+      "layer_mm": 0.12,
+      "supports": "Head on bed; longer 8\u00d73 profile, flush tip. New grip length requires fit and loaded tests."
+    },
+    {
+      "name": "thumb_nut",
+      "file": "thumb_nut.stl",
+      "quantity": 5,
+      "material": "ELEGOO TPU 95A",
+      "bounds_mm": [
+        18.0,
+        15.588,
+        6.0
+      ],
+      "bed_z_min_mm": 1.0000000116860974e-07,
+      "watertight": true,
+      "layer_mm": 0.12,
+      "supports": "Flat on bed; no supports. Fit trial first."
+    },
+    {
+      "name": "clip_string_guide",
+      "file": "clip_string_guide.stl",
+      "quantity": 1,
+      "material": "ELEGOO TPU 95A",
+      "bounds_mm": [
+        17.0,
+        30.198,
+        6.0
+      ],
+      "bed_z_min_mm": 0.0,
+      "watertight": true,
+      "layer_mm": 0.2,
+      "supports": "Axial end flat on bed; vertical 4 mm hole and constant-section clip. TPU 95A. Fresh slice and physical snap-fit test required; no support-free claim before slicing."
+    }
+  ]
+}

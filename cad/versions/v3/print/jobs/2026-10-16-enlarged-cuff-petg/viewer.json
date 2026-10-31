@@ -1,0 +1,29 @@
+{
+  "title": "Enlarged PETG cuff \u00b7 single-plate slice review",
+  "subtitle": "1 separate pieces at 100% scale \u00b7 enlarged-cuff-v1",
+  "notes": [
+    "Cuff only: 20% larger C arms and seats; reinforced flat back with 1.7 mm head shoulder. Key openings unchanged. No designed pull-out latch. Physical fit and strength require review."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "title": "Three TPU cuffs + screw and nut trial \u00b7 single-plate slice review",
+  "subtitle": "5 separate pieces at 100% scale \u00b7 integral-stud-cuff-batch-tpu-v1",
+  "notes": [
+    "Three exact identical 21.6 mm cuffs; supports disabled per user feedback. Back-down orientation unchanged.",
+    "One unchanged 8x3 thumb screw and matching nut in TPU for fit comparison only; not approved structural fasteners.",
+    "Same TPU recipe as successful cuff: 230C nozzle, 35C bed, 0.12 mm layers, 25 mm/s primary speeds, 2 mm3/s volumetric limit."
+  ],
+  "links": [
+    {
+      "label": "Sliced Bambu Studio project",
+      "href": "cuff-fit.gcode.3mf"
+    },
+    {
+      "label": "Editable arranged plate",
+      "href": "cuff-fit-input.3mf"
+    },
+    {
+      "label": "Source geometry and object settings",
+      "href": "inputs.json"
+    },
+    {
+      "label": "Static support projections",
+      "href": "support-details.png"
+    },
+    {
+      "label": "Whole plate overview",
+      "href": "plate-overview.png"
+    }
+  ]
+}

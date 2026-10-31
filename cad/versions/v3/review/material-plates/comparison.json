@@ -1,0 +1,162 @@
+{
+  "plates": [
+    {
+      "plate": "1",
+      "title": "PETG \u00b7 all seven rigid parts",
+      "job": "2026-10-26-flush-fins-petg",
+      "pieces": 7,
+      "grams": 78.74777221679688,
+      "minutes": 549.2658203125,
+      "support_g": 0.37639999999999996,
+      "warning": ""
+    },
+    {
+      "plate": "2",
+      "title": "TPU \u00b7 all flexible parts",
+      "job": "2026-10-26-material-tpu",
+      "pieces": 15,
+      "grams": 18.922273635864258,
+      "minutes": 256.54259440104164,
+      "support_g": 0,
+      "warning": ""
+    }
+  ],
+  "pieces": 22,
+  "parts": [
+    {
+      "design": "sliding_jaw",
+      "name": "Sliding jaw",
+      "plate": "1",
+      "material": "PETG",
+      "quantity": 1,
+      "support_g": 0.0292,
+      "model_g": 13.0678,
+      "support_each_g": 0.0292,
+      "model_each_g": 13.0678
+    },
+    {
+      "design": "carrier",
+      "name": "Fixed jaw",
+      "plate": "1",
+      "material": "PETG",
+      "quantity": 1,
+      "support_g": 0.2379,
+      "model_g": 27.1878,
+      "support_each_g": 0.2379,
+      "model_each_g": 27.1878
+    },
+    {
+      "design": "shaft_cap",
+      "name": "Shaft cap",
+      "plate": "1",
+      "material": "PETG",
+      "quantity": 1,
+      "support_g": 0.0,
+      "model_g": 26.6209,
+      "support_each_g": 0.0,
+      "model_each_g": 26.6209
+    },
+    {
+      "design": "pulley",
+      "name": "Redirect pulley",
+      "plate": "1",
+      "material": "PETG",
+      "quantity": 1,
+      "support_g": 0.0,
+      "model_g": 0.6603,
+      "support_each_g": 0.0,
+      "model_each_g": 0.6603
+    },
+    {
+      "design": "actuator_bracket",
+      "name": "Actuator bracket",
+      "plate": "1",
+      "material": "PETG",
+      "quantity": 1,
+      "support_g": 0.1094,
+      "model_g": 8.0154,
+      "support_each_g": 0.1094,
+      "model_each_g": 8.0154
+    },
+    {
+      "design": "plunger",
+      "name": "Plunger",
+      "plate": "1",
+      "material": "PETG",
+      "quantity": 1,
+      "support_g": 0.0,
+      "model_g": 1.8391,
+      "support_each_g": 0.0,
+      "model_each_g": 1.8391
+    },
+    {
+      "design": "pulley_axle",
+      "name": "Smooth axle",
+      "plate": "1",
+      "material": "PETG",
+      "quantity": 1,
+      "support_g": 0.0,
+      "model_g": 0.9087,
+      "support_each_g": 0.0,
+      "model_each_g": 0.9087
+    },
+    {
+      "design": "phone_cuff",
+      "name": "Rounded cuff",
+      "plate": "2",
+      "material": "TPU 95A",
+      "quantity": 3,
+      "support_g": 0.0,
+      "model_g": 5.1702,
+      "support_each_g": 0.0,
+      "model_each_g": 1.7234
+    },
+    {
+      "design": "collar_screw",
+      "name": "Common long screw",
+      "plate": "2",
+      "material": "TPU 95A",
+      "quantity": 5,
+      "support_g": 0.0,
+      "model_g": 7.6419999999999995,
+      "support_each_g": 0.0,
+      "model_each_g": 1.5284
+    },
+    {
+      "design": "thumb_nut",
+      "name": "Common nut",
+      "plate": "2",
+      "material": "TPU 95A",
+      "quantity": 5,
+      "support_g": 0.0,
+      "model_g": 4.8565000000000005,
+      "support_each_g": 0.0,
+      "model_each_g": 0.9713
+    },
+    {
+      "design": "pulley_key",
+      "name": "T/V axle key",
+      "plate": "2",
+      "material": "TPU 95A",
+      "quantity": 1,
+      "support_g": 0.0,
+      "model_g": 0.1638,
+      "support_each_g": 0.0,
+      "model_each_g": 0.1638
+    },
+    {
+      "design": "clip_string_guide",
+      "name": "Clip string guide",
+      "plate": "2",
+      "material": "TPU 95A",
+      "quantity": 1,
+      "support_g": 0.0,
+      "model_g": 1.0188,
+      "support_each_g": 0.0,
+      "model_each_g": 1.0188
+    }
+  ],
+  "rank_basis": "per-piece average; all-copies totals also shown",
+  "printer_contacted": false,
+  "rigid_arrangement": "Silhouette nesting fits all seven rigid parts on one plate; exact projected deposited-path separation checked where bounding boxes overlap."
+}

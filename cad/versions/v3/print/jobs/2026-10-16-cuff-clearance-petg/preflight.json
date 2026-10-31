@@ -1,0 +1,30 @@
+{
+  "date_local": "2026-10-16",
+  "user_authorization": "Print these three pieces in PETG; bed clear and ready; Bambu PETG Translucent Blue still loaded",
+  "printer_profile": "tmt-a1-mini",
+  "model": "a1mini",
+  "firmware": "01.08.01.00",
+  "nozzle_mm": "0.4",
+  "state": "FINISH",
+  "print_type": "idle",
+  "print_error": 0,
+  "hms": [],
+  "filament": {
+    "location": "external",
+    "material": "PETG",
+    "name": null,
+    "color": "0085D5FF"
+  },
+  "active_spool": "254",
+  "bed_type": "textured_plate",
+  "remote_file": "/tmt-v3-cuff-petg-b4d32270.gcode.3mf",
+  "sha256": "b4d3227079400be42cf8cbf8243478d86f08c95400d2ec0e4e57cd2cf7bfc755",
+  "gcode_md5": "d310afec4b21e401fa571e34f28896f8",
+  "parts": [
+    "fit-cuff",
+    "fit-jaw",
+    "fit-key"
+  ],
+  "physical_bed_clearance": "User confirmed; not inferred from telemetry",
+  "limits": "Rigid PETG dimensional fit only; no designed key pull-out retention."
+}

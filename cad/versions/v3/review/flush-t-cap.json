@@ -1,0 +1,125 @@
+{
+  "revision": "flat-back-mount-v3",
+  "passed": true,
+  "choice": "A: coplanar rail, not perpendicular flange",
+  "rail": {
+    "outer_plane_x_mm": 12,
+    "thickness_mm": 6,
+    "span_y_mm": 120,
+    "span_z_mm": [
+      16,
+      36
+    ],
+    "screw_z_mm": 26,
+    "old_screw_z_mm": -14,
+    "solid_middle": true,
+    "wing_slot_endpoint_centers_y_mm": [
+      [
+        -54,
+        -18.5
+      ],
+      [
+        18.5,
+        54
+      ]
+    ]
+  },
+  "adaptation": "Crossbar moved to cap end to clear the unchanged plunger and pulley; mounting bar moves inward 10 mm and upward 40 mm. Cap main face increased 0.7 mm to match existing ear faces.",
+  "unchanged": [
+    "11.6 x 17.6 mm neck opening",
+    "102 mm collar mating length",
+    "Four collar fastener stations and all fastener designs",
+    "Phone, plunger, pulley and cord positions",
+    "V1 and V2"
+  ],
+  "manufacturing_orientation": {
+    "axis": "Y",
+    "degrees": 90,
+    "bed_face": "common X12 exterior",
+    "support_free_verified": false
+  },
+  "configurations": {
+    "wallet-near": {
+      "screw_centers_y_mm": [
+        24.6
+      ],
+      "shaft_passage_intersections_mm3": [
+        0.0
+      ]
+    },
+    "wallet-far": {
+      "screw_centers_y_mm": [
+        -33.4
+      ],
+      "shaft_passage_intersections_mm3": [
+        0.0
+      ]
+    },
+    "bare-near": {
+      "screw_centers_y_mm": [
+        24.6
+      ],
+      "shaft_passage_intersections_mm3": [
+        0.0
+      ]
+    },
+    "bare-far": {
+      "screw_centers_y_mm": [
+        -33.4
+      ],
+      "shaft_passage_intersections_mm3": [
+        0.0
+      ]
+    },
+    "small-near": {
+      "screw_centers_y_mm": [
+        24.6
+      ],
+      "shaft_passage_intersections_mm3": [
+        0.0
+      ]
+    },
+    "small-far": {
+      "screw_centers_y_mm": [
+        -33.4
+      ],
+      "shaft_passage_intersections_mm3": [
+        0.0
+      ]
+    },
+    "large-near": {
+      "screw_centers_y_mm": [
+        39.6
+      ],
+      "shaft_passage_intersections_mm3": [
+        0.0
+      ]
+    },
+    "large-far": {
+      "screw_centers_y_mm": [
+        -48.4
+      ],
+      "shaft_passage_intersections_mm3": [
+        0.0
+      ]
+    }
+  },
+  "volumes": {
+    "shaft_cap": {
+      "previous_mm3": 35643.95,
+      "current_mm3": 37638.67,
+      "change_percent": 5.6
+    },
+    "actuator_bracket": {
+      "previous_mm3": 8482.12,
+      "current_mm3": 8750.78,
+      "change_percent": 3.17
+    }
+  },
+  "limitations": [
+    "Solid volume is not sliced filament use. Support savings unmeasured.",
+    "Local bracket-to-wing nominal gap is 0.2 mm, not a qualified printed tolerance.",
+    "Root strength, clamping retention and new mounting sequence require physical validation.",
+    "14 mm pocket conflict and unqualified button force/overtravel remain."
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "phone_cuff": {
+    "centered_mesh_vertex_distance_mm": 1.9433520434984615,
+    "volume_difference_mm3": 3.7505706657127575
+  },
+  "collar_screw": {
+    "centered_mesh_vertex_distance_mm": 0.0,
+    "volume_difference_mm3": 0.0
+  },
+  "thumb_nut": {
+    "centered_mesh_vertex_distance_mm": 0.0,
+    "volume_difference_mm3": 0.0
+  },
+  "pulley_key": {
+    "centered_mesh_vertex_distance_mm": 0.0,
+    "volume_difference_mm3": 0.0
+  },
+  "clip_string_guide": {
+    "centered_mesh_vertex_distance_mm": 0.0,
+    "volume_difference_mm3": 0.0
+  },
+  "note": "Prior validated cuff print mesh retained intentionally, as in the reviewed TPU plate. Other four TPU designs match current centered mesh vertices exactly. No TPU part or recipe changed in this update."
+}
