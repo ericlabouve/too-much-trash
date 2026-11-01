@@ -4,23 +4,38 @@ Run commands from `cad/` in the locked Python environment:
 
 ```sh
 uv sync --frozen
-uv run --frozen python cad.py list
-uv run --frozen python cad.py plan v3
-uv run --frozen python cad.py build v3
-uv run --frozen python cad.py check v3
-uv run --frozen python cad.py inventory --git --json build/inventory.json
-uv run --frozen python cad.py explain versions/v3/source/actuator_current/b-plunger.step
-uv run --frozen python cad.py build-site --versions all --output build/site
-uv run --frozen python cad.py serve v3 --site build/site --port 8767
+uv run inv --list
+uv run inv list
+uv run inv plan
+uv run inv build
+uv run inv check
+uv run inv inventory --git --json build/inventory.json
+uv run inv explain versions/v3/source/clip_current/clip.stl
+uv run inv build-site --versions all --output build/site
+uv run inv serve --site build/site --port 8767
 ```
 
-From the repository root, the same interface is available as
-`cad/.venv/bin/python cad/cad.py ...` after environment setup. `--help` lists
-options. `plan` shows the operation without creating files. Build and check
-commands create a new source snapshot under ignored `cad/build/<version>/`;
-`--output` selects a new directory. Existing output directories are rejected.
-The original version scripts continue to exist, but invoking them directly
-writes into their historical tracked output paths.
+Invoke is the convenience interface over `cad.py`; it forwards arguments without
+shell interpolation and preserves failure exit codes. Build, check, plan and
+serve default to V3; select another version with `--version v2` (not a positional
+version). `build-site` defaults to all versions; repeat `--versions v1 --versions
+v3` to select several. Use `uv run inv --help TASK` for task options.
+
+For historical data use `uv run inv artifacts.list --prefix PREFIX` or
+`uv run inv artifacts.restore --prefix PREFIX --site build/site`. Exact paths
+can be passed by repeating `--path`. A `--dry-run` does not restore files.
+
+The underlying interface remains available as `uv run --frozen python cad.py ...`
+from `cad/`, or `cad/.venv/bin/python cad/cad.py ...` from the repository root
+after environment setup. Its existing positional syntax is unchanged. Use
+`uv run --frozen inv ...` for locked CI runs. Invoke does not add automatic
+builds, slicing, artifact restoration or printer actions to other tasks.
+
+`plan` shows the operation without creating files. Build and check commands
+create a new source snapshot under ignored `cad/build/<version>/`; `--output`
+selects a new directory. Existing output directories are rejected. The original
+version scripts continue to exist, but invoking them directly writes into their
+historical tracked output paths.
 
 Each isolated run preserves the relative source layout and explicitly required
 geometry inputs. A `workspace-run.json` records source hashes, the command,
@@ -61,9 +76,9 @@ Use `cad.py artifacts list` and the hash-verified restore commands in
 [artifact-migration.md](artifact-migration.md). For example, from `cad/`:
 
 ```sh
-uv run --frozen python cad.py artifacts restore --dry-run
-uv run --frozen python cad.py artifacts list cad/versions/v3/print/jobs/
-uv run --frozen python cad.py artifacts restore --site build/site --prefix cad/versions/v3/print/jobs/2026-10-14-actuator-bridge
+uv run inv artifacts.restore --dry-run
+uv run inv artifacts.list --prefix cad/versions/v3/print/jobs/
+uv run inv artifacts.restore --site build/site --prefix cad/versions/v3/print/jobs/2026-10-14-actuator-bridge
 ```
 
 Historical restores need the catalog's baseline commit available in Git. Source
