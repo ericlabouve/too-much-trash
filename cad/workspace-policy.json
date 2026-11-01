@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "description": "Ordered, first-match inventory rules. Categories describe provenance, not permission to delete. Unknown files require review.",
+  "excluded_directory_names": [".git", ".venv", "venv", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", "build", "dist"],
+  "rules": [
+    {"pattern": "(^|/)motion-paths\\.json$", "category": "source-geometry", "reason": "Motion paths are inputs to concept viewers, even under review directories."},
+    {"pattern": "(^|/)source/actuator_current/.*\\.(step|stp)$", "category": "source-geometry", "reason": "Promoted actuator STEP solids are canonical design inputs."},
+    {"pattern": "^cad/versions/v3/source/clip_current/clip\\.stl$", "category": "source-geometry", "reason": "Canonical V3 build imports this approved TPU clip mesh as source geometry."},
+    {"pattern": "^cad/versions/v3/print/jobs/(2026-10-24-common-cuff-tpu-source/common-cuff\\.step|2026-10-24-three-cuffs-thread-tpu/cuff-1-bed\\.stl|2026-10-25-jaw-arm-slots-source/sliding_jaw\\.step|2026-10-26-final-materials-source/shaft_cap\\.stl|2026-10-26-ramped-fixed-hook-source/(carrier|shaft_cap)\\.(step|stl)|2026-10-30-straight-arm-clip-tpu/clip-source\\.stl)$", "category": "source-geometry", "reason": "Retained historical geometry is imported by specific study, comparison or preparation scripts; preserve its exact bytes and path."},
+    {"pattern": "^cad/versions/v3/print/sliding_jaw\\.stl$", "category": "source-geometry", "reason": "Retained historical jaw mesh is imported by plate preparation."},
+    {"pattern": "^cad/versions/v3/review/concepts/(closed-rail-sleeve-b/b-bracket\\.step|open-mount-clear-handle-b/b-(bracket|plunger)\\.step|uniform-rail-sleeve-b/b-bracket\\.step)$", "category": "source-geometry", "reason": "Retained concept STEP solids are inputs to historical study and check scripts."},
+    {"pattern": "(^|/)(start-record[^/]*|[^/]*physical[^/]*|[^/]*experiment[^/]*|[^/]*outcome[^/]*)\\.(json|md|txt|csv)$", "category": "physical-evidence", "reason": "Start, experiment, physical-observation or outcome record; preserve and inspect its contents before interpreting it as physical validation."},
+    {"pattern": "(^|/)print/jobs/[^/]+/(machine|filament|process|inputs|layout|manifest)\\.json$", "category": "config", "reason": "Recorded print job inputs, profiles or layout; preserve with the exact job package."},
+    {"pattern": "(^|/)print/jobs/.*\\.(gcode|stl|step|stp|bin|png|3mf|json|html|css|js)$", "category": "generated", "reason": "Job artifact or generated viewer data; preserve the exact printed package and do not remove before an audit."},
+    {"pattern": "^cad/reference/.*\\.(py|js|html|css)$", "category": "code", "reason": "Reference rendering or preview implementation."},
+    {"pattern": "^cad/reference/readme[^/]*\\.png$", "category": "generated", "reason": "Generated README preview or render; verify its dependencies before changing it."},
+    {"pattern": "^cad/reference/", "category": "reference", "reason": "Reference images, measurements and supporting material preserve design context."},
+    {"pattern": "^cad/renders/", "category": "reference", "reason": "Concept illustrations and their specification sidecars preserve user requirements."},
+    {"pattern": "(^|/)source/.*\\.(step|stp|stl|3mf|scad|fcstd|brep)$", "category": "review-needed", "reason": "Geometry in a source directory may be an input; establish provenance and dependencies before changing it."},
+    {"pattern": "(^|/)review/concepts/.*\\.(step|stp|stl|3mf|brep)$", "category": "review-needed", "reason": "Concept geometry may be a source input or review export; inspect before changing it."},
+    {"pattern": "\\.(py|js|cjs|mjs|html|css)$", "category": "code", "reason": "Executable or viewer implementation."},
+    {"pattern": "(^|/)(pyproject\\.toml|uv\\.lock|versions\\.json|workspace-policy\\.json|workspace-artifacts\\.json|workspace-retained-assets\\.json)$", "category": "config", "reason": "Workspace configuration or dependency lock."},
+    {"pattern": "(^|/)review/.*\\.json$", "category": "review-needed", "reason": "Review metadata may contain source inputs, validation results or experiment context; inspect before changing it."},
+    {"pattern": "(^|/)(print|review)/.*\\.(step|stp|stl|3mf|gcode|obj|glb|png|bin)$", "category": "generated", "reason": "Review or manufacturing output; may be intentionally tracked or needed by viewers, so preserve until audited."},
+    {"pattern": "\\.(step|stp|stl|3mf|gcode|obj|glb)$", "category": "review-needed", "reason": "Geometry or manufacturing file with uncertain provenance; inspect before changing it."},
+    {"pattern": "\\.(md|toml|yaml|yml)$", "category": "config", "reason": "Documentation or configuration retained for project context."}
+  ],
+  "fallback": {"category": "review-needed", "reason": "No explicit rule matches; inspect provenance and dependencies. Never infer deletion from this category."}
+}

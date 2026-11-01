@@ -1,1 +1,4 @@
 print/*.step -diff
+
+# Slicer output is generated printer code, not hand-written application source.
+*.gcode linguist-generated=true
