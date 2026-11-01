@@ -137,7 +137,8 @@ def main() -> int:
         return workspace_inventory.main(options)
     if args.command == 'list':
         for version, data in VERSIONS.items():
-            print(f'{version}: viewer={data["viewer"]}; build={data["source"]}/build.py; check={data["source"]}/{data["check"]}')
+            check = f'{data["source"]}/{data["check"]}' if version == 'v1' else f'workspace/check.py {version} (copied into snapshot)'
+            print(f'{version}: viewer={data["viewer"]}; build={data["source"]}/build.py; check={check}')
         return 0
     if args.command == 'serve':
         if not 0 <= args.port <= 65535:

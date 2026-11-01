@@ -27,6 +27,14 @@ Python version and completion status. A failed run retains its snapshot for
 diagnosis. CAD dependencies come from the shared environment; this is process
 isolation of outputs, not a container or a security sandbox.
 
+For V2/V3, `check` validates single solids and all eight sampled assembly
+configurations without exporting meshes. V3 distinguishes `mechanical_passed`
+from `checks_passed` in `review/workspace-validation.json`: the command exits
+successfully if mechanical checks pass even when undeformed phone/cuff overlaps
+remain. Current overlaps include thin-phone samples as well as the known
+incompatible 18/20 mm envelopes. Read the report; a zero exit status is not a
+claim of complete phone fit or physical validation.
+
 V1 is the preserved R4 implementation in `source/`. V2 and V3 have separate
 `versions/<version>/source/` implementations. V3 also imports shared V1 stock
 geometry and canonical geometry assets. Historical `study_*`, `prepare_*` and
