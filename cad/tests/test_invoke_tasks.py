@@ -9,19 +9,18 @@ import uuid
 from unittest.mock import patch
 
 CAD = Path(__file__).resolve().parents[1]
-INV = CAD / '.venv/bin/inv'
 
 
 def invoke(*args):
-    return subprocess.run([str(INV), *map(str, args)], cwd=CAD, text=True,
+    return subprocess.run([sys.executable, '-m', 'invoke', *map(str, args)], cwd=CAD, text=True,
                           capture_output=True)
 
 
 class InvokeTasksTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # Use the CAD interpreter so Invoke is available in the test environment.
-        if not INV.exists():
+        # Use the invoking environment; worktrees need not duplicate .venv.
+        if importlib.util.find_spec('invoke') is None:
             raise unittest.SkipTest('CAD Invoke environment is not installed')
 
     def test_cli_discovery_and_help(self):
