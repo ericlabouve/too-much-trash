@@ -79,15 +79,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish complete immutable release manifest
+        id: release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 backend/ops/cd/release.py "$GITHUB_SHA" release.json
-          gh release create "backend-$GITHUB_SHA" release.json --target "$GITHUB_SHA" \
-            --title "Backend ${GITHUB_SHA:0:12}" --notes "Complete ARM64 backend image release; deployment result is recorded in Actions." \
-            || gh release view "backend-$GITHUB_SHA" >/dev/null
-          gh release download "backend-$GITHUB_SHA" --pattern release.json --dir published
-          cmp release.json published/release.json
+          python3 backend/ops/cd/publish_release.py release.json >> "$GITHUB_OUTPUT"
       - uses: tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd # v4
         with:
           oauth-client-id: ${{ vars.TS_DEPLOY_CLIENT_ID }}
@@ -111,7 +108,7 @@ jobs:
       - name: Report deployment result
         if: always()
         run: |
-          echo "Backend release: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "Backend release: ${{ steps.release.outputs.tag }} ($GITHUB_SHA)" >> "$GITHUB_STEP_SUMMARY"
           echo "Result: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
 
   verify-public:
