@@ -2,8 +2,11 @@
 from __future__ import annotations
 
 import json
+import html
+import io
 from http.server import SimpleHTTPRequestHandler
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -11,6 +14,40 @@ import tempfile
 
 
 class SiteHandler(SimpleHTTPRequestHandler):
+    def list_directory(self, path):
+        # SimpleHTTPRequestHandler calls this only when no index file exists.
+        # Retained job metadata otherwise produces a misleading directory listing.
+        root = Path(self.directory).resolve()
+        try:
+            parts = Path(path).resolve().relative_to(root).parts
+        except ValueError:
+            return super().list_directory(path)
+        if (len(parts) >= 5 and parts[0] == 'versions' and
+                parts[1] in ('v2', 'v3') and parts[2:4] == ('print', 'jobs')):
+            prefix = 'cad/' + '/'.join(parts[:5])
+            cad = Path(__file__).resolve().parents[1]
+            catalog = json.loads((cad / 'workspace-artifacts.json').read_text())
+            if any(entry['path'].startswith(prefix + '/') for entry in catalog['artifacts']):
+                command = ['python3', 'cad/cad.py', 'artifacts', 'restore']
+                if root != cad:
+                    command.extend(['--site', str(root)])
+                command.extend(['--prefix', prefix])
+                body = ("<!doctype html><html><head><meta charset='utf-8'>"
+                        "<title>Restore historical preview</title></head><body>"
+                        "<h1>Restore historical preview</h1>"
+                        "<p>This job's preview files are stored in Git history. "
+                        "From the repository root, run:</p><pre>"
+                        + html.escape(shlex.join(command)) + "</pre>"
+                        "<p>Then reload this page. The pinned baseline commit must be available; "
+                        "see cad/artifact-migration.md for recovery details.</p></body></html>")
+                data = body.encode('utf-8')
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html; charset=utf-8')
+                self.send_header('Content-Length', str(len(data)))
+                self.end_headers()
+                return io.BytesIO(data)
+        return super().list_directory(path)
+
     def send_error(self, code, message=None, explain=None):
         if code == 404:
             message = 'Asset missing: build a site or restore the relevant historical artifact'

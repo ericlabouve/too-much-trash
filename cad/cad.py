@@ -116,7 +116,7 @@ def parser() -> argparse.ArgumentParser:
         q.add_argument('--output', help='new snapshot directory (default: unique cad/build/<version>/ directory)')
     q = sub.add_parser('build-site', help='build an isolated viewer site')
     q.add_argument('--versions', nargs='+', choices=[*VERSIONS, 'all'], default=['all'])
-    q.add_argument('--output', help='new site directory (default: unique cad/build/site directory)')
+    q.add_argument('--output', help='new directory under cad/build/ (default: unique cad/build/site directory)')
     q = sub.add_parser('serve', help='serve a viewer site on loopback')
     q.add_argument('version', choices=VERSIONS, nargs='?', default='v3')
     q.add_argument('--port', type=int, default=8765)
@@ -146,6 +146,8 @@ def main() -> int:
         from workspace.site import build_site
         versions = list(VERSIONS) if 'all' in args.versions else list(dict.fromkeys(args.versions))
         dest = output_path('site', 'site', args.output)
+        if CAD / 'build' not in dest.parents:
+            raise ValueError('site output must be a new directory under cad/build/ for artifact restoration')
         return build_site(CAD, dest, versions, VERSIONS)
     if args.command == 'serve':
         if not 0 <= args.port <= 65535:

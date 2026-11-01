@@ -43,7 +43,10 @@ geometry and canonical geometry assets. Historical `study_*`, `prepare_*` and
 exposes no slicing or printer operation.
 
 `build-site` builds fresh version snapshots and assembles authored viewer code with
-those outputs under a new ignored site directory. Use `--versions all` for full
+those outputs under a new ignored site directory within `cad/build/`. Its
+`--output` must also be within `cad/build/` so selected historical artifacts can
+be restored into the site. Build and check snapshots may still use new output
+directories elsewhere. Use `--versions all` for full
 V1/V2/V3 navigation. `serve --site` serves that site on IPv4 loopback. A source
 checkout no longer includes tracked manufacturing or preview payloads; legacy
 `serve` can use locally restored files but is not the clean-checkout workflow.
