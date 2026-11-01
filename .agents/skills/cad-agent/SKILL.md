@@ -9,6 +9,19 @@ Read the repository's `AGENTS.md`, the relevant version README, source and revie
 
 ## Workspace
 
+Start in `cad/` with `uv run inv --list` to discover the top-level tasks, then
+`uv run inv --help TASK` to inspect the relevant command and options. Prefer
+these entry points over direct historical generators, which can overwrite
+tracked paths. Read [the workspace guide](../../../cad/workspace.md) for the
+current build, viewer and recovery workflows.
+
+Before deciding whether a CAD file belongs in Git, inspect
+[the inventory policy](../../../cad/workspace-policy.json) with
+`uv run inv explain PATH` or `uv run inv inventory --git`. Check consumers and
+provenance as well as the classification. Maintain the corresponding ignore
+rules, source-input exceptions and site-retention list when dependencies change;
+never stage all build outputs or delete files solely by extension.
+
 Use [cad/workspace.md](../../../cad/workspace.md) for the interface and retention policy. From `cad/`, run `uv sync --frozen` when needed, then use the Invoke shortcuts `uv run inv` with:
 
 - `list` to discover versions; `plan` (or `--operation check`) to inspect a run without creating files.
