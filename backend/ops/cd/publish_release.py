@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 
 from release import validate_manifest
 
@@ -60,6 +61,19 @@ def list_releases():
     return [item for page in pages for item in page]
 
 
+def find_release(tag):
+    # GitHub can acknowledge draft creation before it appears in list results.
+    for attempt in range(10):
+        matches = [item for item in list_releases() if item["tag_name"] == tag]
+        if len(matches) > 1:
+            raise ValueError("Multiple releases have the selected tag")
+        if matches:
+            return matches[0]
+        if attempt < 9:
+            time.sleep(2)
+    raise ValueError("Release did not become visible; retry the deployment")
+
+
 def ensure_tag(tag, commit, existing):
     if existing:
         ref = api(API + "/git/ref/tags/" + tag)
@@ -99,10 +113,7 @@ def publish(manifest_path):
            + marker(commit))
     # The by-tag REST endpoint is documented for published releases. Refresh
     # the authenticated list instead so interrupted drafts are resumable.
-    current = [item for item in list_releases() if item["tag_name"] == tag]
-    if len(current) != 1:
-        raise ValueError("Expected exactly one release for the selected tag")
-    item = current[0]
+    item = find_release(tag)
     # target_commitish may be a descriptive branch name. The actual tag's Git
     # object (checked above), not that mutable branch, binds this release to SHA.
     if (marker(commit) not in (item.get("body") or "")

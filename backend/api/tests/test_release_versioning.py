@@ -61,6 +61,20 @@ class VersionSelectionTests(unittest.TestCase):
 
 
 class PublicationTests(unittest.TestCase):
+    def test_new_draft_eventually_appears_in_release_list(self):
+        draft = item("0.1.0", owned=True, draft=True)
+        with patch.object(publisher, "list_releases", side_effect=[[], [], [draft]]) as listing, \
+             patch.object(publisher.time, "sleep") as sleep:
+            self.assertEqual(publisher.find_release("0.1.0"), draft)
+        self.assertEqual(listing.call_count, 3)
+        self.assertEqual(sleep.call_count, 2)
+
+    def test_missing_draft_stops_after_bounded_wait(self):
+        with patch.object(publisher, "list_releases", return_value=[]) as listing, \
+             patch.object(publisher.time, "sleep"), self.assertRaises(ValueError):
+            publisher.find_release("0.1.0")
+        self.assertEqual(listing.call_count, 10)
+
     def manifest(self, directory):
         path = Path(directory) / "release.json"
         path.write_text(json.dumps({"version": 1, "commit": COMMIT, "images": {
