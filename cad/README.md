@@ -1,3 +1,9 @@
+# CAD workspace
+
+Use the [workspace commands and file policy](workspace.md) for shared commands,
+isolated builds and the source/artifact inventory across V1, V2 and V3.
+The historical V1 guide follows below.
+
 # R4 — adjustable reacher phone retrofit
 
 This guide describes **Version 1**, preserved at `printed-prototype-checkpoint`. The [versioned viewer](viewer.html) now also includes [Version 2: adjustable jaws, twine and rubber bands](versions/v2/README.md), a separate fit prototype with its own exports and an archived dedicated-cradle concept. V2 does not replace these V1 manufacturing files or accepted prints.

@@ -229,3 +229,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Isolated CAD workspace builds and inventory reports
+/cad/build/
