@@ -123,10 +123,29 @@ uploads or the saved collector origin just because a server is discovered.
 
 V1 uses `.github/workflows/backend-cd.yaml`: a merge into protected `main`
 builds API/worker/Caddy on GitHub-hosted Linux ARM64, publishes digest-pinned
-GHCR images and a complete `backend-<commit>` release manifest, then deploys
+GHCR images and a complete semantic-versioned release manifest, then deploys
 automatically. No second deployment approval, mini runner or Arcane agent.
 CI tests remain deferred; local verification and deployment smoke checks remain
 required. The API image also runs the explicit Alembic migration container.
+
+Automatic release tags and titles start at `0.1.0` and increment the minor
+version (`0.2.0`, `0.3.0`, ...), resetting patch to zero. The baseline is the
+highest published stable semantic version across all release pages, not the
+latest badge/date. Legacy `backend-<commit>` releases remain untouched; drafts,
+prereleases and non-version tags do not advance the baseline.
+
+Major releases are manual: publish `1.0.0` (or `v1.0.0`) in GitHub Releases,
+and the next merge to main produces `1.1.0`, then `1.2.0`. An unreleased Git
+tag alone does not advance the baseline. Publishing a manual release does not
+itself deploy; the workflow still triggers only on main updates.
+
+The serialized CD job records a commit marker, reuses that release/version on
+retry, and uploads/byte-verifies `release.json` while the release is a draft
+before publishing it. It refuses mismatched tags/manifests rather than moving
+tags or overwriting assets. A build/deployment's actual identity remains its
+full commit SHA and three image digests; image tags stay SHA-based. Release
+publication precedes rollout, so a published version is not proof of deployment
+success—check the Actions deployment and public verification results.
 
 The deployment job uses Tailscale OIDC constrained to this repository, `main`
 and this exact workflow. `tag:tmt-deploy` can reach only the mini's TCP22.
