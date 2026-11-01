@@ -112,6 +112,8 @@ class WorkspaceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / 'cad'
             root.mkdir()
+            (root / 'workspace-artifacts.json').write_text(json.dumps({'artifacts': []}))
+            (root / 'workspace-retained-assets.json').write_text(json.dumps({'paths': []}))
             (root / 'viewer.html').write_text('selector')
             (root / 'viewer-v1.html').write_text('viewer')
             (root / 'versions.json').write_text(json.dumps({
@@ -128,6 +130,33 @@ class WorkspaceTests(unittest.TestCase):
                 self.assertEqual(build_site(root, output, ['v1'], {}), 0)
             self.assertEqual((output / 'print/manifest.json').read_text(), 'fresh output')
             self.assertEqual((output / 'viewer.html').read_text(), 'selector')
+
+    def test_site_copies_retained_metadata_without_warm_or_cataloged_files(self):
+        from workspace.site import copy_retained_review_assets
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cad = root / 'cad'
+            review = cad / 'versions/v2/review'
+            review.mkdir(parents=True)
+            retained = review / 'retained.json'
+            cataloged = review / 'cataloged.json'
+            warm = review / 'warm.json'
+            for path in (retained, cataloged, warm):
+                path.write_text(path.name)
+            (cad / 'workspace-artifacts.json').write_text(json.dumps({'artifacts': [
+                {'path': 'cad/versions/v2/review/cataloged.json'}]}))
+            (cad / 'workspace-retained-assets.json').write_text(json.dumps({'paths': [
+                'cad/versions/v2/review/retained.json',
+                'cad/versions/v2/review/cataloged.json']}))
+            site = root / 'site'
+            copy_retained_review_assets(cad, site, ['v2'])
+            out = site / 'versions/v2/review'
+            self.assertEqual((out / 'retained.json').read_text(), 'retained.json')
+            self.assertFalse((out / 'cataloged.json').exists())
+            self.assertFalse((out / 'warm.json').exists())
+            (out / 'retained.json').write_text('fresh report')
+            copy_retained_review_assets(cad, site, ['v2'])
+            self.assertEqual((out / 'retained.json').read_text(), 'fresh report')
 
     def test_explain_rejects_path_escape(self):
         script = CAD / 'workspace_inventory.py'

@@ -16,7 +16,7 @@
     {"pattern": "(^|/)source/.*\\.(step|stp|stl|3mf|scad|fcstd|brep)$", "category": "review-needed", "reason": "Geometry in a source directory may be an input; establish provenance and dependencies before changing it."},
     {"pattern": "(^|/)review/concepts/.*\\.(step|stp|stl|3mf|brep)$", "category": "review-needed", "reason": "Concept geometry may be a source input or review export; inspect before changing it."},
     {"pattern": "\\.(py|js|cjs|mjs|html|css)$", "category": "code", "reason": "Executable or viewer implementation."},
-    {"pattern": "(^|/)(pyproject\\.toml|uv\\.lock|versions\\.json|workspace-policy\\.json|workspace-artifacts\\.json)$", "category": "config", "reason": "Workspace configuration or dependency lock."},
+    {"pattern": "(^|/)(pyproject\\.toml|uv\\.lock|versions\\.json|workspace-policy\\.json|workspace-artifacts\\.json|workspace-retained-assets\\.json)$", "category": "config", "reason": "Workspace configuration or dependency lock."},
     {"pattern": "(^|/)review/.*\\.json$", "category": "review-needed", "reason": "Review metadata may contain source inputs, validation results or experiment context; inspect before changing it."},
     {"pattern": "(^|/)(print|review)/.*\\.(step|stp|stl|3mf|gcode|obj|glb|png|bin)$", "category": "generated", "reason": "Review or manufacturing output; may be intentionally tracked or needed by viewers, so preserve until audited."},
     {"pattern": "\\.(step|stp|stl|3mf|gcode|obj|glb)$", "category": "review-needed", "reason": "Geometry or manufacturing file with uncertain provenance; inspect before changing it."},

@@ -18,6 +18,34 @@ class SiteHandler(SimpleHTTPRequestHandler):
         super().send_error(code, message, explain)
 
 
+def copy_retained_review_assets(cad: Path, dest: Path, versions: list[str]) -> None:
+    """Copy explicitly retained metadata; never copy cataloged artifact payloads.
+
+    The list works in source archives without Git. Existing destination files
+    are left intact so freshly generated reports take precedence.
+    """
+    catalog = json.loads((cad / 'workspace-artifacts.json').read_text())
+    excluded = {entry['path'] for entry in catalog['artifacts']}
+    retained = json.loads((cad / 'workspace-retained-assets.json').read_text())['paths']
+    prefixes = [f'cad/versions/{version}/{folder}/' for version in versions
+                if version != 'v1' for folder in ('review', 'print')]
+    if 'v1' in versions:
+        prefixes.append('cad/print/')
+    allowed = {'.json', '.md', '.txt', '.html', '.js', '.css', '.py', '.toml', '.yaml', '.yml'}
+    for name in retained:
+        if name in excluded or not any(name.startswith(prefix) for prefix in prefixes):
+            continue
+        relative = Path(name).relative_to('cad')
+        if '..' in relative.parts:
+            raise ValueError(f'invalid retained asset path: {name}')
+        source = cad / relative
+        target = dest / relative
+        if source.suffix.lower() not in allowed or source.is_symlink() or not source.is_file() or target.exists():
+            continue
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+
+
 def build_site(cad: Path, dest: Path, versions: list[str], definitions: dict) -> int:
     """Build versions in fresh snapshots; never use existing generated exports."""
     dest.mkdir(parents=True, exist_ok=False)
@@ -25,8 +53,8 @@ def build_site(cad: Path, dest: Path, versions: list[str], definitions: dict) ->
     build_root.mkdir(exist_ok=True)
     runs = Path(tempfile.mkdtemp(prefix='site-runs-', dir=build_root))
     try:
-        # Only authored top-level viewer resources and documentation. Historical
-        # reviews/jobs are supplied explicitly by the artifact restore workflow.
+        # Authored viewer resources and retained review records are separate
+        # from cataloged historical exports, which require explicit restoration.
         for name in ('version_navigation.js', 'view_cube.js', 'component_navigation.js',
                      'material_strategy.js', 'viewer.html', 'viewer-v1.html', 'bom.md'):
             path = cad / name
@@ -37,6 +65,7 @@ def build_site(cad: Path, dest: Path, versions: list[str], definitions: dict) ->
         if registry['default'] not in versions:
             registry['default'] = versions[0]
         (dest / 'versions.json').write_text(json.dumps(registry, indent=2) + '\n')
+        copy_retained_review_assets(cad, dest, versions)
         for version in versions:
             if version != 'v1':
                 source = cad / 'versions' / version

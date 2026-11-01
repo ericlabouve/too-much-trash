@@ -48,6 +48,11 @@ V1/V2/V3 navigation. `serve --site` serves that site on IPv4 loopback. A source
 checkout no longer includes tracked manufacturing or preview payloads; legacy
 `serve` can use locally restored files but is not the clean-checkout workflow.
 
+`workspace-retained-assets.json` explicitly lists retained print/review records
+and authored resources that the site needs. Update that list when adding a new
+record or source resource used by the site; routine generated outputs do not
+belong in it. Freshly built reports take precedence over retained records.
+
 Historical studies and exact print previews are distinct from the current build.
 Use `cad.py artifacts list` and the hash-verified restore commands in
 [artifact-migration.md](artifact-migration.md). For example, from `cad/`:
@@ -55,6 +60,7 @@ Use `cad.py artifacts list` and the hash-verified restore commands in
 ```sh
 uv run --frozen python cad.py artifacts restore --dry-run
 uv run --frozen python cad.py artifacts list cad/versions/v3/print/jobs/
+uv run --frozen python cad.py artifacts restore --site build/site --prefix cad/versions/v3/print/jobs/2026-10-14-actuator-bridge
 ```
 
 Historical restores need the catalog's baseline commit available in Git. Source
