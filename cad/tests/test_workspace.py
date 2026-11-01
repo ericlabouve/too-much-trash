@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 CAD = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(CAD))
@@ -23,7 +24,7 @@ class WorkspaceTests(unittest.TestCase):
         examples = {
             'cad/versions/v3/source/actuator_current/bracket.step': 'source-geometry',
             'cad/versions/v3/source/actuator_current/motion-paths.json': 'source-geometry',
-            'cad/versions/v3/review/concepts/straight-arm-clip-45/clip.stl': 'source-geometry',
+            'cad/versions/v3/source/clip_current/clip.stl': 'source-geometry',
             'cad/versions/v3/print/jobs/example/model.stl': 'generated',
             'cad/versions/v3/print/jobs/example/start-record.json': 'physical-evidence',
             'cad/versions/v3/print/jobs/example/machine.json': 'config',
@@ -81,7 +82,7 @@ class WorkspaceTests(unittest.TestCase):
             for relative in ('source/parameters.py', 'source/assembly.py',
                              'versions/v3/source/model.py',
                              'versions/v3/source/actuator_current/motion-paths.json',
-                             'versions/v3/review/concepts/straight-arm-clip-45/clip.stl'):
+                             'versions/v3/source/clip_current/clip.stl'):
                 self.assertTrue((dest / relative).is_file(), relative)
             source_steps = sorted((CAD / 'versions/v3/source/actuator_current').glob('*.step'))
             self.assertTrue(source_steps)
@@ -105,6 +106,28 @@ class WorkspaceTests(unittest.TestCase):
             self.assertEqual(report['totals']['files'], len(report['files']))
             self.assertEqual(report['totals']['bytes'], sum(f['bytes'] for f in report['files']))
             self.assertTrue(all('tracked' in f for f in report['files']))
+
+    def test_site_uses_fresh_outputs_not_legacy_exports(self):
+        from workspace.site import build_site
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / 'cad'
+            root.mkdir()
+            (root / 'viewer.html').write_text('selector')
+            (root / 'viewer-v1.html').write_text('viewer')
+            (root / 'versions.json').write_text(json.dumps({
+                'default': 'v1', 'versions': [{'id': 'v1'}]}))
+            (root / 'print').mkdir()
+            (root / 'print/manifest.json').write_text('stale legacy data')
+            def fake_build(command, check):
+                run = Path(command[command.index('--output') + 1])
+                (run / 'print').mkdir(parents=True)
+                (run / 'print/manifest.json').write_text('fresh output')
+                return subprocess.CompletedProcess(command, 0)
+            output = Path(tmp) / 'site'
+            with patch('workspace.site.subprocess.run', side_effect=fake_build):
+                self.assertEqual(build_site(root, output, ['v1'], {}), 0)
+            self.assertEqual((output / 'print/manifest.json').read_text(), 'fresh output')
+            self.assertEqual((output / 'viewer.html').read_text(), 'selector')
 
     def test_explain_rejects_path_escape(self):
         script = CAD / 'workspace_inventory.py'

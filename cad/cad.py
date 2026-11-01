@@ -6,7 +6,7 @@ import argparse
 import hashlib
 import json
 from functools import partial
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from http.server import ThreadingHTTPServer
 from pathlib import Path
 import shutil
 import shlex
@@ -15,7 +15,7 @@ import sys
 from datetime import datetime, timezone
 
 CAD = Path(__file__).resolve().parent
-V3_ASSET = Path('versions/v3/review/concepts/straight-arm-clip-45/clip.stl')
+V3_ASSET = Path('versions/v3/source/clip_current/clip.stl')
 VERSIONS = {
     'v1': {'source': 'source', 'viewer': 'viewer-v1.html', 'check': 'check_design.py',
            'report': 'print/validation.json'},
@@ -57,8 +57,6 @@ def describe(version: str, operation: str, dest: Path) -> tuple[Path, Path]:
         print(f'Copy: {CAD / data["source"]} -> {cwd}')
     if version != 'v1':
         print(f'Copy: {CAD / "workspace/check.py"} -> {cwd / "workspace_check.py"}')
-    if version == 'v3':
-        print(f'Copy: {CAD / V3_ASSET} -> {dest / V3_ASSET}')
     print(f'Working directory: {cwd}')
     command = [sys.executable, script] + ([version] if operation == 'check' and version != 'v1' else [])
     print(f'Command: {shlex.join(command)}')
@@ -92,12 +90,8 @@ def snapshot(version: str, dest: Path) -> None:
     root = dest if version == 'v1' else dest / 'versions' / version
     if version != 'v1':
         shutil.copy2(CAD / 'workspace/check.py', dest / VERSIONS[version]['source'] / 'workspace_check.py')
-    if version == 'v3':
-        asset = CAD / V3_ASSET
-        if asset.is_symlink() or not asset.is_file():
-            raise ValueError(f'missing or symlinked required source asset: {asset}')
-        (dest / V3_ASSET).parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(asset, dest / V3_ASSET)
+    if version == 'v3' and not (dest / V3_ASSET).is_file():
+        raise ValueError(f'missing required source asset: {CAD / V3_ASSET}')
     (root / 'print').mkdir(exist_ok=True)
     if version != 'v1':
         (root / 'review').mkdir(exist_ok=True)
@@ -107,6 +101,7 @@ def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest='command', required=True)
     sub.add_parser('list', help='list supported versions, checks and viewers')
+    sub.add_parser('artifacts', help='list or restore preserved historical artifacts')
     inventory = sub.add_parser('inventory', help='summarize workspace files and classifications')
     inventory.add_argument('--git', action='store_true')
     inventory.add_argument('--tracked-only', action='store_true')
@@ -119,13 +114,20 @@ def parser() -> argparse.ArgumentParser:
         if command == 'plan':
             q.add_argument('--operation', choices=('build', 'check'), default='build')
         q.add_argument('--output', help='new snapshot directory (default: unique cad/build/<version>/ directory)')
-    q = sub.add_parser('serve', help='serve the existing viewer on loopback')
+    q = sub.add_parser('build-site', help='build an isolated viewer site')
+    q.add_argument('--versions', nargs='+', choices=[*VERSIONS, 'all'], default=['all'])
+    q.add_argument('--output', help='new site directory (default: unique cad/build/site directory)')
+    q = sub.add_parser('serve', help='serve a viewer site on loopback')
     q.add_argument('version', choices=VERSIONS, nargs='?', default='v3')
     q.add_argument('--port', type=int, default=8765)
+    q.add_argument('--site', help='built site directory; omit to serve the legacy CAD tree')
     return p
 
 
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == 'artifacts':
+        from workspace import artifacts
+        return artifacts.main(sys.argv[2:])
     args = parser().parse_args()
     if args.command in ('inventory', 'explain'):
         import workspace_inventory
@@ -140,12 +142,26 @@ def main() -> int:
             check = f'{data["source"]}/{data["check"]}' if version == 'v1' else f'workspace/check.py {version} (copied into snapshot)'
             print(f'{version}: viewer={data["viewer"]}; build={data["source"]}/build.py; check={check}')
         return 0
+    if args.command == 'build-site':
+        from workspace.site import build_site
+        versions = list(VERSIONS) if 'all' in args.versions else list(dict.fromkeys(args.versions))
+        dest = output_path('site', 'site', args.output)
+        return build_site(CAD, dest, versions, VERSIONS)
     if args.command == 'serve':
         if not 0 <= args.port <= 65535:
             raise ValueError('port must be between 0 and 65535')
-        handler = partial(SimpleHTTPRequestHandler, directory=str(CAD))
+        from workspace.site import SiteHandler
+        root = Path(args.site).expanduser().resolve() if args.site else CAD
+        if not (root / VERSIONS[args.version]['viewer']).is_file():
+            raise ValueError(f'missing viewer in {root}; run build-site --versions all and serve --site PATH')
+        manifest = root / ('print/manifest.json' if args.version == 'v1' else f'versions/{args.version}/review/manifest.json')
+        if not manifest.is_file():
+            raise ValueError(f'missing viewer manifest {manifest}; run build-site --versions all and serve --site PATH')
+        if not args.site:
+            print('Serving legacy tree; if assets are missing, run build-site --versions all or restore historical artifacts.', flush=True)
+        handler = partial(SiteHandler, directory=str(root))
         with ThreadingHTTPServer(('127.0.0.1', args.port), handler) as server:
-            print(f'Open http://127.0.0.1:{server.server_port}/{VERSIONS[args.version]["viewer"]}', flush=True)
+            print(f'Open http://127.0.0.1:{server.server_port}/viewer.html?version={args.version}', flush=True)
             try:
                 server.serve_forever()
             except KeyboardInterrupt:

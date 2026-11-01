@@ -10,7 +10,8 @@ uv run --frozen python cad.py build v3
 uv run --frozen python cad.py check v3
 uv run --frozen python cad.py inventory --git --json build/inventory.json
 uv run --frozen python cad.py explain versions/v3/source/actuator_current/b-plunger.step
-uv run --frozen python cad.py serve v3 --port 8767
+uv run --frozen python cad.py build-site --versions all --output build/site
+uv run --frozen python cad.py serve v3 --site build/site --port 8767
 ```
 
 From the repository root, the same interface is available as
@@ -41,11 +42,27 @@ geometry and canonical geometry assets. Historical `study_*`, `prepare_*` and
 `slice_*` scripts are not automatically run by this interface. The interface
 exposes no slicing or printer operation.
 
-`serve` serves the existing CAD tree on IPv4 loopback, including its current
-tracked meshes and previews. It does not rebuild or promote isolated results.
-The isolated build snapshots contain manufacturing/review outputs, not a
-complete deployed viewer site. Viewer publication and artifact downloads remain
-a later migration step.
+`build-site` builds fresh version snapshots and assembles authored viewer code with
+those outputs under a new ignored site directory. Use `--versions all` for full
+V1/V2/V3 navigation. `serve --site` serves that site on IPv4 loopback. A source
+checkout no longer includes tracked manufacturing or preview payloads; legacy
+`serve` can use locally restored files but is not the clean-checkout workflow.
+
+Historical studies and exact print previews are distinct from the current build.
+Use `cad.py artifacts list` and the hash-verified restore commands in
+[artifact-migration.md](artifact-migration.md). For example, from `cad/`:
+
+```sh
+uv run --frozen python cad.py artifacts restore --dry-run
+uv run --frozen python cad.py artifacts list cad/versions/v3/print/jobs/
+```
+
+Historical restores need the catalog's baseline commit available in Git. Source
+archives and shallow clones may need to fetch that commit first. Restore an exact
+job into the source tree or a generated site when needed; do not overlay all old
+active outputs on a freshly built site. Older study/check scripts can depend on
+these restored inputs; they are not all independently reproducible from current
+source. The catalog does not rewrite history or provide an independent backup.
 
 ## File classification
 
@@ -69,9 +86,14 @@ An exact sliced file submitted for an experiment may be generated and still
 need durable archival outside the normal source tree. A start record identifies
 a launch; it does not establish successful printing or physical fit.
 
-This first migration phase preserves all existing artifacts. Raw G-code is
-marked generated for GitHub language statistics and diffs. No Git history is
-rewritten. Before untracking outputs, establish reproducible CAD and slicer
-recipes, durable storage of actual experimental jobs, and working viewer/test
-asset delivery. Compare shape validity and geometry rather than assuming STEP
-headers or slicer output will be byte-identical across tool versions.
+The audited migration removes generated payloads from current Git tracking and
+ignores their working copies. The catalog preserves paths, sizes and SHA-256
+hashes against a pinned Git commit; see [artifact-migration.md](artifact-migration.md)
+for the retained-input exceptions and exact historical recovery workflow.
+Routine new outputs belong under `build/` or agreed artifact storage. Preserve
+physical observations and exact submitted-job identifiers; keep irreplaceable
+references and genuinely required imported geometry as explicit source inputs.
+G-code remains marked generated for GitHub statistics if intentionally retained.
+Git history is unchanged, so existing clone/history size is not reduced by this
+commit alone. A separate history rewrite or external artifact archive is outside
+this migration.

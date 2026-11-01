@@ -14,7 +14,7 @@ def guide():
     from pathlib import Path
     import trimesh
     from OCP.BRepBuilderAPI import BRepBuilderAPI_Sewing
-    mesh = trimesh.load_mesh(Path(__file__).resolve().parents[1] / 'review/concepts/straight-arm-clip-45/clip.stl')
+    mesh = trimesh.load_mesh(Path(__file__).resolve().parent / 'clip_current/clip.stl')
     sew = BRepBuilderAPI_Sewing(1e-5)
     for tri in mesh.triangles:
         wire = cq.Wire.makePolygon([cq.Vector(*v) for v in tri], close=True)

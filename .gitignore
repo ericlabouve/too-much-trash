@@ -232,3 +232,43 @@ __marimo__/
 
 # Isolated CAD workspace builds and inventory reports
 /cad/build/
+
+# Rebuildable CAD print/review payloads; exact historical bytes are cataloged
+# in cad/workspace-artifacts.json and can be restored from Git history.
+/cad/**/print/**/*.stl
+/cad/**/print/**/*.step
+/cad/**/print/**/*.3mf
+/cad/**/print/**/*.bin
+/cad/**/print/**/*.glb
+/cad/**/print/**/*.png
+/cad/**/print/**/*.gcode
+/cad/**/print/**/manifest.json
+/cad/**/print/**/paths.json
+/cad/**/print/**/viewer.json
+/cad/**/review/**/*.stl
+/cad/**/review/**/*.step
+/cad/**/review/**/*.3mf
+/cad/**/review/**/*.bin
+/cad/**/review/**/*.glb
+/cad/**/review/**/*.png
+/cad/**/review/**/*.gcode
+/cad/**/review/**/manifest.json
+/cad/**/review/**/paths.json
+/cad/**/review/**/viewer.json
+/cad/**/print/jobs/**/index.html
+/cad/**/print/jobs/**/viewer.html
+/cad/**/print/jobs/**/viewer.css
+/cad/**/print/jobs/**/viewer.js
+!/cad/versions/v3/print/jobs/2026-10-24-common-cuff-tpu-source/common-cuff.step
+!/cad/versions/v3/print/jobs/2026-10-24-three-cuffs-thread-tpu/cuff-1-bed.stl
+!/cad/versions/v3/print/jobs/2026-10-25-jaw-arm-slots-source/sliding_jaw.step
+!/cad/versions/v3/print/jobs/2026-10-25-sliding-jaw-angle-35-source/sliding_jaw.step
+!/cad/versions/v3/print/jobs/2026-10-26-final-materials-source/shaft_cap.stl
+!/cad/versions/v3/print/jobs/2026-10-30-straight-arm-clip-tpu/clip-source.stl
+!/cad/versions/v3/print/sliding_jaw.stl
+!/cad/versions/v3/review/concepts/closed-rail-sleeve-b/b-bracket.step
+!/cad/versions/v3/review/concepts/open-mount-clear-handle-b/b-bracket.step
+!/cad/versions/v3/review/concepts/open-mount-clear-handle-b/b-plunger.step
+!/cad/versions/v3/review/concepts/uniform-rail-sleeve-b/b-bracket.step
+!/cad/versions/v3/print/jobs/2026-10-26-ramped-fixed-hook-source/*.stl
+!/cad/versions/v3/print/jobs/2026-10-26-ramped-fixed-hook-source/*.step
