@@ -19,6 +19,20 @@ Passkey enrollment, recovery and production admin identity remain separate work.
 All hosted credential traffic requires HTTPS. Codes and credentials must never
 appear in URLs, analytics, logs, UserDefaults, or committed configuration.
 
+### Local development shortcut
+
+The local Tailscale Compose overlay enables `TMT_DEVELOPMENT_KEYS`; the API is
+disabled by default and in production. An authenticated admin can create, list,
+and revoke scoped development keys in the private dashboard. Key values are
+shown only at creation; the database stores hashes. The private
+`POST /api/v1/admin/development-enroll` accepts a key and creates a regular,
+quota-limited installation; key records show last use and installation count.
+Revoking a key blocks future enrollment but does not revoke existing installations.
+Admin installation records expose `development_key_id` for review. Enrollment
+requests are rate limited; a lost response may have created an installation and
+must not be automatically retried. The iPhone stores its key in device-only
+Keychain and only sends it to the configured development private HTTPS origin.
+
 ## Client contract
 
 | Request | Body / authorization | Result |

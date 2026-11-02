@@ -1,6 +1,7 @@
 """Invite-only installation access. This is authentication, not app attestation."""
 
 import hashlib
+import os
 import secrets
 import time
 from uuid import UUID, uuid4
@@ -67,6 +68,69 @@ class Refresh(BaseModel):
     refresh_token: str = Field(min_length=1, max_length=256)
 
 
+class DevelopmentKeyCreate(BaseModel):
+    label: str = Field(min_length=1, max_length=80)
+
+
+class DevelopmentEnrollment(BaseModel):
+    key: str = Field(min_length=1, max_length=256)
+
+
+def require_development_keys():
+    if os.environ.get("TMT_DEVELOPMENT_KEYS", "false").lower() != "true":
+        fail(404, "not_found", "Not found")
+
+
+@router.post("/admin/development-keys", status_code=201, dependencies=[Depends(require_admin_write), Depends(require_development_keys)])
+def create_development_key(payload: DevelopmentKeyCreate, response: Response):
+    no_store(response)
+    if not payload.label.strip():
+        fail(400, "validation", "Label is required")
+    key = secrets.token_urlsafe(32)
+    with database() as connection:
+        row = connection.execute(
+            "INSERT INTO development_keys (id, key_hash, label) VALUES (%s,%s,%s) RETURNING id,label,created_at",
+            (uuid4(), digest(key), payload.label.strip()),
+        ).fetchone()
+    return {**row, "key": key}
+
+
+@router.get("/admin/development-keys", dependencies=[Depends(require_admin), Depends(require_development_keys)])
+def list_development_keys(response: Response):
+    no_store(response)
+    with database() as connection:
+        return connection.execute("""SELECT k.id,k.label,k.created_at,k.last_used_at,k.revoked_at,
+            count(i.id) AS installation_count FROM development_keys k
+            LEFT JOIN installations i ON i.development_key_id=k.id
+            GROUP BY k.id ORDER BY k.created_at DESC LIMIT 200""").fetchall()
+
+
+@router.post("/admin/development-keys/{key_id}/revoke", status_code=204, dependencies=[Depends(require_admin_write), Depends(require_development_keys)])
+def revoke_development_key(key_id: UUID):
+    with database() as connection:
+        row = connection.execute("UPDATE development_keys SET revoked_at=COALESCE(revoked_at,now()) WHERE id=%s RETURNING id", (key_id,)).fetchone()
+    if not row:
+        fail(404, "not_found", "Not found")
+
+
+@router.post("/admin/development-enroll", status_code=201, dependencies=[Depends(require_development_keys)])
+def development_enroll(payload: DevelopmentEnrollment, response: Response):
+    no_store(response)
+    throttle("development_enroll", 10)
+    installation_id, invite_id, refresh = uuid4(), uuid4(), secrets.token_urlsafe(32)
+    with database() as connection:
+        key = connection.execute("SELECT id,label FROM development_keys WHERE key_hash=%s AND revoked_at IS NULL FOR UPDATE", (digest(payload.key),)).fetchone()
+        if not key:
+            fail(401, "key_invalid", "Development key is invalid or revoked")
+        connection.execute("UPDATE development_keys SET last_used_at=now() WHERE id=%s", (key["id"],))
+        connection.execute("""INSERT INTO invitations(id,code_hash,label,expires_at,quota_bytes,quota_uploads,redeemed_at)
+            VALUES (%s,%s,%s,now(),%s,%s,now())""", (invite_id, digest(secrets.token_urlsafe(32)), key["label"], 1073741824, 100))
+        connection.execute("""INSERT INTO installations(id,invitation_id,installation_name,refresh_hash,refresh_expires_at,quota_bytes,quota_uploads,development_key_id)
+            VALUES (%s,%s,'Admin iPhone',%s,now()+%s*interval '1 second',%s,%s,%s)""", (installation_id, invite_id, digest(refresh), REFRESH_SECONDS, 1073741824, 100, key["id"]))
+        access = mint_access(connection, installation_id)
+    return {**access, "installation_id": installation_id, "refresh_token": refresh, "refresh_expires_in": REFRESH_SECONDS}
+
+
 def mint_access(connection, installation_id):
     token = secrets.token_urlsafe(32)
     connection.execute("DELETE FROM access_tokens WHERE expires_at <= now()")
@@ -123,7 +187,7 @@ def list_installations(response: Response):
     no_store(response)
     with database() as connection:
         return connection.execute(
-            """SELECT i.id,i.invitation_id,i.installation_name,i.created_at,i.revoked_at,
+            """SELECT i.id,i.invitation_id,i.development_key_id,i.installation_name,i.created_at,i.revoked_at,
                i.refresh_expires_at,i.quota_bytes,i.quota_uploads,i.used_bytes,i.used_uploads,
                v.label AS tester_label FROM installations i
                JOIN invitations v ON v.id=i.invitation_id

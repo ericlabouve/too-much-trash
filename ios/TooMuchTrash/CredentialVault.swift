@@ -2,6 +2,32 @@ import Foundation
 import Security
 
 @MainActor
+final class DevelopmentKeyVault {
+    private let service = "org.toomuchtrash.development-key"
+    private func query(origin: URL) -> [String: Any] {
+        [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service,
+         kSecAttrAccount as String: origin.absoluteString, kSecAttrSynchronizable as String: false]
+    }
+    func load(origin: URL) throws -> String? {
+        var request = query(origin: origin)
+        request[kSecReturnData as String] = true
+        request[kSecMatchLimit as String] = kSecMatchLimitOne
+        var result: CFTypeRef?
+        let status = SecItemCopyMatching(request as CFDictionary, &result)
+        if status == errSecItemNotFound { return nil }
+        guard status == errSecSuccess, let data = result as? Data, let value = String(data: data, encoding: .utf8) else { throw ClientError.storage }
+        return value
+    }
+    func save(_ value: String, origin: URL) throws {
+        let attributes: [String: Any] = [kSecValueData as String: Data(value.utf8), kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
+        let base = query(origin: origin)
+        let status = SecItemUpdate(base as CFDictionary, attributes as CFDictionary)
+        if status == errSecSuccess { return }
+        guard status == errSecItemNotFound, SecItemAdd(base.merging(attributes) { _, new in new } as CFDictionary, nil) == errSecSuccess else { throw ClientError.storage }
+    }
+}
+
+@MainActor
 protocol CredentialVault {
     func load(origin: URL) throws -> InstallationCredential?
     func save(_ credential: InstallationCredential, origin: URL) throws

@@ -73,9 +73,11 @@ protocol CollectorAPI {
     func media(id: UUID, token: String) async throws -> MediaReceipt
     func adminReachable() async -> Bool
     func availableServers() async throws -> [AvailableServer]
+    func developmentEnroll(key: String) async throws -> Enrollment
 }
 
 extension CollectorAPI {
+    func developmentEnroll(key: String) async throws -> Enrollment { throw ClientError.configuration }
     func availableServers() async throws -> [AvailableServer] { [] }
     func upload(file: URL, captureID: UUID, token: String,
                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
@@ -103,6 +105,19 @@ final class LiveCollectorAPI: CollectorAPI {
         var body = ["invite_code": invite]
         if let name, !name.isEmpty { body["installation_name"] = name }
         return try await json(path: "api/v1/auth/enroll", body: body, status: 201)
+    }
+
+    func developmentEnroll(key: String) async throws -> Enrollment {
+        guard configuration.publicOrigin == APIConfiguration.developmentNetwork.publicOrigin,
+              let origin = configuration.privateAdminOrigin,
+              origin == APIConfiguration.developmentNetwork.privateAdminOrigin else { throw ClientError.configuration }
+        var request = URLRequest(url: origin.appendingPathComponent("api/v1/admin/development-enroll"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(["key": key])
+        let (data, response) = try await transport.data(for: request)
+        guard response.url == request.url else { throw ClientError.invalidResponse }
+        return try decode(data, response, expected: 201)
     }
 
     func refresh(token: String) async throws -> AccessToken {

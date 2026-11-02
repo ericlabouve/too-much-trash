@@ -17,7 +17,7 @@ class MigrationTests(unittest.TestCase):
         config = Config("alembic.ini")
         with database() as connection:
             connection.execute(Path("/sql/init/02-captures.sql").read_text())
-        command.upgrade(config, "head")
+        command.upgrade(config, "003_onboarding")
         invite, installation, capture = uuid4(), uuid4(), uuid4()
         with database() as connection:
             connection.execute("INSERT INTO invitations(id,code_hash,label,expires_at,quota_bytes,quota_uploads) VALUES (%s,%s,'Migration test',now()+interval '1 hour',1024,1)", (invite, str(invite)))
@@ -28,7 +28,7 @@ class MigrationTests(unittest.TestCase):
         command.upgrade(config, "head")
         command.upgrade(config, "head")
         with database() as connection:
-            self.assertEqual(connection.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"], "003_onboarding")
+            self.assertEqual(connection.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"], "004_development_keys")
             self.assertEqual(connection.execute("SELECT installation_id FROM captures WHERE id=%s", (capture,)).fetchone()["installation_id"], installation)
             self.assertEqual(connection.execute("SELECT invitation_id FROM installations WHERE id=%s", (installation,)).fetchone()["invitation_id"], invite)
             self.assertEqual(connection.execute("SELECT code_hash FROM invitations WHERE id=%s", (invite,)).fetchone()["code_hash"], str(invite))

@@ -4,11 +4,12 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Ownership and collaboration
 
-- The iPhone agent owns `ios/` and this skill. Backend Agent owns backend/admin implementation, including its supporting frontend/configuration/docs. Coordinate API contracts and integration results, but do not copy iOS commits into the backend branch or bundle component PRs unless the user explicitly requests a combined integration branch.
+- As of 2026-11-01, Eric prefers one combined chat to own iPhone and backend work. Use the relevant iPhone and backend skills for their respective areas; do not involve the separate Backend Agent unless Eric explicitly requests it.
+- One chat may own `ios/`, backend, admin, and their related docs. Use the relevant domain skill and preserve API contracts across components.
 - Keep component PRs separate against `main`, with high-level titles and concise bullet-point bodies. Check changed-file overlap before opening or updating coordinated PRs. The user specifically corrected duplicated iOS changes in PRs #6/#7.
-- Two-way communication with Backend Agent was explicitly authorized for this project. Discover its current chat by title when needed; do not assume a historical chat/worktree is still active. New chats or unrelated recipients need their own authorization.
+- Do not message the separate Backend Agent unless Eric explicitly requests it.
 - Open Xcode's generated project from the active worktree, not the main checkout. No project linking between checkouts is needed. Xcode need not remain open for command-line builds.
-- Migration preference clarified 2026-10-12: after merging the component PRs, relaunch the iPhone chat in Backend Agent's existing worktree and retain the existing Backend chat. Preserve file ownership, but share one agreed branch/index and serialize Git operations, branch changes and disruptive integration/deployment work. Private restart notes belong in gitignored `.agents/handoff/`; copy them deliberately because Git will not transfer them. Do not archive a checkout that still supplies container bind mounts or ignored runtime configuration.
+- Shared checkout: serialize Git operations, branch changes and disruptive integration/deployment work. Private restart notes belong in gitignored `.agents/handoff/`; Git will not transfer them. Do not archive a checkout that still supplies container bind mounts or ignored runtime configuration.
 - Commit/push/open a PR when requested; skill maintenance alone does not authorize remote writes, merges, deployment, credential provisioning, or network exposure.
 
 ## Product and architecture
@@ -84,6 +85,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Build and validation workflow
 
+- Prefer wireless deployment to Eric's paired iPhone for development updates when it is available on the local network. On 2026-11-01 a signed Xcode build was installed successfully over Wi-Fi with `devicectl`; Developer Mode was enabled. Personal Team provisioning expires after seven days, and signing or developer-trust prompts may require Eric's interaction. Preserve existing app data and credentials when updating.
+- 2026-11-01: Dev Proceed is scoped to the development server and gated by its private HTTPS reachability. A separate revocable development key is saved in device-only Keychain, never the admin password; production is disabled. An uncertain enrollment must not be automatically retried. Preserve existing installation credentials and let users replace a revoked key.
 - Generate the Xcode project in `ios/`, build/test the `TooMuchTrash` scheme, and discover the currently booted Simulator instead of assuming a remembered device UUID or runtime.
 - Simulator Keychain tests require normal simulator ad hoc signing (`CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=-`). Entirely unsigned Simulator hosts cannot validate real Keychain behavior. This does not constitute physical-device signing or distribution.
 - Full Simulator coverage includes onboarding, Keychain isolation, contract parsing, durable queues, hold/release races, and Home UI. After tests, explicitly install the freshly built app and relaunch it; visually verify its final state rather than leaving a test-run screen.

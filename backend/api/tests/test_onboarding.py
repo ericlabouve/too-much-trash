@@ -66,7 +66,7 @@ class OnboardingTests(unittest.TestCase):
 
     def setUp(self):
         with database() as connection:
-            connection.execute("TRUNCATE captures, access_tokens, installations, invitations, auth_rate_limits CASCADE")
+            connection.execute("TRUNCATE captures, access_tokens, installations, invitations, auth_rate_limits, development_keys CASCADE")
         self.directory = tempfile.TemporaryDirectory()
         self.hash_path = Path(self.directory.name) / "admin.sha256"
         self.hash_path.write_text(digest("test-only-admin"))
@@ -100,6 +100,27 @@ class OnboardingTests(unittest.TestCase):
 
     def bearer(self, credentials):
         return {"Authorization": "Bearer " + credentials["access_token"]}
+
+    def test_development_key_is_scoped_audited_and_revocable(self):
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
+            created = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers, json={"label": "Test phone"})
+            self.assertEqual(created.status_code, 201)
+            key, key_id = created.json()["key"], created.json()["id"]
+            listing = self.client.get("/api/v1/admin/development-keys").json()
+            self.assertNotIn(key, str(listing))
+            self.assertEqual(self.client.post("/api/v1/admin/development-enroll", json={"key": "invalid"}).status_code, 401)
+            enrolled = self.client.post("/api/v1/admin/development-enroll", json={"key": key})
+            self.assertEqual(enrolled.status_code, 201)
+            installation_id = enrolled.json()["installation_id"]
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(enrolled.json())).status_code, 200)
+            row = next(x for x in self.client.get("/api/v1/admin/installations").json() if x["id"] == installation_id)
+            self.assertEqual(row["development_key_id"], key_id)
+            self.assertEqual(self.client.get("/api/v1/admin/development-keys").json()[0]["installation_count"], 1)
+            self.assertEqual(self.client.post(f"/api/v1/admin/development-keys/{key_id}/revoke", headers=self.admin_headers).status_code, 204)
+            self.assertEqual(self.client.post("/api/v1/admin/development-enroll", json={"key": key}).status_code, 401)
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(enrolled.json())).status_code, 200)
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "false"}):
+            self.assertEqual(self.client.post("/api/v1/admin/development-enroll", json={"key": key}).status_code, 404)
 
     def keyed_upload(self, credentials, key, data=b"data", filename="a.mov", content_type="video/quicktime"):
         return self.client.post("/api/v1/media", headers={**self.bearer(credentials), "Idempotency-Key": str(key)},

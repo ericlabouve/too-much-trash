@@ -177,6 +177,53 @@ final class AccountSession: ObservableObject {
         }
     }
 
+    var canAdminProceed: Bool {
+        adminVisible && configuration?.publicOrigin == APIConfiguration.developmentNetwork.publicOrigin &&
+        configuration?.privateAdminOrigin == APIConfiguration.developmentNetwork.privateAdminOrigin
+    }
+
+    func hasDevelopmentKey() throws -> Bool {
+        guard let origin = APIConfiguration.developmentNetwork.privateAdminOrigin else { return false }
+        return try DevelopmentKeyVault().load(origin: origin) != nil
+    }
+
+    func adminProceed(newKey: String? = nil) async -> Bool {
+        guard !busy, canAdminProceed, let configuration, let api,
+              let privateOrigin = APIConfiguration.developmentNetwork.privateAdminOrigin else { return false }
+        guard !hasSavedCredential, credential == nil else {
+            message = "An existing installation is saved for this server. Resolve that session before registering another."
+            return false
+        }
+        busy = true
+        defer { busy = false }
+        do {
+            guard await api.adminReachable(), canAdminProceed else { throw ClientError.network }
+            let keyVault = DevelopmentKeyVault()
+            let key: String
+            if let newKey, !newKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                key = newKey.trimmingCharacters(in: .whitespacesAndNewlines)
+                try keyVault.save(key, origin: privateOrigin)
+            } else {
+                guard let saved = try keyVault.load(origin: privateOrigin) else { throw ClientError.noCredential }
+                key = saved
+            }
+            let enrollment = try await api.developmentEnroll(key: key)
+            let next = try InstallationCredential(enrollment: enrollment)
+            try vault.save(next, origin: configuration.publicOrigin)
+            credential = next
+            hasSavedCredential = true
+            try await validateInstallation()
+            phase = .authorized
+            message = "Registration complete."
+            kickUploads()
+            return true
+        } catch {
+            handle(error)
+            message += " If registration completed but the response was lost, check the admin dashboard before retrying."
+            return false
+        }
+    }
+
     private func validateInstallation() async throws {
         guard let api else { throw ClientError.configuration }
         let confirmed = try await authorized { try await api.me(token: $0) }

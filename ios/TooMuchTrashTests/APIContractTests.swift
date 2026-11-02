@@ -24,6 +24,19 @@ private final class ScriptedTransport: HTTPTransport {
 
 @MainActor
 final class APIContractTests: XCTestCase {
+    func testDevelopmentEnrollmentUsesOnlyThePrivateDevelopmentOrigin() async throws {
+        let transport = ScriptedTransport()
+        transport.replies = [.init(status: 201, json: """
+            {"installation_id":"AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE","access_token":"test-access","refresh_token":"test-refresh","token_type":"Bearer","expires_in":900,"refresh_expires_in":2592000}
+            """)]
+        let client = LiveCollectorAPI(configuration: .developmentNetwork, transport: transport)
+        _ = try await client.developmentEnroll(key: "test-development-key")
+        XCTAssertEqual(transport.requests.first?.url?.absoluteString, APIConfiguration.developmentAdminURL + "/api/v1/admin/development-enroll")
+        XCTAssertEqual(transport.requests.first?.httpMethod, "POST")
+        let production = LiveCollectorAPI(configuration: .productionNetwork, transport: transport)
+        do { _ = try await production.developmentEnroll(key: "test-development-key"); XCTFail("Production must reject development enrollment") }
+        catch { XCTAssertEqual(transport.requests.count, 1) }
+    }
     func testFreshDefaultsAreProductionAndSavedOriginsStillWin() throws {
         let suite = "test.initial.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
