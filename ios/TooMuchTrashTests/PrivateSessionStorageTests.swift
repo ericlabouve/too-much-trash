@@ -6,6 +6,29 @@ final class PrivateSessionStorageTests: XCTestCase {
     private let origin = URL(string: "https://collector.example.test")!
     private func folder() -> URL { FileManager.default.temporaryDirectory.appendingPathComponent("tmt-private-\(UUID())") }
 
+    func testEpisodeQueuePersistsAllFilesAndTracksUnfinishedFolders() throws {
+        let root = folder()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let queue = CaptureQueue(directory: root), owner = UUID(), id = UUID()
+        let ownerFolder = try queue.recordingDirectory(origin: origin, installationID: owner)
+        let episode = ownerFolder.appendingPathComponent("episode-\(id.uuidString.lowercased())", isDirectory: true)
+        try FileManager.default.createDirectory(at: episode, withIntermediateDirectories: true)
+        XCTAssertEqual(queue.untrackedVideoCount(origin: origin, installationID: owner), 1)
+        for name in ["video.mp4", "imu.jsonl", "poses.jsonl"] {
+            try Data(name.utf8).write(to: episode.appendingPathComponent(name))
+        }
+        try Data("{\"episode_id\":\"\(id.uuidString)\",\"complete\":false}".utf8).write(to: episode.appendingPathComponent("manifest.json"))
+        try queue.enqueueEpisode(folder: episode, id: id, origin: origin, installationID: owner)
+        XCTAssertEqual(queue.untrackedVideoCount(origin: origin, installationID: owner), 0)
+        let restored = CaptureQueue(directory: root)
+        let entry = try XCTUnwrap(restored.captures.first)
+        XCTAssertEqual(entry.id, id)
+        XCTAssertEqual(entry.isIncomplete, true)
+        XCTAssertEqual(restored.file(for: entry), episode.appendingPathComponent("video.mp4"))
+        XCTAssertEqual(try restored.storedSize(for: entry), entry.sizeBytes)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: episode.appendingPathComponent("imu.jsonl").path))
+    }
+
     func testLegacyMigrationPreservesOriginalQueueAndVideos() throws {
         let legacy = folder(), target = folder(), id = UUID()
         let old = CaptureQueue(directory: legacy)

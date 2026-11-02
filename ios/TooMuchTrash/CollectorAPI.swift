@@ -74,10 +74,14 @@ protocol CollectorAPI {
     func adminReachable() async -> Bool
     func availableServers() async throws -> [AvailableServer]
     func developmentEnroll(key: String) async throws -> Enrollment
+    func uploadEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt
 }
 
 extension CollectorAPI {
     func developmentEnroll(key: String) async throws -> Enrollment { throw ClientError.configuration }
+    func uploadEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt { throw ClientError.configuration }
     func availableServers() async throws -> [AvailableServer] { [] }
     func upload(file: URL, captureID: UUID, token: String,
                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
@@ -195,6 +199,62 @@ final class LiveCollectorAPI: CollectorAPI {
 
     func upload(file: URL, token: String) async throws -> MediaReceipt {
         try await upload(file: file, captureID: UUID(), token: token, progress: { _, _ in })
+    }
+
+    func uploadEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
+        let parts = [("video", "video.mp4", "video/mp4"), ("imu", "imu.jsonl", "application/x-ndjson"),
+                     ("poses", "poses.jsonl", "application/x-ndjson"), ("manifest", "manifest.json", "application/json")]
+        var total: Int64 = 0
+        for (_, filename, _) in parts {
+            let attributes = try FileManager.default.attributesOfItem(atPath: directory.appendingPathComponent(filename).path)
+            guard let size = attributes[.size] as? NSNumber, size.int64Value > 0 else { throw ClientError.invalidResponse }
+            total += size.int64Value
+            guard total <= 200 * 1024 * 1024 else { throw ClientError.uploadTooLarge }
+        }
+        let boundary = "TMT-\(episodeID.uuidString)"
+        let staging = BackgroundUploads.stagingDirectory
+        try FileManager.default.createDirectory(at: staging, withIntermediateDirectories: true)
+        try CaptureQueue.protect(staging)
+        let bodyURL = staging.appendingPathComponent(episodeID.uuidString + ".multipart")
+        if !FileManager.default.fileExists(atPath: bodyURL.path) {
+            try await Task.detached(priority: .utility) {
+                try Self.stageEpisode(directory: directory, bodyURL: bodyURL, boundary: boundary)
+            }.value
+        }
+        var request = URLRequest(url: configuration.endpoint("api/v1/episodes"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue(episodeID.uuidString, forHTTPHeaderField: "Idempotency-Key")
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        defer { try? FileManager.default.removeItem(at: bodyURL) }
+        let (data, response) = try await transport.upload(for: request, from: bodyURL, progress: progress)
+        guard response.url == request.url else { throw ClientError.invalidResponse }
+        return try decode(data, response, expected: 202)
+    }
+
+    private nonisolated static func stageEpisode(directory: URL, bodyURL: URL, boundary: String) throws {
+        let building = bodyURL.deletingPathExtension().appendingPathExtension("building")
+        if FileManager.default.fileExists(atPath: building.path) { try FileManager.default.removeItem(at: building) }
+        defer { try? FileManager.default.removeItem(at: building) }
+        guard FileManager.default.createFile(atPath: building.path, contents: nil,
+            attributes: [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication]) else { throw ClientError.storage }
+        let destination = try FileHandle(forWritingTo: building)
+        defer { try? destination.close() }
+        for (name, filename, contentType) in [("video", "video.mp4", "video/mp4"), ("imu", "imu.jsonl", "application/x-ndjson"),
+                                               ("poses", "poses.jsonl", "application/x-ndjson"), ("manifest", "manifest.json", "application/json")] {
+            try destination.write(contentsOf: Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\r\nContent-Type: \(contentType)\r\n\r\n".utf8))
+            let source = try FileHandle(forReadingFrom: directory.appendingPathComponent(filename))
+            defer { try? source.close() }
+            while let chunk = try source.read(upToCount: 1024 * 1024), !chunk.isEmpty { try destination.write(contentsOf: chunk) }
+            try source.close()
+            try destination.write(contentsOf: Data("\r\n".utf8))
+        }
+        try destination.write(contentsOf: Data("--\(boundary)--\r\n".utf8))
+        try destination.synchronize()
+        try destination.close()
+        try FileManager.default.moveItem(at: building, to: bodyURL)
     }
 
     func upload(file: URL, captureID: UUID, token: String,

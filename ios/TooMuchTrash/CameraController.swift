@@ -1,5 +1,7 @@
 import AVFoundation
+import ARKit
 import Combine
+import CoreMotion
 import Foundation
 
 // AVFoundation state is confined to `queue`; UI state is confined to MainActor.
@@ -204,5 +206,991 @@ final class CameraController: NSObject, ObservableObject, AVCaptureFileOutputRec
             case .configuration: return "Could not configure the camera. Reopen the app to retry."
             }
         }
+    }
+}
+
+/// Raw Core Motion samples retain the timestamps supplied by Core Motion.
+/// Collection is confined to one operation queue so each stream remains ordered.
+struct MotionSample: Codable, Sendable {
+    enum Stream: String, Codable, Sendable { case accelerometer, gyroscope, attitude }
+    let stream: Stream
+    let timestamp: TimeInterval
+    let values: [Double]
+    let callbackUptime: TimeInterval
+
+    init(stream: Stream, timestamp: TimeInterval, values: [Double]) {
+        self.stream = stream
+        self.timestamp = timestamp
+        self.values = values
+        self.callbackUptime = ProcessInfo.processInfo.systemUptime
+    }
+}
+
+final class MotionSampleCollector {
+    private let motion = CMMotionManager()
+    private let queue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.name = "org.toomuchtrash.motion"
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
+    private var active = false
+    private var accelerometer = TimedPreRoll<MotionSample>()
+    private var gyroscope = TimedPreRoll<MotionSample>()
+    private var attitude = TimedPreRoll<MotionSample>()
+    /// All callbacks, including failures, run on the collector's serial queue.
+    var onSample: ((MotionSample) -> Void)?
+    var onFailure: ((String) -> Void)?
+
+    func start() {
+        queue.addOperation { [weak self] in
+            guard let self, !self.active else { return }
+            self.active = true
+            self.accelerometer = TimedPreRoll()
+            self.gyroscope = TimedPreRoll()
+            self.attitude = TimedPreRoll()
+            self.motion.accelerometerUpdateInterval = 0.01
+            self.motion.gyroUpdateInterval = 0.01
+            self.motion.deviceMotionUpdateInterval = 0.01
+            if self.motion.isAccelerometerAvailable {
+                self.motion.startAccelerometerUpdates(to: self.queue) { [weak self] data, error in
+                    guard let self, self.active else { return }
+                    guard let data else { if error != nil { self.onFailure?("accelerometer") }; return }
+                    let a = data.acceleration
+                    self.record(MotionSample(stream: .accelerometer, timestamp: data.timestamp, values: [a.x, a.y, a.z]))
+                }
+            } else { self.onFailure?("accelerometer unavailable") }
+            if self.motion.isGyroAvailable {
+                self.motion.startGyroUpdates(to: self.queue) { [weak self] data, error in
+                    guard let self, self.active else { return }
+                    guard let data else { if error != nil { self.onFailure?("gyroscope") }; return }
+                    let v = data.rotationRate
+                    self.record(MotionSample(stream: .gyroscope, timestamp: data.timestamp, values: [v.x, v.y, v.z]))
+                }
+            } else { self.onFailure?("gyroscope unavailable") }
+            if self.motion.isDeviceMotionAvailable {
+                self.motion.startDeviceMotionUpdates(using: .xArbitraryZVertical, to: self.queue) { [weak self] data, error in
+                    guard let self, self.active else { return }
+                    guard let data else { if error != nil { self.onFailure?("attitude") }; return }
+                    let q = data.attitude.quaternion
+                    self.record(MotionSample(stream: .attitude, timestamp: data.timestamp, values: [q.x, q.y, q.z, q.w]))
+                }
+            } else { self.onFailure?("attitude unavailable") }
+        }
+    }
+
+    func stop() {
+        queue.addOperation { [weak self] in
+            guard let self else { return }
+            self.active = false
+            self.motion.stopAccelerometerUpdates()
+            self.motion.stopGyroUpdates()
+            self.motion.stopDeviceMotionUpdates()
+        }
+    }
+
+    private func record(_ sample: MotionSample) {
+        let accepted: Bool
+        switch sample.stream {
+        case .accelerometer: accepted = accelerometer.append(time: sample.timestamp, value: sample)
+        case .gyroscope: accepted = gyroscope.append(time: sample.timestamp, value: sample)
+        case .attitude: accepted = attitude.append(time: sample.timestamp, value: sample)
+        }
+        // Never suppress a raw callback: live episode writers can preserve even
+        // an out-of-order sample while recording the pre-roll gap separately.
+        onSample?(sample)
+        if !accepted { onFailure?("out-of-order \(sample.stream.rawValue) sample") }
+    }
+
+    func snapshot(from start: TimeInterval, through end: TimeInterval, completion: @escaping ([MotionSample]) -> Void) {
+        queue.addOperation { [weak self] in
+            guard let self else { completion([]); return }
+            let all = self.accelerometer.snapshot(from: start, through: end).map(\.value) +
+                self.gyroscope.snapshot(from: start, through: end).map(\.value) +
+                self.attitude.snapshot(from: start, through: end).map(\.value)
+            completion(all.sorted { $0.timestamp < $1.timestamp })
+        }
+    }
+}
+
+/// Frame metadata uses the camera-to-AR-world transform in column-major order.
+struct CameraPoseSample: Codable, Sendable {
+    let timestamp: TimeInterval
+    let callbackUptime: TimeInterval
+    let cameraToWorldColumns: [Float]
+    let cameraOrientationQuaternion: [Float]
+    let intrinsicsColumns: [Float]
+    let imageWidth: Int
+    let imageHeight: Int
+    let tracking: String
+    let trackingReason: String?
+}
+
+/// This collector owns a single ARKit camera session. Its frame callback must
+/// encode/copy the pixel buffer promptly; retaining ARFrames can stall capture.
+final class ARFrameCollector: NSObject, ARSessionDelegate {
+    let session = ARSession()
+    private let frameQueue = DispatchQueue(label: "org.toomuchtrash.arkit-frames")
+    var onFrame: ((CVPixelBuffer, CameraPoseSample) -> Void)?
+    var onInterruption: ((String) -> Void)?
+
+    override init() {
+        super.init()
+        session.delegate = self
+        session.delegateQueue = frameQueue
+    }
+
+    func start() -> Bool {
+        guard ARWorldTrackingConfiguration.isSupported else { return false }
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.worldAlignment = .gravity
+        configuration.providesAudioData = false
+        session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+        return true
+    }
+
+    func stop() { session.pause() }
+
+    func onFrameQueue(_ action: @escaping @Sendable () -> Void) { frameQueue.async(execute: action) }
+
+    func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        let transform = frame.camera.transform
+        let rotation = simd_quatf(transform)
+        let matrix = frame.camera.intrinsics
+        let tracking: String
+        let reason: String?
+        switch frame.camera.trackingState {
+        case .normal: tracking = "normal"; reason = nil
+        case .notAvailable: tracking = "unavailable"; reason = nil
+        case .limited(let value):
+            tracking = "limited"
+            switch value {
+            case .initializing: reason = "initializing"
+            case .excessiveMotion: reason = "excessive_motion"
+            case .insufficientFeatures: reason = "insufficient_features"
+            case .relocalizing: reason = "relocalizing"
+            @unknown default: reason = "unknown"
+            }
+        }
+        let pose = CameraPoseSample(
+            timestamp: frame.timestamp,
+            callbackUptime: ProcessInfo.processInfo.systemUptime,
+            cameraToWorldColumns: [transform.columns.0.x, transform.columns.0.y, transform.columns.0.z, transform.columns.0.w,
+                                   transform.columns.1.x, transform.columns.1.y, transform.columns.1.z, transform.columns.1.w,
+                                   transform.columns.2.x, transform.columns.2.y, transform.columns.2.z, transform.columns.2.w,
+                                   transform.columns.3.x, transform.columns.3.y, transform.columns.3.z, transform.columns.3.w],
+            cameraOrientationQuaternion: [rotation.imag.x, rotation.imag.y, rotation.imag.z, rotation.real],
+            intrinsicsColumns: [matrix.columns.0.x, matrix.columns.0.y, matrix.columns.0.z,
+                                matrix.columns.1.x, matrix.columns.1.y, matrix.columns.1.z,
+                                matrix.columns.2.x, matrix.columns.2.y, matrix.columns.2.z],
+            imageWidth: CVPixelBufferGetWidth(frame.capturedImage),
+            imageHeight: CVPixelBufferGetHeight(frame.capturedImage), tracking: tracking, trackingReason: reason)
+        onFrame?(frame.capturedImage, pose)
+    }
+
+    func sessionWasInterrupted(_ session: ARSession) { onInterruption?("arkit_interrupted") }
+    func session(_ session: ARSession, didFailWithError error: Error) { onInterruption?("arkit_failed") }
+}
+
+/// Encodes ARKit frames into independently readable MP4 segments. All methods
+/// must be called on the AR frame queue; callbacks may arrive on another queue.
+final class ARVideoSegmentWriter {
+    struct Segment {
+        let url: URL
+        let firstTimestamp: TimeInterval
+        let lastTimestamp: TimeInterval
+        let frameCount: Int
+        let error: String?
+    }
+    private struct OpenSegment {
+        let writer: AVAssetWriter
+        let input: AVAssetWriterInput
+        let adaptor: AVAssetWriterInputPixelBufferAdaptor
+        let url: URL
+        let first: TimeInterval
+        var last: TimeInterval
+        var frames: Int
+    }
+    private let directory: URL
+    private let segmentDuration: TimeInterval
+    private var current: OpenSegment?
+    var onSegmentOpened: ((URL, TimeInterval) -> Void)?
+    var onSegment: ((Segment) -> Void)?
+    var onFrameDropped: ((TimeInterval, String) -> Void)?
+
+    init(directory: URL, segmentDuration: TimeInterval = 1) throws {
+        precondition(segmentDuration > 0 && segmentDuration.isFinite)
+        self.directory = directory
+        self.segmentDuration = segmentDuration
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    }
+
+    func append(_ source: CVPixelBuffer, timestamp: TimeInterval) throws {
+        guard timestamp.isFinite else { throw SegmentError.invalidTimestamp }
+        if let open = current, timestamp < open.last { onFrameDropped?(timestamp, "out_of_order"); return }
+        if let open = current, timestamp - open.first >= segmentDuration { finishCurrent() }
+        if current == nil {
+            let segment = try makeSegment(source, timestamp: timestamp)
+            current = segment
+            onSegmentOpened?(segment.url, timestamp)
+        }
+        guard var open = current else { throw SegmentError.writer }
+        guard open.writer.status == .writing else { throw open.writer.error ?? SegmentError.writer }
+        guard open.input.isReadyForMoreMediaData else { onFrameDropped?(timestamp, "encoder_backpressure"); return }
+        guard let pool = open.adaptor.pixelBufferPool else { throw SegmentError.pixelBuffer }
+        var copied: CVPixelBuffer?
+        guard CVPixelBufferPoolCreatePixelBuffer(nil, pool, &copied) == kCVReturnSuccess, let copied else {
+            onFrameDropped?(timestamp, "pixel_buffer_allocation"); return
+        }
+        try copyPixels(from: source, to: copied)
+        CVBufferPropagateAttachments(source, copied)
+        let pts = CMTime(seconds: timestamp, preferredTimescale: 1_000_000_000)
+        guard open.adaptor.append(copied, withPresentationTime: pts) else {
+            onFrameDropped?(timestamp, "encoder_rejected_frame")
+            if open.writer.status == .failed { throw open.writer.error ?? SegmentError.writer }
+            return
+        }
+        open.last = timestamp
+        open.frames += 1
+        current = open
+    }
+
+    func finishCurrent() {
+        guard let open = current else { return }
+        current = nil
+        open.input.markAsFinished()
+        let callback = onSegment
+        open.writer.finishWriting {
+            let failure = open.writer.status == .completed ? nil : (open.writer.error?.localizedDescription ?? "segment_encoding_failed")
+            callback?(Segment(url: open.url, firstTimestamp: open.first, lastTimestamp: open.last,
+                              frameCount: open.frames, error: failure))
+        }
+    }
+
+    func closeAfterFailure() {
+        guard let open = current else { return }
+        if open.writer.status == .writing { finishCurrent(); return }
+        current = nil
+        onSegment?(Segment(url: open.url, firstTimestamp: open.first, lastTimestamp: open.last,
+                           frameCount: open.frames, error: open.writer.error?.localizedDescription ?? "segment_encoding_failed"))
+    }
+
+    private func makeSegment(_ source: CVPixelBuffer, timestamp: TimeInterval) throws -> OpenSegment {
+        let width = CVPixelBufferGetWidth(source), height = CVPixelBufferGetHeight(source)
+        let url = directory.appendingPathComponent("segment-\(UUID().uuidString).mp4")
+        let writer = try AVAssetWriter(outputURL: url, fileType: .mp4)
+        let input = AVAssetWriterInput(mediaType: .video, outputSettings: [
+            AVVideoCodecKey: AVVideoCodecType.h264, AVVideoWidthKey: width, AVVideoHeightKey: height
+        ])
+        input.expectsMediaDataInRealTime = true
+        guard writer.canAdd(input) else { throw SegmentError.writer }
+        writer.add(input)
+        let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: [
+            kCVPixelBufferPixelFormatTypeKey as String: CVPixelBufferGetPixelFormatType(source),
+            kCVPixelBufferWidthKey as String: width, kCVPixelBufferHeightKey as String: height,
+            kCVPixelBufferIOSurfacePropertiesKey as String: [:]
+        ])
+        guard writer.startWriting() else { throw writer.error ?? SegmentError.writer }
+        writer.startSession(atSourceTime: CMTime(seconds: timestamp, preferredTimescale: 1_000_000_000))
+        return OpenSegment(writer: writer, input: input, adaptor: adaptor, url: url, first: timestamp, last: timestamp, frames: 0)
+    }
+
+    private func copyPixels(from source: CVPixelBuffer, to destination: CVPixelBuffer) throws {
+        guard CVPixelBufferGetPixelFormatType(source) == CVPixelBufferGetPixelFormatType(destination),
+              CVPixelBufferGetWidth(source) == CVPixelBufferGetWidth(destination),
+              CVPixelBufferGetHeight(source) == CVPixelBufferGetHeight(destination),
+              CVPixelBufferGetPlaneCount(source) == CVPixelBufferGetPlaneCount(destination) else { throw SegmentError.pixelBuffer }
+        CVPixelBufferLockBaseAddress(source, .readOnly)
+        CVPixelBufferLockBaseAddress(destination, [])
+        defer { CVPixelBufferUnlockBaseAddress(destination, []); CVPixelBufferUnlockBaseAddress(source, .readOnly) }
+        let planes = CVPixelBufferGetPlaneCount(source)
+        for plane in 0..<max(planes, 1) {
+            let sourceBase = planes == 0 ? CVPixelBufferGetBaseAddress(source) : CVPixelBufferGetBaseAddressOfPlane(source, plane)
+            let destinationBase = planes == 0 ? CVPixelBufferGetBaseAddress(destination) : CVPixelBufferGetBaseAddressOfPlane(destination, plane)
+            let sourceStride = planes == 0 ? CVPixelBufferGetBytesPerRow(source) : CVPixelBufferGetBytesPerRowOfPlane(source, plane)
+            let destinationStride = planes == 0 ? CVPixelBufferGetBytesPerRow(destination) : CVPixelBufferGetBytesPerRowOfPlane(destination, plane)
+            let rows = planes == 0 ? CVPixelBufferGetHeight(source) : CVPixelBufferGetHeightOfPlane(source, plane)
+            guard let sourceBase, let destinationBase else { throw SegmentError.pixelBuffer }
+            for row in 0..<rows {
+                destinationBase.advanced(by: row * destinationStride).copyMemory(from: sourceBase.advanced(by: row * sourceStride), byteCount: min(sourceStride, destinationStride))
+            }
+        }
+    }
+
+    private enum SegmentError: Error { case invalidTimestamp, pixelBuffer, writer }
+}
+
+/// Incrementally persists raw samples for one episode. All calls are made by
+/// the capture coordinator on its serial queue. A failed or unfinished journal
+/// is deliberately retained for recovery; it is never presented as complete.
+final class EpisodeJournal: @unchecked Sendable {
+    struct Gap: Codable {
+        let stream: String
+        let timestamp: TimeInterval
+        let reason: String
+    }
+    private struct TimedRecord<Value: Codable>: Codable {
+        let commonTime: TimeInterval
+        let sample: Value
+    }
+    private struct Coverage: Codable {
+        var first: TimeInterval?
+        var last: TimeInterval?
+        var count = 0
+        mutating func add(_ time: TimeInterval) {
+            first = min(first ?? time, time)
+            last = max(last ?? time, time)
+            count += 1
+        }
+    }
+    private struct Manifest: Codable {
+        struct Timing: Codable { let start: TimeInterval; let press: TimeInterval; let release: TimeInterval?; let end: TimeInterval }
+        struct Metadata: Codable {
+            let commonClock: String
+            let nativeClockAlignment: String
+            let buttonTiming: String
+            let triggerSource: String
+            let accelerationUnits: String
+            let angularVelocityUnits: String
+            let attitudeQuaternionOrder: String
+            let cameraTransform: String
+            let cameraIntrinsics: String
+            let streams: [String: Coverage]
+            let gaps: [Gap]
+        }
+        let schemaVersion: Int
+        let episodeID: String
+        let complete: Bool
+        let timing: Timing
+        let files: [String: String]
+        let sensorMetadata: Metadata
+        enum CodingKeys: String, CodingKey {
+            case schemaVersion = "schema_version", episodeID = "episode_id", complete, timing, files, sensorMetadata = "sensor_metadata"
+        }
+    }
+
+    let directory: URL
+    let window: EpisodeWindowScheduler.Window
+    private var imu: FileHandle?
+    private var poses: FileHandle?
+    private var coverage: [String: Coverage] = [:]
+    private var gaps: [Gap] = []
+    private var lastSyncTime: TimeInterval?
+    private let encoder = JSONEncoder()
+
+    init(ownerDirectory: URL, window: EpisodeWindowScheduler.Window) throws {
+        self.window = window
+        directory = ownerDirectory.appendingPathComponent("episode-\(window.id.uuidString.lowercased())", isDirectory: true)
+        guard !FileManager.default.fileExists(atPath: directory.path) else { throw ClientError.storage }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false)
+        try CaptureQueue.protect(directory)
+        let imuURL = directory.appendingPathComponent("imu.jsonl")
+        let poseURL = directory.appendingPathComponent("poses.jsonl")
+        guard FileManager.default.createFile(atPath: imuURL.path, contents: nil),
+              FileManager.default.createFile(atPath: poseURL.path, contents: nil) else { throw ClientError.storage }
+        try CaptureQueue.protect(imuURL)
+        try CaptureQueue.protect(poseURL)
+        imu = try FileHandle(forWritingTo: imuURL)
+        poses = try FileHandle(forWritingTo: poseURL)
+        let recoveryURL = directory.appendingPathComponent("recovery.json")
+        let recovery: [String: Any] = ["schema_version": 1, "episode_id": window.id.uuidString,
+                                       "complete": false, "start": window.start,
+                                       "press": window.pressedAt, "reason": "recording_not_finalized"]
+        try JSONSerialization.data(withJSONObject: recovery, options: [.sortedKeys]).write(to: recoveryURL, options: .atomic)
+        try CaptureQueue.protect(recoveryURL)
+    }
+
+    deinit { try? imu?.close(); try? poses?.close() }
+
+    func append(_ sample: MotionSample, commonTime: TimeInterval, through end: TimeInterval?) throws {
+        guard includes(commonTime, end: end), let imu else { return }
+        try line(TimedRecord(commonTime: commonTime, sample: sample), to: imu)
+        coverage[sample.stream.rawValue, default: Coverage()].add(commonTime)
+        try synchronizePeriodically(at: commonTime)
+    }
+
+    func append(_ sample: CameraPoseSample, commonTime: TimeInterval, through end: TimeInterval?) throws {
+        guard includes(commonTime, end: end), let poses else { return }
+        try line(TimedRecord(commonTime: commonTime, sample: sample), to: poses)
+        coverage["camera_pose", default: Coverage()].add(commonTime)
+        try synchronizePeriodically(at: commonTime)
+    }
+
+    func noteGap(stream: String, time: TimeInterval, reason: String) {
+        guard time.isFinite else { return }
+        gaps.append(Gap(stream: stream, timestamp: time, reason: reason))
+    }
+
+    func markExportFailure(end: TimeInterval, reason: String) throws {
+        try imu?.synchronize(); try poses?.synchronize()
+        try imu?.close(); try poses?.close()
+        imu = nil; poses = nil
+        let metadata: [String: Any] = ["schema_version": 1, "episode_id": window.id.uuidString,
+                                       "complete": false, "start": window.start,
+                                       "press": window.pressedAt, "end": end, "reason": reason]
+        let url = directory.appendingPathComponent("recovery.json")
+        try JSONSerialization.data(withJSONObject: metadata, options: [.sortedKeys]).write(to: url, options: .atomic)
+        try CaptureQueue.protect(url)
+    }
+
+    /// Finalization requires explicit coverage/clock validation from the
+    /// coordinator; a produced file alone does not establish synchronized data.
+    func finalize(video: URL, release: TimeInterval?, end: TimeInterval,
+                  validatedCoverageAndClock: Bool) throws {
+        guard end.isFinite, end >= window.pressedAt,
+              release.map({ $0.isFinite && $0 >= window.pressedAt && $0 <= end }) ?? true else { throw ClientError.storage }
+        guard let imu, let poses else { throw ClientError.storage }
+        if coverage["accelerometer"] == nil || coverage["gyroscope"] == nil || coverage["attitude"] == nil {
+            noteGap(stream: "imu", time: end, reason: "one_or_more_streams_missing")
+        }
+        if coverage["camera_pose"] == nil { noteGap(stream: "camera_pose", time: end, reason: "stream_missing") }
+        if coverage["accelerometer"] == nil && coverage["gyroscope"] == nil && coverage["attitude"] == nil {
+            try line(["type": "missing", "stream": "imu"], to: imu)
+        }
+        if coverage["camera_pose"] == nil { try line(["type": "missing", "stream": "camera_pose"], to: poses) }
+        try imu.synchronize(); try poses.synchronize()
+        try imu.close(); try poses.close()
+        self.imu = nil; self.poses = nil
+        let target = directory.appendingPathComponent("video.mp4")
+        guard !FileManager.default.fileExists(atPath: target.path) else { throw ClientError.storage }
+        try FileManager.default.moveItem(at: video, to: target)
+        try CaptureQueue.protect(target)
+        let hasPadding = release.map { window.pressedAt - window.start >= 3 && end - $0 >= 3 } ?? false
+        let manifest = Manifest(schemaVersion: 1, episodeID: window.id.uuidString, complete: validatedCoverageAndClock && gaps.isEmpty && hasPadding,
+            timing: .init(start: window.start, press: window.pressedAt, release: release, end: end),
+            files: ["video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"],
+            sensorMetadata: .init(commonClock: "system_uptime_seconds", nativeClockAlignment: validatedCoverageAndClock ? "validated" : "unverified",
+                buttonTiming: window.source == "screen" ? "screen_gesture_callback_uptime" : "capture_event_callback_uptime_not_physical_edge",
+                triggerSource: window.source,
+                accelerationUnits: "g", angularVelocityUnits: "rad/s", attitudeQuaternionOrder: "x,y,z,w",
+                cameraTransform: "camera_to_ar_world_column_major", cameraIntrinsics: "column_major_pixels",
+                streams: coverage, gaps: gaps))
+        let manifestURL = directory.appendingPathComponent("manifest.json")
+        try encoder.encode(manifest).write(to: manifestURL, options: .atomic)
+        try CaptureQueue.protect(manifestURL)
+        try? FileManager.default.removeItem(at: directory.appendingPathComponent("recovery.json"))
+    }
+
+    private func includes(_ time: TimeInterval, end: TimeInterval?) -> Bool {
+        time.isFinite && time >= window.start && (end.map { time <= $0 } ?? true)
+    }
+
+    private func synchronizePeriodically(at time: TimeInterval) throws {
+        guard lastSyncTime.map({ time - $0 >= 1 }) ?? true else { return }
+        try imu?.synchronize()
+        try poses?.synchronize()
+        lastSyncTime = time
+    }
+
+    private func line<T: Encodable>(_ value: T, to handle: FileHandle) throws {
+        try handle.write(contentsOf: encoder.encode(value))
+        try handle.write(contentsOf: Data([10]))
+    }
+}
+
+/// Composes overlapping encoded segments on the requested common timeline.
+/// Gaps are returned explicitly rather than collapsing time between segments.
+enum EpisodeVideoAssembler {
+    struct Gap: Equatable { let start: TimeInterval; let end: TimeInterval }
+    struct Result { let url: URL; let gaps: [Gap] }
+    private final class ExportBox: @unchecked Sendable {
+        let session: AVAssetExportSession
+        init(_ session: AVAssetExportSession) { self.session = session }
+    }
+
+    static func assemble(segments: [ARVideoSegmentWriter.Segment], start: TimeInterval,
+                         end: TimeInterval, output: URL) async throws -> Result {
+        guard start.isFinite, end.isFinite, end > start,
+              !FileManager.default.fileExists(atPath: output.path) else { throw ClientError.storage }
+        let composition = AVMutableComposition()
+        guard let destination = composition.addMutableTrack(withMediaType: .video,
+                                                               preferredTrackID: kCMPersistentTrackID_Invalid) else { throw ClientError.storage }
+        let scale: CMTimeScale = 1_000_000_000
+        var cursor = start
+        var gaps: [Gap] = []
+        for segment in segments.sorted(by: { $0.firstTimestamp < $1.firstTimestamp }) {
+            guard segment.error == nil, segment.frameCount > 0 else { continue }
+            let asset = AVURLAsset(url: segment.url)
+            guard let track = try await asset.loadTracks(withMediaType: .video).first else { continue }
+            let trackRange = try await track.load(.timeRange)
+            let duration = CMTimeGetSeconds(trackRange.duration)
+            guard duration.isFinite, duration > 0 else { continue }
+            let actualStart = segment.firstTimestamp + CMTimeGetSeconds(trackRange.start)
+            let segmentEnd = actualStart + duration
+            let from = max(start, cursor, actualStart)
+            let to = min(end, segmentEnd)
+            guard to > from else { continue }
+            if from > cursor { gaps.append(Gap(start: cursor, end: from)) }
+            let sourceStart = CMTimeAdd(trackRange.start, CMTime(seconds: from - actualStart, preferredTimescale: scale))
+            let range = CMTimeRange(start: sourceStart, duration: CMTime(seconds: to - from, preferredTimescale: scale))
+            try destination.insertTimeRange(range, of: track, at: CMTime(seconds: from - start, preferredTimescale: scale))
+            cursor = to
+        }
+        if cursor < end { gaps.append(Gap(start: cursor, end: end)) }
+        guard cursor > start, let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality) else {
+            throw ClientError.storage
+        }
+        exporter.outputURL = output
+        exporter.outputFileType = .mp4
+        let box = ExportBox(exporter)
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            exporter.exportAsynchronously {
+                if box.session.status == .completed { continuation.resume() }
+                else { continuation.resume(throwing: box.session.error ?? ClientError.storage) }
+            }
+        }
+        return Result(url: output, gaps: gaps)
+    }
+}
+
+/// Coordinates a single ARKit camera and independently sampled motion streams.
+/// The UI integration stays separate until device and recovery validation passes.
+final class EpisodeCaptureEngine: @unchecked Sendable {
+    struct Status: Sendable {
+        let ready: Bool
+        let message: String
+        let pendingEpisodes: Int
+        let latestMotion: [String: MotionSample]
+        let latestPose: CameraPoseSample?
+    }
+    let camera = ARFrameCollector()
+    private let motion = MotionSampleCollector()
+    private let state = DispatchQueue(label: "org.toomuchtrash.episode-state")
+    private let ownerDirectory: URL
+    private let scratchDirectory: URL
+    private let writer: ARVideoSegmentWriter
+    private var scheduler = EpisodeWindowScheduler()
+    private var journals: [UUID: EpisodeJournal] = [:]
+    private var pendingExports: [UUID: EpisodeWindowScheduler.Window] = [:]
+    private var openSegments: [URL: TimeInterval] = [:]
+    private var segments: [ARVideoSegmentWriter.Segment] = []
+    private var accelerometer = TimedPreRoll<MotionSample>(duration: 5)
+    private var gyroscope = TimedPreRoll<MotionSample>(duration: 5)
+    private var attitude = TimedPreRoll<MotionSample>(duration: 5)
+    private var poses = TimedPreRoll<CameraPoseSample>(duration: 5)
+    private var recentGaps: [EpisodeJournal.Gap] = []
+    private var latestMotion: [String: MotionSample] = [:]
+    private var latestPose: CameraPoseSample?
+    private var lastGoodVideoTime: TimeInterval?
+    private var firstFrameUptime: TimeInterval?
+    private var lastStatusUptime: TimeInterval = 0
+    private var active = false
+    private var ready = false
+    private var outstandingExports = 0
+    private var preserveRollingFiles = false
+    private let lifecycleLock = NSLock()
+    private var running = false
+    var onStatus: ((Status) -> Void)?
+    var onEpisode: ((URL, UUID) -> Void)?
+
+    init(ownerDirectory: URL) throws {
+        self.ownerDirectory = ownerDirectory
+        scratchDirectory = ownerDirectory.appendingPathComponent("rolling-\(UUID().uuidString.lowercased())", isDirectory: true)
+        writer = try ARVideoSegmentWriter(directory: scratchDirectory)
+        try CaptureQueue.protect(scratchDirectory)
+        camera.onFrame = { [weak self] pixels, pose in
+            guard let self else { return }
+            self.lifecycleLock.lock()
+            let running = self.running
+            self.lifecycleLock.unlock()
+            guard running else { return }
+            do { try self.writer.append(pixels, timestamp: pose.timestamp) }
+            catch {
+                self.writer.closeAfterFailure()
+                self.state.async {
+                    self.preserveRollingFiles = true
+                    self.recordGap(stream: "video", time: pose.callbackUptime, reason: "encoding_failed")
+                    self.publish("Video encoding failed. Partial data is retained.")
+                }
+            }
+            self.state.async { self.accept(pose) }
+        }
+        writer.onSegmentOpened = { [weak self] url, time in self?.state.async { [weak self] in self?.openSegments[url] = time } }
+        writer.onFrameDropped = { [weak self] time, reason in self?.state.async { [weak self] in self?.recordGap(stream: "video", time: time, reason: reason) } }
+        writer.onSegment = { [weak self] segment in self?.state.async { [weak self] in
+            guard let self else { return }
+            self.openSegments.removeValue(forKey: segment.url)
+            self.segments.append(segment)
+            do { try self.persistSegmentMetadata(segment) }
+            catch { self.preserveRollingFiles = true; self.publish("Could not save video timing metadata. Partial data is retained.") }
+            if segment.error != nil || segment.frameCount == 0 {
+                self.lastGoodVideoTime = nil
+                self.recordGap(stream: "video", time: segment.lastTimestamp, reason: "segment_encoding_failed")
+            } else { self.lastGoodVideoTime = segment.lastTimestamp }
+            self.finishReady()
+            self.prune()
+        } }
+        motion.onSample = { [weak self] sample in self?.state.async { [weak self] in self?.accept(sample) } }
+        motion.onFailure = { [weak self] reason in self?.state.async { [weak self] in
+            self?.recordGap(stream: "imu", time: ProcessInfo.processInfo.systemUptime, reason: reason)
+        } }
+        camera.onInterruption = { [weak self] reason in self?.stop(reason: reason) }
+    }
+
+    func start() -> Bool {
+        guard ARWorldTrackingConfiguration.isSupported else { return false }
+        lifecycleLock.lock()
+        if running { lifecycleLock.unlock(); return true }
+        running = true
+        lifecycleLock.unlock()
+        state.async {
+            self.active = true
+            self.ready = false
+            self.firstFrameUptime = nil
+            self.accelerometer = TimedPreRoll(duration: 5)
+            self.gyroscope = TimedPreRoll(duration: 5)
+            self.attitude = TimedPreRoll(duration: 5)
+            self.poses = TimedPreRoll(duration: 5)
+            self.recentGaps = []
+            self.latestMotion = [:]
+            self.latestPose = nil
+            self.lastGoodVideoTime = nil
+            self.publish("Buffering at least three seconds…")
+        }
+        motion.start()
+        return camera.start()
+    }
+
+    func press(_ source: String, at timestamp: TimeInterval) {
+        state.async {
+            guard self.active, self.ready, let window = self.scheduler.press(source, at: timestamp) else { return }
+            do {
+                let journal = try EpisodeJournal(ownerDirectory: self.ownerDirectory, window: window)
+                self.journals[window.id] = journal
+                let samples = self.accelerometer.snapshot(from: window.start, through: timestamp).map(\.value) +
+                    self.gyroscope.snapshot(from: window.start, through: timestamp).map(\.value) +
+                    self.attitude.snapshot(from: window.start, through: timestamp).map(\.value)
+                for sample in samples { try journal.append(sample, commonTime: sample.timestamp, through: nil) }
+                for sample in self.poses.snapshot(from: window.start, through: timestamp).map(\.value) {
+                    try journal.append(sample, commonTime: sample.timestamp, through: nil)
+                }
+                for gap in self.recentGaps where gap.timestamp >= window.start && gap.timestamp <= timestamp {
+                    journal.noteGap(stream: gap.stream, time: gap.timestamp, reason: gap.reason)
+                }
+                self.publish("Recording episode")
+            } catch {
+                self.scheduler.cancel(source, at: timestamp, reason: "journal_failed")
+                if self.journals[window.id] == nil { _ = self.scheduler.take(window.id) }
+                self.preserveRollingFiles = true
+                self.publish("Could not start the episode. Partial data is retained.")
+                self.flushSegments(after: 0)
+            }
+        }
+    }
+
+    func release(_ source: String, at timestamp: TimeInterval) {
+        state.async {
+            self.scheduler.release(source, at: timestamp)
+            self.publish("Recording post-roll…")
+            self.flushSegments(after: 3.2)
+        }
+    }
+
+    func cancel(_ source: String, at timestamp: TimeInterval, reason: String) {
+        state.async {
+            self.scheduler.cancel(source, at: timestamp, reason: reason)
+            self.recordGap(stream: "capture", time: timestamp, reason: reason)
+            self.flushSegments(after: 0)
+        }
+    }
+
+    func stop(reason: String) {
+        lifecycleLock.lock()
+        guard running else { lifecycleLock.unlock(); return }
+        running = false
+        lifecycleLock.unlock()
+        camera.stop()
+        motion.stop()
+        state.async {
+            guard self.active else { return }
+            self.active = false
+            self.ready = false
+            let now = ProcessInfo.processInfo.systemUptime
+            for window in self.scheduler.interrupt(at: now, reason: reason) { self.pendingExports[window.id] = window }
+            self.recordGap(stream: "capture", time: now, reason: reason)
+            self.publish("Capture interrupted; preserving available data.")
+            self.flushSegments(after: 0)
+        }
+    }
+
+    private func accept(_ sample: MotionSample) {
+        guard active else { return }
+        if ProcessInfo.processInfo.systemUptime - sample.callbackUptime > 0.5 {
+            recordGap(stream: sample.stream.rawValue, time: sample.timestamp, reason: "sample_processing_backlog")
+        }
+        if let previous = latestMotion[sample.stream.rawValue], sample.timestamp - previous.timestamp > 0.25 {
+            recordGap(stream: sample.stream.rawValue, time: sample.timestamp, reason: "sample_gap_after_\(previous.timestamp)")
+        }
+        switch sample.stream {
+        case .accelerometer: _ = accelerometer.append(time: sample.timestamp, value: sample)
+        case .gyroscope: _ = gyroscope.append(time: sample.timestamp, value: sample)
+        case .attitude: _ = attitude.append(time: sample.timestamp, value: sample)
+        }
+        latestMotion[sample.stream.rawValue] = sample
+        for window in scheduler.pending + Array(pendingExports.values) {
+            do { try journals[window.id]?.append(sample, commonTime: sample.timestamp, through: window.end) }
+            catch {
+                journals[window.id]?.noteGap(stream: sample.stream.rawValue, time: sample.timestamp, reason: "sample_write_failed")
+                preserveRollingFiles = true
+                publish("Sensor write failed. Partial data is retained.")
+            }
+        }
+        refreshReadiness()
+    }
+
+    private func accept(_ pose: CameraPoseSample) {
+        guard active else { return }
+        if ProcessInfo.processInfo.systemUptime - pose.callbackUptime > 0.5 {
+            recordGap(stream: "camera_pose", time: pose.timestamp, reason: "frame_processing_backlog")
+        }
+        if firstFrameUptime == nil { firstFrameUptime = pose.callbackUptime }
+        if let previous = latestPose, pose.timestamp - previous.timestamp > 0.25 {
+            recordGap(stream: "camera_pose", time: pose.timestamp, reason: "frame_gap_after_\(previous.timestamp)")
+        }
+        if !poses.append(time: pose.timestamp, value: pose) {
+            recordGap(stream: "camera_pose", time: pose.callbackUptime, reason: "out_of_order_frame")
+        }
+        latestPose = pose
+        for window in scheduler.pending + Array(pendingExports.values) {
+            do { try journals[window.id]?.append(pose, commonTime: pose.timestamp, through: window.end) }
+            catch {
+                journals[window.id]?.noteGap(stream: "camera_pose", time: pose.timestamp, reason: "sample_write_failed")
+                preserveRollingFiles = true
+                publish("Pose write failed. Partial data is retained.")
+            }
+        }
+        refreshReadiness()
+    }
+
+    private func refreshReadiness() {
+        let now = ProcessInfo.processInfo.systemUptime
+        let firstTimes = [accelerometer.samples.first?.time, gyroscope.samples.first?.time,
+                          attitude.samples.first?.time, poses.samples.first?.time]
+        let lastTimes = [accelerometer.samples.last?.time, gyroscope.samples.last?.time,
+                         attitude.samples.last?.time, poses.samples.last?.time]
+        ready = active && !preserveRollingFiles && firstFrameUptime.map { now - $0 >= 3.1 } == true &&
+            firstTimes.allSatisfy { $0.map { $0 <= now - 3 } ?? false } &&
+            lastTimes.allSatisfy { $0.map { $0 <= now && $0 >= now - 0.5 } ?? false } &&
+            lastGoodVideoTime.map { $0 <= now && $0 >= now - 2.5 } == true
+        if now - lastStatusUptime >= 0.25 {
+            publish(preserveRollingFiles ? "Recording needs attention; partial data retained." : (ready ? (scheduler.pending.isEmpty ? "Ready" : "Recording") : "Buffering…"))
+        }
+    }
+
+    private func flushSegments(after delay: TimeInterval) {
+        state.asyncAfter(deadline: .now() + delay) {
+            self.camera.onFrameQueue {
+                self.writer.finishCurrent()
+                self.state.async { self.finishReady() }
+            }
+            self.state.asyncAfter(deadline: .now() + 2) { self.finishReady() }
+            self.state.asyncAfter(deadline: .now() + 6) { self.finishReady() }
+        }
+    }
+
+    private func finishReady() {
+        let now = ProcessInfo.processInfo.systemUptime
+        for window in scheduler.pending where window.end.map({ $0 <= now }) == true {
+            if let taken = scheduler.take(window.id) { pendingExports[window.id] = taken }
+        }
+        for window in Array(pendingExports.values) {
+            guard let end = window.end else { continue }
+            if openSegments.values.contains(where: { $0 <= end }) {
+                if now >= end + 5 {
+                    if let journal = journals.removeValue(forKey: window.id) {
+                        try? journal.markExportFailure(end: end, reason: "video_segment_finish_timeout")
+                    }
+                    pendingExports.removeValue(forKey: window.id)
+                    preserveRollingFiles = true
+                    publish("Video segment did not finish. Partial data is retained.")
+                }
+                continue
+            }
+            let watermarks = [latestMotion["accelerometer"]?.timestamp, latestMotion["gyroscope"]?.timestamp,
+                              latestMotion["attitude"]?.timestamp, latestPose?.timestamp]
+            let streamsReachedEnd = watermarks.allSatisfy { $0.map { $0 >= end } ?? false }
+            guard streamsReachedEnd || !active || now >= end + 2 else { continue }
+            guard let journal = journals.removeValue(forKey: window.id) else {
+                pendingExports.removeValue(forKey: window.id)
+                preserveRollingFiles = true
+                continue
+            }
+            if !streamsReachedEnd { journal.noteGap(stream: "capture", time: end, reason: "stream_ended_before_requested_window") }
+            pendingExports.removeValue(forKey: window.id)
+            outstandingExports += 1
+            let chosen = segments.filter { $0.lastTimestamp + 0.2 >= window.start && $0.firstTimestamp <= end }
+            let output = scratchDirectory.appendingPathComponent("export-\(window.id.uuidString).mp4")
+            Task {
+                do {
+                    let result = try await EpisodeVideoAssembler.assemble(segments: chosen, start: window.start, end: end, output: output)
+                    self.state.async {
+                        do {
+                            for gap in result.gaps { journal.noteGap(stream: "video", time: gap.start, reason: "gap_until_\(gap.end)") }
+                            if let reason = window.incompleteReason { journal.noteGap(stream: "capture", time: end, reason: reason) }
+                            // Clock and complete-stream coverage must be validated on real hardware.
+                            try journal.finalize(video: result.url, release: window.releasedAt, end: end, validatedCoverageAndClock: false)
+                            self.onEpisode?(journal.directory, window.id)
+                            self.publish("Episode saved; synchronization validation pending.")
+                        } catch {
+                            try? journal.markExportFailure(end: end, reason: "episode_finalize_failed")
+                            self.preserveRollingFiles = true
+                            self.publish("Episode export failed. Partial data is retained.")
+                        }
+                        self.outstandingExports -= 1
+                        self.prune()
+                    }
+                } catch {
+                    self.state.async {
+                        try? journal.markExportFailure(end: end, reason: "video_assembly_failed")
+                        self.outstandingExports -= 1
+                        self.preserveRollingFiles = true
+                        self.publish("Episode video could not be assembled. Partial data is retained.")
+                    }
+                }
+            }
+        }
+    }
+
+    private func recordGap(stream: String, time: TimeInterval, reason: String) {
+        guard time.isFinite else { return }
+        recentGaps.append(EpisodeJournal.Gap(stream: stream, timestamp: time, reason: reason))
+        let cutoff = (recentGaps.map(\.timestamp).max() ?? time) - 5
+        recentGaps.removeAll { $0.timestamp < cutoff }
+        for window in scheduler.pending + Array(pendingExports.values) where time >= window.start && time <= (window.end ?? .infinity) {
+            journals[window.id]?.noteGap(stream: stream, time: time, reason: reason)
+        }
+    }
+
+    private func prune() {
+        guard !preserveRollingFiles, scheduler.pending.isEmpty, pendingExports.isEmpty, outstandingExports == 0, let latestPose else { return }
+        let cutoff = latestPose.timestamp - 5
+        let old = segments.filter { !active || $0.lastTimestamp < cutoff }
+        for segment in old {
+            do {
+                try FileManager.default.removeItem(at: segment.url)
+                let metadata = segment.url.deletingPathExtension().appendingPathExtension("json")
+                if FileManager.default.fileExists(atPath: metadata.path) { try FileManager.default.removeItem(at: metadata) }
+                segments.removeAll { $0.url == segment.url }
+            }
+            catch { publish("Could not reclaim rolling-buffer storage.") }
+        }
+    }
+
+    private func persistSegmentMetadata(_ segment: ARVideoSegmentWriter.Segment) throws {
+        let metadata: [String: Any] = ["file": segment.url.lastPathComponent,
+            "first_timestamp": segment.firstTimestamp, "last_timestamp": segment.lastTimestamp,
+            "frame_count": segment.frameCount, "error": (segment.error as Any?) ?? NSNull()]
+        let url = segment.url.deletingPathExtension().appendingPathExtension("json")
+        try JSONSerialization.data(withJSONObject: metadata, options: [.sortedKeys]).write(to: url, options: .atomic)
+        try CaptureQueue.protect(url)
+        try CaptureQueue.protect(segment.url)
+    }
+
+    private func publish(_ message: String) {
+        lastStatusUptime = ProcessInfo.processInfo.systemUptime
+        onStatus?(Status(ready: ready, message: message, pendingEpisodes: scheduler.pending.count + pendingExports.count + outstandingExports,
+                         latestMotion: latestMotion, latestPose: latestPose))
+    }
+
+    #if DEBUG
+    private final class DebugPixelBufferBox: @unchecked Sendable {
+        let value: CVPixelBuffer
+        init(_ value: CVPixelBuffer) { self.value = value }
+    }
+    func debugActivateForSyntheticFrames() {
+        lifecycleLock.lock(); running = true; lifecycleLock.unlock()
+        state.sync { active = true; ready = true }
+    }
+    func debugAccept(_ sample: MotionSample) { state.sync { accept(sample) } }
+    func debugForceReady() { state.sync { ready = true } }
+    func debugDrainState() { state.sync {} }
+    func debugSummary() -> String {
+        state.sync { "pending=\(scheduler.pending.count), awaiting=\(pendingExports.count), journals=\(journals.count), open=\(openSegments.count), segments=\(segments.count), exports=\(outstandingExports), retain=\(preserveRollingFiles)" }
+    }
+    func debugFrame(_ pixels: CVPixelBuffer, pose: CameraPoseSample, completion: @escaping () -> Void) {
+        let buffer = DebugPixelBufferBox(pixels)
+        camera.onFrameQueue {
+            self.camera.onFrame?(buffer.value, pose)
+            self.state.async { completion() }
+        }
+    }
+    #endif
+}
+
+@MainActor
+final class EpisodeCameraController: ObservableObject {
+    @Published private(set) var session: ARSession?
+    @Published private(set) var isReady = false
+    @Published private(set) var permissionDenied = false
+    @Published private(set) var status = "Opening camera…"
+    @Published private(set) var recordingStartedAt: Date?
+    @Published private(set) var pendingEpisodes = 0
+    @Published private(set) var latestMotion: [String: MotionSample] = [:]
+    @Published private(set) var latestPose: CameraPoseSample?
+    var onEpisodeSaved: ((URL, UUID) -> Void)?
+    private var engine: EpisodeCaptureEngine?
+    private var heldSources: Set<String> = []
+
+    func configure(directory: URL) throws {
+        guard engine == nil else { return }
+        let engine = try EpisodeCaptureEngine(ownerDirectory: directory)
+        engine.onStatus = { [weak self] update in
+            Task { @MainActor [weak self] in
+                self?.isReady = update.ready
+                self?.status = update.message
+                self?.pendingEpisodes = update.pendingEpisodes
+                self?.latestMotion = update.latestMotion
+                self?.latestPose = update.latestPose
+            }
+        }
+        engine.onEpisode = { [weak self] folder, id in
+            Task { @MainActor [weak self] in self?.onEpisodeSaved?(folder, id) }
+        }
+        self.engine = engine
+        session = engine.camera.session
+    }
+
+    func activate() async {
+        #if targetEnvironment(simulator)
+        status = "No camera available. Use an iPhone to record."
+        isReady = false
+        #else
+        let granted: Bool
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized: granted = true
+        case .notDetermined: granted = await AVCaptureDevice.requestAccess(for: .video)
+        default: granted = false
+        }
+        guard granted else { permissionDenied = true; status = "Allow camera access to record pickup attempts."; return }
+        permissionDenied = false
+        guard let engine, engine.start() else { status = "AR camera tracking is unavailable on this device."; return }
+        #endif
+    }
+
+    func deactivate() {
+        heldSources.removeAll()
+        recordingStartedAt = nil
+        isReady = false
+        engine?.stop(reason: "capture_screen_inactive")
+    }
+
+    func press(_ source: String) {
+        guard isReady, !heldSources.contains(source) else { return }
+        let time = ProcessInfo.processInfo.systemUptime
+        heldSources.insert(source)
+        if recordingStartedAt == nil { recordingStartedAt = Date() }
+        engine?.press(source, at: time)
+    }
+
+    func release(_ source: String) {
+        guard heldSources.remove(source) != nil else { return }
+        engine?.release(source, at: ProcessInfo.processInfo.systemUptime)
+        if heldSources.isEmpty { recordingStartedAt = nil }
+    }
+
+    func cancel(_ source: String) {
+        guard heldSources.remove(source) != nil else { return }
+        engine?.cancel(source, at: ProcessInfo.processInfo.systemUptime, reason: "capture_event_cancelled")
+        if heldSources.isEmpty { recordingStartedAt = nil }
     }
 }

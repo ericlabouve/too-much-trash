@@ -12,6 +12,8 @@ struct QueuedCapture: Codable, Identifiable, Equatable {
     var createdAt: Date?
     var sizeBytes: Int64?
     var uploadBlocked: String?
+    var episodeDirectory: String?
+    var isIncomplete: Bool?
 }
 
 @MainActor
@@ -47,7 +49,7 @@ final class CaptureQueue: ObservableObject {
                 captures = try JSONDecoder().decode([QueuedCapture].self, from: Data(contentsOf: manifest))
                 guard captures.allSatisfy(Self.validOwnership),
                       Set(captures.map(\.id)).count == captures.count,
-                      Set(captures.map { $0.relativePath ?? $0.filename }).count == captures.count else { throw ClientError.storage }
+                      Set(captures.map { $0.episodeDirectory ?? $0.relativePath ?? $0.filename }).count == captures.count else { throw ClientError.storage }
             }
         } catch {
             // Do not replace a corrupt/unreadable manifest with an empty queue.
@@ -79,7 +81,74 @@ final class CaptureQueue: ObservableObject {
         captures.filter { $0.origin == origin.absoluteString && $0.installationID == installationID }
     }
 
-    func file(for capture: QueuedCapture) -> URL { directory.appendingPathComponent(capture.relativePath ?? capture.filename) }
+    func file(for capture: QueuedCapture) -> URL {
+        if let episode = capture.episodeDirectory { return directory.appendingPathComponent(episode).appendingPathComponent("video.mp4") }
+        return directory.appendingPathComponent(capture.relativePath ?? capture.filename)
+    }
+
+    func episodeFolder(for capture: QueuedCapture) -> URL? {
+        capture.episodeDirectory.map { directory.appendingPathComponent($0, isDirectory: true) }
+    }
+
+    func storedSize(for capture: QueuedCapture) throws -> Int64 {
+        if let folder = episodeFolder(for: capture) {
+            var total: Int64 = 0
+            for name in ["video.mp4", "imu.jsonl", "poses.jsonl", "manifest.json"] {
+                let attributes = try FileManager.default.attributesOfItem(atPath: folder.appendingPathComponent(name).path)
+                guard let size = attributes[.size] as? NSNumber, size.int64Value > 0 else { throw ClientError.storage }
+                total += size.int64Value
+            }
+            return total
+        }
+        let attributes = try FileManager.default.attributesOfItem(atPath: file(for: capture).path)
+        guard let size = attributes[.size] as? NSNumber else { throw ClientError.storage }
+        return size.int64Value
+    }
+
+    nonisolated static func episodeDigest(folder: URL) throws -> String {
+        var combined = SHA256()
+        for (name, filename) in [("video", "video.mp4"), ("imu", "imu.jsonl"), ("poses", "poses.jsonl"), ("manifest", "manifest.json")] {
+            let url = folder.appendingPathComponent(filename)
+            let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+            guard let size = attributes[.size] as? NSNumber, size.int64Value > 0 else { throw ClientError.storage }
+            var part = SHA256()
+            let source = try FileHandle(forReadingFrom: url)
+            defer { try? source.close() }
+            while let bytes = try source.read(upToCount: 1024 * 1024), !bytes.isEmpty { part.update(data: bytes) }
+            try source.close()
+            combined.update(data: Data("\(name)\0\(size.int64Value)\0".utf8))
+            combined.update(data: Data(part.finalize()))
+        }
+        return combined.finalize().map { String(format: "%02x", $0) }.joined()
+    }
+
+    func enqueueEpisode(folder: URL, id: UUID, origin: URL, installationID: UUID) throws {
+        let ownerFolder = try recordingDirectory(origin: origin, installationID: installationID)
+        let expectedName = "episode-\(id.uuidString.lowercased())"
+        guard folder.standardizedFileURL.deletingLastPathComponent() == ownerFolder.standardizedFileURL,
+              folder.lastPathComponent == expectedName else { throw ClientError.storage }
+        let relative = ownerFolder.lastPathComponent + "/" + expectedName
+        guard !captures.contains(where: { $0.id == id || $0.episodeDirectory == relative }) else { return }
+        try Self.protect(folder)
+        var total: Int64 = 0
+        for name in ["video.mp4", "imu.jsonl", "poses.jsonl", "manifest.json"] {
+            let file = folder.appendingPathComponent(name)
+            let values = try file.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey])
+            guard values.isRegularFile == true, values.isSymbolicLink != true, let size = values.fileSize, size > 0 else { throw ClientError.storage }
+            total += Int64(size)
+            try Self.protect(file)
+        }
+        let manifestData = try Data(contentsOf: folder.appendingPathComponent("manifest.json"))
+        guard manifestData.count <= 1024 * 1024,
+              let manifest = try JSONSerialization.jsonObject(with: manifestData) as? [String: Any],
+              let episodeID = manifest["episode_id"] as? String, UUID(uuidString: episodeID) == id,
+              let complete = manifest["complete"] as? Bool else { throw ClientError.storage }
+        var next = captures
+        next.append(QueuedCapture(id: id, filename: "video.mp4", origin: origin.absoluteString,
+                                  installationID: installationID, createdAt: Date(), sizeBytes: total,
+                                  episodeDirectory: relative, isIncomplete: !complete))
+        try persist(next)
+    }
 
     func recordingDirectory(origin: URL, installationID: UUID) throws -> URL {
         guard !storageUnavailable else { throw ClientError.storage }
@@ -93,7 +162,12 @@ final class CaptureQueue: ObservableObject {
         guard let folder = try? recordingDirectory(origin: origin, installationID: installationID),
               let files = try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil) else { return 0 }
         let tracked = Set(matching(origin: origin, installationID: installationID).map { file(for: $0).standardizedFileURL })
-        return files.filter { $0.pathExtension.lowercased() == "mov" && !tracked.contains($0.standardizedFileURL) }.count
+        let episodeFolders = Set(matching(origin: origin, installationID: installationID).compactMap { episodeFolder(for: $0)?.standardizedFileURL })
+        return files.filter { file in
+            (file.pathExtension.lowercased() == "mov" && !tracked.contains(file.standardizedFileURL)) ||
+                (file.lastPathComponent.hasPrefix("episode-") && !episodeFolders.contains(file.standardizedFileURL)) ||
+                (file.lastPathComponent.hasPrefix("rolling-") && (try? FileManager.default.contentsOfDirectory(atPath: file.path).isEmpty) == false)
+        }.count
     }
 
     /// Called only after server-confirmed revocation and the user's destructive confirmation.
@@ -150,6 +224,10 @@ final class CaptureQueue: ObservableObject {
     }
 
     private static func validOwnership(_ capture: QueuedCapture) -> Bool {
+        if let episode = capture.episodeDirectory {
+            return capture.filename == "video.mp4" && capture.relativePath == nil &&
+                episode == folderName(origin: capture.origin, installationID: capture.installationID) + "/episode-" + capture.id.uuidString.lowercased()
+        }
         let path = capture.relativePath ?? capture.filename
         guard safeFilename(capture.filename), safeRelativePath(path) else { return false }
         // Legacy files are in the queue root; new files must match their recorded owner.

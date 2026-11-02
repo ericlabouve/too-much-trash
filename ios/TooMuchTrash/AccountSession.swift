@@ -268,6 +268,10 @@ final class AccountSession: ObservableObject {
         return CaptureOwner(origin: configuration.publicOrigin, installationID: credential.installationID)
     }
 
+    var showDeveloperSensorOverlay: Bool {
+        phase == .authorized && installation?.developmentSession == true
+    }
+
     func queueCapture(_ file: URL, owner: CaptureOwner?) {
         guard let owner else {
             uploadMessage = "Video saved locally. No installation identity is available for upload."
@@ -278,6 +282,18 @@ final class AccountSession: ObservableObject {
             uploadMessage = "Video saved and queued on this iPhone."
             kickUploads()
         } catch { uploadMessage = "Video saved locally, but its upload could not be queued. Please keep the app installed." }
+    }
+
+    func queueEpisode(_ folder: URL, id: UUID, owner: CaptureOwner?) {
+        guard let owner else {
+            uploadMessage = "Episode saved locally. No installation identity is available for upload."
+            return
+        }
+        do {
+            try queue.enqueueEpisode(folder: folder, id: id, origin: owner.origin, installationID: owner.installationID)
+            uploadMessage = "Episode saved and queued on this iPhone."
+            kickUploads()
+        } catch { uploadMessage = "Episode saved locally, but it could not be queued. Please keep the app installed." }
     }
 
     var currentCaptures: [QueuedCapture] {
@@ -300,6 +316,10 @@ final class AccountSession: ObservableObject {
             while let capture = currentCaptures.first(where: { $0.receipt == nil && $0.uploadBlocked == nil }) {
                 try Task.checkCancellation()
                 guard !isEndingSession else { return }
+                if queue.episodeFolder(for: capture) != nil && installation?.episodeContractVersion != 1 {
+                    uploadMessage = "Episode sync requires the updated backend. Recordings remain on this iPhone."
+                    return
+                }
                 uploadingID = capture.id
                 uploadFraction = 0
                 transferStarted = Date()
@@ -309,7 +329,7 @@ final class AccountSession: ObservableObject {
                     receipt = try await authorized { try await api.uploaded(captureID: capture.id, token: $0) }
                 } catch ClientError.missingMedia {
                     receipt = try await authorized { token in
-                        try await api.upload(file: queue.file(for: capture), captureID: capture.id, token: token) { [weak self] sent, expected in
+                        let progress: @MainActor @Sendable (Int64, Int64) -> Void = { [weak self] sent, expected in
                             guard let self, self.uploadingID == capture.id, expected > 0 else { return }
                             self.uploadFraction = min(1, Double(sent) / Double(expected))
                             self.lastProgressAt = Date()
@@ -317,10 +337,18 @@ final class AccountSession: ObservableObject {
                                 self.uploadBytesPerSecond = Double(sent) / Date().timeIntervalSince(start)
                             }
                         }
+                        if let folder = queue.episodeFolder(for: capture) {
+                            return try await api.uploadEpisode(directory: folder, episodeID: capture.id, token: token, progress: progress)
+                        }
+                        return try await api.upload(file: queue.file(for: capture), captureID: capture.id, token: token, progress: progress)
                     }
                 }
-                let size = (try FileManager.default.attributesOfItem(atPath: queue.file(for: capture).path)[.size] as? NSNumber)?.int64Value
+                let size = try queue.storedSize(for: capture)
                 guard receipt.clientCaptureID == capture.id, receipt.sizeBytes == size else { throw ClientError.invalidResponse }
+                if let folder = queue.episodeFolder(for: capture) {
+                    let digest = try await Task.detached(priority: .utility) { try CaptureQueue.episodeDigest(folder: folder) }.value
+                    guard receipt.episodeBundleSHA256 == digest else { throw ClientError.idempotencyConflict }
+                }
                 try queue.record(receipt, for: capture.id)
                 uploadingID = nil
                 uploadFraction = 0
@@ -401,10 +429,10 @@ final class AccountSession: ObservableObject {
               response.value(forHTTPHeaderField: "Content-Type")?.hasPrefix("application/json") == true,
               let key = request.value(forHTTPHeaderField: "Idempotency-Key"), let id = UUID(uuidString: key),
               let capture = queue.captures.first(where: { $0.id == id }),
-              request.url == URL(string: capture.origin)?.appendingPathComponent("api/v1/media"),
+              capture.episodeDirectory == nil,
+              request.url == URL(string: capture.origin)?.appendingPathComponent(capture.episodeDirectory == nil ? "api/v1/media" : "api/v1/episodes"),
               let receipt = try? JSONDecoder().decode(MediaReceipt.self, from: data), receipt.clientCaptureID == id,
-              let size = try? FileManager.default.attributesOfItem(atPath: queue.file(for: capture).path)[.size] as? NSNumber,
-              size.int64Value == receipt.sizeBytes else { return }
+              let size = try? queue.storedSize(for: capture), size == receipt.sizeBytes else { return }
         do { try queue.record(receipt, for: id) }
         catch { uploadMessage = "Upload confirmed, but local sync metadata needs attention. Videos retained." }
     }

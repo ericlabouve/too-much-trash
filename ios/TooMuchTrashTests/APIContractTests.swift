@@ -24,6 +24,33 @@ private final class ScriptedTransport: HTTPTransport {
 
 @MainActor
 final class APIContractTests: XCTestCase {
+    func testEpisodeUploadStagesAllFourFilesWithStableIdentity() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        for name in ["video.mp4", "imu.jsonl", "poses.jsonl", "manifest.json"] {
+            try Data("test-\(name)".utf8).write(to: directory.appendingPathComponent(name))
+        }
+        XCTAssertEqual(try CaptureQueue.episodeDigest(folder: directory), "24c074780c375e5b7434dbaeb62b6d709200f20252e6a0d54a924aaa33f5356a")
+        let id = UUID(), transport = ScriptedTransport()
+        transport.replies = [.init(status: 202, json: "{\"id\":\"\(UUID())\",\"status\":\"queued\",\"filename\":\"video.mp4\",\"size_bytes\":40,\"client_capture_id\":\"\(id)\"}")]
+        let client = try api(transport)
+        let receipt = try await client.uploadEpisode(directory: directory, episodeID: id, token: "test-access", progress: { _, _ in })
+        XCTAssertEqual(receipt.clientCaptureID, id)
+        XCTAssertEqual(transport.requests.first?.url?.path, "/api/v1/episodes")
+        XCTAssertEqual(transport.requests.first?.value(forHTTPHeaderField: "Idempotency-Key"), id.uuidString)
+        let body = String(decoding: try XCTUnwrap(transport.stagedUpload), as: UTF8.self)
+        for name in ["video", "imu", "poses", "manifest"] { XCTAssertTrue(body.contains("name=\"\(name)\"")) }
+    }
+    func testDevelopmentSessionIsOptionalForOlderServers() throws {
+        let template = """
+        {"installation_id":"AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE","installation_name":"Test","quota_bytes":100,"quota_uploads":1,"used_bytes":0,"used_uploads":0%@}
+        """
+        let legacy = try JSONDecoder().decode(Installation.self, from: Data(String(format: template, "").utf8))
+        let development = try JSONDecoder().decode(Installation.self, from: Data(String(format: template, ",\"development_session\":true").utf8))
+        XCTAssertNil(legacy.developmentSession)
+        XCTAssertEqual(development.developmentSession, true)
+    }
     func testDevelopmentEnrollmentUsesOnlyThePrivateDevelopmentOrigin() async throws {
         let transport = ScriptedTransport()
         transport.replies = [.init(status: 201, json: """

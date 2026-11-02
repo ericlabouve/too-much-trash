@@ -122,6 +122,11 @@ private struct SessionVideoTile: View {
                     .foregroundStyle(capture.receipt != nil ? .green : .secondary)
                     .accessibilityLabel(capture.receipt != nil ? "Synced" : capture.uploadBlocked ?? (uploading ? "Uploading" : "Pending"))
             }.padding(.horizontal, 10).padding(.bottom, 10)
+            if capture.isIncomplete == true {
+                Label("Incomplete or unverified", systemImage: "exclamationmark.triangle")
+                    .font(.caption2).foregroundStyle(.orange)
+                    .padding(.horizontal, 10).padding(.bottom, 10)
+            }
         }
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
         .clipShape(RoundedRectangle(cornerRadius: 14))

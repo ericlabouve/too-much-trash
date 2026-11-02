@@ -88,8 +88,8 @@ final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Send
 
     func cancel(captureIDs: Set<UUID>, origin: URL) async {
         for task in await session.allTasks {
-            guard let request = task.originalRequest,
-                  request.url == origin.appendingPathComponent("api/v1/media"),
+            guard let request = task.originalRequest, let requestURL = request.url,
+                  [origin.appendingPathComponent("api/v1/media"), origin.appendingPathComponent("api/v1/episodes")].contains(requestURL),
                   let key = request.value(forHTTPHeaderField: "Idempotency-Key"), let id = UUID(uuidString: key),
                   captureIDs.contains(id) else { continue }
             task.cancel()

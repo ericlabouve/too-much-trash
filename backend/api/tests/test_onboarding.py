@@ -1,6 +1,7 @@
 """Integration suite: isolated Postgres, real HTTP handlers, in-memory blob adapter."""
 
 import io
+import json
 import os
 import tempfile
 import unittest
@@ -102,6 +103,8 @@ class OnboardingTests(unittest.TestCase):
         return {"Authorization": "Bearer " + credentials["access_token"]}
 
     def test_development_key_is_scoped_audited_and_revocable(self):
+        regular = self.enrolled()
+        self.assertFalse(self.client.get("/api/v1/auth/me", headers=self.bearer(regular)).json()["development_session"])
         with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
             created = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers, json={"label": "Test phone"})
             self.assertEqual(created.status_code, 201)
@@ -113,6 +116,7 @@ class OnboardingTests(unittest.TestCase):
             self.assertEqual(enrolled.status_code, 201)
             installation_id = enrolled.json()["installation_id"]
             self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(enrolled.json())).status_code, 200)
+            self.assertTrue(self.client.get("/api/v1/auth/me", headers=self.bearer(enrolled.json())).json()["development_session"])
             row = next(x for x in self.client.get("/api/v1/admin/installations").json() if x["id"] == installation_id)
             self.assertEqual(row["development_key_id"], key_id)
             self.assertEqual(self.client.get("/api/v1/admin/development-keys").json()[0]["installation_count"], 1)
@@ -121,6 +125,63 @@ class OnboardingTests(unittest.TestCase):
             self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(enrolled.json())).status_code, 200)
         with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "false"}):
             self.assertEqual(self.client.post("/api/v1/admin/development-enroll", json={"key": key}).status_code, 404)
+
+    def test_episode_upload_is_atomic_owned_and_idempotent(self):
+        owner = self.enrolled()
+        other = self.enrolled()
+        episode = uuid4()
+        manifest = {"schema_version": 1, "episode_id": str(episode), "complete": True,
+                    "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                    "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"},
+                    "sensor_metadata": {"clock": "test"}}
+        def files(video=b"test video"):
+            return {"video": ("video.mp4", video, "video/mp4"),
+                    "imu": ("imu.jsonl", b'{"timestamp":10}\n', "application/x-ndjson"),
+                    "poses": ("poses.jsonl", b'{"timestamp":10}\n', "application/x-ndjson"),
+                    "manifest": ("manifest.json", json.dumps(manifest).encode(), "application/json")}
+        headers = {**self.bearer(owner), "Idempotency-Key": str(episode)}
+        response = self.client.post("/api/v1/episodes", headers=headers, files=files())
+        self.assertEqual(response.status_code, 202, response.text)
+        self.assertEqual(len(response.json()["episode_bundle_sha256"]), 64)
+        self.assertEqual(self.client.post("/api/v1/episodes", headers=headers, files=files()).json()["id"], response.json()["id"])
+        self.assertEqual(self.client.post("/api/v1/episodes", headers=headers, files=files(b"different")).status_code, 409)
+        for name in ("video", "imu", "poses", "manifest"):
+            path = f"/api/v1/episodes/{episode}/files/{name}"
+            self.assertEqual(self.client.get(path, headers=self.bearer(owner)).status_code, 200)
+            self.assertEqual(self.client.get(path, headers=self.bearer(other)).status_code, 404)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(owner)).json()["used_uploads"], 1)
+        manifest["timing"]["start"] = 9
+        bad_episode = uuid4()
+        manifest["episode_id"] = str(bad_episode)
+        self.assertEqual(self.client.post("/api/v1/episodes", headers={**self.bearer(owner), "Idempotency-Key": str(bad_episode)}, files=files()).status_code, 400)
+
+    @unittest.skipUnless(os.environ.get("TMT_TEST_REAL_S3") == "1", "Requires isolated disposable S3")
+    def test_episode_round_trip_with_disposable_object_storage(self):
+        self.blob_patch.stop()
+        try:
+            from app.main import storage
+            client = storage()
+            client.head_bucket(Bucket=os.environ["S3_BUCKET"])
+            owner, episode = self.enrolled(), uuid4()
+            manifest = {"schema_version": 1, "episode_id": str(episode), "complete": False,
+                        "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                        "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"},
+                        "sensor_metadata": {"clock": "test"}}
+            expected = {"video": b"synthetic-video", "imu": b'{"sample":1}\n', "poses": b'{"pose":1}\n',
+                        "manifest": json.dumps(manifest).encode()}
+            files = {"video": ("video.mp4", expected["video"], "video/mp4"),
+                     "imu": ("imu.jsonl", expected["imu"], "application/x-ndjson"),
+                     "poses": ("poses.jsonl", expected["poses"], "application/x-ndjson"),
+                     "manifest": ("manifest.json", expected["manifest"], "application/json")}
+            headers = {**self.bearer(owner), "Idempotency-Key": str(episode)}
+            response = self.client.post("/api/v1/episodes", headers=headers, files=files)
+            self.assertEqual(response.status_code, 202, response.text)
+            for name, content in expected.items():
+                downloaded = self.client.get(f"/api/v1/episodes/{episode}/files/{name}", headers=self.bearer(owner))
+                self.assertEqual(downloaded.status_code, 200)
+                self.assertEqual(downloaded.content, content)
+        finally:
+            self.blob_patch.start()
 
     def keyed_upload(self, credentials, key, data=b"data", filename="a.mov", content_type="video/quicktime"):
         return self.client.post("/api/v1/media", headers={**self.bearer(credentials), "Idempotency-Key": str(key)},

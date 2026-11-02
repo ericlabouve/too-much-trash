@@ -40,6 +40,9 @@ private final class StubAPI: CollectorAPI {
     var enrollCalls = 0
     var invitesSeen: [String] = []
     var uploadCalls = 0
+    var episodeUploadCalls = 0
+    var episodeSupported = false
+    var developmentSession = false
     var reachable = false
     var servers: [AvailableServer] = []
     var catalogError: Error?
@@ -68,7 +71,8 @@ private final class StubAPI: CollectorAPI {
         tokensSeen.append(token)
         if !meErrors.isEmpty { throw meErrors.removeFirst() }
         return Installation(installationID: confirmedID ?? id, installationName: "Test iPhone",
-                            quotaBytes: 1000000, quotaUploads: 10, usedBytes: 0, usedUploads: 0, mediaContractVersion: 1)
+                            quotaBytes: 1000000, quotaUploads: 10, usedBytes: 0, usedUploads: 0, mediaContractVersion: 1,
+                            episodeContractVersion: episodeSupported ? 1 : nil, developmentSession: developmentSession)
     }
     func upload(file: URL, token: String) async throws -> MediaReceipt {
         uploadCalls += 1
@@ -85,6 +89,18 @@ private final class StubAPI: CollectorAPI {
     }
     func media(id: UUID, token: String) async throws -> MediaReceipt {
         MediaReceipt(id: id, status: "completed", filename: "pickup.mov", sizeBytes: 10)
+    }
+    func uploadEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
+        episodeUploadCalls += 1
+        let names = ["video.mp4", "imu.jsonl", "poses.jsonl", "manifest.json"]
+        let total = try names.reduce(Int64(0)) { sum, name in
+            let attrs = try FileManager.default.attributesOfItem(atPath: directory.appendingPathComponent(name).path)
+            return sum + (attrs[.size] as? NSNumber)!.int64Value
+        }
+        progress(total, total)
+        return MediaReceipt(id: UUID(), status: "queued", filename: "video.mp4", sizeBytes: total,
+                            clientCaptureID: episodeID, episodeBundleSHA256: try CaptureQueue.episodeDigest(folder: directory))
     }
     func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt {
         guard let receipt = acceptedUploads[captureID] else { throw ClientError.missingMedia }
@@ -125,6 +141,53 @@ final class OnboardingTests: XCTestCase {
         vault.values[origin] = credential
     }
 
+    func testEpisodeUploadKeepsAllFilesAndRequiresMatchingBundleDigest() async throws {
+        let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        api.episodeSupported = true
+        try seed(api, vault)
+        let queue = CaptureQueue(directory: root)
+        let session = try account(api, vault, queue: queue)
+        await session.bootstrap()
+        let owner = try XCTUnwrap(session.captureOwner)
+        let id = UUID(), ownerFolder = try queue.recordingDirectory(origin: owner.origin, installationID: owner.installationID)
+        let folder = ownerFolder.appendingPathComponent("episode-\(id.uuidString.lowercased())", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        for name in ["video.mp4", "imu.jsonl", "poses.jsonl"] {
+            try Data("test".utf8).write(to: folder.appendingPathComponent(name))
+        }
+        try Data("{\"episode_id\":\"\(id.uuidString)\",\"complete\":false}".utf8).write(to: folder.appendingPathComponent("manifest.json"))
+        session.queueEpisode(folder, id: id, owner: owner)
+        await session.uploadPending()
+        XCTAssertEqual(api.episodeUploadCalls, 1)
+        XCTAssertNotNil(queue.captures.first?.receipt)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: folder.appendingPathComponent("imu.jsonl").path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: folder.appendingPathComponent("poses.jsonl").path))
+    }
+
+    func testEpisodeLookupWithMismatchedDigestDoesNotMarkSynced() async throws {
+        let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        api.episodeSupported = true
+        try seed(api, vault)
+        let queue = CaptureQueue(directory: root), session = try account(api, vault, queue: queue)
+        await session.bootstrap()
+        let owner = try XCTUnwrap(session.captureOwner), id = UUID()
+        let ownerFolder = try queue.recordingDirectory(origin: owner.origin, installationID: owner.installationID)
+        let folder = ownerFolder.appendingPathComponent("episode-\(id.uuidString.lowercased())", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        for name in ["video.mp4", "imu.jsonl", "poses.jsonl"] { try Data("test".utf8).write(to: folder.appendingPathComponent(name)) }
+        try Data("{\"episode_id\":\"\(id.uuidString)\",\"complete\":false}".utf8).write(to: folder.appendingPathComponent("manifest.json"))
+        session.queueEpisode(folder, id: id, owner: owner)
+        let capture = try XCTUnwrap(queue.captures.first)
+        api.acceptedUploads[id] = MediaReceipt(id: UUID(), status: "queued", filename: "video.mp4", sizeBytes: try queue.storedSize(for: capture),
+                                              clientCaptureID: id, episodeBundleSHA256: String(repeating: "0", count: 64))
+        await session.uploadPending()
+        XCTAssertNil(queue.captures.first?.receipt)
+        XCTAssertNotNil(queue.captures.first?.uploadBlocked)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: folder.appendingPathComponent("video.mp4").path))
+    }
+
     func testNoCredentialDoesNotAuthorizeOrCallMe() async throws {
         let api = StubAPI(), vault = MemoryVault()
         let session = try account(api, vault)
@@ -133,6 +196,18 @@ final class OnboardingTests: XCTestCase {
         XCTAssertEqual(api.meCalls, 0)
         await session.continueLogin()
         XCTAssertEqual(session.phase, .home)
+    }
+
+    func testSensorOverlayRequiresValidatedDevelopmentSession() async throws {
+        let api = StubAPI(), vault = MemoryVault()
+        try seed(api, vault)
+        let session = try account(api, vault)
+        XCTAssertFalse(session.showDeveloperSensorOverlay)
+        await session.bootstrap()
+        XCTAssertFalse(session.showDeveloperSensorOverlay)
+        api.developmentSession = true
+        await session.continueLogin()
+        XCTAssertTrue(session.showDeveloperSensorOverlay)
     }
 
     func testConfiguringFirstServerUpdatesHomeInstructions() async throws {

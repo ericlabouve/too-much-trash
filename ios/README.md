@@ -2,13 +2,13 @@
 
 New users enter the two-word invite directly on registration, with no redundant Login/Continue button. Returning credentials are validated by the backend before automatically opening capture. Failed saved-credential validation offers Retry connection. An already-validated active session can continue recording through temporary network loss. Session identity is the installation at its original server origin and persists across relaunch and camera/dashboard navigation.
 
-After authorization, the rear camera opens. Hold either volume button (or the onscreen record button) to record; release to finish and save. Camera access is requested when entering capture. Requires iOS 17.2 or later for Apple's `AVCaptureEventInteraction` hardware capture API. Physical button and camera behavior still require iPhone validation.
+After authorization, the app uses an ARKit rear-camera session. The intended episode spans three seconds before a press, the hold, and three seconds after release; consecutive presses create separate, potentially overlapping episodes. Camera and motion access may be requested. Requires iOS 17.2 or later. On 2026-11-01 the user reported that the physical volume button showed a recording cue and an episode uploaded on an iPhone 15 Pro; timing, stream completeness, and repeatability still require validation. Apple documents capture-button events for apps actively using an AVCaptureSession; compatibility with an ARKit-only session is not guaranteed. The onscreen hold control is diagnostic, not a substitute for the mounted harness. Capture-event callbacks have no hardware-edge timestamp, so recorded button times are callback times with unmeasured latency.
 
-Video-only MOV originals and the atomic queue manifest live in Application Support/PrivateCaptures, outside Photos and the Files browser. Origin+installation subfolders, backup exclusion and protection available after first device unlock keep session data private while allowing admitted background transfers. Upgrade moves legacy Documents/Captures intact when safe; conflicting locations or corrupt manifests are preserved and block unsafe overwrites. Unowned originals are never silently reassigned to a new installation.
+Legacy video-only MOV originals and new episode folders live in Application Support/PrivateCaptures, outside Photos and the Files browser. Each episode contains a video-only MP4, timestamped IMU and pose JSONL files, and a manifest with calibration, clock, tracking and gap metadata. Origin+installation subfolders, backup exclusion and protection available after first device unlock keep session data private while allowing admitted background transfers. Upgrade moves legacy Documents/Captures intact when safe; conflicting locations or corrupt manifests are preserved and block unsafe overwrites. Unowned originals are never silently reassigned to a new installation.
 
 The camera has a Dashboard button, a transparent double-ring record control, and no admin/upload menu or instruction footer. Dashboard has Back to camera, aggregate sync progress/status, two-column inline video players with native scrubbing/fullscreen controls and per-video sync indicators, and End Session. Its Admin dropdown is in the header beside End Session. Synced means the backend accepted the original and committed its receipt, not that processing finished or succeeded. Backend previews are not validated research labels.
 
-Sync starts automatically after queueing completed recordings, connectivity recovery, foreground/relaunch and periodic checks. File-backed background URLSession transfers allow ordinary suspension subject to iOS scheduling; force-quitting pauses delivery until reopening. Multipart MOV uploads are limited to 200 MiB and staged off the UI thread. The persisted capture UUID supplies Idempotency-Key; by-client receipt lookup, UUID echo and original byte size are checked before persisting Synced. Exact retries cannot duplicate accepted captures or charge quota twice. Automatic uploads require authenticated media_contract_version:1; older servers are not assumed to honor idempotency. Failed transfers may restart the whole video, not resume byte offsets. Retry backoff/Retry-After preserve local originals. Progress uses actual sent bytes; ETA uses measured recent speed or explicitly remains unknown.
+Sync starts automatically after queueing completed recordings, connectivity recovery, foreground/relaunch and periodic checks. File-backed background URLSession transfers allow ordinary suspension subject to iOS scheduling; force-quitting pauses delivery until reopening. Multipart MOV and entire episode uploads are currently limited to 200 MiB and staged off the UI thread; oversized episodes remain locally blocked for attention. The persisted capture UUID supplies Idempotency-Key; by-client receipt lookup, UUID echo and original byte size are checked before persisting Synced. Episodes also verify the digest of all four files. Exact retries cannot duplicate accepted captures or charge quota twice. Automatic uploads require authenticated media_contract_version:1, and episodes also require episode_contract_version:1. Failed transfers may restart the whole upload, not resume byte offsets. Retry backoff/Retry-After preserve local originals. Progress uses actual sent bytes; ETA uses measured recent speed or explicitly remains unknown.
 
 End Session requires a destructive confirmation. Unsynced or untracked recordings trigger an explicit permanent-loss warning, available ETA and Keep uploading / End & Delete choices. The app journals End intent in Keychain, cancels/waits for owned uploads, requests idempotent self-revocation with its strong refresh proof, and checks the returned installation UUID/revoked flag. Only after matching server acknowledgement does it delete current-session originals/staging/queue and remove credentials, returning to registration. Already-accepted backend originals remain. Failed End retains remaining files/credentials and offers retry; a revocation-confirmed journal resumes cleanup after crashes without auto-login. Other sessions' files are not erased. Deleting the app removes its private local data; offloading retains it. Explicit exports outside the app cannot be cleaned up by the app.
 
@@ -46,7 +46,7 @@ the explicit switch, preserving other origins' sessions and videos. The catalog
 requires the corresponding backend Caddy deployment and is blocked on public
 collector listeners.
 
-The initial capture screen uses portrait orientation. Backgrounding the app or a camera interruption ends the held recording. This first version does not implement the project's future rolling pre-grasp buffer or event labels.
+The capture screen uses portrait orientation. Backgrounding or a camera interruption preserves available data as incomplete; crash recovery remains to be validated. The sensor overlay appears only for backend-verified development installations and is not part of exported video. No inference or labeling runs on the phone. ARKit poses are estimates and can be limited or unavailable. Until clock alignment and coverage are validated on actual hardware, episode manifests mark recordings incomplete/unverified.
 
 ## Development
 
@@ -80,8 +80,7 @@ origin can reuse its credentials after validation. Retired development volumes
 and credentials are preserved by the backend and were not migrated into the
 remaining stack. Authn/authz redesign remains separate.
 
-Backend Agent owns the development app node, routing and Compose runtime. Use
-its current documentation; enrollment requires a separately approved invitation.
+Use the backend documentation for the development app node, routing and Compose runtime. Regular enrollment requires an invitation; development enrollment uses its separate scoped key.
 Preserve existing Simulator Keychain/queues and saved origins during updates.
 
 Install XcodeGen (`brew install xcodegen`), run `xcodegen generate` in this directory, and open `TooMuchTrash.xcodeproj` from the same checkout. Edit `project.yml` for project configuration; generated Xcode projects are ignored by Git.
@@ -92,13 +91,13 @@ Real Keychain tests require Xcode's normal simulator ad hoc signing; an entirely
 
 ## iPhone validation
 
-Select your signing team in Xcode, connect an iPhone, and run the app. Configure administrator-provided URLs and register with a live invite, then verify:
+Use Xcode's paired wireless device deployment when available, configure administrator-provided URLs, and register with a live invite. Verify the physical trigger with the phone mounted in the harness:
 
 - The rear preview appears immediately after permission is granted.
-- Holding either volume button starts recording; releasing stops and saves.
+- Holding the harness-actuated volume button starts an episode; releasing it starts the three-second post-roll. Confirm both events are detected reliably in the ARKit preview. This is a release requirement, not yet validated.
 - A quick press/release does not leave recording running.
-- Overlapping presses continue recording until both buttons are released.
-- The onscreen hold button has the same behavior.
+- A second press during post-roll creates a separate overlapping episode.
+- The onscreen hold button exercises the same episode logic for diagnostics only; it cannot replace the harness trigger.
 - Backgrounding or locking during recording ends it; foregrounding restores the preview.
 - Review the saved clip on Dashboard and check playback, fullscreen controls, portrait orientation, and duration.
 - Denying camera permission shows an Open Settings action and disables recording.

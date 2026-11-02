@@ -287,7 +287,8 @@ def require_installation(request: Request):
 @router.get("/auth/me")
 def me(response: Response, installation=Depends(require_installation)):
     no_store(response)
-    return {"installation_id": installation["id"], "media_contract_version": 1, **{
+    return {"installation_id": installation["id"], "media_contract_version": 1, "episode_contract_version": 1,
+            "development_session": installation["development_key_id"] is not None, **{
         key: installation[key] for key in
         ("installation_name", "quota_bytes", "quota_uploads", "used_bytes", "used_uploads")}}
 
