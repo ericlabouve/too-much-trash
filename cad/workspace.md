@@ -94,16 +94,17 @@ source. The catalog does not rewrite history or provide an independent backup.
 From `cad/`, run `uv run inv release` (unique ignored output directory), or
 `uv run inv release --output build/release` for an explicit new directory.
 The command builds current V3 in a fresh isolated snapshot, verifies the build
-inputs against the checkout, and composes four flat files:
+inputs against the checkout, and composes six flat files:
 
 - `PETG.3mf`: seven rigid pieces.
 - `TPU.3mf`: fifteen flexible pieces (three cuffs, five screws, five nuts,
   one axle key and one clip).
+- `PETG.png` and `TPU.png`: compact top views rendered from the exported 3MF geometry and placement transforms.
 - `README.md`: material, slicing, assembly and design-limit instructions.
 - `manifest.json`: geometry, placement, source hashes and package checksums.
 
-The first three are the minimal recipient package; the manifest provides
-provenance. These are generic core 3MF models with embedded geometry, 100% scale
+The two 3MFs and README are the minimal recipient package; PNGs provide quick
+visual inspection and the manifest provides provenance and preview hashes. These are generic core 3MF models with embedded geometry, 100% scale
 and arranged quantities, not Bambu-specific saved presets or sliced printer
 jobs. Recipients must choose their actual printer, bed, filament and process
 settings, then slice and inspect supports/brims and excluded bed areas.
@@ -114,17 +115,19 @@ snapshots are siblings of the output directory and are not release assets.
 
 `.github/workflows/cad-release.yml` builds and checks these packages on an
 Ubuntu standard GitHub-hosted runner. Pull requests and manual runs produce a
-short-lived verification artifact; a published GitHub Release attaches the four
-files to that release. A tag push alone does not publish release assets. The
+short-lived verification artifact; a published GitHub Release attaches all six
+files to that release and adds the PNGs to a marker-delimited section of its
+release notes. Existing notes are preserved; reruns replace only that generated
+section. A tag push alone does not publish release assets. The
 checkout uses the release tag's source, and only the publish job gets repository
 write permission. The workflow must be merged before the next published release
 can use it. It does not publish a release or change a tag itself.
 
 The repository is public, so standard hosted-runner compute is free under
 GitHub's public-repository Actions policy. Build artifacts have one-day retention;
-release attachments are the durable download location. GitHub-hosted execution
-must still be checked in the workflow's first run; local packaging tests do not
-establish Linux runner or slicer import compatibility.
+release attachments are the durable download location. The initial GitHub-hosted build passed; preview or workflow changes require their
+own CI verification. Local geometry and image checks do not establish physical
+print quality.
 
 ## File classification
 

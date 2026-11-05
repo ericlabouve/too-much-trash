@@ -231,7 +231,7 @@ class ReleaseBundleTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get('CAD_RELEASE_BUNDLE'), 'set CAD_RELEASE_BUNDLE for actual release')
     def test_current_release(self):
         root = Path(os.environ['CAD_RELEASE_BUNDLE'])
-        self.assertEqual({p.name for p in root.iterdir()}, {'PETG.3mf', 'TPU.3mf', 'README.md', 'manifest.json'})
+        self.assertEqual({p.name for p in root.iterdir()}, {'PETG.3mf', 'TPU.3mf', 'PETG.png', 'TPU.png', 'README.md', 'manifest.json'})
         manifest = json.loads((root / 'manifest.json').read_text())
         self.assertEqual(manifest['status'], 'unsliced')
         build = Path(os.environ['CAD_RELEASE_BUILD']) if os.environ.get('CAD_RELEASE_BUILD') else None
@@ -258,6 +258,8 @@ class ReleaseBundleTests(unittest.TestCase):
                 items = validate_plate(plate, expected)
                 project = manifest['projects'][material]
                 self.assertEqual(project['sha256'], hashlib.sha256(plate.read_bytes()).hexdigest())
+                self.assertEqual(project['preview'], f'{material}.png')
+                self.assertEqual(project['preview_sha256'], hashlib.sha256((root / project['preview']).read_bytes()).hexdigest())
                 self.assertEqual(Counter(o['design'] for o in project['objects']), expected)
                 if build:
                     source = build / 'versions/v3/print'

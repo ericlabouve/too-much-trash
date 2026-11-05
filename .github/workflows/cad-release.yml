@@ -38,7 +38,14 @@ jobs:
         env:
           CAD_RELEASE_BUNDLE: build/release
           CAD_RELEASE_BUILD: build/release-build
-        run: uv run --frozen python -m unittest discover -s tests -p test_release_bundle.py
+        run: |
+          uv run --frozen python -m unittest discover -s tests -p 'test_*release*.py'
+          uv run --frozen python -m unittest discover -s tests -p test_plate_previews.py
+      - name: Verify plate previews exist
+        working-directory: cad/build/release
+        run: |
+          test -s PETG.png
+          test -s TPU.png
       - name: Upload packages for verification
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -54,6 +61,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: cad-release-packages
@@ -63,4 +73,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$RELEASE_TAG" release-assets/*
+        run: gh release upload "$RELEASE_TAG" release-assets/* --clobber
+      - name: Add plate previews to release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: python3 cad/workspace/release_notes.py

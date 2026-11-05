@@ -16,6 +16,11 @@ import shapely
 from shapely import affinity
 import trimesh
 
+try:
+    from .plate_preview import render_preview
+except ImportError:  # Direct invocation by the workspace task.
+    from plate_preview import render_preview
+
 CAD = Path(__file__).resolve().parents[1]
 CORE = 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'
 ET.register_namespace('', CORE)
@@ -171,11 +176,21 @@ def package(build, output):
             z.writestr('[Content_Types].xml', contents)
             z.writestr('_rels/.rels', rels)
             z.writestr('3D/3dmodel.model', model)
-        result['projects'][material] = {'file': filename, 'sha256': digest(output / filename), 'objects': objects}
+        preview = f'{material}.png'
+        counts = render_preview(output / filename, output / preview, material)
+        if counts != Counter(o['design'] for o in objects):
+            raise ValueError(f'{material} preview object counts differ from project')
+        result['projects'][material] = {'file': filename, 'sha256': digest(output / filename), 'preview': preview, 'preview_sha256': digest(output / preview), 'objects': objects}
     (output / 'manifest.json').write_text(json.dumps(result, indent=2) + '\n')
     (output / 'README.md').write_text(f'''# Too Much Trash V3 — unsliced print projects
 
 PETG.3mf contains seven rigid pieces; TPU.3mf contains fifteen ELEGOO TPU 95A pieces. The files embed the current V3 manufacturing meshes, in millimetres at 100% scale. Each project is an independent generic 3MF; no printer, filament, support, or process profile is embedded. They are not G-code and cannot be sent as ready-to-print jobs.
+
+![PETG plate preview](PETG.png)
+
+![TPU plate preview](TPU.png)
+
+These previews show the embedded geometry and placement from above; they do not show slicer-generated supports or toolpaths.
 
 Open each project in a slicer, select the actual printer, 0.4 mm nozzle, bed and filament, and slice and review each plate before printing. The layouts fit a 180 × 180 mm A1 mini bed in geometric projection, with at least 2 mm between projected models; supports, brims, bed exclusions and purge areas require separate slicer review. Keep the supplied bed-facing orientation unless deliberately reviewed. Use 0.12 mm layers for threaded parts; recent PETG review also used 0.12 mm. Supports and their removal must be reviewed per part. TPU cuff support was disabled in a prior successful cuff print; other current parts still require review.
 
