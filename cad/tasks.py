@@ -38,6 +38,14 @@ def build(c, version='v3', output=None):
 
 
 @task(auto_shortflags=False)
+def release(c, output=None):
+    """Build and package unsliced V3 material projects."""
+    result = subprocess.run([sys.executable, str(Path(__file__).resolve().parent / 'workspace/release.py'), *_option('--output', output)], check=False)
+    if result.returncode:
+        raise Exit(code=result.returncode)
+
+
+@task(auto_shortflags=False)
 def check(c, version='v3', output=None):
     """Check a version in a new isolated snapshot."""
     _run('check', version, *_option('--output', output))
@@ -86,7 +94,7 @@ def artifacts_restore(c, prefix=None, site=None, destination=None, dry_run=False
 
 ns = Collection()
 ns.add_task(list_tasks)
-for _task in (plan, build, check, build_site, serve, inventory, explain):
+for _task in (plan, build, release, check, build_site, serve, inventory, explain):
     ns.add_task(_task)
 artifacts = Collection('artifacts')
 artifacts.add_task(artifacts_list)

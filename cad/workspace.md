@@ -9,6 +9,7 @@ uv run inv list
 uv run inv plan
 uv run inv build
 uv run inv check
+uv run inv release --output build/release
 uv run inv inventory --git --json build/inventory.json
 uv run inv explain versions/v3/source/clip_current/clip.stl
 uv run inv build-site --versions all --output build/site
@@ -87,6 +88,43 @@ job into the source tree or a generated site when needed; do not overlay all old
 active outputs on a freshly built site. Older study/check scripts can depend on
 these restored inputs; they are not all independently reproducible from current
 source. The catalog does not rewrite history or provide an independent backup.
+
+## Shareable print releases
+
+From `cad/`, run `uv run inv release` (unique ignored output directory), or
+`uv run inv release --output build/release` for an explicit new directory.
+The command builds current V3 in a fresh isolated snapshot, verifies the build
+inputs against the checkout, and composes four flat files:
+
+- `PETG.3mf`: seven rigid pieces.
+- `TPU.3mf`: fifteen flexible pieces (three cuffs, five screws, five nuts,
+  one axle key and one clip).
+- `README.md`: material, slicing, assembly and design-limit instructions.
+- `manifest.json`: geometry, placement, source hashes and package checksums.
+
+The first three are the minimal recipient package; the manifest provides
+provenance. These are generic core 3MF models with embedded geometry, 100% scale
+and arranged quantities, not Bambu-specific saved presets or sliced printer
+jobs. Recipients must choose their actual printer, bed, filament and process
+settings, then slice and inspect supports/brims and excluded bed areas.
+The packager checks 180 x 180 mm geometric bed fit and at least 2 mm projected
+model spacing; this does not qualify the sliced plate or physical device.
+No printer is contacted. Existing output directories are rejected. Build
+snapshots are siblings of the output directory and are not release assets.
+
+`.github/workflows/cad-release.yml` builds and checks these packages on an
+Ubuntu standard GitHub-hosted runner. Pull requests and manual runs produce a
+short-lived verification artifact; a published GitHub Release attaches the four
+files to that release. A tag push alone does not publish release assets. The
+checkout uses the release tag's source, and only the publish job gets repository
+write permission. The workflow must be merged before the next published release
+can use it. It does not publish a release or change a tag itself.
+
+The repository is public, so standard hosted-runner compute is free under
+GitHub's public-repository Actions policy. Build artifacts have one-day retention;
+release attachments are the durable download location. GitHub-hosted execution
+must still be checked in the workflow's first run; local packaging tests do not
+establish Linux runner or slicer import compatibility.
 
 ## File classification
 
