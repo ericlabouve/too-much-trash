@@ -40,6 +40,14 @@ struct ContentView: View {
                 .padding(28)
                 .background(.black.opacity(0.65), in: RoundedRectangle(cornerRadius: 24))
             }
+            if camera.isReady, let notice = camera.limitNotice {
+                Text(notice)
+                    .font(.callout.weight(.semibold))
+                    .multilineTextAlignment(.center)
+                    .padding(14)
+                    .background(.black.opacity(0.75), in: RoundedRectangle(cornerRadius: 14))
+                    .accessibilityIdentifier("recordingLimitNotice")
+            }
             VStack(spacing: 20) {
                 HStack {
                     Label("FIELD CAMERA", systemImage: "viewfinder")

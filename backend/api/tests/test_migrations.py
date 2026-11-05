@@ -28,7 +28,7 @@ class MigrationTests(unittest.TestCase):
         command.upgrade(config, "head")
         command.upgrade(config, "head")
         with database() as connection:
-            self.assertEqual(connection.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"], "004_development_keys")
+            self.assertEqual(connection.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"], "005_episode_transfers")
             self.assertEqual(connection.execute("SELECT installation_id FROM captures WHERE id=%s", (capture,)).fetchone()["installation_id"], installation)
             self.assertEqual(connection.execute("SELECT invitation_id FROM installations WHERE id=%s", (installation,)).fetchone()["invitation_id"], invite)
             self.assertEqual(connection.execute("SELECT code_hash FROM invitations WHERE id=%s", (invite,)).fetchone()["code_hash"], str(invite))

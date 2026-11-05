@@ -401,6 +401,7 @@ final class ARVideoSegmentWriter {
         let lastTimestamp: TimeInterval
         let frameCount: Int
         let error: String?
+        var frameTimestamps: [TimeInterval] = []
     }
     private struct OpenSegment {
         let writer: AVAssetWriter
@@ -410,6 +411,7 @@ final class ARVideoSegmentWriter {
         let first: TimeInterval
         var last: TimeInterval
         var frames: Int
+        var frameTimestamps: [TimeInterval] = []
     }
     private let directory: URL
     private let segmentDuration: TimeInterval
@@ -452,6 +454,7 @@ final class ARVideoSegmentWriter {
         }
         open.last = timestamp
         open.frames += 1
+        open.frameTimestamps.append(timestamp)
         current = open
     }
 
@@ -463,7 +466,7 @@ final class ARVideoSegmentWriter {
         open.writer.finishWriting {
             let failure = open.writer.status == .completed ? nil : (open.writer.error?.localizedDescription ?? "segment_encoding_failed")
             callback?(Segment(url: open.url, firstTimestamp: open.first, lastTimestamp: open.last,
-                              frameCount: open.frames, error: failure))
+                              frameCount: open.frames, error: failure, frameTimestamps: open.frameTimestamps))
         }
     }
 
@@ -472,7 +475,7 @@ final class ARVideoSegmentWriter {
         if open.writer.status == .writing { finishCurrent(); return }
         current = nil
         onSegment?(Segment(url: open.url, firstTimestamp: open.first, lastTimestamp: open.last,
-                           frameCount: open.frames, error: open.writer.error?.localizedDescription ?? "segment_encoding_failed"))
+                           frameCount: open.frames, error: open.writer.error?.localizedDescription ?? "segment_encoding_failed", frameTimestamps: open.frameTimestamps))
     }
 
     private func makeSegment(_ source: CVPixelBuffer, timestamp: TimeInterval) throws -> OpenSegment {
@@ -524,6 +527,8 @@ final class ARVideoSegmentWriter {
 /// the capture coordinator on its serial queue. A failed or unfinished journal
 /// is deliberately retained for recovery; it is never presented as complete.
 final class EpisodeJournal: @unchecked Sendable {
+    static let maximumEpisodeBytes: Int64 = 80_000_000
+    private static let manifestReserveBytes: Int64 = 1_048_576
     struct Gap: Codable {
         let stream: String
         let timestamp: TimeInterval
@@ -557,6 +562,7 @@ final class EpisodeJournal: @unchecked Sendable {
             let cameraIntrinsics: String
             let streams: [String: Coverage]
             let gaps: [Gap]
+            let videoSegmentJoins: [EpisodeVideoAssembler.JoinTiming]
         }
         let schemaVersion: Int
         let episodeID: String
@@ -574,7 +580,13 @@ final class EpisodeJournal: @unchecked Sendable {
     private var imu: FileHandle?
     private var poses: FileHandle?
     private var coverage: [String: Coverage] = [:]
+    private(set) var sensorBytesWritten: Int64 = 0
     private var gaps: [Gap] = []
+    private var videoSegmentJoins: [EpisodeVideoAssembler.JoinTiming] = []
+
+    func noteVideoSegmentJoins(_ joins: [EpisodeVideoAssembler.JoinTiming]) {
+        videoSegmentJoins.append(contentsOf: joins)
+    }
     private var lastSyncTime: TimeInterval?
     private let encoder = JSONEncoder()
 
@@ -621,6 +633,41 @@ final class EpisodeJournal: @unchecked Sendable {
         gaps.append(Gap(stream: stream, timestamp: time, reason: reason))
     }
 
+    /// A byte limit can be discovered after an encoded segment is finalized.
+    /// Keep the original sensor journals privately and publish only the common
+    /// truncated interval. No timestamp is rewritten or synthesized.
+    func trimSensors(through end: TimeInterval) throws {
+        try imu?.synchronize(); try poses?.synchronize()
+        try imu?.close(); try poses?.close(); imu = nil; poses = nil
+        let overflow = directory.appendingPathComponent("overflow", isDirectory: true)
+        try FileManager.default.createDirectory(at: overflow, withIntermediateDirectories: true)
+        try CaptureQueue.protect(overflow)
+        coverage = [:]
+        sensorBytesWritten = 0
+        for name in ["imu.jsonl", "poses.jsonl"] {
+            let source = directory.appendingPathComponent(name)
+            let original = overflow.appendingPathComponent(name)
+            try FileManager.default.moveItem(at: source, to: original)
+            var retained = Data()
+            for line in try Data(contentsOf: original).split(separator: 10) {
+                guard let record = try JSONSerialization.jsonObject(with: Data(line)) as? [String: Any],
+                      let time = record["commonTime"] as? Double,
+                      let sample = record["sample"] as? [String: Any] else { throw ClientError.storage }
+                guard time <= end else { continue }
+                retained.append(contentsOf: line); retained.append(10)
+                let stream = name == "poses.jsonl" ? "camera_pose" : (sample["stream"] as? String ?? "unknown")
+                coverage[stream, default: Coverage()].add(time)
+            }
+            try retained.write(to: source, options: .atomic)
+            try CaptureQueue.protect(source)
+            sensorBytesWritten += Int64(retained.count)
+        }
+        imu = try FileHandle(forWritingTo: directory.appendingPathComponent("imu.jsonl"))
+        poses = try FileHandle(forWritingTo: directory.appendingPathComponent("poses.jsonl"))
+        try imu?.seekToEnd(); try poses?.seekToEnd()
+        gaps.removeAll { $0.timestamp > end }
+    }
+
     func markExportFailure(end: TimeInterval, reason: String) throws {
         try imu?.synchronize(); try poses?.synchronize()
         try imu?.close(); try poses?.close()
@@ -631,6 +678,18 @@ final class EpisodeJournal: @unchecked Sendable {
         let url = directory.appendingPathComponent("recovery.json")
         try JSONSerialization.data(withJSONObject: metadata, options: [.sortedKeys]).write(to: url, options: .atomic)
         try CaptureQueue.protect(url)
+    }
+
+    /// Reserve space for sensor sidecars and the largest accepted manifest.
+    /// A second exact check runs before publishing the episode.
+    func videoByteBudget() throws -> Int64 {
+        try imu?.synchronize(); try poses?.synchronize()
+        let sidecarBytes = try ["imu.jsonl", "poses.jsonl"].reduce(Int64(0)) { total, name in
+            let attributes = try FileManager.default.attributesOfItem(atPath: directory.appendingPathComponent(name).path)
+            guard let size = attributes[.size] as? NSNumber else { throw ClientError.storage }
+            return total + size.int64Value
+        }
+        return Self.maximumEpisodeBytes - Self.manifestReserveBytes - sidecarBytes
     }
 
     /// Finalization requires explicit coverage/clock validation from the
@@ -664,10 +723,16 @@ final class EpisodeJournal: @unchecked Sendable {
                 triggerSource: window.source,
                 accelerationUnits: "g", angularVelocityUnits: "rad/s", attitudeQuaternionOrder: "x,y,z,w",
                 cameraTransform: "camera_to_ar_world_column_major", cameraIntrinsics: "column_major_pixels",
-                streams: coverage, gaps: gaps))
+                streams: coverage, gaps: gaps, videoSegmentJoins: videoSegmentJoins))
         let manifestURL = directory.appendingPathComponent("manifest.json")
         try encoder.encode(manifest).write(to: manifestURL, options: .atomic)
         try CaptureQueue.protect(manifestURL)
+        let bundleSize = try ["video.mp4", "imu.jsonl", "poses.jsonl", "manifest.json"].reduce(Int64(0)) { total, name in
+            let attributes = try FileManager.default.attributesOfItem(atPath: directory.appendingPathComponent(name).path)
+            guard let size = attributes[.size] as? NSNumber else { throw ClientError.storage }
+            return total + size.int64Value
+        }
+        guard bundleSize <= Self.maximumEpisodeBytes else { throw EpisodeVideoAssembler.ExportLimitError.oversizedOrTruncated }
         try? FileManager.default.removeItem(at: directory.appendingPathComponent("recovery.json"))
     }
 
@@ -683,31 +748,68 @@ final class EpisodeJournal: @unchecked Sendable {
     }
 
     private func line<T: Encodable>(_ value: T, to handle: FileHandle) throws {
-        try handle.write(contentsOf: encoder.encode(value))
+        let data = try encoder.encode(value)
+        try handle.write(contentsOf: data)
         try handle.write(contentsOf: Data([10]))
+        sensorBytesWritten += Int64(data.count + 1)
     }
 }
 
 /// Composes overlapping encoded segments on the requested common timeline.
 /// Gaps are returned explicitly rather than collapsing time between segments.
 enum EpisodeVideoAssembler {
+    enum ExportLimitError: Error { case oversizedOrTruncated }
     struct Gap: Equatable { let start: TimeInterval; let end: TimeInterval }
-    struct Result { let url: URL; let gaps: [Gap] }
+    struct JoinTiming: Codable {
+        let containerGapStart: TimeInterval
+        let containerGapEnd: TimeInterval
+        let previousSourceFrame: TimeInterval?
+        let nextSourceFrame: TimeInterval?
+        let estimatedFrameInterval: TimeInterval?
+        let classification: String
+    }
+    struct Result { let url: URL; let gaps: [Gap]; let joins: [JoinTiming] }
+
+    /// Distinguish a sub-frame container join from a missing expected source
+    /// frame. Retain the exact discrepancy as a diagnostic in either case.
+    /// This checks accepted encoder input cadence, not physical clock alignment.
+    static func classifyJoin(previous: ARVideoSegmentWriter.Segment, next: ARVideoSegmentWriter.Segment,
+                             gapStart: TimeInterval, gapEnd: TimeInterval) -> JoinTiming {
+        let before = Array(previous.frameTimestamps.suffix(4))
+        let after = Array(next.frameTimestamps.prefix(4))
+        let intervals = (Array(zip(before.dropFirst(), before)) + Array(zip(after.dropFirst(), after)))
+            .map { $0.0 - $0.1 }.filter { $0.isFinite && $0 > 0 }.sorted()
+        let cadence = intervals.isEmpty ? nil : intervals[intervals.count / 2]
+        let last = before.last, first = after.first
+        let continuous: Bool
+        if let cadence, let last, let first {
+            let step = first - last
+            continuous = step >= cadence * 0.5 && step < cadence * 1.5 &&
+                gapEnd - gapStart < cadence * 0.5
+        } else { continuous = false }
+        return JoinTiming(containerGapStart: gapStart, containerGapEnd: gapEnd,
+            previousSourceFrame: last, nextSourceFrame: first, estimatedFrameInterval: cadence,
+            classification: continuous ? "subframe_container_join" : "unverified_video_gap")
+    }
     private final class ExportBox: @unchecked Sendable {
         let session: AVAssetExportSession
         init(_ session: AVAssetExportSession) { self.session = session }
     }
 
     static func assemble(segments: [ARVideoSegmentWriter.Segment], start: TimeInterval,
-                         end: TimeInterval, output: URL) async throws -> Result {
+                         end: TimeInterval, output: URL,
+                         maximumVideoBytes: Int64 = EpisodeJournal.maximumEpisodeBytes) async throws -> Result {
         guard start.isFinite, end.isFinite, end > start,
               !FileManager.default.fileExists(atPath: output.path) else { throw ClientError.storage }
+        guard maximumVideoBytes > 0 else { throw ExportLimitError.oversizedOrTruncated }
         let composition = AVMutableComposition()
         guard let destination = composition.addMutableTrack(withMediaType: .video,
                                                                preferredTrackID: kCMPersistentTrackID_Invalid) else { throw ClientError.storage }
         let scale: CMTimeScale = 1_000_000_000
         var cursor = start
         var gaps: [Gap] = []
+        var joins: [JoinTiming] = []
+        var previousSegment: ARVideoSegmentWriter.Segment?
         for segment in segments.sorted(by: { $0.firstTimestamp < $1.firstTimestamp }) {
             guard segment.error == nil, segment.frameCount > 0 else { continue }
             let asset = AVURLAsset(url: segment.url)
@@ -720,18 +822,28 @@ enum EpisodeVideoAssembler {
             let from = max(start, cursor, actualStart)
             let to = min(end, segmentEnd)
             guard to > from else { continue }
-            if from > cursor { gaps.append(Gap(start: cursor, end: from)) }
+            if from > cursor {
+                if let previousSegment, cursor > start {
+                    let join = classifyJoin(previous: previousSegment, next: segment, gapStart: cursor, gapEnd: from)
+                    joins.append(join)
+                    if join.classification != "subframe_container_join" { gaps.append(Gap(start: cursor, end: from)) }
+                } else { gaps.append(Gap(start: cursor, end: from)) }
+            }
             let sourceStart = CMTimeAdd(trackRange.start, CMTime(seconds: from - actualStart, preferredTimescale: scale))
             let range = CMTimeRange(start: sourceStart, duration: CMTime(seconds: to - from, preferredTimescale: scale))
             try destination.insertTimeRange(range, of: track, at: CMTime(seconds: from - start, preferredTimescale: scale))
             cursor = to
+            previousSegment = segment
         }
         if cursor < end { gaps.append(Gap(start: cursor, end: end)) }
-        guard cursor > start, let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetHighestQuality) else {
+        guard cursor > start, let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetPassthrough) else {
             throw ClientError.storage
         }
         exporter.outputURL = output
         exporter.outputFileType = .mp4
+        // AVFoundation may fail or truncate when enforcing this limit. We
+        // verify both the final size and duration before publishing an episode.
+        exporter.fileLengthLimit = maximumVideoBytes
         let box = ExportBox(exporter)
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             exporter.exportAsynchronously {
@@ -739,7 +851,14 @@ enum EpisodeVideoAssembler {
                 else { continuation.resume(throwing: box.session.error ?? ClientError.storage) }
             }
         }
-        return Result(url: output, gaps: gaps)
+        let size = (try FileManager.default.attributesOfItem(atPath: output.path)[.size] as? NSNumber)?.int64Value ?? 0
+        let exportedDuration = CMTimeGetSeconds(try await AVURLAsset(url: output).load(.duration))
+        let intendedDuration = CMTimeGetSeconds(composition.duration)
+        guard size > 0, size <= maximumVideoBytes, exportedDuration.isFinite,
+              intendedDuration.isFinite, exportedDuration + 0.1 >= intendedDuration else {
+            throw ExportLimitError.oversizedOrTruncated
+        }
+        return Result(url: output, gaps: gaps, joins: joins)
     }
 }
 
@@ -778,10 +897,17 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
     private var ready = false
     private var outstandingExports = 0
     private var preserveRollingFiles = false
+    private var retainedFailureMessage: String?
+    private var protectedSizeOverflowSegments: Set<URL> = []
+    private var sizeOverflowIntervals: [(start: TimeInterval, end: TimeInterval)] = []
+    private var lastByteCheckUptime: TimeInterval = 0
     private let lifecycleLock = NSLock()
     private var running = false
     var onStatus: ((Status) -> Void)?
     var onEpisode: ((URL, UUID) -> Void)?
+    var onDurationLimit: ((String, TimeInterval) -> Void)?
+    var onSizeLimit: ((String, TimeInterval) -> Void)?
+    var onPostRollTruncated: (() -> Void)?
 
     init(ownerDirectory: URL) throws {
         self.ownerDirectory = ownerDirectory
@@ -811,12 +937,16 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
             guard let self else { return }
             self.openSegments.removeValue(forKey: segment.url)
             self.segments.append(segment)
+            if self.sizeOverflowIntervals.contains(where: { segment.lastTimestamp >= $0.start && segment.firstTimestamp <= $0.end }) {
+                self.protectedSizeOverflowSegments.insert(segment.url)
+            }
             do { try self.persistSegmentMetadata(segment) }
             catch { self.preserveRollingFiles = true; self.publish("Could not save video timing metadata. Partial data is retained.") }
             if segment.error != nil || segment.frameCount == 0 {
                 self.lastGoodVideoTime = nil
                 self.recordGap(stream: "video", time: segment.lastTimestamp, reason: "segment_encoding_failed")
             } else { self.lastGoodVideoTime = segment.lastTimestamp }
+            self.enforceLiveByteLimits(force: true)
             self.finishReady()
             self.prune()
         } }
@@ -868,6 +998,14 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
                     journal.noteGap(stream: gap.stream, time: gap.timestamp, reason: gap.reason)
                 }
                 self.publish("Recording episode")
+                let deadline = window.start + EpisodeWindowScheduler.maximumDuration
+                let delay = max(0, deadline - ProcessInfo.processInfo.systemUptime)
+                self.state.asyncAfter(deadline: .now() + delay) {
+                    guard let limited = self.scheduler.limit(window.id, at: deadline) else { return }
+                    self.onDurationLimit?(limited.source, limited.pressedAt)
+                    self.publish("30-second limit reached. Release the trigger.")
+                    self.flushSegments(after: 0.2)
+                }
             } catch {
                 self.scheduler.cancel(source, at: timestamp, reason: "journal_failed")
                 if self.journals[window.id] == nil { _ = self.scheduler.take(window.id) }
@@ -880,9 +1018,13 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
 
     func release(_ source: String, at timestamp: TimeInterval) {
         state.async {
+            let activeWindow = self.scheduler.pending.first { $0.source == source && $0.end == nil }
             self.scheduler.release(source, at: timestamp)
             self.publish("Recording post-roll…")
-            self.flushSegments(after: 3.2)
+            if let id = activeWindow?.id, let window = self.scheduler.pending.first(where: { $0.id == id }), let end = window.end {
+                if window.incompleteReason == "episode_duration_limit" { self.onPostRollTruncated?() }
+                self.flushSegments(after: max(0, end - ProcessInfo.processInfo.systemUptime + 0.2))
+            }
         }
     }
 
@@ -928,7 +1070,8 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
         }
         latestMotion[sample.stream.rawValue] = sample
         for window in scheduler.pending + Array(pendingExports.values) {
-            do { try journals[window.id]?.append(sample, commonTime: sample.timestamp, through: window.end) }
+            let end = min(window.end ?? .infinity, window.start + EpisodeWindowScheduler.maximumDuration)
+            do { try journals[window.id]?.append(sample, commonTime: sample.timestamp, through: end) }
             catch {
                 journals[window.id]?.noteGap(stream: sample.stream.rawValue, time: sample.timestamp, reason: "sample_write_failed")
                 preserveRollingFiles = true
@@ -952,7 +1095,8 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
         }
         latestPose = pose
         for window in scheduler.pending + Array(pendingExports.values) {
-            do { try journals[window.id]?.append(pose, commonTime: pose.timestamp, through: window.end) }
+            let end = min(window.end ?? .infinity, window.start + EpisodeWindowScheduler.maximumDuration)
+            do { try journals[window.id]?.append(pose, commonTime: pose.timestamp, through: end) }
             catch {
                 journals[window.id]?.noteGap(stream: "camera_pose", time: pose.timestamp, reason: "sample_write_failed")
                 preserveRollingFiles = true
@@ -963,6 +1107,7 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
     }
 
     private func refreshReadiness() {
+        enforceLiveByteLimits()
         let now = ProcessInfo.processInfo.systemUptime
         let firstTimes = [accelerometer.samples.first?.time, gyroscope.samples.first?.time,
                           attitude.samples.first?.time, poses.samples.first?.time]
@@ -973,7 +1118,35 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
             lastTimes.allSatisfy { $0.map { $0 <= now && $0 >= now - 0.5 } ?? false } &&
             lastGoodVideoTime.map { $0 <= now && $0 >= now - 2.5 } == true
         if now - lastStatusUptime >= 0.25 {
-            publish(preserveRollingFiles ? "Recording needs attention; partial data retained." : (ready ? (scheduler.pending.isEmpty ? "Ready" : "Recording") : "Buffering…"))
+            publish(preserveRollingFiles ? (retainedFailureMessage ?? "Recording needs attention; partial data retained.") : (ready ? (scheduler.pending.isEmpty ? "Ready" : "Recording") : "Buffering…"))
+        }
+    }
+
+    private func enforceLiveByteLimits(force: Bool = false) {
+        let now = ProcessInfo.processInfo.systemUptime
+        guard force || now - lastByteCheckUptime >= 0.1 else { return }
+        lastByteCheckUptime = now
+        for window in scheduler.pending where window.incompleteReason != "episode_size_limit" {
+            guard let journal = journals[window.id] else { continue }
+            let relevant = segments.filter { $0.lastTimestamp >= window.start && $0.firstTimestamp <= (window.end ?? .infinity) }
+                .sorted { $0.firstTimestamp < $1.firstTimestamp }
+            do {
+                let pieces = try relevant.map { segment -> EpisodeLiveByteBudget.Piece in
+                    guard let bytes = try FileManager.default.attributesOfItem(atPath: segment.url.path)[.size] as? NSNumber else { throw ClientError.storage }
+                    return .init(end: segment.lastTimestamp, bytes: bytes.int64Value)
+                }
+                guard let safeEnd = EpisodeLiveByteBudget.cutoff(pieces: pieces, sensorBytes: journal.sensorBytesWritten, start: window.start) else { continue }
+                let end = max(window.pressedAt, safeEnd)
+                guard let limited = scheduler.limitBytes(window.id, through: end) else { continue }
+                sizeOverflowIntervals.append((start: end, end: ProcessInfo.processInfo.systemUptime))
+                for segment in relevant where segment.lastTimestamp >= end { protectedSizeOverflowSegments.insert(segment.url) }
+                onSizeLimit?(limited.source, limited.pressedAt)
+                publish("80 MB byte budget reached; preserving a shorter episode.")
+                flushSegments(after: 0)
+            } catch {
+                preserveRollingFiles = true
+                publish("Could not measure recording size. Source data retained.")
+            }
         }
     }
 
@@ -1017,15 +1190,30 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
             }
             if !streamsReachedEnd { journal.noteGap(stream: "capture", time: end, reason: "stream_ended_before_requested_window") }
             pendingExports.removeValue(forKey: window.id)
+            let videoBudget: Int64
+            do {
+                if window.incompleteReason == "episode_size_limit" { try journal.trimSensors(through: end) }
+                videoBudget = try journal.videoByteBudget()
+                guard videoBudget > 0 else { throw EpisodeVideoAssembler.ExportLimitError.oversizedOrTruncated }
+            } catch {
+                try? journal.markExportFailure(end: end, reason: "episode_size_budget_unavailable")
+                preserveRollingFiles = true
+                ready = false
+                let message = "Episode cannot fit within 80 MB. Partial data is retained."
+                retainedFailureMessage = message
+                publish(message)
+                continue
+            }
             outstandingExports += 1
             let chosen = segments.filter { $0.lastTimestamp + 0.2 >= window.start && $0.firstTimestamp <= end }
             let output = scratchDirectory.appendingPathComponent("export-\(window.id.uuidString).mp4")
             Task {
                 do {
-                    let result = try await EpisodeVideoAssembler.assemble(segments: chosen, start: window.start, end: end, output: output)
+                    let result = try await EpisodeVideoAssembler.assemble(segments: chosen, start: window.start, end: end, output: output, maximumVideoBytes: videoBudget)
                     self.state.async {
                         do {
                             for gap in result.gaps { journal.noteGap(stream: "video", time: gap.start, reason: "gap_until_\(gap.end)") }
+                            journal.noteVideoSegmentJoins(result.joins)
                             if let reason = window.incompleteReason { journal.noteGap(stream: "capture", time: end, reason: reason) }
                             // Clock and complete-stream coverage must be validated on real hardware.
                             try journal.finalize(video: result.url, release: window.releasedAt, end: end, validatedCoverageAndClock: false)
@@ -1034,17 +1222,24 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
                         } catch {
                             try? journal.markExportFailure(end: end, reason: "episode_finalize_failed")
                             self.preserveRollingFiles = true
-                            self.publish("Episode export failed. Partial data is retained.")
+                            self.ready = false
+                            let message = error is EpisodeVideoAssembler.ExportLimitError ? "Episode exceeds 80 MB. Partial data is retained." : "Episode export failed. Partial data is retained."
+                            self.retainedFailureMessage = message
+                            self.publish(message)
                         }
                         self.outstandingExports -= 1
                         self.prune()
                     }
                 } catch {
                     self.state.async {
-                        try? journal.markExportFailure(end: end, reason: "video_assembly_failed")
+                        let reason = error is EpisodeVideoAssembler.ExportLimitError ? "video_size_limit_or_truncated_export" : "video_assembly_failed"
+                        try? journal.markExportFailure(end: end, reason: reason)
                         self.outstandingExports -= 1
                         self.preserveRollingFiles = true
-                        self.publish("Episode video could not be assembled. Partial data is retained.")
+                        self.ready = false
+                        let message = "Video export failed or exceeded 80 MB. Partial data is retained."
+                        self.retainedFailureMessage = message
+                        self.publish(message)
                     }
                 }
             }
@@ -1064,7 +1259,7 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
     private func prune() {
         guard !preserveRollingFiles, scheduler.pending.isEmpty, pendingExports.isEmpty, outstandingExports == 0, let latestPose else { return }
         let cutoff = latestPose.timestamp - 5
-        let old = segments.filter { !active || $0.lastTimestamp < cutoff }
+        let old = segments.filter { !protectedSizeOverflowSegments.contains($0.url) && (!active || $0.lastTimestamp < cutoff) }
         for segment in old {
             do {
                 try FileManager.default.removeItem(at: segment.url)
@@ -1079,7 +1274,8 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
     private func persistSegmentMetadata(_ segment: ARVideoSegmentWriter.Segment) throws {
         let metadata: [String: Any] = ["file": segment.url.lastPathComponent,
             "first_timestamp": segment.firstTimestamp, "last_timestamp": segment.lastTimestamp,
-            "frame_count": segment.frameCount, "error": (segment.error as Any?) ?? NSNull()]
+            "frame_count": segment.frameCount, "frame_timestamps": segment.frameTimestamps,
+            "error": (segment.error as Any?) ?? NSNull()]
         let url = segment.url.deletingPathExtension().appendingPathExtension("json")
         try JSONSerialization.data(withJSONObject: metadata, options: [.sortedKeys]).write(to: url, options: .atomic)
         try CaptureQueue.protect(url)
@@ -1125,11 +1321,13 @@ final class EpisodeCameraController: ObservableObject {
     @Published private(set) var status = "Opening camera…"
     @Published private(set) var recordingStartedAt: Date?
     @Published private(set) var pendingEpisodes = 0
+    @Published private(set) var limitNotice: String?
     @Published private(set) var latestMotion: [String: MotionSample] = [:]
     @Published private(set) var latestPose: CameraPoseSample?
     var onEpisodeSaved: ((URL, UUID) -> Void)?
     private var engine: EpisodeCaptureEngine?
     private var heldSources: Set<String> = []
+    private var heldStartTimes: [String: TimeInterval] = [:]
 
     func configure(directory: URL) throws {
         guard engine == nil else { return }
@@ -1145,6 +1343,30 @@ final class EpisodeCameraController: ObservableObject {
         }
         engine.onEpisode = { [weak self] folder, id in
             Task { @MainActor [weak self] in self?.onEpisodeSaved?(folder, id) }
+        }
+        engine.onDurationLimit = { [weak self] source, pressedAt in
+            Task { @MainActor [weak self] in
+                guard let self, self.heldStartTimes[source] == pressedAt else { return }
+                self.heldStartTimes.removeValue(forKey: source)
+                self.heldSources.remove(source)
+                if self.heldSources.isEmpty { self.recordingStartedAt = nil }
+                self.limitNotice = "30-second limit reached. Release the trigger to record again."
+            }
+        }
+        engine.onSizeLimit = { [weak self] source, pressedAt in
+            Task { @MainActor [weak self] in
+                guard let self, self.heldStartTimes[source] == pressedAt else { return }
+                self.heldStartTimes.removeValue(forKey: source)
+                self.heldSources.remove(source)
+                if self.heldSources.isEmpty { self.recordingStartedAt = nil }
+                self.limitNotice = "80 MB limit reached. A shorter episode is being saved. Release the trigger."
+            }
+        }
+        engine.onPostRollTruncated = { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self, self.recordingStartedAt == nil else { return }
+                self.limitNotice = "30-second limit reached. The post-roll was shortened."
+            }
         }
         self.engine = engine
         session = engine.camera.session
@@ -1169,6 +1391,7 @@ final class EpisodeCameraController: ObservableObject {
 
     func deactivate() {
         heldSources.removeAll()
+        heldStartTimes.removeAll()
         recordingStartedAt = nil
         isReady = false
         engine?.stop(reason: "capture_screen_inactive")
@@ -1178,18 +1401,22 @@ final class EpisodeCameraController: ObservableObject {
         guard isReady, !heldSources.contains(source) else { return }
         let time = ProcessInfo.processInfo.systemUptime
         heldSources.insert(source)
+        heldStartTimes[source] = time
+        limitNotice = nil
         if recordingStartedAt == nil { recordingStartedAt = Date() }
         engine?.press(source, at: time)
     }
 
     func release(_ source: String) {
         guard heldSources.remove(source) != nil else { return }
+        heldStartTimes.removeValue(forKey: source)
         engine?.release(source, at: ProcessInfo.processInfo.systemUptime)
         if heldSources.isEmpty { recordingStartedAt = nil }
     }
 
     func cancel(_ source: String) {
         guard heldSources.remove(source) != nil else { return }
+        heldStartTimes.removeValue(forKey: source)
         engine?.cancel(source, at: ProcessInfo.processInfo.systemUptime, reason: "capture_event_cancelled")
         if heldSources.isEmpty { recordingStartedAt = nil }
     }

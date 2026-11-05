@@ -3,6 +3,96 @@ import AVFoundation
 @testable import TooMuchTrash
 
 final class HoldRecordingStateTests: XCTestCase {
+    func testMeasuredByteBudgetStopsAtLastSafeSegmentForHighBitrate() {
+        let pieces: [EpisodeLiveByteBudget.Piece] = [.init(end: 11, bytes: 25_000_000), .init(end: 12, bytes: 25_000_000), .init(end: 13, bytes: 25_000_000), .init(end: 14, bytes: 25_000_000)]
+        XCTAssertEqual(EpisodeLiveByteBudget.cutoff(pieces: pieces, sensorBytes: 1_000_000, start: 10), 13)
+        XCTAssertNil(EpisodeLiveByteBudget.cutoff(pieces: Array(pieces.prefix(3)), sensorBytes: 1_000_000, start: 10))
+        XCTAssertEqual(EpisodeLiveByteBudget.cutoff(pieces: pieces, sensorBytes: 30_000_000, start: 10), 11)
+    }
+
+    func testByteLimitNeverInventsReleaseAndTrimsFutureSamples() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        var scheduler = EpisodeWindowScheduler()
+        let window = try XCTUnwrap(scheduler.press("volume", at: 10))
+        let journal = try EpisodeJournal(ownerDirectory: root, window: window)
+        for time in [9.0, 11.0, 13.0] {
+            try journal.append(MotionSample(stream: .accelerometer, timestamp: time, values: [1, 2, 3]), commonTime: time, through: nil)
+        }
+        let limited = try XCTUnwrap(scheduler.limitBytes(window.id, through: 12))
+        XCTAssertEqual(limited.end, 12)
+        XCTAssertNil(limited.releasedAt)
+        XCTAssertEqual(limited.incompleteReason, "episode_size_limit")
+        try journal.trimSensors(through: 12)
+        let retained = try Data(contentsOf: journal.directory.appendingPathComponent("imu.jsonl"))
+        let original = try Data(contentsOf: journal.directory.appendingPathComponent("overflow/imu.jsonl"))
+        XCTAssertEqual(retained.split(separator: 10).count, 2)
+        XCTAssertEqual(original.split(separator: 10).count, 3)
+        XCTAssertEqual(journal.sensorBytesWritten, Int64(retained.count))
+    }
+
+    func testEpisodeDurationLimitMarksLongHoldWithoutInventingRelease() throws {
+        var scheduler = EpisodeWindowScheduler()
+        let window = try XCTUnwrap(scheduler.press("volume", at: 10))
+        XCTAssertNil(scheduler.limit(window.id, at: 36.99))
+        let limited = try XCTUnwrap(scheduler.limit(window.id, at: 37))
+        XCTAssertEqual(limited.start, 7)
+        XCTAssertEqual(limited.end, 37)
+        XCTAssertNil(limited.releasedAt)
+        XCTAssertEqual(limited.incompleteReason, "episode_duration_limit")
+        scheduler.release("volume", at: 40)
+        XCTAssertNil(scheduler.pending.first?.releasedAt)
+    }
+
+    func testEpisodeDurationLimitTruncatesPostRollOnlyWhenNeeded() throws {
+        var scheduler = EpisodeWindowScheduler()
+        let first = try XCTUnwrap(scheduler.press("first", at: 10))
+        scheduler.release("first", at: 34)
+        let completed = try XCTUnwrap(scheduler.pending.first { $0.id == first.id })
+        XCTAssertEqual(completed.end, 37)
+        XCTAssertEqual(completed.releasedAt, 34)
+        XCTAssertNil(completed.incompleteReason)
+
+        let second = try XCTUnwrap(scheduler.press("second", at: 10))
+        scheduler.release("second", at: 36)
+        let capped = try XCTUnwrap(scheduler.pending.first { $0.id == second.id })
+        XCTAssertEqual(capped.end, 37)
+        XCTAssertEqual(capped.releasedAt, 36)
+        XCTAssertEqual(capped.incompleteReason, "episode_duration_limit")
+    }
+
+    func testEpisodeVideoBudgetReservesSpaceForSidecars() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        var scheduler = EpisodeWindowScheduler()
+        let window = try XCTUnwrap(scheduler.press("volume", at: 10))
+        let journal = try EpisodeJournal(ownerDirectory: root, window: window)
+        let emptyBudget = try journal.videoByteBudget()
+        try journal.append(MotionSample(stream: .accelerometer, timestamp: 9, values: [1, 2, 3]), commonTime: 9, through: 15)
+        let sensorBytes = try XCTUnwrap((FileManager.default.attributesOfItem(atPath: journal.directory.appendingPathComponent("imu.jsonl").path)[.size] as? NSNumber)?.int64Value)
+        XCTAssertGreaterThan(sensorBytes, 0)
+        XCTAssertEqual(try journal.videoByteBudget(), emptyBudget - sensorBytes)
+        XCTAssertLessThan(emptyBudget, EpisodeJournal.maximumEpisodeBytes)
+    }
+
+    func testOversizedBundleIsNotFinalizedAndVideoIsRetained() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        var scheduler = EpisodeWindowScheduler()
+        let window = try XCTUnwrap(scheduler.press("volume", at: 10))
+        let journal = try EpisodeJournal(ownerDirectory: root, window: window)
+        let video = root.appendingPathComponent("video.mp4")
+        XCTAssertTrue(FileManager.default.createFile(atPath: video.path, contents: nil))
+        let handle = try FileHandle(forWritingTo: video)
+        try handle.truncate(atOffset: UInt64(EpisodeJournal.maximumEpisodeBytes))
+        try handle.close()
+        XCTAssertThrowsError(try journal.finalize(video: video, release: 12, end: 15, validatedCoverageAndClock: false))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: journal.directory.appendingPathComponent("video.mp4").path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: journal.directory.appendingPathComponent("recovery.json").path))
+    }
     #if DEBUG
     func testSyntheticCaptureCoordinatorFinalizesAnEpisode() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -147,8 +237,75 @@ final class HoldRecordingStateTests: XCTestCase {
         let assembledAudio = try await assembled.loadTracks(withMediaType: .audio)
         XCTAssertTrue(assembledPlayable)
         XCTAssertTrue(assembledAudio.isEmpty)
+        var rejectedTinyBudget = false
+        do {
+            _ = try await EpisodeVideoAssembler.assemble(segments: [segment], start: 9.5, end: 10.3,
+                output: directory.appendingPathComponent("too-small.mp4"), maximumVideoBytes: 1)
+        } catch { rejectedTinyBudget = true }
+        XCTAssertTrue(rejectedTinyBudget)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: segment.url.path), "Retain the original segment when export is limited")
         XCTAssertEqual(assembledResult.gaps.first?.start, 9.5)
     }
+    func testJoinDiagnosticsPreserveRoundingWithoutHidingMissingFrames() {
+        for fps in [29.97, 59.94] {
+            let dt = 1 / fps
+            func segment(_ times: [Double]) -> ARVideoSegmentWriter.Segment {
+                .init(url: URL(fileURLWithPath: "/unused"), firstTimestamp: times.first!, lastTimestamp: times.last!,
+                      frameCount: times.count, error: nil, frameTimestamps: times)
+            }
+            let previous = segment([10, 10 + dt, 10 + 2 * dt, 10 + 3 * dt])
+            let next = segment([10 + 4 * dt, 10 + 5 * dt, 10 + 6 * dt])
+            let tiny = EpisodeVideoAssembler.classifyJoin(previous: previous, next: next,
+                gapStart: next.firstTimestamp - 0.000071, gapEnd: next.firstTimestamp)
+            XCTAssertEqual(tiny.classification, "subframe_container_join")
+            XCTAssertEqual(tiny.containerGapEnd - tiny.containerGapStart, 0.000071, accuracy: 0.000000001)
+            let missing = segment([10 + 5 * dt, 10 + 6 * dt, 10 + 7 * dt])
+            XCTAssertEqual(EpisodeVideoAssembler.classifyJoin(previous: previous, next: missing,
+                gapStart: next.firstTimestamp - 0.000071, gapEnd: missing.firstTimestamp).classification, "unverified_video_gap")
+            let unknown = ARVideoSegmentWriter.Segment(url: previous.url, firstTimestamp: previous.firstTimestamp,
+                lastTimestamp: previous.lastTimestamp, frameCount: previous.frameCount, error: nil)
+            XCTAssertEqual(EpisodeVideoAssembler.classifyJoin(previous: unknown, next: next,
+                gapStart: next.firstTimestamp - 0.000071, gapEnd: next.firstTimestamp).classification, "unverified_video_gap")
+        }
+    }
+
+    func testMultiSegmentPassthroughKeepsSourceCadenceAndNoAudio() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let writer = try ARVideoSegmentWriter(directory: directory, segmentDuration: 0.5)
+        let done = expectation(description: "all segments")
+        done.expectedFulfillmentCount = 3
+        var segments: [ARVideoSegmentWriter.Segment] = []
+        let lock = NSLock()
+        writer.onSegment = { segment in lock.lock(); segments.append(segment); lock.unlock(); done.fulfill() }
+        var source: CVPixelBuffer?
+        XCTAssertEqual(CVPixelBufferCreate(nil, 64, 64, kCVPixelFormatType_32BGRA,
+            [kCVPixelBufferIOSurfacePropertiesKey: [:]] as CFDictionary, &source), kCVReturnSuccess)
+        let frame = try XCTUnwrap(source)
+        for i in 0..<80 { try writer.append(frame, timestamp: 10 + Double(i) / 59.94); try await Task.sleep(for: .milliseconds(2)) }
+        writer.finishCurrent()
+        await fulfillment(of: [done], timeout: 20)
+        let ordered = segments.sorted { $0.firstTimestamp < $1.firstTimestamp }
+        XCTAssertEqual(ordered.reduce(0) { $0 + $1.frameCount }, 80)
+        let result = try await EpisodeVideoAssembler.assemble(segments: ordered, start: 10,
+            end: 10 + 79.0 / 59.94, output: directory.appendingPathComponent("joined.mp4"))
+        XCTAssertTrue(result.gaps.isEmpty, "Contiguous accepted source frames must not be classified as missing")
+        let asset = AVURLAsset(url: result.url)
+        let audio = try await asset.loadTracks(withMediaType: .audio)
+        XCTAssertTrue(audio.isEmpty)
+        let tracks = try await asset.loadTracks(withMediaType: .video)
+        let track = try XCTUnwrap(tracks.first)
+        let reader = try AVAssetReader(asset: asset)
+        let output = AVAssetReaderTrackOutput(track: track, outputSettings: [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA])
+        reader.add(output)
+        XCTAssertTrue(reader.startReading())
+        var times: [Double] = []
+        while let sample = output.copyNextSampleBuffer() { times.append(CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sample))) }
+        XCTAssertEqual(reader.status, .completed)
+        XCTAssertGreaterThanOrEqual(times.count, 79)
+        XCTAssertTrue(zip(times.dropFirst(), times).allSatisfy { $0.0 - $0.1 < 1.5 / 59.94 })
+    }
+
     func testTimedPreRollRetainsExactBoundaryAndAcceptsLateDataInWindow() {
         var buffer = TimedPreRoll<Int>()
         for i in 0...6 { XCTAssertTrue(buffer.append(time: Double(i), value: i)) }

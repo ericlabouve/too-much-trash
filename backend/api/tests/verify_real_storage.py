@@ -36,6 +36,7 @@ class RealBlob:
         client.upload_fileobj(source, bucket, key, **kwargs)
         self.objects[key] = content
     def get_object(self, **kwargs): return client.get_object(**kwargs)
+    def head_object(self, **kwargs): return client.head_object(**kwargs)
     def delete_object(self, Bucket, Key):
         client.delete_object(Bucket=Bucket, Key=Key)
         self.objects.pop(Key, None)

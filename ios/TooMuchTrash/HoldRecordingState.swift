@@ -47,6 +47,7 @@ struct HoldRecordingState {
 /// Plans independent episode windows on a caller-supplied monotonic clock.
 /// This only schedules boundaries; it does not capture or persist sensor data.
 struct EpisodeWindowScheduler {
+    static let maximumDuration: TimeInterval = 30
     struct Window: Equatable {
         let id: UUID
         let source: String
@@ -75,8 +76,22 @@ struct EpisodeWindowScheduler {
     mutating func release(_ source: String, at time: TimeInterval) {
         guard time.isFinite, let index = pending.firstIndex(where: { $0.source == source && $0.end == nil }),
               time >= pending[index].pressedAt else { return }
-        pending[index].releasedAt = time
-        pending[index].end = time + padding
+        let deadline = pending[index].start + Self.maximumDuration
+        if time <= deadline { pending[index].releasedAt = time }
+        pending[index].end = min(time + padding, deadline)
+        if time + padding > deadline { pending[index].incompleteReason = "episode_duration_limit" }
+    }
+
+    /// An enforced limit is not a physical button release. Keep releasedAt nil
+    /// if the user is still holding, and explicitly mark any truncated window.
+    @discardableResult
+    mutating func limit(_ id: UUID, at time: TimeInterval) -> Window? {
+        guard let index = pending.firstIndex(where: { $0.id == id }), time.isFinite else { return nil }
+        let deadline = pending[index].start + Self.maximumDuration
+        guard time >= deadline, pending[index].end.map({ $0 > deadline }) ?? true else { return nil }
+        pending[index].end = deadline
+        pending[index].incompleteReason = "episode_duration_limit"
+        return pending[index]
     }
 
     mutating func cancel(_ source: String, at time: TimeInterval, reason: String) {
@@ -84,6 +99,16 @@ struct EpisodeWindowScheduler {
               time >= pending[index].pressedAt else { return }
         pending[index].end = time
         pending[index].incompleteReason = reason
+    }
+
+    @discardableResult
+    mutating func limitBytes(_ id: UUID, through time: TimeInterval) -> Window? {
+        guard let index = pending.firstIndex(where: { $0.id == id }), time.isFinite,
+              time >= pending[index].pressedAt, pending[index].incompleteReason != "episode_size_limit" else { return nil }
+        pending[index].end = min(pending[index].end ?? .infinity, time)
+        if let release = pending[index].releasedAt, release > time { pending[index].releasedAt = nil }
+        pending[index].incompleteReason = "episode_size_limit"
+        return pending[index]
     }
 
     mutating func completed(through time: TimeInterval) -> [Window] {
@@ -110,6 +135,24 @@ struct EpisodeWindowScheduler {
         }
         pending.removeAll()
         return interrupted
+    }
+}
+
+/// Counts immutable encoded source files, not a bitrate estimate. Whole-file
+/// accounting deliberately includes bytes outside a trim at either boundary.
+enum EpisodeLiveByteBudget {
+    static let maximumBytes: Int64 = 80_000_000
+    static let packagingReserveBytes: Int64 = 2_097_152
+    struct Piece { let end: TimeInterval; let bytes: Int64 }
+    static func cutoff(pieces: [Piece], sensorBytes: Int64, start: TimeInterval) -> TimeInterval? {
+        var used = sensorBytes + packagingReserveBytes
+        var safe = start
+        for piece in pieces {
+            guard piece.bytes >= 0, used <= maximumBytes - piece.bytes else { return safe }
+            used += piece.bytes
+            safe = piece.end
+        }
+        return used >= maximumBytes ? safe : nil
     }
 }
 

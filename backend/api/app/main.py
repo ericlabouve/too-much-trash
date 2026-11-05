@@ -1,6 +1,8 @@
 """Client-facing upload, job status, and asset download API."""
 
 import os
+import asyncio
+import logging
 import hashlib
 import json
 import math
@@ -18,10 +20,12 @@ from app.admin_auth import router as admin_router
 from app.db import database
 from app.enrollment_limit import require_enrollment_permit
 from app.onboarding import fail, require_installation, router as onboarding_router
+from app.episode_transfer import check_quota, router as episode_transfer_router, sweep_expired
 
 app = FastAPI(title="Too Much Trash API", version="0.2.0")
 app.include_router(admin_router)
 app.include_router(onboarding_router)
+app.include_router(episode_transfer_router)
 BUCKET = os.environ["S3_BUCKET"]
 MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 MEDIA_TYPES = {
@@ -33,6 +37,25 @@ MEDIA_TYPES = {
     "video/quicktime": "video",
     "video/webm": "video",
 }
+
+
+@app.on_event("startup")
+async def start_transfer_sweeper():
+    async def run():
+        while True:
+            try:
+                await run_in_threadpool(sweep_expired)
+            except Exception:
+                logging.getLogger(__name__).exception("Resumable transfer cleanup failed; it will be retried")
+            await asyncio.sleep(3600)
+    app.state.transfer_sweeper = asyncio.create_task(run())
+
+
+@app.on_event("shutdown")
+async def stop_transfer_sweeper():
+    task = getattr(app.state, "transfer_sweeper", None)
+    if task:
+        task.cancel()
 
 
 def storage():
@@ -54,6 +77,15 @@ async def guard_sensitive_body(request: Request, call_next):
         except HTTPException as exc:
             return JSONResponse({"detail": exc.detail}, status_code=exc.status_code,
                                 headers={**(exc.headers or {}), "Cache-Control": "no-store"})
+    if request.method == "POST" and request.url.path.startswith("/api/v1/episodes/") and request.url.path.endswith("/transfer"):
+        # Authentication and an explicit small limit precede JSON parsing.
+        try:
+            request.state.installation = await run_in_threadpool(require_installation, request)
+        except HTTPException as exc:
+            return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers={**(exc.headers or {}), "Cache-Control": "no-store"})
+        length = request.headers.get("Content-Length", "")
+        if not length.isdigit() or int(length) > 8192 or request.headers.get("Transfer-Encoding"):
+            return JSONResponse({"detail": {"code": "upload_too_large", "message": "Transfer metadata exceeds request limit"}}, status_code=413, headers={"Cache-Control": "no-store"})
     # Reject unauthorized uploads before FastAPI parses/spools multipart content.
     if request.method == "POST" and request.url.path in ("/api/v1/media", "/api/v1/episodes"):
         try:
@@ -116,8 +148,7 @@ def upload_media(file: UploadFile = File(...), installation=Depends(require_inst
                                 or existing["content_type"] != content_type or existing["filename"] != filename):
                             fail(409, "idempotency_conflict", "Capture key was already accepted with different content")
                         return receipt_from_row(existing)
-                if owner["used_bytes"] + size > owner["quota_bytes"] or owner["used_uploads"] >= owner["quota_uploads"]:
-                    fail(429, "quota_exceeded", "Installation upload quota reached")
+                check_quota(connection, owner, size)
                 client.upload_fileobj(staged, BUCKET, key, ExtraArgs={"ContentType": content_type})
                 uploaded = True
                 connection.execute(
@@ -216,8 +247,7 @@ def upload_episode(video: UploadFile = File(...), imu: UploadFile = File(...), p
                 if existing["original_key"] != original_key or existing["size_bytes"] != total:
                     fail(409, "idempotency_conflict", "Episode key was already accepted with different content")
                 return receipt_from_row(existing)
-            if owner["used_bytes"] + total > owner["quota_bytes"] or owner["used_uploads"] >= owner["quota_uploads"]:
-                fail(429, "quota_exceeded", "Installation upload quota reached")
+            check_quota(connection, owner, total)
             for name, (filename, content_type) in EPISODE_FILES.items():
                 key = original_key if name == "video" else f"{prefix}/{filename}"
                 client.upload_fileobj(staged[name], BUCKET, key, ExtraArgs={"ContentType": content_type})

@@ -338,6 +338,9 @@ final class AccountSession: ObservableObject {
                             }
                         }
                         if let folder = queue.episodeFolder(for: capture) {
+                            if installation?.resumableEpisodeContractVersion == 1 {
+                                return try await api.uploadResumableEpisode(directory: folder, episodeID: capture.id, token: token, progress: progress)
+                            }
                             return try await api.uploadEpisode(directory: folder, episodeID: capture.id, token: token, progress: progress)
                         }
                         return try await api.upload(file: queue.file(for: capture), captureID: capture.id, token: token, progress: progress)

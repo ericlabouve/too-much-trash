@@ -174,6 +174,7 @@ struct Installation: Codable, Equatable {
     let usedUploads: Int
     var mediaContractVersion: Int?
     var episodeContractVersion: Int?
+    var resumableEpisodeContractVersion: Int?
     var developmentSession: Bool?
     enum CodingKeys: String, CodingKey {
         case installationID = "installation_id", installationName = "installation_name"
@@ -181,6 +182,7 @@ struct Installation: Codable, Equatable {
         case usedBytes = "used_bytes", usedUploads = "used_uploads"
         case mediaContractVersion = "media_contract_version"
         case episodeContractVersion = "episode_contract_version"
+        case resumableEpisodeContractVersion = "resumable_episode_contract_version"
         case developmentSession = "development_session"
     }
 }
