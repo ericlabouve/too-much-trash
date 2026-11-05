@@ -118,8 +118,4 @@ The Simulator app accepted the private pilot's configurable collector/admin HTTP
 
 The approved native Simulator test passed real enrollment/Keychain, automatic file-backed background upload, deliberately lost acknowledgement recovery through by-client lookup without retransmission, an explicit keyed duplicate returning the same media ID, and End Session revocation/local cleanup including an unfinished unsynced file. Backend audit confirmed one quota charge, retained byte-identical original and untouched operator installation. Private secret/video fixtures were removed. This is a temporary test identity, not a separate product concept. Real cellular outages, OS suspension scheduling, camera capture and physical buttons remain iPhone validation.
 
-## Timing reference collection
-
-The timing-reference entry is hidden from Dashboard pending agreement on calibration design. The retained collector code can record a guided reference for later independent camera–IMU analysis. It preserves raw clocks, records device/OS metadata, and applies no correction. Collect varied gentle rotations against a stationary textured target. ARKit pose is already fused, so pose-versus-gyro agreement cannot independently validate synchronization. Button delay requires a separate observable reference; the screen does not claim to measure an electrical button edge. Numerical estimation and physical per-device validation remain pending.
-
 Segment joins preserve exact container discrepancies and accepted source-frame timestamps. A sub-frame join with continuous source cadence is reported separately from a missing-frame gap; unknown cadence remains unverified. This classification does not establish cross-sensor clock alignment.

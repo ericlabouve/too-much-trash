@@ -14,6 +14,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Product and architecture
 
+- 2026-11-04: Eric deferred calibration and requested removal of the iPhone timing-reference/calibration workflow and its tests. Do not reintroduce a calibration screen without agreement. Preserve ordinary raw capture timestamps and camera intrinsics metadata.
+
 - App icon selected 2026-10-12: bright green leaf gently turning as it falls above
   pale beach sand, turquoise ocean behind it, in an animated layered paper-cut
   style. Use the approved image in `Assets.xcassets/AppIcon.appiconset`; keep the
