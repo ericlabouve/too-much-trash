@@ -23,7 +23,6 @@ struct SessionDashboard: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showConfiguration = false
     @State private var confirmEnd = false
-    @State private var showTimingReference = false
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]
 
     var body: some View {
@@ -34,8 +33,6 @@ struct SessionDashboard: View {
                         .buttonStyle(.borderedProminent).frame(maxWidth: .infinity)
                         .accessibilityIdentifier("backToCamera")
                     SyncIndicator(account: account, queue: queue)
-                    Button("Collect timing reference", systemImage: "clock.arrow.2.circlepath") { showTimingReference = true }
-                        .accessibilityIdentifier("openTimingReference")
                     if account.isEndingSession { ProgressView("Ending session…") }
                     Text("Session videos").font(.headline)
                     if account.currentCaptures.isEmpty {
@@ -64,7 +61,6 @@ struct SessionDashboard: View {
                 }
             }
             .sheet(isPresented: $showConfiguration) { ServerConfigurationView(account: account) }
-            .fullScreenCover(isPresented: $showTimingReference) { TimingReferenceView(account: account) }
             .onChange(of: account.adminVisible) { _, visible in if !visible { showConfiguration = false } }
             .alert("End session?", isPresented: $confirmEnd) {
                 Button(account.unsyncedVideoCount == 0 ? "Cancel" : "Keep uploading", role: .cancel) {}
