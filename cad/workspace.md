@@ -114,14 +114,17 @@ No printer is contacted. Existing output directories are rejected. Build
 snapshots are siblings of the output directory and are not release assets.
 
 `.github/workflows/cad-release.yml` builds and checks these packages on an
-Ubuntu standard GitHub-hosted runner. Pull requests and manual runs produce a
-short-lived verification artifact; a published GitHub Release attaches all six
-files to that release and adds the PNGs to a marker-delimited section of its
-release notes. Existing notes are preserved; reruns replace only that generated
-section. A tag push alone does not publish release assets. The
-checkout uses the release tag's source, and only the publish job gets repository
-write permission. The workflow must be merged before the next published release
-can use it. It does not publish a release or change a tag itself.
+Ubuntu standard GitHub-hosted runner. Pull requests produce a short-lived
+verification artifact. The main-branch release coordinator in
+`.github/workflows/backend-cd.yaml` calls this reusable build alongside backend
+image builds, then verifies and attaches all six CAD files plus `release.json`
+before publishing one release with plate previews collapsed in a `<details>`
+section by default. Only that coordinator
+allocates release versions, advancing the highest stable patch (for example,
+`0.3.0` to `0.3.1`). Retries resume the same commit-owned release and reject
+changed asset bytes. Manual release publication or tag pushes do not independently
+trigger CAD uploads. Keep all release publication in the coordinator rather than
+adding competing release-event workflows.
 
 The repository is public, so standard hosted-runner compute is free under
 GitHub's public-repository Actions policy. Build artifacts have one-day retention;

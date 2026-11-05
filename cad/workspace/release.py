@@ -151,6 +151,17 @@ def project(path, material, layout, parts):
     return contents, rels, ET.tostring(model, encoding='utf-8', xml_declaration=True), objects
 
 
+def write_project(path, contents, rels, model):
+    """Keep ZIP metadata stable so a retry cannot change identical CAD assets."""
+    with zipfile.ZipFile(path, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
+        for name, data in (('[Content_Types].xml', contents), ('_rels/.rels', rels), ('3D/3dmodel.model', model)):
+            info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3
+            info.external_attr = 0o100644 << 16
+            archive.writestr(info, data)
+
+
 def package(build, output):
     build, output = Path(build).resolve(), Path(output).resolve()
     run = verify_build(build)
@@ -172,10 +183,7 @@ def package(build, output):
     result = {'git_commit': git_commit, 'source_dirty': dirty, 'version': 'v3', 'revision': manifest['revision'], 'status': 'unsliced', 'bed_mm': [180, 180], 'minimum_projected_clearance_mm': 2.0, 'source_sha256': run['source_sha256'], 'environment_sha256': run['environment_sha256'], 'projects': {}}
     for material, (contents, rels, model, objects) in projects.items():
         filename = f'{material}.3mf'
-        with zipfile.ZipFile(output / filename, 'w', compression=zipfile.ZIP_DEFLATED) as z:
-            z.writestr('[Content_Types].xml', contents)
-            z.writestr('_rels/.rels', rels)
-            z.writestr('3D/3dmodel.model', model)
+        write_project(output / filename, contents, rels, model)
         preview = f'{material}.png'
         counts = render_preview(output / filename, output / preview, material)
         if counts != Counter(o['design'] for o in objects):

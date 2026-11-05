@@ -12,6 +12,9 @@ class ReleaseNotesTests(unittest.TestCase):
         original = '## Changes\n\nHuman notes.\n'
         result = update_body(original, 'owner/repo', 'release/v 1')
         self.assertTrue(result.startswith(original))
+        self.assertIn('<details>\n<summary>CAD print plate previews</summary>\n\n', result)
+        self.assertIn('\n</details>\n' + END, result)
+        self.assertNotIn('<details open', result)
         for material in ('PETG', 'TPU'):
             self.assertIn(f'![{material} plate preview](https://github.com/owner/repo/releases/download/release%2Fv%201/{material}.png)', result)
         self.assertEqual(update_body(result, 'owner/repo', 'release/v 1'), result)
