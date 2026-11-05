@@ -1,12 +1,13 @@
 name: CAD release packages
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
+  workflow_call:
   pull_request:
     paths:
       - 'cad/**'
+      - 'backend/ops/cd/**'
+      - 'backend/api/tests/test_release_versioning.py'
+      - '.github/workflows/backend-cd.yaml'
       - '.github/workflows/cad-release.yml'
 
 permissions:
@@ -23,6 +24,8 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
+      - name: Verify release publication and workflow routing
+        run: python -m unittest discover -s backend/api/tests -p test_release_versioning.py
       - name: Install headless CAD runtime libraries
         run: sudo apt-get update && sudo apt-get install -y libgl1 libxrender1 libxext6 libsm6
       - name: Install uv
@@ -53,30 +56,3 @@ jobs:
           path: cad/build/release/
           if-no-files-found: error
           retention-days: 1
-
-  publish:
-    if: github.event_name == 'release'
-    needs: build
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          persist-credentials: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: cad-release-packages
-          path: release-assets
-      - name: Attach packages to the published release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$RELEASE_TAG" release-assets/* --clobber
-      - name: Add plate previews to release notes
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: python3 cad/workspace/release_notes.py

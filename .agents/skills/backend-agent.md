@@ -184,14 +184,17 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 
 ## Verification and operational memory
 
-- October17 release naming preference: automatic main CD releases use numeric
-  semantic tags/titles starting0.1.0, increment highest published stable minor,
-  resetpatch0; manual1.0.0(orv1.0.0) establishes next1.1.0 line. Ignore legacySHA
-  releases/drafts/prereleases as baseline, preserve history. Retry reuses owned
-  commit-marked release; verify actualtag SHA and exactmanifest bytes, resume
-  interrupted draft without overwriting assets. Keep images/receiver SHA+digest
-  identity unchanged and publish complete draft before rollout. Manualrelease
-  alone does not deploy: stillmain-onlytrigger. No DB/auth/network changes.
+- November4 release preference supersedes minor-version allocation: the exact
+  main-only `.github/workflows/backend-cd.yaml` is the sole release publisher.
+  It calls the reusable CAD build and publishes one complete draft containing
+  `release.json`, both CAD 3MFs, both PNGs, README and CAD manifest with previews.
+  Increment the highest stable patch (0.3.0 -> 0.3.1); manual major/minor baselines
+  remain possible. Ignore drafts/prereleases/legacy SHA tags. Retry the same
+  commit-owned version; verify tag SHA and every asset byte without overwrites.
+  Keep serialized deployment, OIDC scopes and SHA/digest identity unchanged.
+  Release publication precedes rollout and does not establish deployment success.
+  Duplicate0.4.0 release/tag removed at Eric's request; this does not roll back
+  the already deployed backend.
 - October14 client-admin follow-up (Eric's request verified directly in Iphone
   Agent chat): fresh app defaults production, recover admin discovery independently
   of stale saved collector origin, and offer available app servers without typing.

@@ -1,4 +1,4 @@
-name: Backend release and production deployment
+name: Release and production deployment
 
 on:
   push:
@@ -59,8 +59,13 @@ jobs:
         env:
           DOCKER_BUILD_RECORD_UPLOAD: "false"
 
+  cad:
+    uses: ./.github/workflows/cad-release.yml
+    permissions:
+      contents: read
+
   deploy:
-    needs: build
+    needs: [build, cad]
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 45
     # This exact workflow/ref is the OIDC trust boundary. No PR trigger/checkouts.
@@ -78,13 +83,17 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish complete immutable release manifest
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: cad-release-packages
+          path: release-assets
+      - name: Publish complete immutable release manifest and CAD packages
         id: release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python3 backend/ops/cd/release.py "$GITHUB_SHA" release.json
-          python3 backend/ops/cd/publish_release.py release.json >> "$GITHUB_OUTPUT"
+          python3 backend/ops/cd/publish_release.py release.json release-assets >> "$GITHUB_OUTPUT"
       - uses: tailscale/github-action@d1b6cd204f8dceda5b3eaad7f1f767be390056cd # v4
         with:
           oauth-client-id: ${{ vars.TS_DEPLOY_CLIENT_ID }}

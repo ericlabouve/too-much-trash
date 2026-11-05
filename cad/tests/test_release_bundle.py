@@ -228,6 +228,19 @@ class ReleaseBundleTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 release.project(root, 'PETG', {'sample_1': (5, 5, 0), 'sample_2': (5, 5, 0)}, parts)
 
+    def test_project_archive_is_reproducible_with_fixed_metadata(self):
+        from workspace.release import write_project
+        with tempfile.TemporaryDirectory() as directory:
+            first, second = (Path(directory) / name for name in ('first.3mf', 'second.3mf'))
+            write_project(first, b'types', b'rels', b'model')
+            # The wall clock must never enter the archive.
+            with patch('zipfile.time.localtime', return_value=(2035, 6, 7, 8, 9, 10, 0, 0, 0)):
+                write_project(second, b'types', b'rels', b'model')
+            self.assertEqual(first.read_bytes(), second.read_bytes())
+            with ZipFile(first) as archive:
+                self.assertEqual([archive.read(n) for n in archive.namelist()], [b'types', b'rels', b'model'])
+                self.assertTrue(all(i.date_time == (1980, 1, 1, 0, 0, 0) for i in archive.infolist()))
+
     @unittest.skipUnless(os.environ.get('CAD_RELEASE_BUNDLE'), 'set CAD_RELEASE_BUNDLE for actual release')
     def test_current_release(self):
         root = Path(os.environ['CAD_RELEASE_BUNDLE'])

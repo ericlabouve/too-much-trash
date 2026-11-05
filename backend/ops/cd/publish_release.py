@@ -1,4 +1,4 @@
-"""Publish minor-versioned GitHub releases; keep SHA/digest deployment identity.
+"""Publish patch-versioned GitHub releases; keep SHA/digest deployment identity.
 
 Only this main-branch workflow allocates automatic versions (serialized by its
 existing concurrency group). Stable manual releases establish the major line.
@@ -13,8 +13,12 @@ import time
 
 from release import validate_manifest
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "cad/workspace"))
+from release_notes import update_body
+
 REPOSITORY = "ericlabouve/too-much-trash"
 API = "repos/" + REPOSITORY
+CAD_ASSETS = ("PETG.3mf", "TPU.3mf", "PETG.png", "TPU.png", "README.md", "manifest.json")
 SEMVER = re.compile(r"v?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)")
 
 
@@ -39,8 +43,8 @@ def choose_tag(releases, commit):
         return item["tag_name"]
     stable = [version(item["tag_name"]) for item in releases
               if not item["draft"] and not item["prerelease"] and version(item["tag_name"]) is not None]
-    major, minor, _ = max(stable, default=(0, 0, 0))
-    candidate = (major, minor + 1, 0)
+    major, minor, patch = max(stable, default=(0, 1, -1))
+    candidate = (major, minor, patch + 1)
     if any(version(item["tag_name"]) == candidate for item in releases):
         raise ValueError("Next version is reserved by another draft/prerelease")
     return ".".join(map(str, candidate))
@@ -89,17 +93,22 @@ def ensure_tag(tag, commit, existing):
         raise ValueError("Release tag already points elsewhere; refusing to retag")
 
 
-def verify_asset(tag, manifest_path):
+def verify_asset(tag, asset_path):
     with tempfile.TemporaryDirectory(prefix="tmt-release-check-") as directory:
         gh("release", "download", tag, "--repo", REPOSITORY,
-           "--pattern", "release.json", "--dir", directory)
-        if (Path(directory) / "release.json").read_bytes() != manifest_path.read_bytes():
-            raise ValueError("Published release manifest differs; refusing to overwrite")
+           "--pattern", asset_path.name, "--dir", directory)
+        if (Path(directory) / asset_path.name).read_bytes() != asset_path.read_bytes():
+            raise ValueError("Published release asset differs; refusing to overwrite")
 
 
-def publish(manifest_path):
+def publish(manifest_path, cad_directory):
     if manifest_path.name != "release.json":
         raise ValueError("Release asset must be named release.json")
+    if not cad_directory.is_dir() or {p.name for p in cad_directory.iterdir()} != set(CAD_ASSETS):
+        raise ValueError("CAD bundle must contain exactly the six expected files")
+    assets = [manifest_path, *(cad_directory / name for name in CAD_ASSETS)]
+    if any(not path.is_file() or path.stat().st_size == 0 for path in assets):
+        raise ValueError("Release assets must be nonempty files")
     manifest = validate_manifest(json.loads(manifest_path.read_text()))
     commit = manifest["commit"]
     releases = list_releases()
@@ -119,16 +128,25 @@ def publish(manifest_path):
     if (marker(commit) not in (item.get("body") or "")
             or item["prerelease"] or item["name"] != tag):
         raise ValueError("Release changed during publication; refusing to modify")
-    if not any(asset["name"] == "release.json" for asset in item["assets"]):
-        if not item["draft"]:
-            raise ValueError("Published release is missing its immutable manifest")
-        gh("release", "upload", tag, str(manifest_path), "--repo", REPOSITORY)
-    verify_asset(tag, manifest_path)
+    names = [asset["name"] for asset in item["assets"]]
+    if len(names) != len(set(names)):
+        raise ValueError("Duplicate release assets")
+    for path in assets:
+        if path.name not in names:
+            if not item["draft"]:
+                raise ValueError("Published release is missing an immutable asset")
+            gh("release", "upload", tag, str(path), "--repo", REPOSITORY)
+        verify_asset(tag, path)
+    body = item.get("body") or ""
+    updated_body = update_body(body, REPOSITORY, tag)
+    if not item["draft"] and body != updated_body:
+        raise ValueError("Published release is missing correct CAD previews")
     if item["draft"]:
-        gh("release", "edit", tag, "--repo", REPOSITORY, "--draft=false")
+        gh("release", "edit", tag, "--repo", REPOSITORY,
+           "--notes", updated_body, "--draft=false")
     return tag
 
 
 if __name__ == "__main__":
     # Only validated numeric/v-numeric tags enter the workflow output file.
-    print("tag=" + publish(Path(sys.argv[1])))
+    print("tag=" + publish(Path(sys.argv[1]), Path(sys.argv[2])))

@@ -16,11 +16,14 @@ def update_body(body: str, repository: str, tag: str) -> str:
     base = f'https://github.com/{repository}/releases/download/{quote(tag, safe="")}'
     block = '\n'.join((
         START,
-        '### CAD print plate previews',
+        '<details>',
+        '<summary>CAD print plate previews</summary>',
         '',
         f'![PETG plate preview]({base}/PETG.png)',
         '',
         f'![TPU plate preview]({base}/TPU.png)',
+        '',
+        '</details>',
         END,
     ))
     if START in body:
