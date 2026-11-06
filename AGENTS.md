@@ -32,6 +32,8 @@ by the Iphone Agent. Use Alembic and at most one new DB migration revision per P
 
 ## Design intent
 
+For project ML research, inference, video labeling, or evaluation, use `.agents/skills/ml-agent/SKILL.md` and read its canonical memory `.agents/skills/ml-agent.md`. Keep that memory current as preferences, evidence, and architectural decisions change; detailed run records belong in ML component documentation.
+
 Use the photo in `cad/reference/reacher-grabber.png` as the specific grabber geometry. The iPhone belongs on the straight neck below the claw fork in a removable, GoPro-like harness. Its rear cameras face along the shaft toward the claw tips and remain uncovered. Keep the phone and mount outside the moving claw sweep. Route the bicycle brake cable externally, with a housing anchor near the handle and a removable flexible strap on the moving black trigger. Avoid drilling the stock handle or depending on its screw holes. A compact cable-driven lever at the phone should press a side volume rocker.
 
 For concept drawing pairs, positive y points up along the grabber shaft. In a views, positive x points right and positive z comes out of the page toward the viewer. In b views, the camera and axis key rotate 90 degrees about y: positive z points left and positive x comes out of the page. Keep each sheet to one view, with a small x/y/z axis glyph and a white background. These are concept illustrations, not proof of fit or working force transmission.
