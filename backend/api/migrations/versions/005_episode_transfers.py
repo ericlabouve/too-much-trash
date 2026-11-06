@@ -1,13 +1,21 @@
-"""Reserve bounded storage for resumable episode transfers."""
+"""Add development enrollment keys and resumable episode transfers."""
 from alembic import op
 
 revision = "005_episode_transfers"
-down_revision = "004_development_keys"
+# Keep the existing development head so databases that already applied both
+# pre-merge revisions have the same schema and can keep their Alembic ledger.
+down_revision = "003_onboarding"
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
+    op.execute("""CREATE TABLE development_keys (
+        id uuid PRIMARY KEY, key_hash text NOT NULL UNIQUE, label text NOT NULL,
+        created_at timestamptz NOT NULL DEFAULT now(), last_used_at timestamptz,
+        revoked_at timestamptz
+    )""")
+    op.execute("ALTER TABLE installations ADD COLUMN development_key_id uuid REFERENCES development_keys(id)")
     op.execute("""CREATE TABLE episode_transfers (
         installation_id uuid NOT NULL REFERENCES installations(id),
         episode_id uuid NOT NULL,
@@ -34,3 +42,5 @@ def upgrade():
 def downgrade():
     op.execute("DROP TABLE episode_transfer_chunks")
     op.execute("DROP TABLE episode_transfers")
+    op.execute("ALTER TABLE installations DROP COLUMN development_key_id")
+    op.execute("DROP TABLE development_keys")

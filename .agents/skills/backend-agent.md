@@ -20,6 +20,11 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 - Use Alembic for DB versioning. At most one new revision file per PR; consolidate
   changes while a revision is unmerged. Never rewrite an applied, merged revision.
   Initial Postgres setup scripts are separate from application revision history.
+  The PR migration workflow checks the proposed merge for added revision files.
+  PR #22 combines development keys and episode transfers under the existing
+  `005_episode_transfers` head. A pre-merge development database stopped on the
+  retired `004_development_keys` must reach `005_episode_transfers` using the
+  previous migration chain before switching to the consolidated code.
 - Test on Simulator for Eric's own review first; only afterward move to his
   personal iPhone. Simulator success is not camera/button/hardware validation.
 - Keep answers concise. State outcomes and distinguish implemented, verified,
