@@ -78,6 +78,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Capture durability and backend coordination
 
+- 2026-11-05 local retention: clear recordings 24 hours after verified upload. At 72 hours, give unsynced recordings a final receipt-first upload attempt before cleanup. Protect active transfers and their staging, including transfers restored by iOS. Resume deferred cleanup in the foreground.
+
 - On 2026-10-11 the user accepted two randomly selected BIP-39 English words for pilot invites after discussion of 22-bit guessability. Keep strong installation credentials, hashed invite storage, single-use redemption, expiry, quotas, and throttling. The backend owns word-list validation and case/whitespace normalization; older opaque codes are no longer accepted for new enrollment, without changing existing installations. Do not show live words in screenshots/logs or claim revocation prevents first-use guessing.
 
 - Originals/manifests live in Application Support/PrivateCaptures, with origin+installation subfolders, no Files/Photos integration and backups excluded. Upgrade moves legacy Documents/Captures intact when safe; conflicting/corrupt storage is preserved. Ordinary failures/debugging retain originals. Explicit 2026-10-12 End Session policy supersedes indefinite retention: after destructive confirmation AND matching backend revocation acknowledgement, delete only current-session files/staging/queue, remove credentials and return to registration. Unsynced files require a permanent-loss warning. Backend copies remain. Never test destructive End on the user's live installation.

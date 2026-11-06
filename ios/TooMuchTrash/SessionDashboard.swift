@@ -35,6 +35,8 @@ struct SessionDashboard: View {
                     SyncIndicator(account: account, queue: queue)
                     if account.isEndingSession { ProgressView("Ending session…") }
                     Text("Session videos").font(.headline)
+                    Text("Uploaded videos are cleared from this iPhone after 24 hours. At 72 hours, the app gives unsynced videos one last chance to upload before clearing them.")
+                        .font(.caption).foregroundStyle(.secondary)
                     if account.currentCaptures.isEmpty {
                         ContentUnavailableView("No videos yet", systemImage: "video")
                     } else {

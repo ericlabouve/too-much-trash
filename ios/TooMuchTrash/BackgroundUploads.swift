@@ -86,6 +86,12 @@ final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Send
         }, onCancel: { box.cancel() })
     }
 
+    func activeCaptureIDs() async -> Set<UUID> {
+        Set(await session.allTasks.compactMap { task in
+            task.originalRequest?.value(forHTTPHeaderField: "Idempotency-Key").flatMap(UUID.init(uuidString:))
+        })
+    }
+
     func cancel(captureIDs: Set<UUID>, origin: URL) async {
         for task in await session.allTasks {
             guard let request = task.originalRequest, let requestURL = request.url,

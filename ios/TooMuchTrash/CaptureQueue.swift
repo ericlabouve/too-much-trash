@@ -10,10 +10,17 @@ struct QueuedCapture: Codable, Identifiable, Equatable {
     var receipt: MediaReceipt?
     var relativePath: String?
     var createdAt: Date?
+    var uploadConfirmedAt: Date?
     var sizeBytes: Int64?
     var uploadBlocked: String?
     var episodeDirectory: String?
     var isIncomplete: Bool?
+
+    func isExpired(at now: Date) -> Bool {
+        let start = receipt == nil ? createdAt : uploadConfirmedAt
+        let lifetime: TimeInterval = receipt == nil ? 72 * 3600 : 24 * 3600
+        return start.map { now.timeIntervalSince($0) >= lifetime } ?? false
+    }
 }
 
 @MainActor
@@ -183,12 +190,105 @@ final class CaptureQueue: ObservableObject {
         try persist(captures.filter { $0.origin != origin.absoluteString || $0.installationID != installationID })
     }
 
-    func record(_ receipt: MediaReceipt, for id: UUID) throws {
+    func record(_ receipt: MediaReceipt, for id: UUID, now: Date = Date()) throws {
         guard let index = captures.firstIndex(where: { $0.id == id }) else { throw ClientError.storage }
         var next = captures
         next[index].receipt = receipt
+        if next[index].uploadConfirmedAt == nil { next[index].uploadConfirmedAt = now }
         next[index].uploadBlocked = nil
         try persist(next)
+    }
+
+    /// Old receipts have no confirmation timestamp. Start their grace period
+    /// when this app version first encounters them.
+    func prepareRetention(now: Date) throws {
+        guard !storageUnavailable else { throw ClientError.storage }
+        var next = captures
+        for index in next.indices {
+            if next[index].receipt != nil, next[index].uploadConfirmedAt == nil {
+                next[index].uploadConfirmedAt = now
+            } else if next[index].receipt == nil, next[index].createdAt == nil {
+                let url = episodeFolder(for: next[index]) ?? file(for: next[index])
+                let dates = try? url.resourceValues(forKeys: [.creationDateKey, .contentModificationDateKey])
+                next[index].createdAt = dates?.creationDate ?? dates?.contentModificationDate ?? now
+            }
+        }
+        if next != captures { try persist(next) }
+    }
+
+    func expiredCaptures(now: Date) -> [QueuedCapture] {
+        captures.filter { $0.isExpired(at: now) }
+    }
+
+    func removeExpired(ids: Set<UUID>, now: Date) throws {
+        guard !storageUnavailable else { throw ClientError.storage }
+        var removed = Set<UUID>()
+        var failed = false
+        let root = directory.resolvingSymlinksInPath()
+        for capture in expiredCaptures(now: now) where ids.contains(capture.id) {
+            let url = episodeFolder(for: capture) ?? file(for: capture)
+            do {
+                // Reject a redirected parent. Deleting the final path itself
+                // is safe even if a crash left only part of the bundle.
+                let parent = url.deletingLastPathComponent()
+                let expectedParent = parent.standardizedFileURL.path == directory.standardizedFileURL.path
+                    ? root : root.appendingPathComponent(parent.lastPathComponent)
+                guard parent.resolvingSymlinksInPath().path == expectedParent.path else { throw ClientError.storage }
+                try FileManager.default.removeItem(at: url)
+                removed.insert(capture.id)
+            } catch let error as NSError where error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError {
+                removed.insert(capture.id)
+            } catch { failed = true }
+        }
+        if !removed.isEmpty { try persist(captures.filter { !removed.contains($0.id) }) }
+        if failed { throw ClientError.storage }
+    }
+
+    /// Run before the camera opens any recording or rolling-buffer directory.
+    func removeAbandonedRecordings(now: Date) throws {
+        guard !storageUnavailable else { throw ClientError.storage }
+        let files = FileManager.default
+        let cutoff = now.addingTimeInterval(-72 * 3600)
+        let tracked = Set(captures.map { (episodeFolder(for: $0) ?? file(for: $0)).standardizedFileURL.path })
+        let keys: Set<URLResourceKey> = [.isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey, .contentModificationDateKey]
+        let roots = try files.contentsOfDirectory(at: directory, includingPropertiesForKeys: Array(keys))
+        for root in roots {
+            let name = root.lastPathComponent
+            let values = try root.resourceValues(forKeys: keys)
+            guard values.isSymbolicLink != true else { continue }
+            if values.isRegularFile == true, Self.safeFilename(name),
+               !tracked.contains(root.standardizedFileURL.path),
+               let modified = values.contentModificationDate, modified <= cutoff {
+                try files.removeItem(at: root)
+            }
+            guard values.isDirectory == true,
+                  name.range(of: "^[0-9a-f]{16}-[0-9a-f-]{36}$", options: .regularExpression) != nil,
+                  UUID(uuidString: String(name.dropFirst(17))) != nil else { continue }
+            for url in try files.contentsOfDirectory(at: root, includingPropertiesForKeys: Array(keys)) {
+                guard !tracked.contains(url.standardizedFileURL.path) else { continue }
+                let info = try url.resourceValues(forKeys: keys)
+                guard info.isSymbolicLink != true, let modified = info.contentModificationDate, modified <= cutoff else { continue }
+                let filename = url.lastPathComponent
+                if info.isRegularFile == true, Self.safeFilename(filename) {
+                    try files.removeItem(at: url)
+                } else if info.isDirectory == true,
+                          (filename.hasPrefix("episode-") || filename.hasPrefix("rolling-")),
+                          UUID(uuidString: String(filename.dropFirst(8))) != nil {
+                    var allOld = true
+                    guard let contents = files.enumerator(at: url, includingPropertiesForKeys: Array(keys),
+                        errorHandler: { _, _ in allOld = false; return false }) else { continue }
+                    for case let child as URL in contents {
+                        let childInfo = try child.resourceValues(forKeys: keys)
+                        guard childInfo.isSymbolicLink != true,
+                              let childModified = childInfo.contentModificationDate, childModified <= cutoff else {
+                            allOld = false
+                            break
+                        }
+                    }
+                    if allOld { try files.removeItem(at: url) }
+                }
+            }
+        }
     }
 
     func blockUpload(_ message: String, for id: UUID) throws {

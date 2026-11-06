@@ -31,6 +31,7 @@ private final class StubAPI: CollectorAPI {
     var refreshError: Error?
     var enrollError: Error?
     var uploadError: Error?
+    var beforeUpload: (() async -> Void)?
     var endError: Error?
     var endCalls = 0
     var endID: UUID?
@@ -76,6 +77,7 @@ private final class StubAPI: CollectorAPI {
     }
     func upload(file: URL, token: String) async throws -> MediaReceipt {
         uploadCalls += 1
+        await beforeUpload?()
         if let uploadError { throw uploadError }
         return MediaReceipt(id: UUID(), status: "queued", filename: "pickup.mov", sizeBytes: 10)
     }
@@ -597,6 +599,64 @@ final class OnboardingTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
         await session.refreshUploadStatus()
         XCTAssertEqual(queue.captures[0].receipt?.status, "completed")
+    }
+
+    private func expiredVideo(in root: URL, installationID: UUID) throws -> CaptureQueue {
+        let initial = CaptureQueue(directory: root)
+        let file = root.appendingPathComponent("expired.mov")
+        try Data("test-video".utf8).write(to: file)
+        try initial.enqueue(file: file, origin: origin, installationID: installationID)
+        var captures = initial.captures
+        captures[0].createdAt = Date().addingTimeInterval(-73 * 3600)
+        try JSONEncoder().encode(captures).write(to: root.appendingPathComponent("upload-queue.json"))
+        return CaptureQueue(directory: root)
+    }
+
+    func testRetentionKeepsVideoDuringFinalUploadAndStartsConfirmedWindow() async throws {
+        let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try seed(api, vault)
+        let queue = try expiredVideo(in: root, installationID: api.id)
+        let capture = try XCTUnwrap(queue.captures.first)
+        let session = try account(api, vault, queue: queue)
+        await session.bootstrap()
+        let started = expectation(description: "Final transfer started")
+        var transfer: CheckedContinuation<Void, Never>?
+        api.beforeUpload = {
+            await withCheckedContinuation {
+                transfer = $0
+                started.fulfill()
+            }
+        }
+
+        let cleanup = try XCTUnwrap(session.checkRetention())
+        await fulfillment(of: [started], timeout: 5)
+        XCTAssertEqual(session.uploadingID, capture.id)
+        XCTAssertNil(session.checkRetention())
+        XCTAssertTrue(FileManager.default.fileExists(atPath: queue.file(for: capture).path))
+        transfer?.resume()
+        await cleanup.value
+        XCTAssertEqual(api.uploadCalls, 1)
+        let synced = try XCTUnwrap(queue.captures.first)
+        XCTAssertNotNil(synced.receipt)
+        XCTAssertFalse(synced.isExpired(at: Date()))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: queue.file(for: synced).path))
+    }
+
+    func testRetentionClearsExpiredVideoAfterFailedFinalAttempt() async throws {
+        let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try seed(api, vault)
+        let queue = try expiredVideo(in: root, installationID: api.id)
+        let capture = try XCTUnwrap(queue.captures.first)
+        let session = try account(api, vault, queue: queue)
+        await session.bootstrap()
+        api.uploadError = URLError(.notConnectedToInternet)
+        let cleanup = try XCTUnwrap(session.checkRetention())
+        await cleanup.value
+        XCTAssertEqual(api.uploadCalls, 1)
+        XCTAssertTrue(queue.captures.isEmpty)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: queue.file(for: capture).path))
     }
 
     func testOldInstallationAndOriginQueueEntriesAreNeverUploaded() async throws {

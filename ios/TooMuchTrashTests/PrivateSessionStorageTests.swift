@@ -27,6 +27,12 @@ final class PrivateSessionStorageTests: XCTestCase {
         XCTAssertEqual(restored.file(for: entry), episode.appendingPathComponent("video.mp4"))
         XCTAssertEqual(try restored.storedSize(for: entry), entry.sizeBytes)
         XCTAssertTrue(FileManager.default.fileExists(atPath: episode.appendingPathComponent("imu.jsonl").path))
+        let confirmed = Date()
+        try restored.record(MediaReceipt(id: UUID(), status: "queued", filename: entry.filename,
+                                         sizeBytes: try restored.storedSize(for: entry)), for: entry.id, now: confirmed)
+        try restored.removeExpired(ids: [entry.id], now: confirmed.addingTimeInterval(24 * 3600))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: episode.path))
+        XCTAssertTrue(CaptureQueue(directory: root).captures.isEmpty)
     }
 
     func testLegacyMigrationPreservesOriginalQueueAndVideos() throws {
@@ -92,5 +98,62 @@ final class PrivateSessionStorageTests: XCTestCase {
         XCTAssertTrue(CaptureQueue.defaultDirectory.path.contains("Library/Application Support/PrivateCaptures"))
         XCTAssertNotEqual(Bundle.main.object(forInfoDictionaryKey: "UIFileSharingEnabled") as? Bool, true)
         XCTAssertNotEqual(Bundle.main.object(forInfoDictionaryKey: "LSSupportsOpeningDocumentsInPlace") as? Bool, true)
+    }
+
+    func testRetentionUsesFirstReceiptAndRecordingAgeAcrossRelaunch() throws {
+        let root = folder()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let initial = CaptureQueue(directory: root)
+        let owner = UUID()
+        let directory = try initial.recordingDirectory(origin: origin, installationID: owner)
+        for name in ["synced.mov", "pending.mov"] {
+            let url = directory.appendingPathComponent(name)
+            try Data("video".utf8).write(to: url)
+            try initial.enqueue(file: url, origin: origin, installationID: owner)
+        }
+        let synced = initial.captures[0], pending = initial.captures[1]
+        let saved = try XCTUnwrap(pending.createdAt)
+        let confirmed = saved.addingTimeInterval(3600)
+        let receipt = MediaReceipt(id: UUID(), status: "queued", filename: synced.filename, sizeBytes: 5)
+        try initial.record(receipt, for: synced.id, now: confirmed)
+        try initial.record(receipt, for: synced.id, now: confirmed.addingTimeInterval(3600))
+
+        let queue = CaptureQueue(directory: root)
+        let syncedDeadline = confirmed.addingTimeInterval(24 * 3600)
+        XCTAssertTrue(queue.expiredCaptures(now: syncedDeadline.addingTimeInterval(-1)).isEmpty)
+        XCTAssertEqual(queue.expiredCaptures(now: syncedDeadline).map(\.id), [synced.id])
+        try queue.removeExpired(ids: [synced.id, pending.id], now: syncedDeadline)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: queue.file(for: synced).path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: queue.file(for: pending).path))
+        let pendingDeadline = saved.addingTimeInterval(72 * 3600)
+        XCTAssertTrue(queue.expiredCaptures(now: pendingDeadline.addingTimeInterval(-1)).isEmpty)
+        // A crash after file deletion must not strand a stale queue entry.
+        try FileManager.default.removeItem(at: queue.file(for: pending))
+        try queue.removeExpired(ids: [pending.id], now: pendingDeadline)
+        XCTAssertTrue(CaptureQueue(directory: root).captures.isEmpty)
+    }
+
+    func testLaunchRetentionOnlyRemovesAbandonedFilesWithNoRecentWrites() throws {
+        let root = folder()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let queue = CaptureQueue(directory: root)
+        let owner = try queue.recordingDirectory(origin: origin, installationID: UUID())
+        let old = owner.appendingPathComponent("abandoned.mov")
+        let episode = owner.appendingPathComponent("episode-\(UUID().uuidString.lowercased())")
+        try FileManager.default.createDirectory(at: episode, withIntermediateDirectories: false)
+        try Data("video".utf8).write(to: old)
+        let recent = episode.appendingPathComponent("video.mp4")
+        try Data("recent".utf8).write(to: recent)
+        let now = Date()
+        let aged = now.addingTimeInterval(-73 * 3600)
+        for url in [old, episode] {
+            try FileManager.default.setAttributes([.modificationDate: aged], ofItemAtPath: url.path)
+        }
+        try queue.removeAbandonedRecordings(now: now)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: old.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: recent.path))
+        try FileManager.default.setAttributes([.modificationDate: aged], ofItemAtPath: recent.path)
+        try queue.removeAbandonedRecordings(now: now)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: episode.path))
     }
 }
