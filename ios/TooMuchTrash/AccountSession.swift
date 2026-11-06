@@ -21,8 +21,9 @@ final class AccountSession: ObservableObject {
     @Published private(set) var uploadBytesPerSecond: Double?
     @Published private(set) var isEndingSession = false
     @Published private(set) var isUploading = false
+    @Published private(set) var isDeletingCapture = false
     private(set) var adminNetworkConfiguration: APIConfiguration?
-    @Published private(set) var uploadMessage = "Videos stay on this iPhone until you upload them."
+    @Published private(set) var uploadMessage = "Local videos expire 24 hours after upload or 72 hours after recording if unsynced."
     let queue: CaptureQueue
     private let vault: CredentialVault
     private let apiFactory: @MainActor (APIConfiguration) -> CollectorAPI
@@ -30,6 +31,7 @@ final class AccountSession: ObservableObject {
     private var credential: InstallationCredential?
     private var probeGeneration = UUID()
     private var foreground = true
+    private var hasBootstrapped = false
     private let automaticallyUseLocalCollector: Bool
     private let automaticUploads: Bool
     private let discoverAdminServers: Bool
@@ -37,6 +39,8 @@ final class AccountSession: ObservableObject {
     private var catalogServers: [AvailableServer] = []
     private var lastCatalogCheck: Date?
     private var uploadTask: Task<Void, Never>?
+    private var retentionTask: Task<Void, Never>?
+    private var nextRetentionCheck = Date.distantPast
     private var retryUploadAt: Date?
     private var retryDelay: TimeInterval = 2
     private var transferStarted: Date?
@@ -65,6 +69,10 @@ final class AccountSession: ObservableObject {
         api = self.configuration.map(apiFactory)
         if self.configuration == nil { message = "Collector server is not configured. Contact your administrator." }
         if automaticUploads {
+            if !self.queue.storageUnavailable {
+                do { try self.queue.removeAbandonedRecordings(now: Date()) }
+                catch { uploadMessage = "Could not clear some old local recordings." }
+            }
             recoveryObserver = BackgroundUploads.shared.setRecoveredHandler { [weak self] request, data, response in
                 self?.recoverUpload(request: request, data: data, response: response)
             }
@@ -79,12 +87,12 @@ final class AccountSession: ObservableObject {
     }
 
     deinit {
-        monitor?.cancel(); uploadTask?.cancel()
+        monitor?.cancel(); uploadTask?.cancel(); retentionTask?.cancel()
         if let recoveryObserver { BackgroundUploads.shared.removeRecoveredHandler(recoveryObserver) }
     }
 
     func configure(_ value: APIConfiguration) async {
-        guard !busy, !isUploading, !isEndingSession else { return }
+        guard !busy, !isUploading, !isEndingSession, !isDeletingCapture, retentionTask == nil else { return }
         configuration = value
         if value.privateAdminOrigin?.scheme == "https" { adminNetworkConfiguration = value }
         value.save()
@@ -99,6 +107,10 @@ final class AccountSession: ObservableObject {
 
     func bootstrap() async {
         guard !busy else { return }
+        defer {
+            hasBootstrapped = true
+            kickUploads()
+        }
         hideAdmin()
         guard let configuration else { return }
         do {
@@ -111,12 +123,15 @@ final class AccountSession: ObservableObject {
     }
 
     func continueLogin() async {
-        guard !busy, !isUploading, !isEndingSession, retryAllowed() else { return }
+        guard !busy, !isUploading, !isEndingSession, !isDeletingCapture, retentionTask == nil, retryAllowed() else { return }
         guard let configuration, api != nil else { handle(ClientError.configuration); return }
         let wasAuthorized = phase == .authorized && installation != nil
         busy = true
         phase = .validating
-        defer { busy = false }
+        defer {
+            busy = false
+            kickUploads()
+        }
         do {
             credential = try vault.load(origin: configuration.publicOrigin)
             hasSavedCredential = credential != nil
@@ -124,7 +139,6 @@ final class AccountSession: ObservableObject {
             try await validateInstallation()
             phase = .authorized
             message = "Access confirmed."
-            kickUploads()
         } catch {
             if wasAuthorized && ((error as? ClientError) == .network || (error as? ClientError) == .server || error is URLError) {
                 phase = .authorized
@@ -134,7 +148,7 @@ final class AccountSession: ObservableObject {
     }
 
     func register(invite: String, name: String) async -> Bool {
-        guard !busy, retryAllowed() else { return false }
+        guard !busy, retentionTask == nil, retryAllowed() else { return false }
         guard credential?.endingSession != true else { message = "Finish ending the previous session first."; return false }
         guard let configuration, let api else { handle(ClientError.configuration); return false }
         let code = invite.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -173,6 +187,53 @@ final class AccountSession: ObservableObject {
             } else if !stored {
                 message += " Registration may have consumed the invite. Ask your administrator for help."
             }
+            return false
+        }
+    }
+
+    var canAdminProceed: Bool {
+        adminVisible && configuration?.publicOrigin == APIConfiguration.developmentNetwork.publicOrigin &&
+        configuration?.privateAdminOrigin == APIConfiguration.developmentNetwork.privateAdminOrigin
+    }
+
+    func hasDevelopmentKey() throws -> Bool {
+        guard let origin = APIConfiguration.developmentNetwork.privateAdminOrigin else { return false }
+        return try DevelopmentKeyVault().load(origin: origin) != nil
+    }
+
+    func adminProceed(newKey: String? = nil) async -> Bool {
+        guard !busy, retentionTask == nil, canAdminProceed, let configuration, let api,
+              let privateOrigin = APIConfiguration.developmentNetwork.privateAdminOrigin else { return false }
+        guard !hasSavedCredential, credential == nil else {
+            message = "An existing installation is saved for this server. Resolve that session before registering another."
+            return false
+        }
+        busy = true
+        defer { busy = false }
+        do {
+            guard await api.adminReachable(), canAdminProceed else { throw ClientError.network }
+            let keyVault = DevelopmentKeyVault()
+            let key: String
+            if let newKey, !newKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                key = newKey.trimmingCharacters(in: .whitespacesAndNewlines)
+                try keyVault.save(key, origin: privateOrigin)
+            } else {
+                guard let saved = try keyVault.load(origin: privateOrigin) else { throw ClientError.noCredential }
+                key = saved
+            }
+            let enrollment = try await api.developmentEnroll(key: key)
+            let next = try InstallationCredential(enrollment: enrollment)
+            try vault.save(next, origin: configuration.publicOrigin)
+            credential = next
+            hasSavedCredential = true
+            try await validateInstallation()
+            phase = .authorized
+            message = "Registration complete."
+            kickUploads()
+            return true
+        } catch {
+            handle(error)
+            message += " If registration completed but the response was lost, check the admin dashboard before retrying."
             return false
         }
     }
@@ -221,6 +282,10 @@ final class AccountSession: ObservableObject {
         return CaptureOwner(origin: configuration.publicOrigin, installationID: credential.installationID)
     }
 
+    var showDeveloperSensorOverlay: Bool {
+        phase == .authorized && installation?.developmentSession == true
+    }
+
     func queueCapture(_ file: URL, owner: CaptureOwner?) {
         guard let owner else {
             uploadMessage = "Video saved locally. No installation identity is available for upload."
@@ -233,14 +298,33 @@ final class AccountSession: ObservableObject {
         } catch { uploadMessage = "Video saved locally, but its upload could not be queued. Please keep the app installed." }
     }
 
+    func queueEpisode(_ folder: URL, id: UUID, owner: CaptureOwner?) {
+        guard let owner else {
+            uploadMessage = "Episode saved locally. No installation identity is available for upload."
+            return
+        }
+        do {
+            try queue.enqueueEpisode(folder: folder, id: id, origin: owner.origin, installationID: owner.installationID)
+            uploadMessage = "Episode saved and queued on this iPhone."
+            kickUploads()
+        } catch { uploadMessage = "Episode saved locally, but it could not be queued. Please keep the app installed." }
+    }
+
     var currentCaptures: [QueuedCapture] {
         guard let configuration, let credential else { return [] }
         return queue.matching(origin: configuration.publicOrigin, installationID: credential.installationID)
     }
 
     func uploadPending() async {
-        guard !busy, !isUploading, !isEndingSession, retryAllowed(), phase == .authorized, let api else { return }
-        guard !queue.storageUnavailable else { uploadMessage = "Private video storage needs attention. Videos are retained."; return }
+        guard retentionTask == nil else { return }
+        _ = await uploadPending(finalAttemptID: nil)
+    }
+
+    /// A final attempt allows an expired recording through the ordinary
+    /// receipt-first upload path. Return true only when cleanup may proceed.
+    private func uploadPending(finalAttemptID: UUID?) async -> Bool {
+        guard !busy, !isUploading, !isEndingSession, !isDeletingCapture, retryAllowed(), phase == .authorized, let api else { return false }
+        guard !queue.storageUnavailable else { uploadMessage = "Private video storage needs attention. Videos are retained."; return false }
         isUploading = true
         defer { isUploading = false; uploadingID = nil }
         do {
@@ -248,11 +332,19 @@ final class AccountSession: ObservableObject {
             // Older servers do not guarantee idempotency; never blindly retry there.
             guard installation?.mediaContractVersion == 1 else {
                 uploadMessage = "Automatic sync requires the updated backend. Videos are saved locally."
-                return
+                return false
             }
-            while let capture = currentCaptures.first(where: { $0.receipt == nil && $0.uploadBlocked == nil }) {
+            while let capture = currentCaptures.first(where: { capture in
+                guard capture.receipt == nil, capture.uploadBlocked == nil else { return false }
+                if let finalAttemptID { return capture.id == finalAttemptID }
+                return !capture.isExpired(at: Date())
+            }) {
                 try Task.checkCancellation()
-                guard !isEndingSession else { return }
+                guard !isEndingSession else { return false }
+                if queue.episodeFolder(for: capture) != nil && installation?.episodeContractVersion != 1 {
+                    uploadMessage = "Episode sync requires the updated backend. Recordings remain on this iPhone."
+                    return false
+                }
                 uploadingID = capture.id
                 uploadFraction = 0
                 transferStarted = Date()
@@ -262,7 +354,7 @@ final class AccountSession: ObservableObject {
                     receipt = try await authorized { try await api.uploaded(captureID: capture.id, token: $0) }
                 } catch ClientError.missingMedia {
                     receipt = try await authorized { token in
-                        try await api.upload(file: queue.file(for: capture), captureID: capture.id, token: token) { [weak self] sent, expected in
+                        let progress: @MainActor @Sendable (Int64, Int64) -> Void = { [weak self] sent, expected in
                             guard let self, self.uploadingID == capture.id, expected > 0 else { return }
                             self.uploadFraction = min(1, Double(sent) / Double(expected))
                             self.lastProgressAt = Date()
@@ -270,15 +362,27 @@ final class AccountSession: ObservableObject {
                                 self.uploadBytesPerSecond = Double(sent) / Date().timeIntervalSince(start)
                             }
                         }
+                        if let folder = queue.episodeFolder(for: capture) {
+                            if installation?.resumableEpisodeContractVersion == 1 {
+                                return try await api.uploadResumableEpisode(directory: folder, episodeID: capture.id, token: token, progress: progress)
+                            }
+                            return try await api.uploadEpisode(directory: folder, episodeID: capture.id, token: token, progress: progress)
+                        }
+                        return try await api.upload(file: queue.file(for: capture), captureID: capture.id, token: token, progress: progress)
                     }
                 }
-                let size = (try FileManager.default.attributesOfItem(atPath: queue.file(for: capture).path)[.size] as? NSNumber)?.int64Value
+                let size = try queue.storedSize(for: capture)
                 guard receipt.clientCaptureID == capture.id, receipt.sizeBytes == size else { throw ClientError.invalidResponse }
+                if let folder = queue.episodeFolder(for: capture) {
+                    let digest = try await Task.detached(priority: .utility) { try CaptureQueue.episodeDigest(folder: folder) }.value
+                    guard receipt.episodeBundleSHA256 == digest else { throw ClientError.idempotencyConflict }
+                }
                 try queue.record(receipt, for: capture.id)
                 uploadingID = nil
                 uploadFraction = 0
                 retryDelay = 2
                 retryUploadAt = nil
+                if finalAttemptID != nil { return true }
             }
             uploadMessage = unsyncedVideoCount == 0 ? "All videos synced." : "Some videos need attention and have not synced."
         } catch {
@@ -286,7 +390,7 @@ final class AccountSession: ObservableObject {
             uploadingID = nil
             uploadFraction = 0
             uploadBytesPerSecond = nil
-            if error is CancellationError || (error as? URLError)?.code == .cancelled { return }
+            if Task.isCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled { return false }
             let failure = error as? ClientError ?? .network
             uploadMessage = failure.message
             switch failure {
@@ -305,7 +409,12 @@ final class AccountSession: ObservableObject {
                 retryUploadAt = Date().addingTimeInterval(retryDelay)
                 retryDelay = min(60, retryDelay * 2)
             }
+            switch failure {
+            case .unauthorized, .rateLimited, .storage: return false
+            default: return finalAttemptID != nil
+            }
         }
+        return false
     }
 
     var pendingCaptures: [QueuedCapture] { currentCaptures.filter { $0.receipt == nil } }
@@ -338,9 +447,11 @@ final class AccountSession: ObservableObject {
     var endCleanupPending: Bool { credential?.endingSession == true }
 
     private func kickUploads() {
-        guard automaticUploads, foreground, phase == .authorized, !isEndingSession, !busy,
-              !pendingCaptures.isEmpty, uploadTask == nil,
-              pendingCaptures.contains(where: { $0.uploadBlocked == nil }),
+        guard automaticUploads, hasBootstrapped else { return }
+        checkRetention()
+        guard foreground, phase == .authorized, !isEndingSession, !isDeletingCapture, !busy,
+              retentionTask == nil, uploadTask == nil,
+              pendingCaptures.contains(where: { $0.uploadBlocked == nil && !$0.isExpired(at: Date()) }),
               retryUploadAt == nil || retryUploadAt! <= Date() else { return }
         uploadTask = Task { [weak self] in
             guard let self else { return }
@@ -349,21 +460,91 @@ final class AccountSession: ObservableObject {
         }
     }
 
+    @discardableResult
+    func checkRetention() -> Task<Void, Never>? {
+        let now = Date()
+        guard foreground, !busy, !isEndingSession, !isUploading, !isDeletingCapture, uploadTask == nil, retentionTask == nil,
+              !queue.storageUnavailable, now >= nextRetentionCheck else { return nil }
+        nextRetentionCheck = now.addingTimeInterval(60)
+        do { try queue.prepareRetention(now: now) }
+        catch {
+            uploadMessage = "Could not update local video retention. The app will retry."
+            return nil
+        }
+        let expired = queue.expiredCaptures(now: now)
+        guard !expired.isEmpty else { return nil }
+        retentionTask = Task { [weak self] in
+            guard let self else { return }
+            defer {
+                self.retentionTask = nil
+                self.kickUploads()
+            }
+            // Also protect transfers restored by iOS after an app relaunch.
+            let activeIDs = await BackgroundUploads.shared.activeCaptureIDs()
+            guard !Task.isCancelled, self.foreground else { return }
+            for candidate in expired where !activeIDs.contains(candidate.id) {
+                guard !Task.isCancelled, self.foreground else { return }
+                guard let capture = self.queue.captures.first(where: { $0.id == candidate.id }) else { continue }
+                if capture.receipt == nil && capture.uploadBlocked == nil {
+                    guard self.currentCaptures.contains(where: { $0.id == capture.id }),
+                          self.retryUploadAt.map({ $0 <= Date() }) ?? true,
+                          await self.uploadPending(finalAttemptID: capture.id) else { continue }
+                }
+                guard !Task.isCancelled, self.foreground else { return }
+                // A verified receipt starts a new 24-hour window.
+                let cleanupTime = Date()
+                guard self.queue.captures.first(where: { $0.id == capture.id })?.isExpired(at: cleanupTime) == true else { continue }
+                do {
+                    try BackgroundUploads.shared.removeStaged(captureIDs: [capture.id])
+                    try self.queue.removeExpired(ids: [capture.id], now: cleanupTime)
+                } catch {
+                    self.uploadMessage = "Could not clear all expired local videos. The app will retry."
+                }
+            }
+        }
+        return retentionTask
+    }
+
     private func recoverUpload(request: URLRequest, data: Data, response: HTTPURLResponse) {
         guard response.statusCode == 202,
               response.value(forHTTPHeaderField: "Content-Type")?.hasPrefix("application/json") == true,
               let key = request.value(forHTTPHeaderField: "Idempotency-Key"), let id = UUID(uuidString: key),
               let capture = queue.captures.first(where: { $0.id == id }),
-              request.url == URL(string: capture.origin)?.appendingPathComponent("api/v1/media"),
+              capture.episodeDirectory == nil,
+              request.url == URL(string: capture.origin)?.appendingPathComponent(capture.episodeDirectory == nil ? "api/v1/media" : "api/v1/episodes"),
               let receipt = try? JSONDecoder().decode(MediaReceipt.self, from: data), receipt.clientCaptureID == id,
-              let size = try? FileManager.default.attributesOfItem(atPath: queue.file(for: capture).path)[.size] as? NSNumber,
-              size.int64Value == receipt.sizeBytes else { return }
+              let size = try? queue.storedSize(for: capture), size == receipt.sizeBytes else { return }
         do { try queue.record(receipt, for: id) }
         catch { uploadMessage = "Upload confirmed, but local sync metadata needs attention. Videos retained." }
     }
 
+    var canDeleteLocalCapture: Bool {
+        phase == .authorized && !busy && !isUploading && !isEndingSession && !isDeletingCapture && !queue.storageUnavailable
+    }
+
+    func deleteLocalCapture(_ id: UUID) async -> Bool {
+        guard canDeleteLocalCapture, uploadTask == nil, retentionTask == nil,
+              let owner = captureOwner else { return false }
+        guard currentCaptures.contains(where: { $0.id == id }) else { return true }
+        isDeletingCapture = true
+        defer {
+            isDeletingCapture = false
+            kickUploads()
+        }
+        // iOS can restore a transfer that has no in-memory upload task.
+        let activeIDs = await BackgroundUploads.shared.activeCaptureIDs()
+        guard !activeIDs.contains(id) else { return false }
+        do {
+            try BackgroundUploads.shared.removeStaged(captureIDs: [id])
+            try queue.removeLocalCapture(id: id, origin: owner.origin, installationID: owner.installationID)
+            return true
+        } catch {
+            return false
+        }
+    }
+
     func endSession() async -> Bool {
-        guard !busy, !isEndingSession, let configuration, let api, var current = credential else { return false }
+        guard !busy, !isEndingSession, !isDeletingCapture, retentionTask == nil, let configuration, let api, var current = credential else { return false }
         guard !queue.storageUnavailable else { message = "Private storage needs attention. Session was not ended."; return false }
         guard installation?.mediaContractVersion == 1 || current.endingSession == true else {
             message = "End Session requires the updated backend."; return false
@@ -386,7 +567,10 @@ final class AccountSession: ObservableObject {
                 try vault.save(current, origin: configuration.publicOrigin)
                 credential = current
             }
-            try BackgroundUploads.shared.removeStaged(captureIDs: Set(currentCaptures.map(\.id)))
+            let captureIDs = Set(currentCaptures.map(\.id))
+            let activeIDs = await BackgroundUploads.shared.activeCaptureIDs()
+            guard activeIDs.isDisjoint(with: captureIDs) else { throw ClientError.storage }
+            try BackgroundUploads.shared.removeStaged(captureIDs: captureIDs)
             try queue.removeSession(origin: configuration.publicOrigin, installationID: current.installationID)
             try vault.remove(origin: configuration.publicOrigin)
             credential = nil
@@ -405,7 +589,7 @@ final class AccountSession: ObservableObject {
     }
 
     func refreshUploadStatus() async {
-        guard !busy, retryAllowed(), phase == .authorized, let api else { return }
+        guard !busy, !isDeletingCapture, retentionTask == nil, retryAllowed(), phase == .authorized, let api else { return }
         busy = true
         defer { busy = false }
         do {
@@ -429,7 +613,10 @@ final class AccountSession: ObservableObject {
     }
 
     func suspend() { foreground = false; hideAdmin() }
-    func resume() { foreground = true; kickUploads() }
+    func resume() {
+        foreground = true
+        nextRetentionCheck = .distantPast
+    }
 
     func probeAdmin() async {
         probeGeneration = UUID()

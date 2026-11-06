@@ -19,6 +19,20 @@ Passkey enrollment, recovery and production admin identity remain separate work.
 All hosted credential traffic requires HTTPS. Codes and credentials must never
 appear in URLs, analytics, logs, UserDefaults, or committed configuration.
 
+### Local development shortcut
+
+The local Tailscale Compose overlay enables `TMT_DEVELOPMENT_KEYS`; the API is
+disabled by default and in production. An authenticated admin can create, list,
+and revoke scoped development keys in the private dashboard. Key values are
+shown only at creation; the database stores hashes. The private
+`POST /api/v1/admin/development-enroll` accepts a key and creates a regular,
+quota-limited installation; key records show last use and installation count.
+Revoking a key blocks future enrollment but does not revoke existing installations.
+Admin installation records expose `development_key_id` for review. Enrollment
+requests are rate limited; a lost response may have created an installation and
+must not be automatically retried. The iPhone stores its key in device-only
+Keychain and only sends it to the configured development private HTTPS origin.
+
 ## Client contract
 
 | Request | Body / authorization | Result |
@@ -487,3 +501,10 @@ same node identity, DNS name and addresses, without another login. The proxy
 checks verify reachability/isolation, not actual physical-iPhone capture or an
 authenticated admin dashboard interaction. Client origin transition remains
 explicit: never reassign old-origin credentials or pending upload files.
+# Resumable episode transfers
+
+Servers advertise `resumable_episode_contract_version: 1` in the authenticated installation response. The client begins an installation-scoped transfer with four immutable file sizes and SHA-256 hashes, then uploads independently acknowledged 1 MiB chunks and finalizes only after every chunk is present. Repeating begin reports retained chunks; exact duplicate chunks and finalization retries are idempotent. Every request requires installation credentials, owner-row locking serializes revocation and quota accounting, and active transfers reserve bytes and an upload slot. Finalization verifies every stored chunk and file, validates the manifest, writes the four final objects, and atomically commits the existing capture receipt and quota charge.
+
+Staging is retained for seven days after the last begin or chunk upload; an hourly API sweep and `uv run --no-sync python tools/sweep_episode_transfers.py` remove expired objects, including those belonging to revoked installations. A resumed transfer after expiry starts again from the phone's retained original files. On rollback or crashes, cleanup can be retried; beginning a transfer checks retained chunks still exist and asks for missing ones again. Committed originals are never swept. The protocol is separate from the HTTP resumable-upload draft and retries whole chunks. It does not alter the existing one-request episode endpoint.
+
+The migration adding transfer state must be deployed through a separate or stacked PR from the existing unmerged development-key migration, preserving the one-new-revision-per-PR policy. The feature has not yet been deployed or validated with a real iPhone network interruption.

@@ -12,17 +12,19 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 
 ## Ownership and workflow
 
-- Backend owns `backend/`, the admin portal in `frontend/`, and related docs/config.
-  Iphone Agent owns `ios/` and its memory. Both chats now share the96fa checkout;
-  coordinate shared-file edits and serialize Git/branch/deployment operations.
-  Exchange contracts/tests and stage explicit owned paths only. Earlier separate
-  PRs6/7 were merged; do not assume independent branches in the shared checkout.
-- Eric authorized two-way communication with Iphone Agent. Coordinate changes to
-  API contracts and report blockers. This permission does not authorize deployment
-  exposure, signing changes, new invitations, or merging PRs on its own.
+- As of 2026-11-01, Eric prefers one combined chat to own backend, admin and iPhone
+  work. Use the relevant domain skills and preserve API contracts across components.
+  Do not involve a separate agent unless Eric explicitly requests it. Shared
+  checkout operations still need care; this preference grants no extra deployment,
+  exposure, signing, invitation or merge authority.
 - Use Alembic for DB versioning. At most one new revision file per PR; consolidate
   changes while a revision is unmerged. Never rewrite an applied, merged revision.
   Initial Postgres setup scripts are separate from application revision history.
+  The PR migration workflow checks the proposed merge for added revision files.
+  PR #22 combines development keys and episode transfers under the existing
+  `005_episode_transfers` head. A pre-merge development database stopped on the
+  retired `004_development_keys` must reach `005_episode_transfers` using the
+  previous migration chain before switching to the consolidated code.
 - Test on Simulator for Eric's own review first; only afterward move to his
   personal iPhone. Simulator success is not camera/button/hardware validation.
 - Keep answers concise. State outcomes and distinguish implemented, verified,
@@ -30,6 +32,7 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 
 ## Architecture and current decisions
 
+- 2026-11-01 development shortcut: private admin dashboard can create/list/revoke hashed scoped development-enrollment keys; last use, linked installation and revocation are recorded. Local Tailscale overlay explicitly enables the feature; default and production remain disabled. Revoking a key does not revoke existing installations. Protect the private admin route and preserve separate admin and development secrets.
 - FastAPI/uv API, PostgreSQL, SeaweedFS blob storage, Prefect media worker, Caddy
   reverse proxy and admin portal. API migration startup is `alembic upgrade head`;
   credentials come from environment, not committed Alembic configuration.

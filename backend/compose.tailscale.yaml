@@ -10,6 +10,7 @@ services:
   api:
     environment:
       ADMIN_COOKIE_SECURE: "true"
+      TMT_DEVELOPMENT_KEYS: "true"
   tailscale:
     image: ${TAILSCALE_IMAGE:-tailscale/tailscale:v1.102.4}
     network_mode: service:caddy

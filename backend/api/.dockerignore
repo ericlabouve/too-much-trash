@@ -1,0 +1,6 @@
+# Runtime source is copied recursively by the Dockerfile.
+**/__pycache__/
+**/*.py[cod]
+.venv/
+.env
+.env.*

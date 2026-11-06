@@ -86,13 +86,40 @@ final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Send
         }, onCancel: { box.cancel() })
     }
 
+    func activeCaptureIDs() async -> Set<UUID> {
+        Set(await session.allTasks.compactMap { task in
+            task.originalRequest?.value(forHTTPHeaderField: "Idempotency-Key").flatMap(UUID.init(uuidString:))
+        })
+    }
+
     func cancel(captureIDs: Set<UUID>, origin: URL) async {
         for task in await session.allTasks {
-            guard let request = task.originalRequest,
-                  request.url == origin.appendingPathComponent("api/v1/media"),
+            guard let request = task.originalRequest, let requestURL = request.url,
                   let key = request.value(forHTTPHeaderField: "Idempotency-Key"), let id = UUID(uuidString: key),
                   captureIDs.contains(id) else { continue }
+            let ordinary = [origin.appendingPathComponent("api/v1/media"), origin.appendingPathComponent("api/v1/episodes")].contains(requestURL)
+            let transferPrefix = origin.appendingPathComponent("api/v1/episodes/\(id.uuidString)/transfer").absoluteString + "/"
+            guard ordinary || requestURL.absoluteString.hasPrefix(transferPrefix) else { continue }
             task.cancel()
+        }
+    }
+
+    private func chunkName(for request: URLRequest?, key: String?) -> String? {
+        guard let request, let key, UUID(uuidString: key) != nil, let url = request.url else { return nil }
+        let parts = url.pathComponents
+        guard parts.count >= 7, parts[parts.count - 3] == "transfer",
+              UUID(uuidString: parts[parts.count - 4]) == UUID(uuidString: key),
+              ["video", "imu", "poses", "manifest"].contains(parts[parts.count - 2]),
+              let index = Int(parts.last ?? ""), index >= 0 else { return nil }
+        return "\(key).\(parts[parts.count - 2]).\(index).chunk"
+    }
+
+    func cleanOrphanedChunks(captureID: UUID) async throws {
+        let tasks = await session.allTasks
+        let protected = Set(tasks.compactMap { chunkName(for: $0.originalRequest, key: $0.taskDescription) })
+        let contents = (try? FileManager.default.contentsOfDirectory(at: Self.stagingDirectory, includingPropertiesForKeys: nil)) ?? []
+        for file in contents where file.lastPathComponent.hasPrefix(captureID.uuidString + ".") && file.pathExtension == "chunk" {
+            if !protected.contains(file.lastPathComponent) { try FileManager.default.removeItem(at: file) }
         }
     }
 
@@ -131,7 +158,11 @@ final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Send
         }
         lock.unlock()
         if let key = task.taskDescription, UUID(uuidString: key) != nil {
-            try? FileManager.default.removeItem(at: Self.stagingDirectory.appendingPathComponent(key + ".multipart"))
+            if let chunk = chunkName(for: request, key: key) {
+                try? FileManager.default.removeItem(at: Self.stagingDirectory.appendingPathComponent(chunk))
+            } else {
+                try? FileManager.default.removeItem(at: Self.stagingDirectory.appendingPathComponent(key + ".multipart"))
+            }
         }
         if let handler { handler.continuation.resume(with: result) }
         else if case .success(let (data, response)) = result, let request {
@@ -140,10 +171,15 @@ final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Send
     }
 
     func removeStaged(captureIDs: Set<UUID>) throws {
+        let contents = (try? FileManager.default.contentsOfDirectory(at: Self.stagingDirectory, includingPropertiesForKeys: nil)) ?? []
         for id in captureIDs {
             for suffix in [".multipart", ".building"] {
                 let file = Self.stagingDirectory.appendingPathComponent(id.uuidString + suffix)
                 if FileManager.default.fileExists(atPath: file.path) { try FileManager.default.removeItem(at: file) }
+            }
+            let prefix = id.uuidString + "."
+            for file in contents where file.lastPathComponent.hasPrefix(prefix) && file.pathExtension == "chunk" {
+                try FileManager.default.removeItem(at: file)
             }
         }
     }

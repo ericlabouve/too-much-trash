@@ -1,0 +1,13 @@
+# Xcode and Swift build output
+DerivedData/
+.build/
+*.xcresult/
+*.xcarchive/
+*.app/
+*.dSYM/
+*.ipa
+xcuserdata/
+
+# Local signing files
+*.mobileprovision
+*.p12

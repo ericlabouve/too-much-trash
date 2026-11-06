@@ -173,11 +173,17 @@ struct Installation: Codable, Equatable {
     let usedBytes: Int64
     let usedUploads: Int
     var mediaContractVersion: Int?
+    var episodeContractVersion: Int?
+    var resumableEpisodeContractVersion: Int?
+    var developmentSession: Bool?
     enum CodingKeys: String, CodingKey {
         case installationID = "installation_id", installationName = "installation_name"
         case quotaBytes = "quota_bytes", quotaUploads = "quota_uploads"
         case usedBytes = "used_bytes", usedUploads = "used_uploads"
         case mediaContractVersion = "media_contract_version"
+        case episodeContractVersion = "episode_contract_version"
+        case resumableEpisodeContractVersion = "resumable_episode_contract_version"
+        case developmentSession = "development_session"
     }
 }
 
@@ -230,8 +236,10 @@ struct MediaReceipt: Codable, Equatable {
     let filename: String
     let sizeBytes: Int64
     var clientCaptureID: UUID?
+    var episodeBundleSHA256: String?
     enum CodingKeys: String, CodingKey {
         case id, status, filename, sizeBytes = "size_bytes", clientCaptureID = "client_capture_id"
+        case episodeBundleSHA256 = "episode_bundle_sha256"
     }
 }
 

@@ -11,6 +11,13 @@ root.innerHTML = `
       <button id="logout" type="button">Logout</button>
     </div>
     <p id="logout-feedback" role="alert"></p>
+    <section class="panel" id="development-keys-panel" hidden>
+      <h2>Development keys</h2>
+      <p>Keys can register an iPhone on this development server. Revoking a key does not revoke existing installations.</p>
+      <form id="development-key-form"><label>Key label <input name="label" maxlength="80" required></label><button>Create development key</button></form>
+      <div id="development-key-result" hidden><p>Copy this key now; it is shown only once.</p><code id="development-key-value"></code><button id="development-key-hide" type="button">Hide key</button></div>
+      <p id="development-key-feedback" role="status"></p><ul id="development-keys-list"></ul>
+    </section>
     <section class="panel onboarding" aria-labelledby="invites-title">
       <h2 id="invites-title">Invitations & installations</h2>
       <p>Create two single-use invite words and share them privately. Exactly two words are required; case and extra spaces do not matter.</p>
@@ -47,7 +54,7 @@ root.innerHTML = `
 `;
 
 type Invite = { id: string; label: string; expires_at: string; redeemed_at: string | null; revoked_at: string | null };
-type Installation = { id: string; installation_name: string; tester_label?: string; revoked_at: string | null; used_bytes: number; quota_bytes: number; used_uploads: number; quota_uploads: number };
+type Installation = { id: string; installation_name: string; tester_label?: string; development_key_id?: string | null; revoked_at: string | null; used_bytes: number; quota_bytes: number; used_uploads: number; quota_uploads: number };
 const feedback = document.querySelector<HTMLParagraphElement>("#invite-feedback")!;
 const form = document.querySelector<HTMLFormElement>("#invite-form")!;
 const codePanel = document.querySelector<HTMLDivElement>("#new-code")!;
@@ -78,6 +85,8 @@ logoutButton.addEventListener("click", async () => {
     await logoutAdmin(fetch, path => {
       codeElement.textContent = "";
       codePanel.hidden = true;
+      keyValue.textContent = "";
+      keyResult.hidden = true;
       window.location.replace(path);
     });
   } catch {
@@ -98,6 +107,41 @@ async function adminApi<T>(path: string, body?: unknown): Promise<T> {
   if (!response.ok) throw new Error(`Request failed (${response.status}). Check the form or retry.`);
   return response.status === 204 ? undefined as T : await response.json() as T;
 }
+
+type DevelopmentKey = { id: string; label: string; created_at: string; last_used_at: string | null; revoked_at: string | null; installation_count: number };
+const keyPanel = document.querySelector<HTMLElement>("#development-keys-panel")!;
+const keyForm = document.querySelector<HTMLFormElement>("#development-key-form")!;
+const keyResult = document.querySelector<HTMLElement>("#development-key-result")!;
+const keyValue = document.querySelector<HTMLElement>("#development-key-value")!;
+const keyFeedback = document.querySelector<HTMLElement>("#development-key-feedback")!;
+async function refreshDevelopmentKeys(): Promise<void> {
+  const response = await fetch("/api/v1/admin/development-keys", { credentials: "same-origin", cache: "no-store", redirect: "error" });
+  if (response.status === 404) { keyPanel.hidden = true; return; }
+  if (!response.ok) throw new Error(`Development key list failed (${response.status}).`);
+  const keys = await response.json() as DevelopmentKey[];
+  keyPanel.hidden = false;
+  const list = document.querySelector<HTMLUListElement>("#development-keys-list")!;
+  list.replaceChildren();
+  for (const key of keys) {
+    const item = document.createElement("li");
+    item.textContent = `${key.label} · ID ${key.id} · ${key.revoked_at ? "Revoked" : "Active"} · created ${new Date(key.created_at).toLocaleString()} · last used ${key.last_used_at ? new Date(key.last_used_at).toLocaleString() : "never"} · ${key.installation_count} installations `;
+    if (!key.revoked_at) item.append(revokeButton(`development-keys/${key.id}/revoke`, refreshDevelopmentKeys));
+    list.append(item);
+  }
+}
+keyForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!keyResult.hidden) { keyFeedback.textContent = "Copy and hide the current key first."; return; }
+  const button = keyForm.querySelector<HTMLButtonElement>("button")!; button.disabled = true;
+  try {
+    const result = await adminApi<{ key: string }>("development-keys", { label: String(new FormData(keyForm).get("label")).trim() });
+    keyValue.textContent = result.key; keyResult.hidden = false; keyFeedback.textContent = "Key created.";
+    await refreshDevelopmentKeys();
+  } catch (error) { keyFeedback.textContent = `${String(error)} If the response was lost, check the list before retrying.`; }
+  finally { button.disabled = false; }
+});
+document.querySelector("#development-key-hide")!.addEventListener("click", () => { keyValue.textContent = ""; keyResult.hidden = true; });
+void refreshDevelopmentKeys().catch(error => { keyFeedback.textContent = String(error); keyPanel.hidden = false; });
 
 function revokeButton(path: string, refresh: () => Promise<void>): HTMLButtonElement {
   const button = document.createElement("button");
@@ -148,7 +192,7 @@ function renderLists(): void {
   }
   for (const installation of visibleInstallations) {
     const item = document.createElement("li");
-    item.textContent = `${installation.tester_label?.trim() || installation.installation_name} · ${installation.revoked_at ? "Revoked" : "Active"} · ${installation.used_uploads}/${installation.quota_uploads} uploads · ${(installation.used_bytes / 1048576).toFixed(1)}/${(installation.quota_bytes / 1048576).toFixed(1)} MiB `;
+    item.textContent = `${installation.tester_label?.trim() || installation.installation_name} · ${installation.revoked_at ? "Revoked" : "Active"} · ${installation.used_uploads}/${installation.quota_uploads} uploads · ${(installation.used_bytes / 1048576).toFixed(1)}/${(installation.quota_bytes / 1048576).toFixed(1)} MiB${installation.development_key_id ? ` · Development key ${installation.development_key_id}` : ""} `;
     if (!installation.revoked_at) item.append(revokeButton(`installations/${installation.id}/revoke`, refreshLists));
     installationList.append(item);
   }

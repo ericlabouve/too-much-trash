@@ -1,6 +1,8 @@
 """Integration suite: isolated Postgres, real HTTP handlers, in-memory blob adapter."""
 
 import io
+import hashlib
+import json
 import os
 import tempfile
 import unittest
@@ -52,6 +54,12 @@ class Blob:
     def get_object(self, Bucket, Key):
         return {"Body": Body(self.objects[Key])}
 
+    def head_object(self, Bucket, Key):
+        if Key not in self.objects:
+            from botocore.exceptions import ClientError
+            raise ClientError({"Error": {"Code": "404"}}, "HeadObject")
+        return {"ContentLength": len(self.objects[Key])}
+
 
 class OnboardingTests(unittest.TestCase):
     @classmethod
@@ -66,7 +74,7 @@ class OnboardingTests(unittest.TestCase):
 
     def setUp(self):
         with database() as connection:
-            connection.execute("TRUNCATE captures, access_tokens, installations, invitations, auth_rate_limits CASCADE")
+            connection.execute("TRUNCATE captures, access_tokens, installations, invitations, auth_rate_limits, development_keys CASCADE")
         self.directory = tempfile.TemporaryDirectory()
         self.hash_path = Path(self.directory.name) / "admin.sha256"
         self.hash_path.write_text(digest("test-only-admin"))
@@ -100,6 +108,175 @@ class OnboardingTests(unittest.TestCase):
 
     def bearer(self, credentials):
         return {"Authorization": "Bearer " + credentials["access_token"]}
+
+    def test_development_key_is_scoped_audited_and_revocable(self):
+        regular = self.enrolled()
+        self.assertFalse(self.client.get("/api/v1/auth/me", headers=self.bearer(regular)).json()["development_session"])
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
+            created = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers, json={"label": "Test phone"})
+            self.assertEqual(created.status_code, 201)
+            key, key_id = created.json()["key"], created.json()["id"]
+            listing = self.client.get("/api/v1/admin/development-keys").json()
+            self.assertNotIn(key, str(listing))
+            self.assertEqual(self.client.post("/api/v1/admin/development-enroll", json={"key": "invalid"}).status_code, 401)
+            enrolled = self.client.post("/api/v1/admin/development-enroll", json={"key": key})
+            self.assertEqual(enrolled.status_code, 201)
+            installation_id = enrolled.json()["installation_id"]
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(enrolled.json())).status_code, 200)
+            self.assertTrue(self.client.get("/api/v1/auth/me", headers=self.bearer(enrolled.json())).json()["development_session"])
+            row = next(x for x in self.client.get("/api/v1/admin/installations").json() if x["id"] == installation_id)
+            self.assertEqual(row["development_key_id"], key_id)
+            self.assertEqual(self.client.get("/api/v1/admin/development-keys").json()[0]["installation_count"], 1)
+            self.assertEqual(self.client.post(f"/api/v1/admin/development-keys/{key_id}/revoke", headers=self.admin_headers).status_code, 204)
+            self.assertEqual(self.client.post("/api/v1/admin/development-enroll", json={"key": key}).status_code, 401)
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(enrolled.json())).status_code, 200)
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "false"}):
+            self.assertEqual(self.client.post("/api/v1/admin/development-enroll", json={"key": key}).status_code, 404)
+
+    def test_episode_upload_is_atomic_owned_and_idempotent(self):
+        owner = self.enrolled()
+        other = self.enrolled()
+        episode = uuid4()
+        manifest = {"schema_version": 1, "episode_id": str(episode), "complete": True,
+                    "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                    "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"},
+                    "sensor_metadata": {"clock": "test"}}
+        def files(video=b"test video"):
+            return {"video": ("video.mp4", video, "video/mp4"),
+                    "imu": ("imu.jsonl", b'{"timestamp":10}\n', "application/x-ndjson"),
+                    "poses": ("poses.jsonl", b'{"timestamp":10}\n', "application/x-ndjson"),
+                    "manifest": ("manifest.json", json.dumps(manifest).encode(), "application/json")}
+        headers = {**self.bearer(owner), "Idempotency-Key": str(episode)}
+        response = self.client.post("/api/v1/episodes", headers=headers, files=files())
+        self.assertEqual(response.status_code, 202, response.text)
+        self.assertEqual(len(response.json()["episode_bundle_sha256"]), 64)
+        self.assertEqual(self.client.post("/api/v1/episodes", headers=headers, files=files()).json()["id"], response.json()["id"])
+        self.assertEqual(self.client.post("/api/v1/episodes", headers=headers, files=files(b"different")).status_code, 409)
+        for name in ("video", "imu", "poses", "manifest"):
+            path = f"/api/v1/episodes/{episode}/files/{name}"
+            self.assertEqual(self.client.get(path, headers=self.bearer(owner)).status_code, 200)
+            self.assertEqual(self.client.get(path, headers=self.bearer(other)).status_code, 404)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=self.bearer(owner)).json()["used_uploads"], 1)
+        manifest["timing"]["start"] = 9
+        bad_episode = uuid4()
+        manifest["episode_id"] = str(bad_episode)
+        self.assertEqual(self.client.post("/api/v1/episodes", headers={**self.bearer(owner), "Idempotency-Key": str(bad_episode)}, files=files()).status_code, 400)
+
+    def test_resumable_episode_survives_lost_ack_and_enforces_ownership(self):
+        owner, stranger = self.enrolled(), self.enrolled()
+        episode = uuid4()
+        manifest = {"schema_version": 1, "episode_id": str(episode), "complete": True,
+                    "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                    "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"}, "sensor_metadata": {}}
+        files = {"video": b"video", "imu": b"imu", "poses": b"poses", "manifest": json.dumps(manifest).encode()}
+        descriptor = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()} for name, data in files.items()}
+        path = f"/api/v1/episodes/{episode}/transfer"
+        token, other = self.bearer(owner), self.bearer(stranger)
+        started = self.client.post(path, headers=token, json={"files": descriptor})
+        self.assertEqual(started.status_code, 200, started.text)
+        self.assertFalse(started.json()["complete"])
+        self.assertEqual(self.client.post(path + "/finish", headers=token).status_code, 409)
+        for name, data in files.items():
+            chunk_path = f"{path}/{name}/0"
+            self.assertEqual(self.client.put(chunk_path, headers={**other, "Content-Type": "application/octet-stream"}, content=data).status_code, 404)
+            accepted = self.client.put(chunk_path, headers={**token, "Content-Type": "application/octet-stream"}, content=data)
+            self.assertEqual(accepted.status_code, 200, accepted.text)
+            self.assertEqual(self.client.put(chunk_path, headers={**token, "Content-Type": "application/octet-stream"}, content=data).status_code, 200)
+            changed = bytes([data[0] ^ 1]) + data[1:]
+            self.assertEqual(self.client.put(chunk_path, headers={**token, "Content-Type": "application/octet-stream"}, content=changed).status_code, 409)
+        resumed = self.client.post(path, headers=token, json={"files": descriptor}).json()
+        self.assertTrue(all(resumed["chunks"][name] == [0] for name in files))
+        finished = self.client.post(path + "/finish", headers=token)
+        self.assertEqual(finished.status_code, 202, finished.text)
+        self.assertEqual(self.client.post(path + "/finish", headers=token).json()["id"], finished.json()["id"])
+        self.assertTrue(self.client.post(path, headers=token, json={"files": descriptor}).json()["complete"])
+        for name, data in files.items():
+            self.assertEqual(self.client.get(f"/api/v1/episodes/{episode}/files/{name}", headers=token).content, data)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=token).json()["used_uploads"], 1)
+
+    def test_resumable_reserves_quota_and_expired_staging_is_removed(self):
+        credentials = self.enrolled(quota_bytes=40, quota_uploads=1)
+        headers = self.bearer(credentials)
+        episode = uuid4()
+        path = f"/api/v1/episodes/{episode}/transfer"
+        files = {name: {"size": 2, "sha256": hashlib.sha256(b"ab").hexdigest()} for name in ("video", "imu", "poses", "manifest")}
+        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 200)
+        self.assertEqual(self.client.post(f"/api/v1/episodes/{uuid4()}/transfer", headers=headers, json={"files": files}).status_code, 429)
+        self.assertEqual(self.client.post("/api/v1/media", headers=headers, files={"file": ("a.mp4", b"a", "video/mp4")}).status_code, 429)
+        self.assertEqual(self.client.put(path + "/video/0", headers={**headers, "Content-Type": "application/octet-stream"}, content=b"ab").status_code, 200)
+        self.assertTrue(any(key.startswith("episode-staging/") for key in self.blob.objects))
+        with database() as connection:
+            connection.execute("UPDATE episode_transfers SET expires_at=now()-interval '1 second'")
+        second = f"/api/v1/episodes/{uuid4()}/transfer"
+        self.assertEqual(self.client.post(second, headers=headers, json={"files": files}).status_code, 200)
+        self.assertFalse(any(key.startswith("episode-staging/") for key in self.blob.objects))
+        self.assertEqual(self.client.delete(second, headers=headers).status_code, 204)
+
+    def test_resumable_partial_file_and_corrupt_staging(self):
+        owner, episode = self.enrolled(), uuid4()
+        headers = self.bearer(owner)
+        manifest = {"schema_version": 1, "episode_id": str(episode), "complete": False,
+                    "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                    "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"}, "sensor_metadata": {}}
+        payloads = {"video": b"v" * (1024 * 1024 + 5), "imu": b"a", "poses": b"p", "manifest": json.dumps(manifest).encode()}
+        files = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()} for name, data in payloads.items()}
+        path = f"/api/v1/episodes/{episode}/transfer"
+        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 200)
+        put = lambda name, index, data: self.client.put(f"{path}/{name}/{index}", headers={**headers, "Content-Type": "application/octet-stream"}, content=data)
+        self.assertEqual(put("video", 0, payloads["video"][:1024 * 1024]).status_code, 200)
+        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).json()["chunks"]["video"], [0])
+        self.assertEqual(put("video", 1, payloads["video"][1024 * 1024:]).status_code, 200)
+        for name in ("imu", "poses", "manifest"):
+            self.assertEqual(put(name, 0, payloads[name]).status_code, 200)
+        video_key = next(key for key in self.blob.objects if key.endswith("/video/00000001"))
+        self.blob.objects[video_key] = b"bad!!"
+        failed = self.client.post(path + "/finish", headers=headers)
+        self.assertEqual(failed.status_code, 409)
+        self.assertEqual(failed.json()["detail"]["code"], "transfer_corrupt")
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["used_uploads"], 0)
+        del self.blob.objects[video_key]
+        resumed = self.client.post(path, headers=headers, json={"files": files})
+        self.assertEqual(resumed.json()["chunks"]["video"], [0])
+        self.assertEqual(put("video", 1, payloads["video"][1024 * 1024:]).status_code, 200)
+        self.assertEqual(self.client.post(path + "/finish", headers=headers).status_code, 202)
+
+    @unittest.skipUnless(os.environ.get("TMT_TEST_REAL_S3") == "1", "Requires isolated disposable S3")
+    def test_resumable_round_trip_with_disposable_object_storage(self):
+        self.blob_patch.stop()
+        try:
+            from app.main import storage
+            storage().head_bucket(Bucket=os.environ["S3_BUCKET"])
+            self.test_resumable_episode_survives_lost_ack_and_enforces_ownership()
+        finally:
+            self.blob_patch.start()
+
+    @unittest.skipUnless(os.environ.get("TMT_TEST_REAL_S3") == "1", "Requires isolated disposable S3")
+    def test_episode_round_trip_with_disposable_object_storage(self):
+        self.blob_patch.stop()
+        try:
+            from app.main import storage
+            client = storage()
+            client.head_bucket(Bucket=os.environ["S3_BUCKET"])
+            owner, episode = self.enrolled(), uuid4()
+            manifest = {"schema_version": 1, "episode_id": str(episode), "complete": False,
+                        "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                        "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"},
+                        "sensor_metadata": {"clock": "test"}}
+            expected = {"video": b"synthetic-video", "imu": b'{"sample":1}\n', "poses": b'{"pose":1}\n',
+                        "manifest": json.dumps(manifest).encode()}
+            files = {"video": ("video.mp4", expected["video"], "video/mp4"),
+                     "imu": ("imu.jsonl", expected["imu"], "application/x-ndjson"),
+                     "poses": ("poses.jsonl", expected["poses"], "application/x-ndjson"),
+                     "manifest": ("manifest.json", expected["manifest"], "application/json")}
+            headers = {**self.bearer(owner), "Idempotency-Key": str(episode)}
+            response = self.client.post("/api/v1/episodes", headers=headers, files=files)
+            self.assertEqual(response.status_code, 202, response.text)
+            for name, content in expected.items():
+                downloaded = self.client.get(f"/api/v1/episodes/{episode}/files/{name}", headers=self.bearer(owner))
+                self.assertEqual(downloaded.status_code, 200)
+                self.assertEqual(downloaded.content, content)
+        finally:
+            self.blob_patch.start()
 
     def keyed_upload(self, credentials, key, data=b"data", filename="a.mov", content_type="video/quicktime"):
         return self.client.post("/api/v1/media", headers={**self.bearer(credentials), "Idempotency-Key": str(key)},

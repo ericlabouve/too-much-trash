@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 
 @MainActor
 protocol HTTPTransport {
@@ -73,9 +74,19 @@ protocol CollectorAPI {
     func media(id: UUID, token: String) async throws -> MediaReceipt
     func adminReachable() async -> Bool
     func availableServers() async throws -> [AvailableServer]
+    func developmentEnroll(key: String) async throws -> Enrollment
+    func uploadEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt
+    func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt
 }
 
 extension CollectorAPI {
+    func developmentEnroll(key: String) async throws -> Enrollment { throw ClientError.configuration }
+    func uploadEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt { throw ClientError.configuration }
+    func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt { throw ClientError.configuration }
     func availableServers() async throws -> [AvailableServer] { [] }
     func upload(file: URL, captureID: UUID, token: String,
                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
@@ -103,6 +114,19 @@ final class LiveCollectorAPI: CollectorAPI {
         var body = ["invite_code": invite]
         if let name, !name.isEmpty { body["installation_name"] = name }
         return try await json(path: "api/v1/auth/enroll", body: body, status: 201)
+    }
+
+    func developmentEnroll(key: String) async throws -> Enrollment {
+        guard configuration.publicOrigin == APIConfiguration.developmentNetwork.publicOrigin,
+              let origin = configuration.privateAdminOrigin,
+              origin == APIConfiguration.developmentNetwork.privateAdminOrigin else { throw ClientError.configuration }
+        var request = URLRequest(url: origin.appendingPathComponent("api/v1/admin/development-enroll"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(["key": key])
+        let (data, response) = try await transport.data(for: request)
+        guard response.url == request.url else { throw ClientError.invalidResponse }
+        return try decode(data, response, expected: 201)
     }
 
     func refresh(token: String) async throws -> AccessToken {
@@ -182,6 +206,168 @@ final class LiveCollectorAPI: CollectorAPI {
         try await upload(file: file, captureID: UUID(), token: token, progress: { _, _ in })
     }
 
+    func uploadEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
+        let parts = [("video", "video.mp4", "video/mp4"), ("imu", "imu.jsonl", "application/x-ndjson"),
+                     ("poses", "poses.jsonl", "application/x-ndjson"), ("manifest", "manifest.json", "application/json")]
+        var total: Int64 = 0
+        for (_, filename, _) in parts {
+            let attributes = try FileManager.default.attributesOfItem(atPath: directory.appendingPathComponent(filename).path)
+            guard let size = attributes[.size] as? NSNumber, size.int64Value > 0 else { throw ClientError.invalidResponse }
+            total += size.int64Value
+            guard total <= 200 * 1024 * 1024 else { throw ClientError.uploadTooLarge }
+        }
+        let boundary = "TMT-\(episodeID.uuidString)"
+        let staging = BackgroundUploads.stagingDirectory
+        try FileManager.default.createDirectory(at: staging, withIntermediateDirectories: true)
+        try CaptureQueue.protect(staging)
+        let bodyURL = staging.appendingPathComponent(episodeID.uuidString + ".multipart")
+        if !FileManager.default.fileExists(atPath: bodyURL.path) {
+            try await Task.detached(priority: .utility) {
+                try Self.stageEpisode(directory: directory, bodyURL: bodyURL, boundary: boundary)
+            }.value
+        }
+        var request = URLRequest(url: configuration.endpoint("api/v1/episodes"))
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue(episodeID.uuidString, forHTTPHeaderField: "Idempotency-Key")
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        defer { try? FileManager.default.removeItem(at: bodyURL) }
+        let (data, response) = try await transport.upload(for: request, from: bodyURL, progress: progress)
+        guard response.url == request.url else { throw ClientError.invalidResponse }
+        return try decode(data, response, expected: 202)
+    }
+
+    private struct ResumableFile: Codable, Sendable {
+        let size: Int64
+        let sha256: String
+    }
+    private struct ResumableBegin: Encodable { let files: [String: ResumableFile] }
+    private struct ResumableState: Decodable { let complete: Bool; let chunk_size: Int; let chunks: [String: [Int]] }
+    private struct ResumableAccepted: Decodable { let accepted: Bool }
+    private nonisolated static let episodeFileNames = [("video", "video.mp4"), ("imu", "imu.jsonl"),
+                                           ("poses", "poses.jsonl"), ("manifest", "manifest.json")]
+
+    func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String,
+                                progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
+        let descriptors = try await Task.detached(priority: .utility) { try Self.describeEpisode(directory) }.value
+        let total = descriptors.values.reduce(Int64(0)) { $0 + $1.size }
+        guard total > 0, total <= 200 * 1024 * 1024 else { throw ClientError.uploadTooLarge }
+        let path = "api/v1/episodes/\(episodeID.uuidString)/transfer"
+        var begin = URLRequest(url: configuration.endpoint(path))
+        begin.httpMethod = "POST"
+        begin.httpBody = try JSONEncoder().encode(ResumableBegin(files: descriptors))
+        begin.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        begin.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        let (beginData, beginResponse) = try await transport.data(for: begin)
+        guard beginResponse.url == begin.url else { throw ClientError.invalidResponse }
+        let state: ResumableState = try decode(beginData, beginResponse, expected: 200)
+        if state.complete { return try await uploaded(captureID: episodeID, token: token) }
+        guard state.chunk_size == 1024 * 1024, Set(state.chunks.keys) == Set(descriptors.keys) else { throw ClientError.invalidResponse }
+        let staging = BackgroundUploads.stagingDirectory
+        try FileManager.default.createDirectory(at: staging, withIntermediateDirectories: true)
+        try CaptureQueue.protect(staging)
+        try await BackgroundUploads.shared.cleanOrphanedChunks(captureID: episodeID)
+        var sent: Int64 = 0
+        for (name, _) in Self.episodeFileNames {
+            guard let descriptor = descriptors[name], let uploaded = state.chunks[name] else { throw ClientError.invalidResponse }
+            let chunkSize = Int64(state.chunk_size)
+            let count = Int((descriptor.size + chunkSize - 1) / chunkSize)
+            let accepted = Set(uploaded)
+            guard accepted.count == uploaded.count, accepted.allSatisfy({ $0 >= 0 && $0 < count }) else { throw ClientError.invalidResponse }
+            for index in accepted { sent += min(chunkSize, descriptor.size - Int64(index) * chunkSize) }
+        }
+        progress(sent, total)
+        for (name, filename) in Self.episodeFileNames {
+            guard let descriptor = descriptors[name], let uploaded = state.chunks[name] else { throw ClientError.invalidResponse }
+            let chunkSize = Int64(state.chunk_size)
+            let count = Int((descriptor.size + chunkSize - 1) / chunkSize)
+            let accepted = Set(uploaded)
+            for index in 0..<count where !accepted.contains(index) {
+                try Task.checkCancellation()
+                let size = min(chunkSize, descriptor.size - Int64(index) * chunkSize)
+                let bodyURL = staging.appendingPathComponent("\(episodeID.uuidString).\(name).\(index).chunk")
+                let source = directory.appendingPathComponent(filename)
+                try await Task.detached(priority: .utility) {
+                    try Self.stageChunk(source: source, target: bodyURL, offset: UInt64(Int64(index) * chunkSize), size: Int(size))
+                }.value
+                defer { try? FileManager.default.removeItem(at: bodyURL) }
+                var request = URLRequest(url: configuration.endpoint("\(path)/\(name)/\(index)"))
+                request.httpMethod = "PUT"
+                request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                request.setValue(episodeID.uuidString, forHTTPHeaderField: "Idempotency-Key")
+                let previous = sent
+                let (data, response) = try await transport.upload(for: request, from: bodyURL) { current, _ in
+                    progress(min(total, previous + current), total)
+                }
+                guard response.url == request.url else { throw ClientError.invalidResponse }
+                let receipt: ResumableAccepted = try decode(data, response, expected: 200)
+                guard receipt.accepted else { throw ClientError.invalidResponse }
+                sent += size
+                try? FileManager.default.removeItem(at: bodyURL)
+                progress(sent, total)
+            }
+        }
+        var finish = URLRequest(url: configuration.endpoint("\(path)/finish"))
+        finish.httpMethod = "POST"
+        finish.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        let (data, response) = try await transport.data(for: finish)
+        guard response.url == finish.url else { throw ClientError.invalidResponse }
+        return try decode(data, response, expected: 202)
+    }
+
+    private nonisolated static func describeEpisode(_ directory: URL) throws -> [String: ResumableFile] {
+        var result: [String: ResumableFile] = [:]
+        for (name, filename) in episodeFileNames {
+            let url = directory.appendingPathComponent(filename)
+            let source = try FileHandle(forReadingFrom: url)
+            defer { try? source.close() }
+            var digest = SHA256()
+            var size: Int64 = 0
+            while let data = try source.read(upToCount: 1024 * 1024), !data.isEmpty {
+                digest.update(data: data)
+                size += Int64(data.count)
+            }
+            guard size > 0 else { throw ClientError.storage }
+            result[name] = ResumableFile(size: size, sha256: digest.finalize().map { String(format: "%02x", $0) }.joined())
+        }
+        return result
+    }
+
+    private nonisolated static func stageChunk(source: URL, target: URL, offset: UInt64, size: Int) throws {
+        let input = try FileHandle(forReadingFrom: source)
+        defer { try? input.close() }
+        try input.seek(toOffset: offset)
+        guard let bytes = try input.read(upToCount: size), bytes.count == size else { throw ClientError.storage }
+        try bytes.write(to: target, options: .atomic)
+        try CaptureQueue.protect(target)
+    }
+
+    private nonisolated static func stageEpisode(directory: URL, bodyURL: URL, boundary: String) throws {
+        let building = bodyURL.deletingPathExtension().appendingPathExtension("building")
+        if FileManager.default.fileExists(atPath: building.path) { try FileManager.default.removeItem(at: building) }
+        defer { try? FileManager.default.removeItem(at: building) }
+        guard FileManager.default.createFile(atPath: building.path, contents: nil,
+            attributes: [.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication]) else { throw ClientError.storage }
+        let destination = try FileHandle(forWritingTo: building)
+        defer { try? destination.close() }
+        for (name, filename, contentType) in [("video", "video.mp4", "video/mp4"), ("imu", "imu.jsonl", "application/x-ndjson"),
+                                               ("poses", "poses.jsonl", "application/x-ndjson"), ("manifest", "manifest.json", "application/json")] {
+            try destination.write(contentsOf: Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\r\nContent-Type: \(contentType)\r\n\r\n".utf8))
+            let source = try FileHandle(forReadingFrom: directory.appendingPathComponent(filename))
+            defer { try? source.close() }
+            while let chunk = try source.read(upToCount: 1024 * 1024), !chunk.isEmpty { try destination.write(contentsOf: chunk) }
+            try source.close()
+            try destination.write(contentsOf: Data("\r\n".utf8))
+        }
+        try destination.write(contentsOf: Data("--\(boundary)--\r\n".utf8))
+        try destination.synchronize()
+        try destination.close()
+        try FileManager.default.moveItem(at: building, to: bodyURL)
+    }
+
     func upload(file: URL, captureID: UUID, token: String,
                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
         let attributes = try FileManager.default.attributesOfItem(atPath: file.path)
@@ -251,6 +437,7 @@ final class LiveCollectorAPI: CollectorAPI {
             case 415: throw ClientError.unsupportedMedia
             case 422: throw ClientError.validation
             case 404: throw ClientError.missingMedia
+            case 409 where code == "transfer_incomplete": throw ClientError.server
             case 409: throw ClientError.idempotencyConflict
             case 500...599: throw ClientError.server
             default: throw ClientError.invalidResponse

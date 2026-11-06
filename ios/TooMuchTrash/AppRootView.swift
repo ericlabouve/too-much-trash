@@ -81,6 +81,8 @@ struct RegistrationView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var words = InviteWordEntry()
     @State private var attemptedRegistration = false
+    @State private var showDevelopmentKey = false
+    @State private var developmentKey = ""
     @FocusState private var focusedWord: InviteWordEntry.Field?
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -113,7 +115,32 @@ struct RegistrationView: View {
                     }
                     .disabled(account.busy || !words.isComplete)
                     .accessibilityIdentifier("submitRegistration")
+                    if account.canAdminProceed {
+                        Button("Dev Proceed") {
+                            focusedWord = nil
+                            do {
+                                if try account.hasDevelopmentKey() {
+                                    Task { if !(await account.adminProceed()) { attemptedRegistration = true } }
+                                } else { showDevelopmentKey = true }
+                            } catch { attemptedRegistration = true }
+                        }
+                        .disabled(account.busy)
+                        .accessibilityIdentifier("adminProceed")
+                        Button("Change development key") { showDevelopmentKey = true }
+                            .disabled(account.busy)
+                    }
                 }
+            }
+            .alert("Development key", isPresented: $showDevelopmentKey) {
+                SecureField("Development key", text: $developmentKey)
+                Button("Cancel", role: .cancel) { developmentKey = "" }
+                Button("Continue") {
+                    let key = developmentKey
+                    developmentKey = ""
+                    Task { if !(await account.adminProceed(newKey: key)) { attemptedRegistration = true } }
+                }
+            } message: {
+                Text("Enter the development key from your admin dashboard. It will be saved in this iPhone’s Keychain.")
             }
     }
 

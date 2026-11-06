@@ -24,6 +24,71 @@ private final class ScriptedTransport: HTTPTransport {
 
 @MainActor
 final class APIContractTests: XCTestCase {
+    func testResumableEpisodeSkipsPreviouslyAcknowledgedChunks() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        for name in ["video.mp4", "imu.jsonl", "poses.jsonl", "manifest.json"] {
+            try Data("test-\(name)".utf8).write(to: directory.appendingPathComponent(name))
+        }
+        let id = UUID(), transport = ScriptedTransport()
+        let empty = "{\"complete\":false,\"chunk_size\":1048576,\"chunks\":{\"video\":[],\"imu\":[],\"poses\":[],\"manifest\":[]}}"
+        let resumed = "{\"complete\":false,\"chunk_size\":1048576,\"chunks\":{\"video\":[0],\"imu\":[],\"poses\":[],\"manifest\":[]}}"
+        transport.replies = [.init(status: 200, json: empty), .init(status: 200, json: "{\"accepted\":true}"),
+            .init(status: 503, json: ""), .init(status: 200, json: resumed),
+            .init(status: 200, json: "{\"accepted\":true}"), .init(status: 200, json: "{\"accepted\":true}"),
+            .init(status: 200, json: "{\"accepted\":true}"),
+            .init(status: 202, json: "{\"id\":\"\(UUID())\",\"status\":\"queued\",\"filename\":\"video.mp4\",\"size_bytes\":40,\"client_capture_id\":\"\(id)\"}")]
+        let client = try api(transport)
+        do { _ = try await client.uploadResumableEpisode(directory: directory, episodeID: id, token: "test-access", progress: { _, _ in }); XCTFail("Expected interruption") }
+        catch { XCTAssertEqual(error as? ClientError, .server) }
+        let receipt = try await client.uploadResumableEpisode(directory: directory, episodeID: id, token: "test-access", progress: { _, _ in })
+        XCTAssertEqual(receipt.clientCaptureID, id)
+        let paths = transport.requests.compactMap { $0.url?.path }
+        XCTAssertEqual(paths.filter { $0.hasSuffix("/video/0") }.count, 1)
+        XCTAssertEqual(paths.filter { $0.hasSuffix("/imu/0") }.count, 2)
+        XCTAssertTrue(transport.requests.filter { $0.httpMethod == "PUT" }.allSatisfy { $0.value(forHTTPHeaderField: "Idempotency-Key") == id.uuidString })
+    }
+    func testEpisodeUploadStagesAllFourFilesWithStableIdentity() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        for name in ["video.mp4", "imu.jsonl", "poses.jsonl", "manifest.json"] {
+            try Data("test-\(name)".utf8).write(to: directory.appendingPathComponent(name))
+        }
+        XCTAssertEqual(try CaptureQueue.episodeDigest(folder: directory), "24c074780c375e5b7434dbaeb62b6d709200f20252e6a0d54a924aaa33f5356a")
+        let id = UUID(), transport = ScriptedTransport()
+        transport.replies = [.init(status: 202, json: "{\"id\":\"\(UUID())\",\"status\":\"queued\",\"filename\":\"video.mp4\",\"size_bytes\":40,\"client_capture_id\":\"\(id)\"}")]
+        let client = try api(transport)
+        let receipt = try await client.uploadEpisode(directory: directory, episodeID: id, token: "test-access", progress: { _, _ in })
+        XCTAssertEqual(receipt.clientCaptureID, id)
+        XCTAssertEqual(transport.requests.first?.url?.path, "/api/v1/episodes")
+        XCTAssertEqual(transport.requests.first?.value(forHTTPHeaderField: "Idempotency-Key"), id.uuidString)
+        let body = String(decoding: try XCTUnwrap(transport.stagedUpload), as: UTF8.self)
+        for name in ["video", "imu", "poses", "manifest"] { XCTAssertTrue(body.contains("name=\"\(name)\"")) }
+    }
+    func testDevelopmentSessionIsOptionalForOlderServers() throws {
+        let template = """
+        {"installation_id":"AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE","installation_name":"Test","quota_bytes":100,"quota_uploads":1,"used_bytes":0,"used_uploads":0%@}
+        """
+        let legacy = try JSONDecoder().decode(Installation.self, from: Data(String(format: template, "").utf8))
+        let development = try JSONDecoder().decode(Installation.self, from: Data(String(format: template, ",\"development_session\":true").utf8))
+        XCTAssertNil(legacy.developmentSession)
+        XCTAssertEqual(development.developmentSession, true)
+    }
+    func testDevelopmentEnrollmentUsesOnlyThePrivateDevelopmentOrigin() async throws {
+        let transport = ScriptedTransport()
+        transport.replies = [.init(status: 201, json: """
+            {"installation_id":"AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE","access_token":"test-access","refresh_token":"test-refresh","token_type":"Bearer","expires_in":900,"refresh_expires_in":2592000}
+            """)]
+        let client = LiveCollectorAPI(configuration: .developmentNetwork, transport: transport)
+        _ = try await client.developmentEnroll(key: "test-development-key")
+        XCTAssertEqual(transport.requests.first?.url?.absoluteString, APIConfiguration.developmentAdminURL + "/api/v1/admin/development-enroll")
+        XCTAssertEqual(transport.requests.first?.httpMethod, "POST")
+        let production = LiveCollectorAPI(configuration: .productionNetwork, transport: transport)
+        do { _ = try await production.developmentEnroll(key: "test-development-key"); XCTFail("Production must reject development enrollment") }
+        catch { XCTAssertEqual(transport.requests.count, 1) }
+    }
     func testFreshDefaultsAreProductionAndSavedOriginsStillWin() throws {
         let suite = "test.initial.\(UUID().uuidString)"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))

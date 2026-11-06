@@ -23,6 +23,9 @@ struct SessionDashboard: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showConfiguration = false
     @State private var confirmEnd = false
+    @State private var confirmDelete = false
+    @State private var captureToDelete: QueuedCapture?
+    @State private var showDeleteFailure = false
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]
 
     var body: some View {
@@ -40,7 +43,13 @@ struct SessionDashboard: View {
                     } else {
                         LazyVGrid(columns: columns, spacing: 14) {
                             ForEach(account.currentCaptures.reversed()) { capture in
-                                SessionVideoTile(capture: capture, file: queue.file(for: capture), uploading: account.uploadingID == capture.id, stopPlayback: account.isEndingSession)
+                                SessionVideoTile(capture: capture, file: queue.file(for: capture),
+                                                 uploading: account.uploadingID == capture.id,
+                                                 stopPlayback: account.isEndingSession,
+                                                 canDelete: account.canDeleteLocalCapture) {
+                                    captureToDelete = capture
+                                    confirmDelete = true
+                                }
                             }
                         }
                     }
@@ -68,6 +77,17 @@ struct SessionDashboard: View {
                     Task { if await account.endSession() { dismiss() } }
                 }
             } message: { Text(account.endSessionWarning) }
+            .alert("Delete video from this iphone", isPresented: $confirmDelete, presenting: captureToDelete) { capture in
+                Button("Cancel", role: .cancel) {}
+                Button("Delete", role: .destructive) {
+                    Task { showDeleteFailure = !(await account.deleteLocalCapture(capture.id)) }
+                }
+            }
+            .alert("Couldn’t delete video", isPresented: $showDeleteFailure) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Wait for any upload to finish, then try again.")
+            }
         }
     }
 }
@@ -105,6 +125,8 @@ private struct SessionVideoTile: View {
     let file: URL
     let uploading: Bool
     let stopPlayback: Bool
+    let canDelete: Bool
+    let onDelete: () -> Void
     @State private var player: AVPlayer?
 
     var body: some View {
@@ -125,6 +147,11 @@ private struct SessionVideoTile: View {
         }
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 14))
+        .contextMenu {
+            Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
+                .disabled(!canDelete)
+        }
         .task { if player == nil { player = AVPlayer(url: file) } }
         .onDisappear { player?.pause() }
         .onChange(of: stopPlayback) { _, stop in if stop { player?.pause() } }
