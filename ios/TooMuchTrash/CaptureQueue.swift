@@ -221,11 +221,19 @@ final class CaptureQueue: ObservableObject {
     }
 
     func removeExpired(ids: Set<UUID>, now: Date) throws {
+        try removeLocalCaptures(expiredCaptures(now: now).filter { ids.contains($0.id) })
+    }
+
+    func removeLocalCapture(id: UUID, origin: URL, installationID: UUID) throws {
+        try removeLocalCaptures(matching(origin: origin, installationID: installationID).filter { $0.id == id })
+    }
+
+    private func removeLocalCaptures(_ candidates: [QueuedCapture]) throws {
         guard !storageUnavailable else { throw ClientError.storage }
         var removed = Set<UUID>()
         var failed = false
         let root = directory.resolvingSymlinksInPath()
-        for capture in expiredCaptures(now: now) where ids.contains(capture.id) {
+        for capture in candidates {
             let url = episodeFolder(for: capture) ?? file(for: capture)
             do {
                 // Reject a redirected parent. Deleting the final path itself

@@ -167,6 +167,35 @@ final class OnboardingTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: folder.appendingPathComponent("poses.jsonl").path))
     }
 
+    func testManualDeleteRemovesOnlySelectedLocalRecording() async throws {
+        let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try seed(api, vault)
+        let queue = CaptureQueue(directory: root)
+        let session = try account(api, vault, queue: queue)
+        await session.bootstrap()
+        let owner = try XCTUnwrap(session.captureOwner)
+        let id = UUID()
+        let ownerFolder = try queue.recordingDirectory(origin: owner.origin, installationID: owner.installationID)
+        let episode = ownerFolder.appendingPathComponent("episode-\(id.uuidString.lowercased())")
+        try FileManager.default.createDirectory(at: episode, withIntermediateDirectories: true)
+        for name in ["video.mp4", "imu.jsonl", "poses.jsonl"] {
+            try Data("test".utf8).write(to: episode.appendingPathComponent(name))
+        }
+        try Data("{\"episode_id\":\"\(id.uuidString)\",\"complete\":false}".utf8).write(to: episode.appendingPathComponent("manifest.json"))
+        session.queueEpisode(episode, id: id, owner: owner)
+        let otherFile = root.appendingPathComponent("other.mov")
+        try Data("test".utf8).write(to: otherFile)
+        session.queueCapture(otherFile, owner: owner)
+
+        let deleted = await session.deleteLocalCapture(id)
+        XCTAssertTrue(deleted)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: episode.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: otherFile.path))
+        XCTAssertEqual(CaptureQueue(directory: root).captures.map(\.filename), ["other.mov"])
+        XCTAssertEqual(api.episodeUploadCalls, 0)
+    }
+
     func testEpisodeLookupWithMismatchedDigestDoesNotMarkSynced() async throws {
         let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
         defer { try? FileManager.default.removeItem(at: root) }
@@ -633,6 +662,8 @@ final class OnboardingTests: XCTestCase {
         await fulfillment(of: [started], timeout: 5)
         XCTAssertEqual(session.uploadingID, capture.id)
         XCTAssertNil(session.checkRetention())
+        let deletedDuringUpload = await session.deleteLocalCapture(capture.id)
+        XCTAssertFalse(deletedDuringUpload)
         XCTAssertTrue(FileManager.default.fileExists(atPath: queue.file(for: capture).path))
         transfer?.resume()
         await cleanup.value

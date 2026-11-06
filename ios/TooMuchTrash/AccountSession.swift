@@ -21,6 +21,7 @@ final class AccountSession: ObservableObject {
     @Published private(set) var uploadBytesPerSecond: Double?
     @Published private(set) var isEndingSession = false
     @Published private(set) var isUploading = false
+    @Published private(set) var isDeletingCapture = false
     private(set) var adminNetworkConfiguration: APIConfiguration?
     @Published private(set) var uploadMessage = "Local videos expire 24 hours after upload or 72 hours after recording if unsynced."
     let queue: CaptureQueue
@@ -91,7 +92,7 @@ final class AccountSession: ObservableObject {
     }
 
     func configure(_ value: APIConfiguration) async {
-        guard !busy, !isUploading, !isEndingSession, retentionTask == nil else { return }
+        guard !busy, !isUploading, !isEndingSession, !isDeletingCapture, retentionTask == nil else { return }
         configuration = value
         if value.privateAdminOrigin?.scheme == "https" { adminNetworkConfiguration = value }
         value.save()
@@ -122,7 +123,7 @@ final class AccountSession: ObservableObject {
     }
 
     func continueLogin() async {
-        guard !busy, !isUploading, !isEndingSession, retentionTask == nil, retryAllowed() else { return }
+        guard !busy, !isUploading, !isEndingSession, !isDeletingCapture, retentionTask == nil, retryAllowed() else { return }
         guard let configuration, api != nil else { handle(ClientError.configuration); return }
         let wasAuthorized = phase == .authorized && installation != nil
         busy = true
@@ -322,7 +323,7 @@ final class AccountSession: ObservableObject {
     /// A final attempt allows an expired recording through the ordinary
     /// receipt-first upload path. Return true only when cleanup may proceed.
     private func uploadPending(finalAttemptID: UUID?) async -> Bool {
-        guard !busy, !isUploading, !isEndingSession, retryAllowed(), phase == .authorized, let api else { return false }
+        guard !busy, !isUploading, !isEndingSession, !isDeletingCapture, retryAllowed(), phase == .authorized, let api else { return false }
         guard !queue.storageUnavailable else { uploadMessage = "Private video storage needs attention. Videos are retained."; return false }
         isUploading = true
         defer { isUploading = false; uploadingID = nil }
@@ -448,7 +449,7 @@ final class AccountSession: ObservableObject {
     private func kickUploads() {
         guard automaticUploads, hasBootstrapped else { return }
         checkRetention()
-        guard foreground, phase == .authorized, !isEndingSession, !busy,
+        guard foreground, phase == .authorized, !isEndingSession, !isDeletingCapture, !busy,
               retentionTask == nil, uploadTask == nil,
               pendingCaptures.contains(where: { $0.uploadBlocked == nil && !$0.isExpired(at: Date()) }),
               retryUploadAt == nil || retryUploadAt! <= Date() else { return }
@@ -462,7 +463,7 @@ final class AccountSession: ObservableObject {
     @discardableResult
     func checkRetention() -> Task<Void, Never>? {
         let now = Date()
-        guard foreground, !busy, !isEndingSession, !isUploading, uploadTask == nil, retentionTask == nil,
+        guard foreground, !busy, !isEndingSession, !isUploading, !isDeletingCapture, uploadTask == nil, retentionTask == nil,
               !queue.storageUnavailable, now >= nextRetentionCheck else { return nil }
         nextRetentionCheck = now.addingTimeInterval(60)
         do { try queue.prepareRetention(now: now) }
@@ -517,8 +518,33 @@ final class AccountSession: ObservableObject {
         catch { uploadMessage = "Upload confirmed, but local sync metadata needs attention. Videos retained." }
     }
 
+    var canDeleteLocalCapture: Bool {
+        phase == .authorized && !busy && !isUploading && !isEndingSession && !isDeletingCapture && !queue.storageUnavailable
+    }
+
+    func deleteLocalCapture(_ id: UUID) async -> Bool {
+        guard canDeleteLocalCapture, uploadTask == nil, retentionTask == nil,
+              let owner = captureOwner else { return false }
+        guard currentCaptures.contains(where: { $0.id == id }) else { return true }
+        isDeletingCapture = true
+        defer {
+            isDeletingCapture = false
+            kickUploads()
+        }
+        // iOS can restore a transfer that has no in-memory upload task.
+        let activeIDs = await BackgroundUploads.shared.activeCaptureIDs()
+        guard !activeIDs.contains(id) else { return false }
+        do {
+            try BackgroundUploads.shared.removeStaged(captureIDs: [id])
+            try queue.removeLocalCapture(id: id, origin: owner.origin, installationID: owner.installationID)
+            return true
+        } catch {
+            return false
+        }
+    }
+
     func endSession() async -> Bool {
-        guard !busy, !isEndingSession, retentionTask == nil, let configuration, let api, var current = credential else { return false }
+        guard !busy, !isEndingSession, !isDeletingCapture, retentionTask == nil, let configuration, let api, var current = credential else { return false }
         guard !queue.storageUnavailable else { message = "Private storage needs attention. Session was not ended."; return false }
         guard installation?.mediaContractVersion == 1 || current.endingSession == true else {
             message = "End Session requires the updated backend."; return false
@@ -563,7 +589,7 @@ final class AccountSession: ObservableObject {
     }
 
     func refreshUploadStatus() async {
-        guard !busy, retentionTask == nil, retryAllowed(), phase == .authorized, let api else { return }
+        guard !busy, !isDeletingCapture, retentionTask == nil, retryAllowed(), phase == .authorized, let api else { return }
         busy = true
         defer { busy = false }
         do {

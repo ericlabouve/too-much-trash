@@ -1218,7 +1218,7 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
                             // Clock and complete-stream coverage must be validated on real hardware.
                             try journal.finalize(video: result.url, release: window.releasedAt, end: end, validatedCoverageAndClock: false)
                             self.onEpisode?(journal.directory, window.id)
-                            self.publish("Episode saved; synchronization validation pending.")
+                            self.publish("Episode saved.")
                         } catch {
                             try? journal.markExportFailure(end: end, reason: "episode_finalize_failed")
                             self.preserveRollingFiles = true
