@@ -1,4 +1,4 @@
-"""Pretrained Cutie on MPS, with isolated upstream source and one frozen mask seed."""
+"""Benchmark Cutie on MPS with a reviewed seed or one-second SAM 3 anchors."""
 
 import argparse
 from fractions import Fraction
@@ -21,7 +21,78 @@ from .inference import overlay
 from .video import mask_rle
 
 
-def main():
+def one_second_samples(timestamps):
+    """Select the first decoded frame at or after each whole source second."""
+    times = np.asarray(timestamps)
+    indices = np.searchsorted(times + 1e-6, np.arange(int(times[-1] + 1e-6) + 1))
+    return sorted(set(indices.tolist()))
+
+
+def anchor_gaps(frame_count, anchors):
+    """Yield each non-anchor interval, bounded by zero-based anchor indices."""
+    boundaries = [None, *sorted(anchors), None]
+    for left, right in zip(boundaries, boundaries[1:]):
+        start = 0 if left is None else left + 1
+        stop = frame_count if right is None else right
+        if start < stop:
+            yield left, right, range(start, stop)
+
+
+def gap_seed_indices(left, right, policy):
+    """Always backfill before the first anchor; only the control backtracks interior gaps."""
+    return left, right if left is None or policy == 'bidirectional' else None
+
+
+def choose_gap_mask(index, left, right, forward, backward):
+    if forward is None and backward is None:
+        raise ValueError('At least one directional prediction is required')
+    agreement = None
+    if forward is not None and backward is not None:
+        union = (forward | backward).sum()
+        agreement = float((forward & backward).sum() / union) if union else 1.0
+    use_forward = backward is None or (forward is not None and index - left <= right - index)
+    return (forward, 'forward', agreement) if use_forward else (backward, 'backward', agreement)
+
+
+def sam3_anchors(images, timestamps, baseline, args, report, save):
+    from transformers import Sam3Model, Sam3Processor
+
+    started = time.perf_counter()
+    model = Sam3Model.from_pretrained(baseline['model'], revision=baseline['revision'],
+                                     local_files_only=True, dtype=torch.float32).to('mps').eval()
+    processor = Sam3Processor.from_pretrained(baseline['model'], revision=baseline['revision'],
+                                             local_files_only=True)
+    torch.mps.synchronize()
+    report['sam_load_seconds'] = time.perf_counter() - started
+    report['sam_revision'] = baseline['revision']
+    report['sam_attempts'] = []
+    anchors = {}
+    for i in one_second_samples(timestamps):
+        started = time.perf_counter()
+        inputs = processor(images=images[i], text=args.sam_prompt, return_tensors='pt').to('mps')
+        with torch.inference_mode():
+            output = model(**inputs)
+            prediction = processor.post_process_instance_segmentation(
+                output, threshold=args.sam_threshold, mask_threshold=.5,
+                target_sizes=[(images[i].height, images[i].width)])[0]
+        masks = prediction['masks'].detach().cpu().numpy().astype(bool)
+        scores = prediction['scores'].detach().cpu().numpy()
+        torch.mps.synchronize()
+        elapsed = time.perf_counter() - started
+        usable = [j for j, mask in enumerate(masks) if mask.any()]
+        if len(usable) == 1:
+            anchors[i] = masks[usable[0]]
+        status = 'accepted' if len(usable) == 1 else 'ambiguous' if usable else 'empty'
+        report['sam_attempts'].append({'frame_index': i, 'timestamp_seconds': timestamps[i],
+            'status': status, 'candidate_scores': scores.tolist(), 'nonempty_candidate_count': len(usable),
+            'accepted_candidate': usable[0] if status == 'accepted' else None, 'seconds': elapsed})
+        np.savez_compressed(args.output / f'anchor_{i:04d}.npz', masks=masks, scores=scores)
+        print(f'SAM 3 frame {i} ({timestamps[i]:.2f}s): {status}, {elapsed:.2f}s', flush=True)
+        save()
+    return anchors
+
+
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('reference', type=Path)
     parser.add_argument('--source', type=Path, required=True)
@@ -30,9 +101,26 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--size', type=int, default=480, help='Maximum internal shortest side')
     parser.add_argument('--max-tracked-frames', type=int, default=0)
-    args = parser.parse_args()
+    parser.add_argument('--sam-prompt', help='Use fresh SAM 3 candidates every second instead of the reviewed seed')
+    parser.add_argument('--sam-threshold', type=float, default=.5)
+    parser.add_argument('--anchor-policy', choices=('forward-after-first', 'bidirectional'),
+                        help='Default with --sam-prompt: backfill before the first usable anchor, then track forward')
+    args = parser.parse_args(argv)
     if args.size < 16 or args.max_tracked_frames < 0:
         parser.error('Invalid size/frame limit')
+    if not 0 <= args.sam_threshold <= 1 or (args.sam_prompt is not None and not args.sam_prompt.strip()):
+        parser.error('Use a nonempty prompt and a threshold between zero and one')
+    if args.sam_prompt is not None and args.max_tracked_frames:
+        parser.error('One-second anchor mode requires a full clip')
+    if args.sam_prompt is None and args.anchor_policy is not None:
+        parser.error('--anchor-policy requires --sam-prompt')
+    if args.sam_prompt is not None and args.anchor_policy is None:
+        args.anchor_policy = 'forward-after-first'
+    return args
+
+
+def main():
+    args = parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     wall = time.perf_counter()
     report = {'status': 'running', 'device': 'mps', 'precision': 'float32', 'model': 'cutie-base-mega',
@@ -40,6 +128,16 @@ def main():
               'reference': str(args.reference.resolve()),
               'runner_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'notes': 'Original upright RGB input. One frozen reviewed frame-90 mask initializes two independent memory passes, forward and backward. Non-seed references are read after inference for scoring only. No Agent, object prompt, refresh, training or automatic outcome label. CPU media/evaluation, MPS inference with CPU fallback disabled. End-to-end includes seed, decode, tensor transfer, tracking, mask export, scoring and video encoding; excludes cold model construction/loading/download.'}
+    if args.sam_prompt is not None:
+        tracking_notes = {
+            'bidirectional': 'Independent Cutie passes from both neighboring anchors, nearest anchor wins (earlier on a tie); IoU below 0.50 flags disagreement for review. Tails use the nearest available anchor.',
+            'forward-after-first': 'Cutie backfills only before the first usable anchor. Afterward each accepted anchor starts a fresh forward pass to the next one or the end. No directional disagreement check.',
+        }
+        report.update(sam_prompt=args.sam_prompt, sam_threshold=args.sam_threshold, anchor_interval_seconds=1,
+                      anchor_policy=args.anchor_policy,
+                      notes='Fresh text-prompted SAM 3 on upright source frames each second. Accept exactly one nonempty candidate; this is not proof of target identity. '
+                            + tracking_notes[args.anchor_policy]
+                            + ' Reviewed masks used only after prediction for scoring. No Agent, training or outcome label. MPS float32, CPU inference fallback disabled. Processing includes all anchor attempts, tracking, decode, scoring and exports; excludes cold model loading.')
 
     def save():
         (args.output / 'results.json').write_text(json.dumps(report, indent=2))
@@ -74,8 +172,9 @@ def main():
         baseline = json.loads(args.reference.read_text())
         seed_index = baseline['source']['seed_frame_index']
         height, width = baseline['source']['upright_height'], baseline['source']['upright_width']
-        with np.load(args.reference.parent / f'{seed_index:04d}_prediction.npz') as data:
-            seed = torch.from_numpy(data['masks'][0].astype(np.int64)).to('mps')
+        if args.sam_prompt is None:
+            with np.load(args.reference.parent / f'{seed_index:04d}_prediction.npz') as data:
+                seed = torch.from_numpy(data['masks'][0].astype(np.int64)).to('mps')
         processing_started = time.perf_counter()
         started = time.perf_counter()
         images, timestamps = [], []
@@ -94,8 +193,26 @@ def main():
         if len(images) != baseline['source']['frames']:
             raise ValueError('Source/reference frame count mismatch')
         report['decode_seconds'] = time.perf_counter()-started
-        remaining = args.max_tracked_frames or len(images)-1
-        with torch.inference_mode():
+        def track_step(processor, index, mask=None, end=False):
+            torch.mps.synchronize()
+            started = time.perf_counter()
+            tensor = torch.from_numpy(np.array(images[index])).permute(2, 0, 1).to('mps', dtype=torch.float32) / 255
+            probs = processor.step(tensor, mask, objects=[1] if mask is not None else None, end=end)
+            torch.mps.synchronize()
+            elapsed = time.perf_counter()-started
+            return (probs.argmax(dim=0) == 1).cpu().numpy(), elapsed
+
+        def record(index, mask, elapsed, direction, is_seed, **extra):
+            np.savez_compressed(args.output / f'{index:04d}_prediction.npz', masks=mask[None])
+            ys, xs = np.nonzero(mask)
+            report['frames'].append({'source_frame_index': index, 'timestamp_seconds': timestamps[index],
+                'direction': direction, 'seed_frame': is_seed, 'model_and_transfer_seconds': elapsed,
+                'predicted_pixels': int(mask.sum()), 'mask_rle': mask_rle(mask),
+                'box_xyxy': [int(xs.min()), int(ys.min()), int(xs.max())+1, int(ys.max())+1] if len(xs) else None,
+                **extra})
+
+        def run_frozen_seed():
+            remaining = args.max_tracked_frames or len(images)-1
             for direction in (1, -1):
                 if not remaining:
                     break
@@ -104,29 +221,71 @@ def main():
                 for index in order:
                     if index != seed_index and not remaining:
                         break
-                    torch.mps.synchronize()
-                    started = time.perf_counter()
-                    tensor = torch.from_numpy(np.array(images[index])).permute(2, 0, 1).to('mps', dtype=torch.float32) / 255
-                    probs = processor.step(tensor, seed if index == seed_index else None,
-                                           objects=[1] if index == seed_index else None,
-                                           end=index == (len(images)-1 if direction == 1 else 0))
-                    torch.mps.synchronize()
-                    elapsed = time.perf_counter()-started
+                    mask, elapsed = track_step(processor, index, seed if index == seed_index else None,
+                                               end=index == (len(images)-1 if direction == 1 else 0))
                     if index == seed_index and direction == -1:
                         report['reverse_seed_initialization_seconds'] = elapsed
                         continue
-                    mask = (probs.argmax(dim=0) == 1).cpu().numpy()
-                    np.savez_compressed(args.output / f'{index:04d}_prediction.npz', masks=mask[None])
-                    ys, xs = np.nonzero(mask)
-                    report['frames'].append({'source_frame_index': index, 'timestamp_seconds': timestamps[index],
-                        'direction': direction, 'seed_frame': index == seed_index, 'model_and_transfer_seconds': elapsed,
-                        'predicted_pixels': int(mask.sum()), 'mask_rle': mask_rle(mask),
-                        'box_xyxy': [int(xs.min()), int(ys.min()), int(xs.max())+1, int(ys.max())+1] if len(xs) else None})
+                    record(index, mask, elapsed, direction, index == seed_index)
                     if index != seed_index:
                         remaining -= 1
                     if index % 30 == 0:
                         print(f'{direction:+} frame {index}: {elapsed:.3f}s, {mask.sum()} pixels', flush=True)
                         save()
+
+        def run_sampled_anchors(anchors):
+            report['accepted_anchor_frames'] = sorted(anchors)
+            report['cutie_seed_calls'] = 0
+            report['cutie_prediction_calls'] = 0
+            report['cutie_seed_seconds'] = 0.0
+            report['cutie_directional_timing'] = {
+                d: {'seed_calls': 0, 'seed_seconds': 0., 'prediction_calls': 0, 'model_and_transfer_seconds': 0.}
+                for d in ('forward', 'backward')}
+
+            def pass_from(anchor, order, direction):
+                if anchor is None:
+                    return {}
+                processor = InferenceCore(model, cfg=cfg)
+                mask = torch.from_numpy(anchors[anchor].astype(np.int64)).to('mps')
+                _, elapsed = track_step(processor, anchor, mask)
+                report['cutie_seed_calls'] += 1
+                report['cutie_seed_seconds'] += elapsed
+                report['cutie_prediction_calls'] += len(order)
+                predictions = {i: track_step(processor, i, end=i == order[-1]) for i in order}
+                timing = report['cutie_directional_timing'][direction]
+                timing['seed_calls'] += 1
+                timing['seed_seconds'] += elapsed
+                timing['prediction_calls'] += len(order)
+                timing['model_and_transfer_seconds'] += sum(t for _, t in predictions.values())
+                return predictions
+
+            for i, mask in anchors.items():
+                record(i, mask, 0., 'sam3_anchor', True, needs_review=False)
+            for left, right, gap in anchor_gaps(len(images), anchors):
+                forward_seed, backward_seed = gap_seed_indices(left, right, args.anchor_policy)
+                forward = pass_from(forward_seed, gap, 'forward')
+                backward = pass_from(backward_seed, gap[::-1], 'backward')
+                for i in gap:
+                    f, ft = forward.get(i, (None, 0.))
+                    b, bt = backward.get(i, (None, 0.))
+                    if f is None and b is None:
+                        record(i, np.zeros((height, width), bool), 0., 'no_anchor', False, needs_review=True)
+                    else:
+                        mask, direction, iou = choose_gap_mask(i, left, right, f, b)
+                        record(i, mask, ft+bt, direction, False, left_anchor=left, right_anchor=right,
+                               directional_iou=iou, needs_review=iou is not None and iou < .5)
+                print(f'Cutie gap {gap[0]}–{gap[-1]}, anchors {left}/{right}', flush=True)
+                save()
+
+        if args.sam_prompt is not None:
+            anchors = sam3_anchors(images, timestamps, baseline, args, report, save)
+            torch.mps.empty_cache()
+            with torch.inference_mode():
+                run_sampled_anchors(anchors)
+        else:
+            with torch.inference_mode():
+                run_frozen_seed()
+        report['frames'].sort(key=lambda f: f['source_frame_index'])
         for item in report['frames']:
             index = item['source_frame_index']
             with np.load(args.output / f'{index:04d}_prediction.npz') as p, np.load(args.reference.parent / f'{index:04d}_prediction.npz') as r:
@@ -151,10 +310,11 @@ def main():
                 for packet in encoder.encode():
                     destination.mux(packet)
             report['preview_encoding_seconds'] = time.perf_counter()-started
-        duration = time.perf_counter()-processing_started
+        duration = time.perf_counter()-processing_started-report.get('sam_load_seconds', 0.)
         tracked = [f for f in report['frames'] if not f['seed_frame']]
+        tracked_seconds = sum(f['model_and_transfer_seconds'] for f in tracked)
         report.update(processing_seconds=duration, end_to_end_fps=len(report['frames'])/duration,
-                      model_and_transfer_fps=len(tracked)/sum(f['model_and_transfer_seconds'] for f in tracked) if tracked else None,
+                      model_and_transfer_fps=report.get('cutie_prediction_calls', len(tracked))/tracked_seconds if tracked_seconds else None,
                       memory_final=memory(torch), status='completed', total_wall_seconds=time.perf_counter()-wall)
         save()
         print(json.dumps({k: report[k] for k in ('metrics', 'processing_seconds', 'end_to_end_fps', 'model_and_transfer_fps')}, indent=2), flush=True)

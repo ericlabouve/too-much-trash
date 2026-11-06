@@ -292,14 +292,38 @@ Artifacts: ignored `ml/data/cutie-benchmark/2026-10-09/full/`, including `segmen
 
 ## Current workflow and next steps
 
-Cutie is the selected tracker. The working research runner consumes the original video and one supplied seed from the reviewed SAM 3 result. This is not yet a wired SAM 3-to-Cutie Gradio workflow: the existing browser Video tab still performs independent SAM 3 sampled-frame inference.
+Cutie is the selected tracker. The research runner supports either one supplied reviewed seed or fresh SAM 3 anchors every second. This is not yet a SAM 3-to-Cutie Gradio workflow: the existing browser Video tab still performs independent SAM 3 sampled-frame inference.
 
 ```mermaid
 flowchart TD
-    V[Original phone video] --> C[Cutie on MPS: forward and backward tracking]
-    S[Reviewed SAM 3 mask: frame 90, supplied seed] --> C
+    V[Original phone video] --> S[SAM 3 candidates every second]
+    S --> C[Cutie on MPS: backfill once, then forward]
+    V --> C
     C --> O[Every-frame masks and pixel boxes: JSON and overlay video]
     O --> R[Human review: retain misses and uncertain frames]
 ```
 
-Next: connect single-frame SAM 3 mask generation to Cutie and expose that path in the viewer; automate held-frame/object selection without an object-name prompt (the SAM 3 Agent is not implemented); classify deposit outcomes as `trash` or `not trash`, retaining uncertain cases for review; then benchmark Cutie resolution, decoding and export optimizations against the reviewed masks. No custom-model training is planned.
+### Fresh SAM 3 anchors every second — 2026-11-06
+
+Add `--sam-prompt 'cylinder of yarn'` to the Cutie command above and choose a new output directory. This runs SAM 3 at the first source frame at or after each whole second, starting at zero, with default detection/mask thresholds of 0.5. The named prompt is a controlled benchmark aid, not automatic picked-object selection. Only samples with exactly one nonempty candidate seed tracking; empty and ambiguous attempts are logged with scores and saved candidate masks. A unique candidate does not establish identity. The positive clip's reviewed masks are read only for scoring in this mode.
+
+With `--anchor-policy bidirectional`, independent Cutie passes run from both ends between adjacent accepted anchors. Keep the prediction from the nearer anchor (earlier on a tie); flag directional IoU below 0.50 for review rather than combining masks. Before the first and after the last anchor, use the available direction only. With no anchors, either policy outputs empty proposals flagged for review. These are initial deterministic rules, not calibrated confidence or an occlusion-recovery guarantee.
+
+The 249-frame positive clip produced six anchors (seconds 1–6) from nine SAM 3 attempts. Seconds 0, 7 and 8 yielded empty SAM 3 results. At second 7 (frame 210), Cutie still recovered the visible object (Dice 0.868). The final visible frame 213 was still missed. Cutie made 388 gap predictions and 12 seed calls. No overlap frame crossed the disagreement threshold; that check cannot flag single-direction tail errors. The final video and all 249 JSON RLE/NumPy masks were verified.
+
+| Run | Mean visible Dice | p10 Dice | Empty-reference false positives | Processing FPS | Processing seconds |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| One supplied reviewed seed | 0.9640 | 0.9545 | 0 / 54 | 4.07 | 61.18 |
+| Fresh SAM 3 every second + bidirectional Cutie | 0.9657 | 0.9549 | 0 / 54 | 2.79 | 89.26 |
+
+The fresh-anchor run took 100.25 seconds including startup, or 89.26 seconds excluding cold model setup, with 24.14 seconds for the nine SAM 3 attempts. It includes overlapping Cutie passes, scoring, and export. Two visible frames remained below Dice 0.80. This is a small observed quality difference at higher cost, not a controlled anchor-count comparison (the earlier run used a different, reviewed seed). Artifacts: ignored `ml/data/cutie-benchmark/2026-11-06/sam3-1s-positive/`.
+
+### Backfill only before the first anchor — 2026-11-06
+
+The one-second runner defaults to `forward-after-first`: backfill before the first usable anchor, then use fresh forward memory from each usable anchor. Continue through empty or ambiguous SAM samples. Pass `--anchor-policy bidirectional` to reproduce the control above. The default removes the two-direction disagreement check on interior gaps; absence of a flag does not establish confidence.
+
+The fresh SAM 3 outputs from all nine samples matched the bidirectional run pixel-for-pixel, with the same six accepted anchors. The new run reduced Cutie work from 388 to 243 predictions and from 12 to 7 seed calls, with all 249 exported frames and their exact RLE masks verified. Its measured timing was 24.51 s for SAM 3, 20.86 s for 213 forward Cutie predictions, 2.96 s for 30 backward predictions, and 0.70 s for seed initialization. Other processing (decode, transfers outside the model timer, scoring, export, and bookkeeping) took 19.66 s. Total was **68.68 s** (3.63 FPS) excluding cold setup, **77.18 s** including startup, versus 89.26 s / 2.79 FPS and 100.25 s including startup for bidirectional. The observed processing reduction was 23%; the 145 eliminated calls are exact, but elapsed times are single-run measurements.
+
+Mean visible Dice was **0.9636 vs 0.9657** for bidirectional, and p10 was 0.9534 vs 0.9549. Both runs had the same two frames below 0.80 (19 and 213), and no false positives on 54 empty-reference frames. The largest per-frame Dice loss was at frame 58 (0.969 to 0.915), illustrating that removing the reverse pass can hurt individual frames despite a small aggregate change. Artifacts: ignored `ml/data/cutie-benchmark/2026-11-06/sam3-1s-forward-positive/`. Thirteen unit tests passed. The supplied-seed and bidirectional modes remain available for comparison.
+
+Next: verify subscription-backed authentication with image input, then evaluate the SAM 3 Agent for category-free anchor selection. Integrate the workflow into Gradio and later evaluate capture relevance and deposit outcomes. Off-policy means unrelated footage, such as an accidental recording, not a relevant pickup that ends outside the bin. Keep uncertain cases reviewable. Defer further anchor-schedule optimization until more reviewed clips are available. No custom-model training is planned.
