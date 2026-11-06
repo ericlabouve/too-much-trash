@@ -292,7 +292,15 @@ Artifacts: ignored `ml/data/cutie-benchmark/2026-10-09/full/`, including `segmen
 
 ## Current workflow and next steps
 
-Cutie is the selected tracker. The research runner supports either one supplied reviewed seed or fresh SAM 3 anchors every second. This is not yet a SAM 3-to-Cutie Gradio workflow: the existing browser Video tab still performs independent SAM 3 sampled-frame inference.
+Cutie is the selected tracker. The research runner supports either one supplied reviewed seed or fresh SAM 3 anchors every second. In the native MPS Gradio app, use **Track with Cutie** to upload a short clip and enter an object phrase and score threshold. This mode samples SAM 3 every second and uses the forward-after-first Cutie policy. It returns a silent tracked overlay and a downloadable JSON report with frame timestamps, original-pixel boxes, mask RLE, and anchor outcomes. It does not require reference masks or calculate Dice for uploads. The separate **Video** tab still performs independent SAM 3 sampling.
+
+After completing the Cutie setup above and caching SAM 3, launch the native viewer from this directory:
+
+```sh
+PYTORCH_ENABLE_MPS_FALLBACK=0 SAM3_PORT=7861 uv run sam3-viewer
+```
+
+Open <http://127.0.0.1:7861>. The tracker uses `ml/data/cutie/{source,deps,weights/cutie-base-mega.pth}` by default; `CUTIE_SOURCE_DIR`, `CUTIE_DEPS_DIR`, and `CUTIE_WEIGHTS` can override those paths. The Docker demo remains CPU-only and cannot run this MPS workflow. Trim long clips or reduce their resolution if the viewer's decoded-frame memory limit is exceeded. Outputs stay under the ignored viewer output directory; empty or ambiguous anchors are logged, and clips without any usable anchor yield empty proposals flagged for review.
 
 ```mermaid
 flowchart TD
@@ -326,4 +334,4 @@ The fresh SAM 3 outputs from all nine samples matched the bidirectional run pixe
 
 Mean visible Dice was **0.9636 vs 0.9657** for bidirectional, and p10 was 0.9534 vs 0.9549. Both runs had the same two frames below 0.80 (19 and 213), and no false positives on 54 empty-reference frames. The largest per-frame Dice loss was at frame 58 (0.969 to 0.915), illustrating that removing the reverse pass can hurt individual frames despite a small aggregate change. Artifacts: ignored `ml/data/cutie-benchmark/2026-11-06/sam3-1s-forward-positive/`. Thirteen unit tests passed. The supplied-seed and bidirectional modes remain available for comparison.
 
-Next: verify subscription-backed authentication with image input, then evaluate the SAM 3 Agent for category-free anchor selection. Integrate the workflow into Gradio and later evaluate capture relevance and deposit outcomes. Off-policy means unrelated footage, such as an accidental recording, not a relevant pickup that ends outside the bin. Keep uncertain cases reviewable. Defer further anchor-schedule optimization until more reviewed clips are available. No custom-model training is planned.
+Follow-up work: verify subscription-backed authentication with image input and evaluate the SAM 3 Agent for category-free anchor selection. Then evaluate capture relevance and deposit outcomes. Off-policy means unrelated footage, such as an accidental recording, not a relevant pickup that ends outside the bin. Keep uncertain cases reviewable. Defer further anchor-schedule optimization until more reviewed clips are available. No custom-model training is planned.

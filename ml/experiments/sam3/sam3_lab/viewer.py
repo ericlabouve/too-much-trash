@@ -3,6 +3,8 @@
 import os
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
+from uuid import uuid4
 
 import gradio as gr
 
@@ -18,6 +20,33 @@ OUTPUT_ROOT = Path(os.getenv('SAM3_OUTPUT_DIR', str(DATA_ROOT / 'sam3-viewer')))
 
 def predict_video(video, prompt, threshold, policy, progress=gr.Progress()):
     return process_video(video, prompt, threshold, policy, OUTPUT_ROOT, progress)
+
+
+def predict_tracked_video(video, prompt, threshold, progress=gr.Progress()):
+    from .benchmark_cutie import run
+
+    if not video or not prompt or not prompt.strip():
+        raise gr.Error('Upload a video and enter an object phrase.')
+    if not 0 <= threshold <= 1:
+        raise gr.Error('Score threshold must be between zero and one.')
+    root = DATA_ROOT / 'cutie'
+    output = OUTPUT_ROOT / f'cutie-{uuid4().hex}'
+    args = SimpleNamespace(reference=None, video=Path(video), output=output,
+        source=Path(os.getenv('CUTIE_SOURCE_DIR', str(root / 'source'))),
+        deps=Path(os.getenv('CUTIE_DEPS_DIR', str(root / 'deps'))),
+        weights=Path(os.getenv('CUTIE_WEIGHTS', str(root / 'weights' / 'cutie-base-mega.pth'))),
+        size=480, max_tracked_frames=0, sam_prompt=prompt.strip(), sam_threshold=threshold,
+        anchor_policy='forward-after-first')
+    try:
+        report = run(args, progress)
+    except (RuntimeError, ValueError) as exc:
+        raise gr.Error(str(exc)) from exc
+    count = len(report['accepted_anchor_frames'])
+    status = (f"{len(report['frames'])} frames · {count}/{len(report['sam_attempts'])} usable anchors"
+              f" · {report['total_wall_seconds']:.1f}s wall time")
+    if not count:
+        status += ' · No usable anchor; empty proposals need review.'
+    return str(output / 'segmented.mp4'), str(output / 'results.json'), status
 
 
 def predict(image, prompt, threshold):
@@ -36,6 +65,19 @@ def predict(image, prompt, threshold):
 def build_viewer():
     with gr.Blocks(title="Too Much Trash · SAM 3 lab") as app:
         gr.Markdown("# SAM 3 litter segmentation\nUpload a phone frame and try a short object phrase. Predictions are research proposals, not confirmed labels.")
+        with gr.Tab('Track with Cutie'):
+            gr.Markdown('Native Apple MPS only. SAM 3 samples once per second; Cutie backfills before the first usable anchor, then tracks forward. Requires local Cutie setup and a cached SAM 3 checkpoint. The overlay is silent.')
+            with gr.Row():
+                track_source = gr.Video(label='Source clip')
+                track_preview = gr.Video(label='Tracked overlay', format='mp4')
+            track_prompt = gr.Textbox(label='Object phrase')
+            track_threshold = gr.Slider(0, 1, value=.5, step=.05, label='Score threshold')
+            track_run = gr.Button('Track video', variant='primary')
+            track_json = gr.File(label='Download per-frame masks and boxes (JSON)')
+            track_status = gr.Textbox(label='Tracking run', interactive=False)
+            track_run.click(predict_tracked_video, [track_source, track_prompt, track_threshold],
+                            [track_preview, track_json, track_status], api_name='track_video',
+                            concurrency_id='sam3-inference', concurrency_limit=1)
         with gr.Tab('Video'):
             gr.Markdown('Play the source video, enter an object phrase, and choose how often to segment. The output holds each processed frame until the next sample; it does not track objects. Audio is omitted.')
             with gr.Row():

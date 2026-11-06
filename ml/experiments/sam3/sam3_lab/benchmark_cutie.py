@@ -17,7 +17,7 @@ import torch
 
 from .benchmark_tracker import memory
 from .flow_experiment import dice, metrics
-from .inference import overlay
+from .inference import MODEL_ID, overlay
 from .video import mask_rle
 
 
@@ -54,7 +54,7 @@ def choose_gap_mask(index, left, right, forward, backward):
     return (forward, 'forward', agreement) if use_forward else (backward, 'backward', agreement)
 
 
-def sam3_anchors(images, timestamps, baseline, args, report, save):
+def sam3_anchors(images, timestamps, baseline, args, report, save, update):
     from transformers import Sam3Model, Sam3Processor
 
     started = time.perf_counter()
@@ -67,7 +67,8 @@ def sam3_anchors(images, timestamps, baseline, args, report, save):
     report['sam_revision'] = baseline['revision']
     report['sam_attempts'] = []
     anchors = {}
-    for i in one_second_samples(timestamps):
+    samples = one_second_samples(timestamps)
+    for n, i in enumerate(samples):
         started = time.perf_counter()
         inputs = processor(images=images[i], text=args.sam_prompt, return_tensors='pt').to('mps')
         with torch.inference_mode():
@@ -89,6 +90,7 @@ def sam3_anchors(images, timestamps, baseline, args, report, save):
         np.savez_compressed(args.output / f'anchor_{i:04d}.npz', masks=masks, scores=scores)
         print(f'SAM 3 frame {i} ({timestamps[i]:.2f}s): {status}, {elapsed:.2f}s', flush=True)
         save()
+        update(.1 + .3 * (n + 1) / len(samples), f'SAM 3 anchors: {n + 1}/{len(samples)} sampled')
     return anchors
 
 
@@ -120,12 +122,20 @@ def parse_args(argv=None):
 
 
 def main():
-    args = parse_args()
+    run(parse_args())
+
+
+def run(args, progress=None):
+    """Run the CLI benchmark or track a standalone upload without evaluation masks."""
+    def update(fraction, message):
+        if progress is not None:
+            progress(fraction, desc=message)
+
     args.output.mkdir(parents=True, exist_ok=False)
     wall = time.perf_counter()
     report = {'status': 'running', 'device': 'mps', 'precision': 'float32', 'model': 'cutie-base-mega',
               'training': False, 'agent_calls': 0, 'frames': [], 'internal_shortest_side': args.size,
-              'reference': str(args.reference.resolve()),
+              'reference': str(args.reference.resolve()) if args.reference is not None else None,
               'runner_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               'notes': 'Original upright RGB input. One frozen reviewed frame-90 mask initializes two independent memory passes, forward and backward. Non-seed references are read after inference for scoring only. No Agent, object prompt, refresh, training or automatic outcome label. CPU media/evaluation, MPS inference with CPU fallback disabled. End-to-end includes seed, decode, tensor transfer, tracking, mask export, scoring and video encoding; excludes cold model construction/loading/download.'}
     if args.sam_prompt is not None:
@@ -137,7 +147,7 @@ def main():
                       anchor_policy=args.anchor_policy,
                       notes='Fresh text-prompted SAM 3 on upright source frames each second. Accept exactly one nonempty candidate; this is not proof of target identity. '
                             + tracking_notes[args.anchor_policy]
-                            + ' Reviewed masks used only after prediction for scoring. No Agent, training or outcome label. MPS float32, CPU inference fallback disabled. Processing includes all anchor attempts, tracking, decode, scoring and exports; excludes cold model loading.')
+                            + ' Reference masks, if supplied, are used only for scoring. No Agent, training or outcome label. MPS float32, CPU inference fallback disabled. Processing includes all anchor attempts, tracking, decode and exports; excludes cold model loading.')
 
     def save():
         (args.output / 'results.json').write_text(json.dumps(report, indent=2))
@@ -146,6 +156,9 @@ def main():
     try:
         if not torch.backends.mps.is_available() or os.environ.get('PYTORCH_ENABLE_MPS_FALLBACK') == '1':
             raise RuntimeError('Requires MPS without CPU inference fallback')
+        if not args.source.is_dir() or not args.deps.is_dir() or not args.weights.is_file():
+            raise ValueError('Cutie setup is missing. See the SAM 3 lab README for source, dependencies and weights.')
+        update(0, 'Loading Cutie')
         sys.path[:0] = [str(args.source.resolve()), str(args.deps.resolve())]
         from hydra import compose, initialize_config_dir
         from omegaconf import OmegaConf
@@ -169,28 +182,39 @@ def main():
         report.update(load_seconds=time.perf_counter()-started, parameter_count=sum(p.numel() for p in model.parameters()),
                       configuration=OmegaConf.to_container(cfg, resolve=True),
                       memory_after_load=memory(torch))
-        baseline = json.loads(args.reference.read_text())
-        seed_index = baseline['source']['seed_frame_index']
-        height, width = baseline['source']['upright_height'], baseline['source']['upright_width']
+        baseline = json.loads(args.reference.read_text()) if args.reference is not None else {
+            'video': str(args.video), 'model': MODEL_ID, 'revision': None,
+        }
         if args.sam_prompt is None:
+            seed_index = baseline['source']['seed_frame_index']
             with np.load(args.reference.parent / f'{seed_index:04d}_prediction.npz') as data:
                 seed = torch.from_numpy(data['masks'][0].astype(np.int64)).to('mps')
         processing_started = time.perf_counter()
+        update(.05, 'Decoding upright frames')
         started = time.perf_counter()
         images, timestamps = [], []
         with av.open(baseline['video']) as source:
-            rate = Fraction(source.streams.video[0].average_rate)
+            if not source.streams.video:
+                raise ValueError('Upload must contain a video stream')
+            rate = Fraction(source.streams.video[0].average_rate or 30)
             origin = None
             for i, frame in enumerate(source.decode(video=0)):
                 image = frame.to_image().convert('RGB').rotate(frame.rotation, expand=True)
-                if image.size != (width, height):
-                    raise ValueError('Source/reference dimension mismatch')
+                if images and image.size != images[0].size:
+                    raise ValueError('Video dimensions changed mid-clip')
+                if args.reference is None and (i + 1) * image.width * image.height * 4 > 2 * 1024**3:
+                    raise ValueError('Clip is too large for the in-memory viewer. Trim it or reduce its resolution.')
                 images.append(image)
                 timestamp = float(frame.time) if frame.time is not None else i / float(rate)
                 if origin is None:
                     origin = timestamp
                 timestamps.append(timestamp - origin)
-        if len(images) != baseline['source']['frames']:
+        if not images:
+            raise ValueError('Video contains no decodable frames')
+        width, height = images[0].size
+        if args.reference is not None and (width, height) != (baseline['source']['upright_width'], baseline['source']['upright_height']):
+            raise ValueError('Source/reference dimension mismatch')
+        if args.reference is not None and len(images) != baseline['source']['frames']:
             raise ValueError('Source/reference frame count mismatch')
         report['decode_seconds'] = time.perf_counter()-started
         def track_step(processor, index, mask=None, end=False):
@@ -276,9 +300,11 @@ def main():
                                directional_iou=iou, needs_review=iou is not None and iou < .5)
                 print(f'Cutie gap {gap[0]}–{gap[-1]}, anchors {left}/{right}', flush=True)
                 save()
+                update(.45 + .4 * (gap[-1] + 1) / len(images), 'Tracking gaps with Cutie')
 
         if args.sam_prompt is not None:
-            anchors = sam3_anchors(images, timestamps, baseline, args, report, save)
+            update(.1, 'Sampling SAM 3 anchors')
+            anchors = sam3_anchors(images, timestamps, baseline, args, report, save, update)
             torch.mps.empty_cache()
             with torch.inference_mode():
                 run_sampled_anchors(anchors)
@@ -286,23 +312,30 @@ def main():
             with torch.inference_mode():
                 run_frozen_seed()
         report['frames'].sort(key=lambda f: f['source_frame_index'])
-        for item in report['frames']:
-            index = item['source_frame_index']
-            with np.load(args.output / f'{index:04d}_prediction.npz') as p, np.load(args.reference.parent / f'{index:04d}_prediction.npz') as r:
-                item.update(reference_pixels=int(r['masks'][0].sum()), dice=dice(p['masks'][0], r['masks'][0]))
-        report['metrics'] = metrics(report['frames'])
+        if args.reference is not None:
+            for item in report['frames']:
+                index = item['source_frame_index']
+                with np.load(args.output / f'{index:04d}_prediction.npz') as p, np.load(args.reference.parent / f'{index:04d}_prediction.npz') as r:
+                    item.update(reference_pixels=int(r['masks'][0].sum()), dice=dice(p['masks'][0], r['masks'][0]))
+            report['metrics'] = metrics(report['frames'])
         report['complete_source_coverage'] = len(report['frames']) == len(images)
         if report['complete_source_coverage']:
+            update(.9, 'Encoding overlay and exporting masks')
             started = time.perf_counter()
             with av.open(str(args.output / 'segmented.mp4'), mode='w') as destination:
                 encoder = destination.add_stream('libx264', rate=rate)
-                encoder.width, encoder.height, encoder.pix_fmt = width, height, 'yuv420p'
+                encoder.width, encoder.height, encoder.pix_fmt = width + width % 2, height + height % 2, 'yuv420p'
                 encoder.options = {'crf': '23', 'preset': 'veryfast'}
                 for i, image in enumerate(images):
                     with np.load(args.output / f'{i:04d}_prediction.npz') as data:
                         preview = overlay(image, data['masks'])
                     if i % 30 == 0 or i == len(images)-1:
                         preview.save(args.output / f'{i:04d}_overlay.png')
+                    if preview.size != (encoder.width, encoder.height):
+                        from PIL import Image
+                        padded = Image.new('RGB', (encoder.width, encoder.height))
+                        padded.paste(preview, (0, 0))
+                        preview = padded
                     out = av.VideoFrame.from_image(preview)
                     out.pts, out.time_base = i, 1 / rate
                     for packet in encoder.encode(out):
@@ -317,7 +350,9 @@ def main():
                       model_and_transfer_fps=report.get('cutie_prediction_calls', len(tracked))/tracked_seconds if tracked_seconds else None,
                       memory_final=memory(torch), status='completed', total_wall_seconds=time.perf_counter()-wall)
         save()
-        print(json.dumps({k: report[k] for k in ('metrics', 'processing_seconds', 'end_to_end_fps', 'model_and_transfer_fps')}, indent=2), flush=True)
+        update(1, 'Done')
+        print(json.dumps({k: report.get(k) for k in ('metrics', 'processing_seconds', 'end_to_end_fps', 'model_and_transfer_fps')}, indent=2), flush=True)
+        return report
     except BaseException:
         report.update(status='failed', error=traceback.format_exc())
         save()
