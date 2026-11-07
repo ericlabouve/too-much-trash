@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jaw Trigger Experiment</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+  <script src="replay.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">TOO MUCH TRASH / RESEARCH</p>
+      <h1>Jaw trigger experiment</h1>
+      <p>Compare marker-free squeeze detectors and carry the best candidate into the next round.</p>
+      <p class="status" id="status" role="status">Waiting for experiment data</p>
+    </header>
+
+    <section aria-labelledby="pool-title">
+      <div class="section-head"><h2 id="pool-title">Candidates</h2><p id="pool-count"></p></div>
+      <p id="fitness-note" class="note">Fitness combines development accuracy and laptop speed. Select a candidate for details.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Candidate</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col">Pooled F1</th><th scope="col">Matched</th><th scope="col">Missed</th><th scope="col">False triggers</th><th scope="col">Laptop p95 ms</th><th scope="col">iPhone p95 ms</th><th scope="col">Fitness</th></tr></thead>
+          <tbody id="candidates"><tr><td colspan="10">Scores appear when a round starts.</td></tr></tbody>
+        </table>
+      </div>
+      <p class="holdout" id="holdout" hidden></p>
+      <p class="holdout" id="phone-result" hidden></p>
+    </section>
+
+    <section id="video-replay" aria-labelledby="replay-title">
+      <div class="section-head"><h2 id="replay-title">Video replay</h2><p id="replay-round"></p></div>
+      <p id="replay-status" class="note" role="status">Loading the latest scored round…</p>
+      <div id="replay-controls" hidden>
+        <div class="replay-selectors">
+          <label>Candidate <select id="replay-candidate"></select></label>
+          <label>Clip <select id="replay-clip"></select></label>
+        </div>
+        <video id="replay-video" controls playsinline preload="metadata" aria-label="Test clip"></video>
+        <div id="replay-events"></div>
+        <p class="note">Select a marker or timestamp to jump to it. Button timestamps approximate when the jaws squeezed and released.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="loop-title">
+      <h2 id="loop-title">Experiment loop</h2>
+      <div class="flow">
+        <div class="step" data-step="prepare"><strong>Prepare clips</strong><small>Label events and choose the fitting and comparison clips. Candidates can use video and any available sensor data.</small></div>
+        <div class="branches" id="candidate-families" data-step="candidates" aria-label="Candidate families">
+          <div>Jaw edges and tips</div><div>Bilateral motion</div>
+          <div>Small Core ML model</div><div>Reference images or sensor fusion</div>
+        </div>
+        <div class="step" data-step="replay"><strong>Replay on laptop</strong><small>Score candidates on the fitting clips. New ideas may come from published research or the web.</small></div>
+        <div class="step" data-step="holdout"><strong>Check comparison clips if available</strong><small>Measure misses, false triggers and delay.</small></div>
+        <div class="step" data-step="selected"><strong>Select and reproduce</strong><small>Try one mutation per candidate. Researched rounds replace the three lowest-ranked lineages with new ideas.</small></div>
+        <div class="step" data-step="review"><strong>Meaningful improvement on laptop?</strong><small><a href="#candidate-families">Keep iterating ↺ Refine and replay candidates</a></small></div>
+        <div class="step" data-step="iphone"><strong>Benchmark on iPhone</strong><small>Check promising candidates for latency, dropped frames and heat.</small></div>
+        <div class="step" data-step="live"><strong>Validate during live pickups</strong><small>If it meets the targets, test with the grabber in use.</small></div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
