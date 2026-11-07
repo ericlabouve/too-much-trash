@@ -2,12 +2,12 @@
 
 import argparse
 from bisect import bisect_right
-from collections import Counter, deque
+from collections import deque
 from dataclasses import asdict, dataclass, replace
 import json
 import math
 from pathlib import Path
-from random import Random
+import sys
 from statistics import median
 from tempfile import NamedTemporaryFile
 from time import perf_counter_ns
@@ -21,14 +21,17 @@ from alternative_signals import (
 )
 
 
+# Keep the experiment executable directly from its directory and from the repository root.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+from ml.evolution import Policy, SearchSpace, run_round
+
+
 SAMPLE_HZ = 15
 MATCH_SECONDS = 0.5
 PHONE_TARGET_FPS = 60
 DETECTOR_FRAME_SHARE = 0.25
 CALIBRATION_FRAMES = 8
-MAX_CANDIDATES = 10
-MAX_PER_METHOD = 5
-MIN_FITNESS_GAIN = 0.001
+POLICY = Policy()
 FALSE_TRIGGER_COST = 2
 PROJECTION_METHODS = {"linear_hog", "linear_hog_rearm", "linear_hog_median", "linear_hog_slope", "linear_hog_regularized"}
 
@@ -329,23 +332,6 @@ def neighbors(parent):
                 yield replace(parent, signal=signal)
 
 
-def mutate(parent, seen, round_number, rng):
-    local = list(neighbors(parent))
-    unseen = {genotype(child): child for child in local if genotype(child) not in seen}
-    # Occasionally take two steps to escape a local plateau. Fall back to
-    # two-step mutations when all one-step neighbors have already been scored.
-    if not unseen or rng.random() < 0.25:
-        broader = {genotype(child): child for neighbor in local for child in neighbors(neighbor)
-                   if genotype(child) not in seen and genotype(child) not in unseen}
-        unseen = broader or unseen
-    if not unseen:
-        return None
-    child = rng.choice(list(unseen.values()))
-    base = next(candidate.name for candidate in [*CANDIDATES, *ALTERNATIVES, *RESEARCH_CANDIDATES] if candidate.method == parent.method)
-    return replace(child, name=f"{base} / R{round_number} trial {len(seen) + 1}",
-                   created_round=round_number, parent=parent.name)
-
-
 def resume_pool(prior):
     births = {}
     for record in prior.get("history", []):
@@ -362,11 +348,19 @@ def resume_pool(prior):
     return pool or CANDIDATES.copy()
 
 
-def rank_scores(scores):
-    return sorted(scores, key=lambda entry: (
+def rank_key(entry):
+    return (
         -entry["fitness"], entry["development"]["false_positives"], entry["development"]["missed"],
         -entry["worst_clip_accuracy"], entry["candidate"]["name"],
-    ))
+    )
+
+
+def family_name(candidate):
+    return next(seed.name for seed in [*CANDIDATES, *ALTERNATIVES, *RESEARCH_CANDIDATES]
+                if seed.method == candidate.method)
+
+
+SEARCH_SPACE = SearchSpace(Candidate, genotype, neighbors, lambda candidate: candidate.method, family_name, rank_key)
 
 
 def precision_weighted_accuracy(metrics):
@@ -391,103 +385,6 @@ def score(candidate, measured, labels, confirmation_time=False):
             "clip_f1": clip_f1, "mean_clip_f1": sum(clip_f1) / len(clip_f1), "worst_clip_f1": min(clip_f1),
             "worst_clip_accuracy": worst_clip_accuracy, "pooled_accuracy": pooled_accuracy,
             "accuracy_score": accuracy_score, "speed_score": speed, "fitness": (accuracy_score + speed) / 2}
-
-
-def evolve(pool, round_number, seen, evaluate, rng):
-    parents = rank_scores(evaluate(candidate) for candidate in pool)
-    challengers = []
-    exhausted = []
-    for parent in pool:
-        child = mutate(parent, seen, round_number, rng)
-        if child is None:
-            exhausted.append(parent.name)
-            continue
-        seen.add(genotype(child))
-        entry = evaluate(child)
-        entry["parent"] = parent.name
-        challengers.append(entry)
-    challengers = rank_scores(challengers)
-    pruned = []
-    pruned_scores = []
-    counts = Counter(candidate.method for candidate in pool)
-    admitted = []
-    if len(pool) < MAX_CANDIDATES:
-        for child in challengers:
-            if len(pool) + len(admitted) == MAX_CANDIDATES:
-                break
-            method = child["candidate"]["method"]
-            if counts[method] < MAX_PER_METHOD:
-                admitted.append(child)
-                counts[method] += 1
-    else:
-        for child in challengers:
-            method = child["candidate"]["method"]
-            for index in range(len(parents) - 1, -1, -1):
-                incumbent = parents[index]
-                incumbent_method = incumbent["candidate"]["method"]
-                if child["fitness"] - incumbent["fitness"] < MIN_FITNESS_GAIN:
-                    break
-                if method != incumbent_method and (counts[incumbent_method] == 1 or counts[method] >= MAX_PER_METHOD):
-                    continue
-                admitted = [child]
-                pruned_scores = [parents.pop(index)]
-                pruned = [incumbent["candidate"]]
-                break
-            if admitted:
-                break
-    retained = rank_scores(parents + admitted)
-    return {"round": round_number, "ranked": retained, "challengers": challengers, "exhausted": exhausted,
-            "pruned": pruned, "pruned_scores": pruned_scores, "admitted": [entry["candidate"] for entry in admitted],
-            "next_pool": [entry["candidate"] for entry in retained]}
-
-
-def evolve_researched(pool, round_number, seen, evaluate, plan, rng):
-    """Evaluate incumbent mutations, then give three fresh ideas pool slots."""
-    if len(pool) != MAX_CANDIDATES or len(plan["ideas"]) != 3:
-        raise ValueError("A researched round requires ten incumbents and three new ideas")
-    if set(plan["mutations"]) != {candidate.name for candidate in pool}:
-        raise ValueError("Provide one mutation plan per incumbent")
-
-    parents = rank_scores(evaluate(candidate) for candidate in pool)
-    best_by_parent = {entry["candidate"]["name"]: entry for entry in parents}
-    challengers = []
-    for parent in pool:
-        proposal = plan["mutations"][parent.name]
-        changes = proposal.get("changes", proposal)
-        child = replace(parent, **changes)
-        if genotype(child) in seen:
-            child = mutate(parent, seen, round_number, rng)
-        if child is None:
-            continue
-        base = (parent.name.split(" / ")[0] if child.method == parent.method else
-                next(seed.name for seed in [*CANDIDATES, *ALTERNATIVES, *RESEARCH_CANDIDATES]
-                     if seed.method == child.method))
-        child = replace(child, name=f"{base} / R{round_number} trial {len(seen) + 1}",
-                        created_round=round_number, parent=parent.name)
-        seen.add(genotype(child))
-        entry = evaluate(child)
-        entry["parent"] = parent.name
-        if "rationale" in proposal:
-            entry["rationale"] = proposal["rationale"]
-        challengers.append(entry)
-        if entry["fitness"] - best_by_parent[parent.name]["fitness"] >= MIN_FITNESS_GAIN:
-            best_by_parent[parent.name] = entry
-
-    ranked_lineages = rank_scores(best_by_parent.values())
-    survivors = ranked_lineages[:-3]
-    ideas = []
-    for data in plan["ideas"]:
-        child = Candidate(**(data | {"created_round": round_number}))
-        if genotype(child) in seen:
-            raise ValueError(f"Already scored research proposal: {child.name}")
-        seen.add(genotype(child))
-        ideas.append(evaluate(child))
-    retained = rank_scores(survivors + ideas)
-    return {"round": round_number, "ranked": retained, "challengers": rank_scores(challengers + ideas),
-            "pruned": [entry["candidate"] for entry in ranked_lineages[-3:]],
-            "pruned_scores": ranked_lineages[-3:], "incumbents": parents,
-            "admitted": [entry["candidate"] for entry in ideas],
-            "next_pool": [entry["candidate"] for entry in retained]}
 
 
 def main():
@@ -519,14 +416,14 @@ def main():
     prior = json.loads(args.resume.read_text()) if args.resume else {}
     pool = resume_pool(prior)
     seed = args.seed if args.seed is not None else prior.get("seed", 0)
-    if not 1 <= len(pool) <= MAX_CANDIDATES:
+    if not 1 <= len(pool) <= POLICY.pool_size:
         parser.error("Resume file must contain a valid candidate pool")
     start_round = prior.get("round", 1 if prior else 0) + 1
     seed_replacements = []
     if args.diversify_flow:
         flow = [entry["candidate"]["name"] for entry in prior.get("ranked", [])
                 if entry["candidate"]["method"] == "flow"]
-        if len(pool) != MAX_CANDIDATES or len(flow) != MAX_CANDIDATES:
+        if len(pool) != POLICY.pool_size or len(flow) != POLICY.pool_size:
             parser.error("--diversify-flow expects a ranked pool of ten flow candidates")
         seed_replacements = flow[len(flow) // 2:]
         pool = [candidate for candidate in pool if candidate.name not in seed_replacements]
@@ -576,9 +473,8 @@ def main():
                 ranked.append(entry)
                 return entry
 
-            rng = Random(f"{seed}:{round_number}")
-            result = (evolve_researched(pool, round_number, seen, evaluate, plan, rng) if plan
-                      else evolve(pool, round_number, seen, evaluate, rng))
+            result = run_round(pool, round_number, seen, evaluate, SEARCH_SPACE,
+                               policy=POLICY, seed=seed, plan=plan)
             history.append(result)
             pool = [Candidate(**candidate) for candidate in result["next_pool"]]
             ranked = result["ranked"]

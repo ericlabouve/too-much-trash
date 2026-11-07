@@ -169,23 +169,12 @@ Clip 2 remains a miss for that candidate.
 
 ## Agent-guided rounds
 
-Run `python agent_briefs.py PREVIOUS_RESULTS_JSON` to generate a researcher
-brief and one distinct brief per incumbent. The Codex session dispatches
-each brief to a sub-agent and assembles the proposals. The researcher
-browses primary sources and proposes three fresh candidates. Each parent
-agent compares evidence across families and returns one child with a
-rationale. The champion and rotating parents receive structural briefs
-that encourage changing features, fusing sensors, or changing the decision
-rule. Other agents can explore locally or propose structural changes.
-
-Run `round_one.py` with `--resume PREVIOUS_RESULTS_JSON --plan PLAN_JSON`.
-The plan has three complete candidate definitions in `ideas`, and
-`mutations` maps each incumbent's name to its proposal. A proposal can
-provide `changes` and `rationale`. One researched round fits all five clips
-and saves the plan in the result. Each parent competes with its child.
-Three fresh ideas take the slots of the three lowest-ranked lineages.
-Round 19 and later have no independent comparison clips.
-
+The jaw experiment uses the [shared evolutionary runner and agent rules](../../evolution/README.md).
+Run `python agent_briefs.py PREVIOUS_RESULTS_JSON` from this directory for
+briefs with jaw-specific evaluation guidance. After collecting proposals,
+run `round_one.py` with `--resume PREVIOUS_RESULTS_JSON --plan PLAN_JSON`.
+Each researched jaw round fits all five clips and saves its plan with the
+result. Rounds 19 and later have no independent comparison clips.
 
 ### Rounds 19–23
 
