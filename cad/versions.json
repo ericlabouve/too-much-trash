@@ -1,5 +1,5 @@
 {
-  "default": "v3",
+  "default": "v4",
   "versions": [
     {
       "id": "v1",
@@ -21,10 +21,10 @@
     },
     {
       "id": "v4",
-      "label": "Version 4 · shaft liner concepts",
+      "label": "Version 4 \u00b7 lined compact harness",
       "viewer": "versions/v4/viewer.html",
-      "concept_only": true,
-      "note": "Field iteration · broad, flush TPU pads with open cutouts on the shaft cap and fixed jaw."
+      "note": "Approved V4 design baseline \u00b7 flush TPU liners, compact clamp and rails, aligned fixed cuff and integrated string guides. Actuator refinements in review; field validation pending.",
+      "build_mode": "preview"
     }
   ]
 }

@@ -101,7 +101,7 @@ def build_site(cad: Path, dest: Path, versions: list[str], definitions: dict) ->
         registry['versions'] = [entry for entry in registry['versions'] if entry['id'] in versions]
         if registry['default'] not in versions:
             registry['default'] = versions[0]
-        concepts = {entry['id'] for entry in registry['versions'] if entry.get('concept_only')}
+        concepts = {entry['id'] for entry in registry['versions'] if entry.get('concept_only') or entry.get('build_mode') == 'preview'}
         (dest / 'versions.json').write_text(json.dumps(registry, indent=2) + '\n')
         copy_retained_review_assets(cad, dest, versions)
         for version in versions:
@@ -126,7 +126,11 @@ def build_site(cad: Path, dest: Path, versions: list[str], definitions: dict) ->
                 preview = source / 'source' / 'build_preview.py'
                 if preview.is_file():
                     subprocess.run([sys.executable, str(preview), str(target / 'preview')], check=True)
-                continue  # Concept viewer has no manufacturing snapshot.
+                if version == 'v4':
+                    concept = target / 'review/concepts/pulley-lips'
+                    shutil.copytree(source / 'review/concepts/pulley-lips', concept, dirs_exist_ok=True)
+                    subprocess.run([sys.executable, str(source / 'source/build_pulley_concepts.py'), str(concept)], check=True)
+                continue  # Design preview has no manufacturing snapshot.
             run = runs / version
             result = subprocess.run([sys.executable, str(cad / 'cad.py'), 'build', version,
                                      '--output', str(run)], check=False)

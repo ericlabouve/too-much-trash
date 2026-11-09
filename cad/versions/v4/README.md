@@ -1,4 +1,4 @@
-# V4 clamp and liner study
+# V4 · Official design baseline
 
 The accepted full-face TPU pads and perimeter lips are checkpointed at
 c9603da. Each pad replaces 0.8 mm of rigid contact material.
@@ -88,3 +88,20 @@ loaded derailment prevention remain physical/routing checks. No print sent.
 The clamp shortening, 30% exposed rail shortening, lowered fixed cuff,
 full-face flush pads and 3 × 2 mm cap guides are implemented in the V4
 review design. Field validation remains outstanding; V3 is preserved.
+
+## Official V4 baseline — 2026-11-09
+
+The user approved the current harness as the official V4 design. This
+promotes design status, not physical validation or a production release.
+V4 is the default viewer. V3 is preserved; V4 currently uses the V3
+actuator pending separate concept selection. The maintained V4 generator
+is source/build_preview.py; manufacturing bundle promotion is still pending.
+
+Pulley lip alternatives are isolated in review/concepts/pulley-lips/ and
+reproduced by source/build_pulley_concepts.py. A raises one flange to
+21 mm diameter; B adds a 20 mm inward sloping rim; C uses a 20 mm rounded
+bead. All retain nominal 8.6 mm bore and 4 mm axial width. They are
+unselected, unsliced concepts and do not change the official assembly.
+The viewer supports cutaway, assembly context, cube and both pen modes.
+One-sided guide alignment, handle passage, full motion, support-free
+orientation, threading and wear must be checked before promotion.
