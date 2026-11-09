@@ -127,9 +127,10 @@ def build_site(cad: Path, dest: Path, versions: list[str], definitions: dict) ->
                 if preview.is_file():
                     subprocess.run([sys.executable, str(preview), str(target / 'preview')], check=True)
                 if version == 'v4':
-                    concept = target / 'review/concepts/pulley-lips'
-                    shutil.copytree(source / 'review/concepts/pulley-lips', concept, dirs_exist_ok=True)
-                    subprocess.run([sys.executable, str(source / 'source/build_pulley_concepts.py'), str(concept)], check=True)
+                    travel = target / 'review/concepts/tail-handle'
+                    shutil.copytree(source / 'review/concepts/tail-handle', travel, dirs_exist_ok=True)
+                    subprocess.run([sys.executable, str(source / 'source/build_tail_handle.py'),
+                                    str(travel / 'models')], check=True)
                 continue  # Design preview has no manufacturing snapshot.
             run = runs / version
             result = subprocess.run([sys.executable, str(cad / 'cad.py'), 'build', version,

@@ -97,11 +97,82 @@ V4 is the default viewer. V3 is preserved; V4 currently uses the V3
 actuator pending separate concept selection. The maintained V4 generator
 is source/build_preview.py; manufacturing bundle promotion is still pending.
 
-Pulley lip alternatives are isolated in review/concepts/pulley-lips/ and
-reproduced by source/build_pulley_concepts.py. A raises one flange to
-21 mm diameter; B adds a 20 mm inward sloping rim; C uses a 20 mm rounded
-bead. All retain nominal 8.6 mm bore and 4 mm axial width. They are
-unselected, unsliced concepts and do not change the official assembly.
-The viewer supports cutaway, assembly context, cube and both pen modes.
-One-sided guide alignment, handle passage, full motion, support-free
-orientation, threading and wear must be checked before promotion.
+
+### Mandatory support gate
+
+Reject proposed designs that generate any support or interface extrusion.
+Check with automatic supports enabled and bridge suppression disabled.
+Zero support does not establish physical fit, strength or retention.
+
+### Pulley experiments withdrawn — 2026-11-09
+
+The user requested undoing all wheel changes. The original V3 pulley
+remains the official V4 wheel. The isolated flange/lip concepts are
+withdrawn; the approved shaft-cap string passages are retained.
+Next priorities are the actuator's positive travel stop and end-positioned
+plunger handle, then string tension adjustment and physical verification.
+
+### Removable plunger travel-stop concepts — 2026-11-09
+
+Isolated at `review/concepts/travel-stops/`; official actuator unchanged.
+A uses a removable pin inserted from underneath into a closed-ended through slot in the slider,
+with 6 mm nominal pull before contact. B uses a removable one-sided handle gate
+in a shallow rectangular guide-wall pocket, with approximately 3.2 mm pull before contact;
+B keeps the exact current plunger. Both require stop installation after slider
+insertion. Stop seating is provisional: A has a nominal line fit; B has 0.15–0.2 mm side clearance and will need a retaining fit or latch before printing. Neither stop retention is validated.
+The candidate stroke is an escape limit, not a safe phone-button stroke.
+
+Valid single solids, sampled unobstructed slider insertion with stop removed,
+positive stop interference beyond the limit, sampled stop installation/removal, and clearance to the current wheel,
+axle and key were checked. All six PETG candidate pieces sliced with **zero
+support/interface extrusion**, automatic supports ON and bridge suppression OFF,
+A1 mini 0.4 mm nozzle / 0.12 mm layers. See the concept's `support-status.json`
+for actual extrusion masses and package hashes. Printed retention, wear, strength,
+and full-stroke cord/band clearance remain unverified. No print sent.
+
+Reproduce: `uv run python versions/v4/source/build_travel_stops.py build/NEW/source`,
+then `uv run python versions/v4/source/check_travel_stop_slices.py build/NEW/slice
+build/NEW/source`. Generated meshes and slices remain ignored build outputs.
+
+### Tail-positioned handle — 2026-11-09
+
+The user rejected both removable travel-stop concepts: the extra pieces could
+fall out. Do not promote them. The next review moves the original integral
+plunger handle **8 mm tailward**, seating its 1.6 mm-wide stem in the existing
+2.4 mm groove; stem end Y41 has 0.4 mm nominal clearance to the Y41.4 end wall.
+Foot, triangular shaft and bracket remain unchanged. No extra parts or slots.
+
+`source/build_tail_handle.py` generates the isolated review and checks the
+full sampled insertion/pull path (0–53 mm in 0.5 mm steps) against the bracket,
+wheel, axle and key. All overlap volumes are zero. This change does not yet
+provide a positive forward travel stop. Cord/band routing and physical fit
+remain follow-up checks. Official harness geometry is unchanged pending review.
+
+Rebuild with `uv run python versions/v4/source/build_tail_handle.py build/NEW/source`.
+Slice with `uv run python versions/v4/source/check_tail_handle_slice.py
+build/NEW/slice build/NEW/source`. No printer is contacted.
+
+The relocated-handle PETG slice generates zero support and interface extrusion
+with automatic supports enabled and bridge suppression disabled (0.12 mm layers).
+See `review/concepts/tail-handle/support-status.json` for the exact hashes/settings.
+
+The main V4 viewer now includes a Bill of Materials mode (`?view=bom`) using
+current V4 geometry: seven rigid pieces and sixteen TPU pieces, including the
+two separate liners. Repeated cuffs/screws/nuts display once with quantities.
+This official BOM excludes rejected loose stops and retains the existing
+actuator until the separate tail-handle review is accepted.
+
+
+### Accepted tail-handle checkpoint — 2026-11-09
+
+User approved the 8 mm tailward handle relocation. Preserve this design as the
+accepted actuator baseline for subsequent guide-wall studies. The main BOM's
+older actuator geometry has not yet been regenerated; the tail-handle review
+contains the accepted geometry. The positive travel stop remains unresolved.
+
+Next study: steepen the two captured guide faces (currently 45 degrees from the
+bracket base) to allow a thicker matching plunger section while keeping the
+open handle lane and end-loading insertion. Retain inward capture; fully
+vertical walls alone would not prevent lift-out. A 60-degree face is a candidate,
+not a verified support-free result. Check both parts with automatic supports
+on, bridge suppression off, and rerun insertion/motion clearances before adoption.

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {installBOM} from './bom-view.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {STLLoader} from 'three/addons/loaders/STLLoader.js';
 import {installViewCube} from '../../view_cube.js';
@@ -54,9 +55,11 @@ async function showPreview() {
   }));
 
   const cube = installViewCube({canvas, camera, controls, clickStepDegrees: 90});
-  const poseControls = [separation, showShaft, showContext, reset, guideView];
+  const allMeshes={cap:capMesh,jaw:jawMesh,capPad,jawPad,shaft:shaftMesh,pull,...contextMeshes};
+  const bom=installBOM({scene,camera,controls,stage,canvas,meshes:allMeshes,assemblyPose:pose,assemblyReset:resetView});
+  const poseControls = [separation, showShaft, showContext, reset, guideView,...bom.controls];
   installSurfacePen(stage, () => cube.camera, controls, {
-    cap: capMesh, jaw: jawMesh, capPad, jawPad, ...contextMeshes,
+    cap: capMesh, jaw: jawMesh, capPad, jawPad, ...contextMeshes, ...bom.meshes,
   });
   installFramePen(stage, {
     sourceCanvas: canvas, controls: poseControls, filename: 'v4-liner-annotation.png',
@@ -67,6 +70,7 @@ async function showPreview() {
   });
 
   function pose() {
+    for (const mesh of [capMesh,jawMesh,capPad,jawPad]) mesh.visible=true;
     separation.disabled = showContext.checked;
     const spread = showContext.checked ? 0 : Number(separation.value);
     Object.values(contextMeshes).forEach(mesh => { mesh.visible = showContext.checked; });
@@ -111,10 +115,11 @@ async function showPreview() {
   new ResizeObserver(resizeCanvas).observe(canvas);
   renderer.setAnimationLoop(() => {
     if (window.annotationFrozen) return;
+    bom.tick(cube.camera);
     cube.tick();
     renderer.render(scene, cube.camera);
   });
-  resetView();
+  if (!bom.active()) resetView();
   pose();
   for (const control of poseControls) control.disabled = false;
   pose();
