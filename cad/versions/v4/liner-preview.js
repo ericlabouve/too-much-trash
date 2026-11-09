@@ -12,6 +12,7 @@ const separation = document.querySelector('#separation');
 const showShaft = document.querySelector('#show-shaft');
 const showContext = document.querySelector('#show-context');
 const reset = document.querySelector('#reset-view');
+const guideView = document.querySelector('#guide-view');
 
 async function showPreview() {
   const renderer = new THREE.WebGLRenderer({canvas, antialias: true, preserveDrawingBuffer: true});
@@ -53,7 +54,7 @@ async function showPreview() {
   }));
 
   const cube = installViewCube({canvas, camera, controls, clickStepDegrees: 90});
-  const poseControls = [separation, showShaft, showContext, reset];
+  const poseControls = [separation, showShaft, showContext, reset, guideView];
   installSurfacePen(stage, () => cube.camera, controls, {
     cap: capMesh, jaw: jawMesh, capPad, jawPad, ...contextMeshes,
   });
@@ -89,6 +90,15 @@ async function showPreview() {
   showShaft.addEventListener('change', pose);
   showContext.addEventListener('change', pose);
   reset.addEventListener('click', resetView);
+  guideView.addEventListener('click', () => {
+    showContext.checked = true;
+    pose();
+    cube.perspective();
+    camera.up.set(0, 1, 0);
+    camera.position.set(-1, 22.25, -78);
+    controls.target.set(-1, 22.25, -25);
+    controls.update();
+  });
   function resizeCanvas() {
     if (window.annotationFrozen) return;
     const width = canvas.clientWidth;

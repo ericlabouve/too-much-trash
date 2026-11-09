@@ -14,6 +14,23 @@ JAW_WINDOW_END = 4.0 - FIXED_CUFF_DROP
 RAIL_TIP = 13.8 + (60.0 - 13.8) * 0.7
 
 
+def cap_string_passages(shape):
+    """Mirrored 1 mm cord guides through the handle-end bosses, along Z.
+
+    Exterior X12 is the bed face. The elongated hexagon closes toward negative X,
+    with 45-degree walls in the print pose and no flat tunnel ceiling.
+    """
+    for sign in (-1, 1):
+        x, y = -1.0, sign * 22.25
+        cut = (cq.Workplane('XY').polyline([
+            (x - 1.5, y), (x - 0.5, y - 1.0),
+            (x + 0.5, y - 1.0), (x + 1.5, y),
+            (x + 0.5, y + 1.0), (x - 0.5, y + 1.0)])
+            .close().extrude(24).translate((0, 0, -37)))
+        shape = shape.cut(cut)
+    return shape.clean()
+
+
 def shorter_cap_rails(shape):
     # Replace just the projecting wings, preserving their root and slot width.
     for y0, y1 in ((-100, -13.8), (13.8, 100)):
@@ -79,7 +96,7 @@ def liner(seat, face: float, half_width: float, windows: tuple[tuple[float, floa
 
 def build(output: Path) -> None:
     params = Parameters(phone_thickness=8, button_from_screen=4)
-    original_cap = shorter_cap_rails(shorten_clamp(shaft_cap(params)))
+    original_cap = cap_string_passages(shorter_cap_rails(shorten_clamp(shaft_cap(params))))
     original_jaw = shorten_clamp(aligned_fixed_jaw(params))
     face = params.collar_opening_x / 2
     half_width = params.collar_opening_y / 2
