@@ -10,6 +10,7 @@ const stage = document.querySelector('#liner-stage');
 const status = document.querySelector('#preview-status');
 const separation = document.querySelector('#separation');
 const showShaft = document.querySelector('#show-shaft');
+const showContext = document.querySelector('#show-context');
 const reset = document.querySelector('#reset-view');
 
 async function showPreview() {
@@ -42,10 +43,19 @@ async function showPreview() {
     new THREE.Vector3(0, -21, -29), 37, 0x7544a0, 7, 4);
   scene.add(capMesh, jawMesh, capPad, jawPad, shaftMesh, pull);
 
+  const context = await fetch(new URL('./preview/context.json', import.meta.url)).then(response => response.json());
+  const contextMeshes = {};
+  await Promise.all(context.map(async ({name, color}) => {
+    const geometry = await loader.loadAsync(new URL('./preview/' + name + '.stl', import.meta.url).href);
+    const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color}));
+    contextMeshes[name] = mesh;
+    scene.add(mesh);
+  }));
+
   const cube = installViewCube({canvas, camera, controls, clickStepDegrees: 90});
-  const poseControls = [separation, showShaft, reset];
+  const poseControls = [separation, showShaft, showContext, reset];
   installSurfacePen(stage, () => cube.camera, controls, {
-    cap: capMesh, jaw: jawMesh, capPad, jawPad,
+    cap: capMesh, jaw: jawMesh, capPad, jawPad, ...contextMeshes,
   });
   installFramePen(stage, {
     sourceCanvas: canvas, controls: poseControls, filename: 'v4-liner-annotation.png',
@@ -56,7 +66,10 @@ async function showPreview() {
   });
 
   function pose() {
-    const spread = Number(separation.value);
+    separation.disabled = showContext.checked;
+    const spread = showContext.checked ? 0 : Number(separation.value);
+    Object.values(contextMeshes).forEach(mesh => { mesh.visible = showContext.checked; });
+    pull.visible = !showContext.checked;
     capMesh.position.x = 38 * spread;
     jawMesh.position.x = -38 * spread;
     capPad.position.x = 15 * spread;
@@ -67,13 +80,14 @@ async function showPreview() {
   function resetView() {
     cube.perspective();
     camera.up.set(0, 0, 1);
-    camera.position.set(102, -240, 158);
+    camera.position.set(160, -260, 185);
     controls.target.set(-25, 0, 13);
     controls.update();
   }
 
   separation.addEventListener('input', pose);
   showShaft.addEventListener('change', pose);
+  showContext.addEventListener('change', pose);
   reset.addEventListener('click', resetView);
   function resizeCanvas() {
     if (window.annotationFrozen) return;
@@ -93,7 +107,8 @@ async function showPreview() {
   resetView();
   pose();
   for (const control of poseControls) control.disabled = false;
-  status.textContent = 'Drag to orbit, scroll to zoom. Move Explode left to seat the pads.';
+  pose();
+  status.textContent = 'Bare-phone spacing · drag to orbit and zoom to inspect the pulley and jaw clearances. Turn off Assembled harness to explode the pads. Bands are schematic.';
 }
 
 try {

@@ -112,6 +112,11 @@ def build_site(cad: Path, dest: Path, versions: list[str], definitions: dict) ->
                 for path in source.iterdir():
                     if path.is_file() and path.suffix.lower() in ('.html', '.js', '.css', '.md'):
                         shutil.copy2(path, target / path.name)
+            if version == 'v3':
+                review_tools = Path('versions/v3/review/concepts/braced-tail-b')
+                (dest / review_tools).mkdir(parents=True, exist_ok=True)
+                for name in ('frame-pen.js', 'surface-pen.js'):
+                    shutil.copy2(cad / review_tools / name, dest / review_tools / name)
             if version in concepts:
                 if version == 'v4':
                     review_tools = Path('versions/v3/review/concepts/braced-tail-b')

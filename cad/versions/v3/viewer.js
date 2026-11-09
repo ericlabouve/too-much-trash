@@ -1,3 +1,5 @@
+import {installFramePen} from './review/concepts/braced-tail-b/frame-pen.js';
+import {installSurfacePen} from './review/concepts/braced-tail-b/surface-pen.js';
 import {installViewCube} from '../../view_cube.js?revision=quarter-turns-v1';
 import {assemblySteps} from './assembly_steps.js';
 import {installFullscreen} from './viewer_fullscreen.js';
@@ -8,7 +10,7 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 const $=s=>document.querySelector(s);
 const canvas=$('#view'),status=$('#status');
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0xf8f7f3);
 const scene=new THREE.Scene();scene.add(new THREE.HemisphereLight(0xffffff,0x8d9698,2.6));
 const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-150,250,180);scene.add(light);
@@ -317,6 +319,19 @@ try{
  canvas.addEventListener('contextmenu',e=>{e.preventDefault();const m=pick(e);if(m)menu(m.object.userData.bomId,e);});
  document.addEventListener('pointerdown',e=>{if(!$('#context').contains(e.target))$('#context').hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#context').hidden=true;});
  stopFraction=findStopFraction();setupPreview();pose(0);setMode('phone');
+ const drawingControls=[...document.querySelectorAll('nav button,nav input,nav select,#sample,#side,#viewer-fullscreen')];
+ const surfacePen=installSurfacePen($('#stage'),()=>viewCube.camera,controls,
+  ()=>Object.fromEntries(visibleMeshes().map((mesh,index)=>[index,mesh])));
+ installFramePen($('#stage'),{sourceCanvas:canvas,controls:drawingControls,filename:'v3-annotation.png'});
+ window.addEventListener('surface-pen-state',event=>{
+  if(event.detail){marking=false;$('#mark-feature').setAttribute('aria-pressed','false');}
+ });
+ $('#mark-feature').addEventListener('click',()=>surfacePen.setEnabled(false));
+ window.addEventListener('frame-pen-state',event=>{
+  if(event.detail)setPlaying(false);
+  $('#stage').querySelector('.view-cube').inert=event.detail;
+ });
+
  if(params.get('focus')==='cuffs')frameObjects([...meshes.values()].filter(m=>m.userData.bomId==='phone_cuff'));
  canvas.dataset.ready='true';
 }catch(error){status.textContent=`Load failed: ${error.message}`;console.error(error);}
@@ -328,6 +343,7 @@ installFullscreen($('#stage'),$('#viewer-fullscreen'),resize);
 $('#stage').append($('#context'));
 function frame(now){
  requestAnimationFrame(frame);
+ if(window.annotationFrozen)return;
  if(playing&&manifest){
   if(lastFrame!==null)elapsedMs+=Math.min(100,now-lastFrame);
   lastFrame=now;

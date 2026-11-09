@@ -34,10 +34,11 @@
   </header>
 
   <section class="preview" aria-labelledby="preview-title">
-    <h2 id="preview-title">3D · Full-face TPU liners</h2>
+    <h2 id="preview-title">3D · Shortened clamp assembly</h2>
     <div class="preview-controls">
-      <label for="separation">Explode <input id="separation" type="range" min="0" max="1" step="0.01" value="0.85" disabled></label>
-      <label><input id="show-shaft" type="checkbox" disabled> Show shaft</label>
+      <label for="separation">Explode <input id="separation" type="range" min="0" max="1" step="0.01" value="0" disabled></label>
+      <label><input id="show-shaft" type="checkbox" checked disabled> Show shaft</label>
+      <label><input id="show-context" type="checkbox" checked disabled> Assembled harness</label>
       <button id="reset-view" type="button" disabled>Reset view</button>
     </div>
     <div id="liner-stage">
@@ -49,8 +50,9 @@
 
   <section class="overview" aria-labelledby="layout">
     <div>
-      <h2 id="layout">Broad contact faces, open cutouts</h2>
-      <p>Each pad follows its own rigid face and has matching through-cutouts. Nominal TPU contact area is 919 mm² on the cap and 1,319 mm² on the fixed jaw. A continuous lip projects 1.6 mm into each rigid window, one on the cap and two on the fixed jaw.</p>
+      <h2 id="layout">Shorter clamp with matching pads</h2>
+      <p>Each screw-bearing end moves inward 5 mm. Clamp length is 97 mm, with 80 mm between screw pairs. The pads and their window lips follow the shorter openings. The fixed cuff and integral T stud sit 3.28 mm lower, centered at Z 8 mm with the plunger foot. The adjacent clamp opening and pad lip are shortened to retain the stud backing. The separate slot in the fixed-jaw arm extends 14 mm toward the clamp at 6 mm width, removing 336 mm³ of solid CAD material. Both shaft-cap rail projections are shortened 30%, from 46.2 to 32.34 mm. Slot end walls remain 2.6 mm thick. The displayed actuator fits; the large-phone far-side position exceeds the shorter adjustment range. This is a clearance study awaiting slice and physical checks.</p>
+      <p>Each pad follows its own rigid face and has matching through-cutouts. Nominal TPU contact area is 853 mm² on the cap and 1,289 mm² on the fixed jaw. A continuous lip projects 1.6 mm into each rigid window, one on the cap and two on the fixed jaw.</p>
     </div>
     <div>
       <p>Each pad replaces 0.8 mm of rigid material at the contact face. The original shaft opening is preserved. The cap recess opens away from the print bed, and the fixed jaw retains a flat bed face.</p>
