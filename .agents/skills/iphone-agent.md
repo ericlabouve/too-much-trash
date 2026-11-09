@@ -79,6 +79,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 ## Capture durability and backend coordination
 
 - 2026-11-05 local retention: clear recordings 24 hours after verified upload. At 72 hours, give unsynced recordings a final receipt-first upload attempt before cleanup. Protect active transfers and their staging, including transfers restored by iOS. Resume deferred cleanup in the foreground.
+- Resumable 4 MiB uploads keep up to four chunks in flight across the video and sidecars. Two queued episodes can share the four slots, with two per episode. Acknowledged chunks are skipped on retry. Eric approved four after three matched runs per setting on his iPhone cut median time from 6.78 to 5.54 seconds for one fixture. Test parallelism on a shared uplink cap and the physical iPhone before further increases.
+- Developer-only **Delete here and backend** appears on synced video cards when the server advertises deletion support. Require explicit confirmation and a matching backend receipt before removing local data.
 
 - On 2026-10-11 the user accepted two randomly selected BIP-39 English words for pilot invites after discussion of 22-bit guessability. Keep strong installation credentials, hashed invite storage, single-use redemption, expiry, quotas, and throttling. The backend owns word-list validation and case/whitespace normalization; older opaque codes are no longer accepted for new enrollment, without changing existing installations. Do not show live words in screenshots/logs or claim revocation prevents first-use guessing.
 

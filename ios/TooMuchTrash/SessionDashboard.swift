@@ -44,7 +44,7 @@ struct SessionDashboard: View {
                         LazyVGrid(columns: columns, spacing: 14) {
                             ForEach(account.currentCaptures.reversed()) { capture in
                                 SessionVideoTile(capture: capture, file: queue.file(for: capture),
-                                                 uploading: account.uploadingID == capture.id,
+                                                 uploading: account.uploadProgress[capture.id] != nil,
                                                  stopPlayback: account.isEndingSession,
                                                  canDelete: account.canDeleteLocalCapture) {
                                     captureToDelete = capture

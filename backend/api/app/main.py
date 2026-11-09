@@ -8,6 +8,7 @@ import json
 import math
 import tempfile
 from contextlib import ExitStack
+from functools import lru_cache
 from pathlib import Path
 from uuid import UUID, uuid4, uuid5, NAMESPACE_URL
 
@@ -58,8 +59,10 @@ async def stop_transfer_sweeper():
         task.cancel()
 
 
+@lru_cache(maxsize=1)
 def storage():
-    return boto3.client(
+    # Reuse the connection pool across requests in this API process.
+    return boto3.session.Session().client(
         "s3",
         endpoint_url=os.environ["S3_ENDPOINT_URL"],
         aws_access_key_id=os.environ["S3_ACCESS_KEY"],
