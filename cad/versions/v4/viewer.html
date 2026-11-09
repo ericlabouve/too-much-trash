@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>V4 · Shaft liner concepts</title>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.180.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.180.0/examples/jsm/"}}</script>
+<script type="module" src="./liner-preview.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #faf9f6; color: #22313a; font: 16px/1.5 system-ui,sans-serif; }
+  main { max-width: 1200px; margin: auto; padding: clamp(16px,4vw,48px); }
+  h1 { margin: .2em 0; line-height: 1.1; font-size: clamp(32px,5vw,54px); }
+  h2, h3 { line-height: 1.2; margin: 0 0 .5em; }
+  p { margin: .5em 0 1em; }
+  .eyebrow { color: #415460; font-size: .8em; letter-spacing: .12em; font-weight: 700; }
+  .overview { margin: 20px 0; padding: 16px; border: 1px solid #d9dfe3; border-radius: 12px; background: white; display: grid; align-items: center; grid-template-columns: repeat(auto-fit,minmax(min(100%,280px),1fr)); gap: 16px; }
+  .caption { color: #415460; font-size: .87rem; }
+  .queue { margin-top: 28px; }
+  .preview { margin: 20px 0; }
+  #liner-preview { display: block; width: 100%; height: clamp(330px,55vh,580px); border-radius: 10px; touch-action: none; }
+  .preview-controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 10px 0; }
+  .preview-controls label { display: inline-flex; align-items: center; gap: 6px; }
+  .preview-controls button { font: inherit; }
+  li { margin: .35em 0; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">VERSION 4 · FIELD ITERATION 01</span>
+    <h1>Keep the harness in place</h1>
+    <p>Pulling the string drags the V3 harness toward the handle. The V4 concept uses one separately printed TPU pad per side, shaped to cover the shaft-contact faces of the PETG cap and fixed jaw.</p>
+  </header>
+
+  <section class="preview" aria-labelledby="preview-title">
+    <h2 id="preview-title">3D · Full-face TPU liners</h2>
+    <div class="preview-controls">
+      <label for="separation">Explode <input id="separation" type="range" min="0" max="1" step="0.01" value="0.85" disabled></label>
+      <label><input id="show-shaft" type="checkbox" disabled> Show shaft</label>
+      <button id="reset-view" type="button" disabled>Reset view</button>
+    </div>
+    <div id="liner-stage">
+      <canvas id="liner-preview" aria-label="Rotatable shaft cap and fixed jaw with flush TPU liners"></canvas>
+    </div>
+    <p class="caption" id="preview-status" role="status">Loading 3D preview…</p>
+    <p class="caption">Orange · PETG cap and fixed jaw with liner seats. Cyan · full-face TPU liners. Gray · nominal shaft envelope. Purple arrow · pull toward the handle. Pad dimensions and physical grip are provisional.</p>
+  </section>
+
+  <section class="overview" aria-labelledby="layout">
+    <div>
+      <h2 id="layout">Broad contact faces, open cutouts</h2>
+      <p>Each pad follows its own rigid face and has matching through-cutouts. Nominal TPU contact area is 919 mm² on the cap and 1,319 mm² on the fixed jaw. A continuous lip projects 1.6 mm into each rigid window, one on the cap and two on the fixed jaw.</p>
+    </div>
+    <div>
+      <p>Each pad replaces 0.8 mm of rigid material at the contact face. The original shaft opening is preserved. The cap recess opens away from the print bed, and the fixed jaw retains a flat bed face.</p>
+      <p class="caption">The geometry avoids a blind pocket over the print bed. Verify support requirements in the slicer and check lip fit on the printed parts.</p>
+    </div>
+  </section>
+
+  <section class="queue" aria-labelledby="queue">
+    <h2 id="queue">V4 design queue</h2>
+    <ol>
+      <li><strong>Harness slip.</strong> String pull moves the clamp toward the handle, and clamping force fades in use.</li>
+      <li><strong>String tension.</strong> Harness movement creates slack, and dialing in tension is difficult.</li>
+      <li><strong>Pulley derailment.</strong> The string leaves the pulley. Explore guides integrated into either side of the fixed jaw.</li>
+      <li><strong>Actuator travel and fit.</strong> Add a plunger stop, center the contact on the volume button, and move the handle to meet the end of the actuator rail.</li>
+      <li><strong>Fixed jaw cuff and camera aim.</strong> Explore moving the single T stud back about 2.5 mm to improve button alignment and bring the claws closer to the center of the video.</li>
+      <li><strong>Shaft cap and fixed jaw length.</strong> Shorten both clamp bodies along the shaft to reduce material.</li>
+      <li><strong>Shaft cap rails.</strong> Shorten each of the two actuator rails by 30%.</li>
+    </ol>
+  </section>
+</main>
+</body>
+</html>

@@ -18,6 +18,13 @@
       "label": "Version 3 \u00b7 removable cuffs and sliding plunger",
       "viewer": "versions/v3/viewer.html",
       "note": "TPU T/V axle-key prototype: flexible V tip and retained T stop, unchanged axle slot. Keeper remains until physical snap/retention qualification. Flush jaws and interchangeable cuffs unchanged."
+    },
+    {
+      "id": "v4",
+      "label": "Version 4 · shaft liner concepts",
+      "viewer": "versions/v4/viewer.html",
+      "concept_only": true,
+      "note": "Field iteration · broad, flush TPU pads with open cutouts on the shaft cap and fixed jaw."
     }
   ]
 }
