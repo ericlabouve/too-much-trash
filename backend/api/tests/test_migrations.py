@@ -25,10 +25,22 @@ class MigrationTests(unittest.TestCase):
             connection.execute("INSERT INTO captures(id,filename,content_type,media_kind,original_key,size_bytes,installation_id) VALUES (%s,'test.png','image/png','image','test',1,%s)", (capture, installation))
             connection.execute("DROP TABLE alembic_version")
         # Represents the already-deployed pilot: schema/data but no Alembic ledger.
+        command.upgrade(config, "005_episode_transfers")
+        episode = uuid4()
+        with database() as connection:
+            connection.execute("""INSERT INTO episode_transfers (installation_id, episode_id, files, total_size)
+                VALUES (%s, %s, '{}', 1048581)""", (installation, episode))
+            connection.execute("""INSERT INTO episode_transfer_chunks
+                (installation_id, episode_id, file_name, chunk_index, size_bytes, sha256)
+                VALUES (%s, %s, 'video', 0, 1048576, 'staged')""", (installation, episode))
         command.upgrade(config, "head")
         command.upgrade(config, "head")
         with database() as connection:
-            self.assertEqual(connection.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"], "005_episode_transfers")
+            self.assertEqual(connection.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"], "006_episode_chunk_size")
+            self.assertEqual(connection.execute("SELECT chunk_size FROM episode_transfers WHERE episode_id=%s", (episode,)).fetchone()["chunk_size"], 1048576)
+            staged = connection.execute("""SELECT chunk_index, size_bytes, sha256
+                FROM episode_transfer_chunks WHERE episode_id=%s""", (episode,)).fetchone()
+            self.assertEqual(staged, {"chunk_index": 0, "size_bytes": 1048576, "sha256": "staged"})
             self.assertEqual(connection.execute("SELECT installation_id FROM captures WHERE id=%s", (capture,)).fetchone()["installation_id"], installation)
             self.assertEqual(connection.execute("SELECT invitation_id FROM installations WHERE id=%s", (installation,)).fetchone()["invitation_id"], invite)
             self.assertEqual(connection.execute("SELECT code_hash FROM invitations WHERE id=%s", (invite,)).fetchone()["code_hash"], str(invite))

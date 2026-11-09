@@ -77,7 +77,7 @@ protocol CollectorAPI {
     func developmentEnroll(key: String) async throws -> Enrollment
     func uploadEpisode(directory: URL, episodeID: UUID, token: String,
                        progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt
-    func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String,
+    func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String, chunkLimit: Int,
                        progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt
 }
 
@@ -86,6 +86,11 @@ extension CollectorAPI {
     func uploadEpisode(directory: URL, episodeID: UUID, token: String,
                        progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt { throw ClientError.configuration }
     func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String,
+                       progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
+        try await uploadResumableEpisode(directory: directory, episodeID: episodeID, token: token,
+                                         chunkLimit: BackgroundUploads.maximumConcurrentChunks, progress: progress)
+    }
+    func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String, chunkLimit: Int,
                        progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt { throw ClientError.configuration }
     func availableServers() async throws -> [AvailableServer] { [] }
     func upload(file: URL, captureID: UUID, token: String,
@@ -246,10 +251,24 @@ final class LiveCollectorAPI: CollectorAPI {
     private struct ResumableBegin: Encodable { let files: [String: ResumableFile] }
     private struct ResumableState: Decodable { let complete: Bool; let chunk_size: Int; let chunks: [String: [Int]] }
     private struct ResumableAccepted: Decodable { let accepted: Bool }
+    @MainActor private final class ChunkProgress {
+        var open = true
+        var sent: Int64
+        var bytesByIndex: [Int: Int64] = [:]
+
+        init(sent: Int64) { self.sent = sent }
+
+        func update(index: Int, bytes: Int64) {
+            let previous = bytesByIndex[index, default: 0]
+            guard bytes > previous else { return }
+            bytesByIndex[index] = bytes
+            sent += bytes - previous
+        }
+    }
     private nonisolated static let episodeFileNames = [("video", "video.mp4"), ("imu", "imu.jsonl"),
                                            ("poses", "poses.jsonl"), ("manifest", "manifest.json")]
 
-    func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String,
+    func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String, chunkLimit: Int,
                                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
         let descriptors = try await Task.detached(priority: .utility) { try Self.describeEpisode(directory) }.value
         let total = descriptors.values.reduce(Int64(0)) { $0 + $1.size }
@@ -260,56 +279,72 @@ final class LiveCollectorAPI: CollectorAPI {
         begin.httpBody = try JSONEncoder().encode(ResumableBegin(files: descriptors))
         begin.setValue("application/json", forHTTPHeaderField: "Content-Type")
         begin.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        begin.setValue(String(BackgroundUploads.largerChunkSize), forHTTPHeaderField: "X-TMT-Chunk-Size")
         let (beginData, beginResponse) = try await transport.data(for: begin)
         guard beginResponse.url == begin.url else { throw ClientError.invalidResponse }
         let state: ResumableState = try decode(beginData, beginResponse, expected: 200)
         if state.complete { return try await uploaded(captureID: episodeID, token: token) }
-        guard state.chunk_size == 1024 * 1024, Set(state.chunks.keys) == Set(descriptors.keys) else { throw ClientError.invalidResponse }
+        let largeChunks = state.chunk_size == BackgroundUploads.largerChunkSize
+        guard (state.chunk_size == 1024 * 1024 || largeChunks),
+              Set(state.chunks.keys) == Set(descriptors.keys) else { throw ClientError.invalidResponse }
+        let chunkSize = Int64(state.chunk_size)
         let staging = BackgroundUploads.stagingDirectory
         try FileManager.default.createDirectory(at: staging, withIntermediateDirectories: true)
         try CaptureQueue.protect(staging)
         try await BackgroundUploads.shared.cleanOrphanedChunks(captureID: episodeID)
         var sent: Int64 = 0
-        for (name, _) in Self.episodeFileNames {
+        var missing: [(name: String, source: URL, index: Int, size: Int64)] = []
+        for (name, filename) in Self.episodeFileNames {
             guard let descriptor = descriptors[name], let uploaded = state.chunks[name] else { throw ClientError.invalidResponse }
-            let chunkSize = Int64(state.chunk_size)
             let count = Int((descriptor.size + chunkSize - 1) / chunkSize)
             let accepted = Set(uploaded)
             guard accepted.count == uploaded.count, accepted.allSatisfy({ $0 >= 0 && $0 < count }) else { throw ClientError.invalidResponse }
-            for index in accepted { sent += min(chunkSize, descriptor.size - Int64(index) * chunkSize) }
-        }
-        progress(sent, total)
-        for (name, filename) in Self.episodeFileNames {
-            guard let descriptor = descriptors[name], let uploaded = state.chunks[name] else { throw ClientError.invalidResponse }
-            let chunkSize = Int64(state.chunk_size)
-            let count = Int((descriptor.size + chunkSize - 1) / chunkSize)
-            let accepted = Set(uploaded)
-            for index in 0..<count where !accepted.contains(index) {
-                try Task.checkCancellation()
+            let source = directory.appendingPathComponent(filename)
+            for index in 0..<count {
                 let size = min(chunkSize, descriptor.size - Int64(index) * chunkSize)
-                let bodyURL = staging.appendingPathComponent("\(episodeID.uuidString).\(name).\(index).chunk")
-                let source = directory.appendingPathComponent(filename)
-                try await Task.detached(priority: .utility) {
-                    try Self.stageChunk(source: source, target: bodyURL, offset: UInt64(Int64(index) * chunkSize), size: Int(size))
-                }.value
-                defer { try? FileManager.default.removeItem(at: bodyURL) }
-                var request = URLRequest(url: configuration.endpoint("\(path)/\(name)/\(index)"))
-                request.httpMethod = "PUT"
-                request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
-                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-                request.setValue(episodeID.uuidString, forHTTPHeaderField: "Idempotency-Key")
-                let previous = sent
-                let (data, response) = try await transport.upload(for: request, from: bodyURL) { current, _ in
-                    progress(min(total, previous + current), total)
-                }
-                guard response.url == request.url else { throw ClientError.invalidResponse }
-                let receipt: ResumableAccepted = try decode(data, response, expected: 200)
-                guard receipt.accepted else { throw ClientError.invalidResponse }
-                sent += size
-                try? FileManager.default.removeItem(at: bodyURL)
-                progress(sent, total)
+                if accepted.contains(index) { sent += size }
+                else { missing.append((name, source, index, size)) }
             }
         }
+        progress(sent, total)
+        let tracker = ChunkProgress(sent: sent)
+        defer { tracker.open = false }
+        let parallelism = largeChunks ? min(max(1, chunkLimit), BackgroundUploads.maximumConcurrentChunks) : 1
+        let chunkHeader = largeChunks ? String(chunkSize) : nil
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for (position, chunk) in missing.enumerated() {
+                if position >= parallelism { _ = try await group.next() }
+                try Task.checkCancellation()
+                group.addTask { @MainActor in
+                    let bodyURL = staging.appendingPathComponent(BackgroundUploads.chunkFileName(
+                        episodeID: episodeID.uuidString, name: chunk.name, index: chunk.index, chunkSize: chunkHeader))
+                    defer { try? FileManager.default.removeItem(at: bodyURL) }
+                    try await Task.detached(priority: .utility) {
+                        try Self.stageChunk(source: chunk.source, target: bodyURL,
+                                            offset: UInt64(Int64(chunk.index) * chunkSize), size: Int(chunk.size))
+                    }.value
+                    try Task.checkCancellation()
+                    var request = URLRequest(url: self.configuration.endpoint("\(path)/\(chunk.name)/\(chunk.index)"))
+                    request.httpMethod = "PUT"
+                    request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+                    request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                    request.setValue(episodeID.uuidString, forHTTPHeaderField: "Idempotency-Key")
+                    request.setValue(chunkHeader, forHTTPHeaderField: "X-TMT-Chunk-Size")
+                    let (data, response) = try await self.transport.upload(for: request, from: bodyURL) { current, _ in
+                        guard tracker.open else { return }
+                        tracker.update(index: position, bytes: min(chunk.size, current))
+                        progress(tracker.sent, total)
+                    }
+                    guard response.url == request.url else { throw ClientError.invalidResponse }
+                    let receipt: ResumableAccepted = try self.decode(data, response, expected: 200)
+                    guard receipt.accepted else { throw ClientError.invalidResponse }
+                    tracker.update(index: position, bytes: chunk.size)
+                    progress(tracker.sent, total)
+                }
+            }
+            for try await _ in group {}
+        }
+        tracker.open = false
         var finish = URLRequest(url: configuration.endpoint("\(path)/finish"))
         finish.httpMethod = "POST"
         finish.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")

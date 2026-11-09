@@ -240,6 +240,38 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(put("video", 1, payloads["video"][1024 * 1024:]).status_code, 200)
         self.assertEqual(self.client.post(path + "/finish", headers=headers).status_code, 202)
 
+    def test_resumable_chunk_size_is_negotiated_and_frozen(self):
+        size = 4 * 1024 * 1024
+        owner, episode = self.enrolled(quota_bytes=2 * size), uuid4()
+        headers = self.bearer(owner)
+        requested = {**headers, "X-TMT-Chunk-Size": str(size)}
+        manifest = {"schema_version": 1, "episode_id": str(episode), "complete": True,
+                    "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                    "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"}, "sensor_metadata": {}}
+        payloads = {"video": b"v" * size + b"last!", "imu": b"imu", "poses": b"poses", "manifest": json.dumps(manifest).encode()}
+        files = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()} for name, data in payloads.items()}
+        path = f"/api/v1/episodes/{episode}/transfer"
+        started = self.client.post(path, headers=requested, json={"files": files})
+        self.assertEqual(started.status_code, 200, started.text)
+        self.assertEqual(started.json()["chunk_size"], size)
+
+        def put(name, index, data, chunk_headers=requested):
+            return self.client.put(f"{path}/{name}/{index}",
+                                   headers={**chunk_headers, "Content-Type": "application/octet-stream"}, content=data)
+
+        self.assertEqual(put("video", 0, payloads["video"][:size], headers).status_code, 413)
+        self.assertEqual(put("video", 0, payloads["video"][:size]).status_code, 200)
+        resumed = self.client.post(path, headers=headers, json={"files": files}).json()
+        self.assertEqual(resumed["chunk_size"], size)
+        self.assertEqual(resumed["chunks"]["video"], [0])
+        self.assertEqual(put("video", 1, payloads["video"][size:], headers).status_code, 400)
+        self.assertEqual(put("video", 1, payloads["video"][size:]).status_code, 200)
+        for name in ("imu", "poses", "manifest"):
+            self.assertEqual(put(name, 0, payloads[name]).status_code, 200)
+        finished = self.client.post(path + "/finish", headers=headers)
+        self.assertEqual(finished.status_code, 202, finished.text)
+        self.assertEqual(self.client.get(f"/api/v1/episodes/{episode}/files/video", headers=headers).content, payloads["video"])
+
     @unittest.skipUnless(os.environ.get("TMT_TEST_REAL_S3") == "1", "Requires isolated disposable S3")
     def test_resumable_round_trip_with_disposable_object_storage(self):
         self.blob_patch.stop()

@@ -7,6 +7,12 @@ private final class ScriptedTransport: HTTPTransport {
     var replies: [Reply] = []
     var requests: [URLRequest] = []
     var stagedUpload: Data?
+    var overlapUploads = false
+    private var activeUploads = 0
+    private var activeVideoUploads = 0
+    private(set) var peakUploads = 0
+    private(set) var sidecarOverlappedVideo = false
+    private(set) var stagedSizes: [String: Int] = [:]
     func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         requests.append(request)
         let reply = replies.removeFirst()
@@ -17,7 +23,20 @@ private final class ScriptedTransport: HTTPTransport {
         return (Data(reply.json.utf8), response)
     }
     func upload(for request: URLRequest, from file: URL) async throws -> (Data, HTTPURLResponse) {
-        stagedUpload = try Data(contentsOf: file)
+        let body = try Data(contentsOf: file)
+        stagedUpload = body
+        guard overlapUploads, let path = request.url?.path else { return try await data(for: request) }
+        stagedSizes[path] = body.count
+        activeUploads += 1
+        peakUploads = max(peakUploads, activeUploads)
+        let isVideo = path.contains("/video/")
+        if isVideo { activeVideoUploads += 1 }
+        else if activeVideoUploads > 0 { sidecarOverlappedVideo = true }
+        defer {
+            activeUploads -= 1
+            if isVideo { activeVideoUploads -= 1 }
+        }
+        if isVideo { try await Task.sleep(for: .milliseconds(path.hasSuffix("/video/1") ? 500 : 250)) }
         return try await data(for: request)
     }
 }
@@ -48,6 +67,47 @@ final class APIContractTests: XCTestCase {
         XCTAssertEqual(paths.filter { $0.hasSuffix("/video/0") }.count, 1)
         XCTAssertEqual(paths.filter { $0.hasSuffix("/imu/0") }.count, 2)
         XCTAssertTrue(transport.requests.filter { $0.httpMethod == "PUT" }.allSatisfy { $0.value(forHTTPHeaderField: "Idempotency-Key") == id.uuidString })
+        XCTAssertTrue(transport.requests.filter { $0.httpMethod == "PUT" }.allSatisfy { $0.value(forHTTPHeaderField: "X-TMT-Chunk-Size") == nil })
+    }
+
+    func testLargerChunksOverlapAndResumeFromTheStoredLayout() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let chunkSize = 4 * 1024 * 1024
+        try Data(repeating: 1, count: 4 * chunkSize + 5).write(to: directory.appendingPathComponent("video.mp4"))
+        for name in ["imu.jsonl", "poses.jsonl", "manifest.json"] {
+            try Data([1]).write(to: directory.appendingPathComponent(name))
+        }
+        let id = UUID(), transport = ScriptedTransport()
+        transport.overlapUploads = true
+        transport.replies = [.init(status: 200, json: """
+            {"complete":false,"chunk_size":4194304,"chunks":{"video":[0],"imu":[],"poses":[],"manifest":[]}}
+            """)]
+        transport.replies += Array(repeating: .init(status: 200, json: "{\"accepted\":true}"), count: 7)
+        transport.replies.append(.init(status: 202, json: """
+            {"id":"\(UUID())","status":"queued","filename":"video.mp4","size_bytes":\(4 * chunkSize + 8),"client_capture_id":"\(id)"}
+            """))
+        var reportedBytes: [Int64] = []
+        let receipt = try await api(transport).uploadResumableEpisode(directory: directory, episodeID: id,
+                                                                     token: "test-access") { sent, _ in
+            reportedBytes.append(sent)
+        }
+        let path = "/api/v1/episodes/\(id)/transfer"
+        XCTAssertEqual(receipt.clientCaptureID, id)
+        XCTAssertEqual(transport.peakUploads, 4)
+        XCTAssertTrue(transport.sidecarOverlappedVideo)
+        XCTAssertEqual(reportedBytes, reportedBytes.sorted())
+        XCTAssertEqual(reportedBytes.first, Int64(chunkSize))
+        XCTAssertEqual(reportedBytes.last, Int64(4 * chunkSize + 8))
+        XCTAssertNil(transport.stagedSizes[path + "/video/0"])
+        XCTAssertEqual(transport.stagedSizes[path + "/video/1"], chunkSize)
+        XCTAssertEqual(transport.stagedSizes[path + "/video/4"], 5)
+        XCTAssertEqual(transport.requests.first?.value(forHTTPHeaderField: "X-TMT-Chunk-Size"), String(chunkSize))
+        XCTAssertTrue(transport.requests.filter { $0.httpMethod == "PUT" }.allSatisfy {
+            $0.value(forHTTPHeaderField: "X-TMT-Chunk-Size") == String(chunkSize)
+        })
+        XCTAssertEqual(transport.requests.last?.url?.path, path + "/finish")
     }
     func testEpisodeUploadStagesAllFourFilesWithStableIdentity() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -76,6 +136,7 @@ final class APIContractTests: XCTestCase {
         XCTAssertNil(legacy.developmentSession)
         XCTAssertEqual(development.developmentSession, true)
     }
+
     func testDevelopmentEnrollmentUsesOnlyThePrivateDevelopmentOrigin() async throws {
         let transport = ScriptedTransport()
         transport.replies = [.init(status: 201, json: """

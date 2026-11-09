@@ -5,9 +5,10 @@ import math
 import logging
 import tempfile
 from contextlib import ExitStack
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Header, Request
 from pydantic import BaseModel, ConfigDict, Field
 from psycopg.types.json import Jsonb
 from botocore.exceptions import ClientError as StorageError
@@ -18,6 +19,7 @@ from app.onboarding import fail, require_installation
 
 router = APIRouter(prefix="/api/v1/episodes", tags=["episode transfers"])
 CHUNK_SIZE = 1024 * 1024
+LARGE_CHUNK_SIZE = 4 * CHUNK_SIZE
 MAX_SIZE = 200 * 1024 * 1024
 NAMES = ("video", "imu", "poses", "manifest")
 
@@ -54,13 +56,13 @@ def delete_transfer(connection, owner_id, episode_id):
     # Delete each deterministic object before removing its durable index. If a
     # delete or transaction fails, retrying the sweep is safe (S3 delete is idempotent).
     from app.main import BUCKET, EPISODE_FILES, keyed_capture_id, storage
-    row = connection.execute("SELECT files FROM episode_transfers WHERE installation_id=%s AND episode_id=%s", (owner_id, episode_id)).fetchone()
+    row = connection.execute("SELECT files,chunk_size FROM episode_transfers WHERE installation_id=%s AND episode_id=%s", (owner_id, episode_id)).fetchone()
     if not row:
         return
     client = storage()
     # Include possible objects whose DB insert failed after the S3 write.
     for name in NAMES:
-        for index in range(math.ceil(row["files"][name]["size"] / CHUNK_SIZE)):
+        for index in range(math.ceil(row["files"][name]["size"] / row["chunk_size"])):
             client.delete_object(Bucket=BUCKET, Key=object_key(owner_id, episode_id, name, index))
     # A process may die after publishing final objects but before its DB
     # transaction commits. Delete those only after proving no committed row
@@ -123,7 +125,8 @@ def expected_bundle(files):
 
 
 @router.post("/{episode_id}/transfer")
-def begin(episode_id: UUID, body: TransferInfo, installation=Depends(require_installation)):
+def begin(episode_id: UUID, body: TransferInfo, installation=Depends(require_installation),
+          requested_chunk_size: Annotated[int | None, Header(alias="X-TMT-Chunk-Size")] = None):
     from app.main import BUCKET, keyed_capture_id, storage
     if set(body.files) != set(NAMES):
         fail(400, "episode_files_invalid", "Episode must contain exactly four files")
@@ -144,10 +147,12 @@ def begin(episode_id: UUID, body: TransferInfo, installation=Depends(require_ins
         if row and row["files"] != files:
             fail(409, "idempotency_conflict", "Transfer key was already used with different content")
         if not row:
+            chunk_size = LARGE_CHUNK_SIZE if requested_chunk_size == LARGE_CHUNK_SIZE else CHUNK_SIZE
             check_quota(connection, owner, size)
-            connection.execute("INSERT INTO episode_transfers (installation_id,episode_id,files,total_size) VALUES (%s,%s,%s,%s)",
-                (owner["id"], episode_id, Jsonb(files), size))
+            connection.execute("""INSERT INTO episode_transfers (installation_id,episode_id,files,total_size,chunk_size)
+                VALUES (%s,%s,%s,%s,%s)""", (owner["id"], episode_id, Jsonb(files), size, chunk_size))
         else:
+            chunk_size = row["chunk_size"]
             connection.execute("UPDATE episode_transfers SET expires_at=now()+interval '7 days' WHERE installation_id=%s AND episode_id=%s", (owner["id"], episode_id))
         chunks = {name: [] for name in NAMES}
         client = storage()
@@ -164,10 +169,10 @@ def begin(episode_id: UUID, body: TransferInfo, installation=Depends(require_ins
                     (owner["id"], episode_id, part["file_name"], part["chunk_index"]))
                 continue
             chunks[part["file_name"]].append(part["chunk_index"])
-        return {"complete": False, "chunk_size": CHUNK_SIZE, "chunks": chunks}
+        return {"complete": False, "chunk_size": chunk_size, "chunks": chunks}
 
 
-def store_chunk(installation, episode_id, name, index, data):
+def store_chunk(installation, episode_id, name, index, data, requested_chunk_size=None):
     from app.main import BUCKET, storage
     if name not in NAMES or index < 0:
         fail(404, "transfer_not_found", "Transfer not found")
@@ -175,9 +180,11 @@ def store_chunk(installation, episode_id, name, index, data):
         owner = owner_locked(connection, installation)
         transfer = transfer_locked(connection, owner["id"], episode_id)
         info = transfer["files"][name]
-        count = math.ceil(info["size"] / CHUNK_SIZE)
-        expected = min(CHUNK_SIZE, info["size"] - index * CHUNK_SIZE)
-        if transfer["status"] != "active" or index >= count or len(data) != expected:
+        chunk_size = transfer["chunk_size"]
+        count = math.ceil(info["size"] / chunk_size)
+        expected = min(chunk_size, info["size"] - index * chunk_size)
+        if (transfer["status"] != "active" or index >= count or len(data) != expected
+                or (requested_chunk_size is not None and requested_chunk_size != chunk_size)):
             fail(400, "chunk_invalid", "Invalid chunk")
         digest = hashlib.sha256(data).hexdigest()
         old = connection.execute("""SELECT * FROM episode_transfer_chunks WHERE
@@ -196,15 +203,19 @@ def store_chunk(installation, episode_id, name, index, data):
 
 
 @router.put("/{episode_id}/transfer/{name}/{index}")
-async def put_chunk(episode_id: UUID, name: str, index: int, request: Request, installation=Depends(require_installation)):
+async def put_chunk(episode_id: UUID, name: str, index: int, request: Request, installation=Depends(require_installation),
+                    requested_chunk_size: Annotated[int | None, Header(alias="X-TMT-Chunk-Size")] = None):
     if request.headers.get("content-type") != "application/octet-stream":
         fail(415, "media_type_unsupported", "Expected binary chunk")
+    chunk_size = CHUNK_SIZE if requested_chunk_size is None else requested_chunk_size
+    if chunk_size not in (CHUNK_SIZE, LARGE_CHUNK_SIZE):
+        fail(400, "chunk_invalid", "Invalid chunk size")
     data = bytearray()
     async for part in request.stream():
-        data.extend(part)
-        if len(data) > CHUNK_SIZE:
+        if len(data) + len(part) > chunk_size:
             fail(413, "upload_too_large", "Chunk exceeds upload limit")
-    return await run_in_threadpool(store_chunk, installation, episode_id, name, index, bytes(data))
+        data.extend(part)
+    return await run_in_threadpool(store_chunk, installation, episode_id, name, index, bytes(data), chunk_size)
 
 
 @router.post("/{episode_id}/transfer/finish", status_code=202)
@@ -227,7 +238,7 @@ def finish(episode_id: UUID, installation=Depends(require_installation)):
                 descriptor = transfer["files"][name]
                 target = stack.enter_context(tempfile.TemporaryFile())
                 digest = hashlib.sha256()
-                for index in range(math.ceil(descriptor["size"] / CHUNK_SIZE)):
+                for index in range(math.ceil(descriptor["size"] / transfer["chunk_size"])):
                     row = connection.execute("""SELECT * FROM episode_transfer_chunks WHERE
                         installation_id=%s AND episode_id=%s AND file_name=%s AND chunk_index=%s""",
                         (owner["id"], episode_id, name, index)).fetchone()
