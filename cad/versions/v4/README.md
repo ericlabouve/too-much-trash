@@ -379,3 +379,7 @@ The 1 mm straight string-lead audit found far-side pulley-to-cap contact with th
 ### V3-to-V4 PETG reuse audit
 
 Boolean solid comparisons against final canonical V3 found zero added/removed volume for the sliding jaw, redirect pulley and extended diamond-hole smooth axle. Reuse those three components, including the October 31 extended axle (not the earlier short axle). The shaft cap, fixed jaw, actuator bracket and plunger differ and form the four-piece upgrade plate. Current slice: 55.31 g, 418 minutes, 0.1972 g support/interface on the fixed jaw only. Review output: `build/v4-petg-upgrade-20261109/`. No print sent; fixed-jaw supports still violate the zero-support requirement. `source/compare_petg.py` reproduces the canonical solid comparison.
+
+### PETG upgrade print started — 2026-11-09
+
+The user approved the reviewed four-piece upgrade plate, including its disclosed 0.1972 g fixed-jaw supports, and confirmed the textured PEI bed clear with Bambu PETG Translucent Blue loaded externally. Uploaded package and G-code checksums matched; the A1 mini reported RUNNING / heatbed preheating, no print error, and 417 minutes remaining. This confirms job start, not completion or physical fit. Exact identifiers and settings are in `review/petg-upgrade-print-2026-11-09.json`; the immutable local package remains in the ignored upgrade output directory.
