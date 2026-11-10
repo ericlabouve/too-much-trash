@@ -1,10 +1,11 @@
-"""Package a fresh isolated V3 build into portable, unsliced material projects."""
+"""Package a fresh isolated CAD build into portable, unsliced material projects."""
 from __future__ import annotations
 
 import argparse
 from collections import Counter
 import hashlib
 import json
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -79,7 +80,7 @@ def footprint(mesh):
     return shapely.union_all(shapely.polygons(triangles))
 
 
-def validate_layouts(parts):
+def validate_layouts(parts, rigid=RIGID, flex=FLEX):
     """Reject any manifest design, material, or quantity not covered by layouts."""
     expected = {'PETG': Counter(), 'TPU': Counter()}
     for name, part in parts.items():
@@ -88,21 +89,21 @@ def validate_layouts(parts):
             raise ValueError(f'invalid quantity for {name}: {quantity!r}')
         material = part.get('material')
         # PETG / PLA is the V3 rigid BOM label; this release selects PETG.
-        if material == 'PETG / PLA':
+        if material in ('PETG / PLA', 'PETG'):
             plate = 'PETG'
-        elif material == 'ELEGOO TPU 95A':
+        elif material in ('ELEGOO TPU 95A', 'TPU'):
             plate = 'TPU'
         else:
             raise ValueError(f'unsupported manufacturing material for {name}: {material!r}')
         expected[plate][name] = quantity
-    for plate, layout in (('PETG', RIGID), ('TPU', FLEX)):
+    for plate, layout in (('PETG', rigid), ('TPU', flex)):
         actual = Counter(key.rsplit('_', 1)[0] if key.rsplit('_', 1)[-1].isdigit() else key
                          for key in layout)
         if actual != expected[plate]:
             raise ValueError(f'{plate} layout does not match manufacturing manifest: {actual} vs {expected[plate]}')
 
 
-def project(path, material, layout, parts):
+def project(path, material, layout, parts, minimum_clearance=2.0, excluded=None):
     model = ET.Element(Q('model'), {'unit': 'millimeter', '{http://www.w3.org/XML/1998/namespace}lang': 'en-US'})
     resources = ET.SubElement(model, Q('resources'))
     build_xml = ET.SubElement(model, Q('build'))
@@ -125,8 +126,10 @@ def project(path, material, layout, parts):
         if bounds[0] < -1e-4 or bounds[1] < -1e-4 or bounds[2] > 180.0001 or bounds[3] > 180.0001 or abs(float(mesh.bounds[0, 2])) > .001:
             raise ValueError(f'{key} exceeds 180 mm bed or is not on bed: {bounds}')
         for other, old in placed:
-            if shape.distance(old) < 2.0 - 1e-5:
-                raise ValueError(f'{key} and {other} have less than 2 mm projected clearance ({shape.distance(old):.3f} mm)')
+            if shape.distance(old) < minimum_clearance - 1e-5:
+                raise ValueError(f'{key} and {other} have less than {minimum_clearance} mm projected clearance ({shape.distance(old):.3f} mm)')
+        if excluded is not None and shape.intersects(excluded):
+            raise ValueError(f'{key} intersects the bed exclusion')
         placed.append((key, shape))
         ident = len(objects) + 1
         obj = ET.SubElement(resources, Q('object'), {'id': str(ident), 'type': 'model', 'name': base})
@@ -211,17 +214,96 @@ For assembly, fit the sliding jaw into the fixed jaw track and fit the three fle
     return result
 
 
+def build_v4(snapshot):
+    """Build manufacturing meshes from a self-contained source snapshot."""
+    paths = ('source', 'versions/v3/source', 'versions/v4/source')
+    snapshot.mkdir(parents=True, exist_ok=False)
+    for rel in paths:
+        src = CAD / rel
+        if any(p.is_symlink() for p in src.rglob('*')):
+            raise ValueError(f'source contains symlink: {src}')
+        shutil.copytree(src, snapshot / rel, ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.DS_Store'))
+    for rel in ('workspace/release.py', 'workspace/plate_preview.py', 'workspace/layouts/v4-petg.json', 'workspace/layouts/v4-tpu.json'):
+        (snapshot / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(CAD / rel, snapshot / rel)
+    inputs = {str(p.relative_to(snapshot)): digest(p) for p in snapshot.rglob('*') if p.is_file()}
+    environment = {name: digest(CAD / name) for name in ('pyproject.toml', 'uv.lock')}
+    run = {'version': 'v4', 'operation': 'build', 'status': 'running', 'source_sha256': inputs, 'environment_sha256': environment}
+    (snapshot / 'workspace-run.json').write_text(json.dumps(run, indent=2) + '\n')
+    code = "import sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); from prepare_material_plates import export_parts; export_parts(Path(sys.argv[2]))"
+    result = subprocess.run([sys.executable, '-c', code, str(snapshot / 'versions/v4/source'), str(snapshot / 'manufacturing')], cwd=snapshot)
+    run.update(status='completed' if result.returncode == 0 else 'failed', returncode=result.returncode)
+    (snapshot / 'workspace-run.json').write_text(json.dumps(run, indent=2) + '\n')
+    if result.returncode:
+        raise subprocess.CalledProcessError(result.returncode, result.args)
+    for rel, sha in inputs.items():
+        if digest(CAD / rel) != sha or digest(snapshot / rel) != sha:
+            raise ValueError(f'build source differs from checkout: {rel}')
+    for rel in paths:
+        current = {str(p.relative_to(CAD)) for p in (CAD / rel).rglob('*')
+                   if p.is_file() and '__pycache__' not in p.parts and not p.name.endswith('.pyc') and p.name != '.DS_Store'}
+        recorded = {p for p in inputs if p.startswith(rel + '/')}
+        if current != recorded:
+            raise ValueError(f'build input inventory differs from checkout: {rel}')
+    for name, sha in environment.items():
+        if digest(CAD / name) != sha:
+            raise ValueError(f'build environment differs from checkout: {name}')
+    return run
+
+
+def package_v4(snapshot, output, run):
+    from shapely.geometry import box
+    source = snapshot / 'manufacturing/source'
+    report = json.loads((source / 'fit-attachment-check.json').read_text())
+    parts = {name: {**data, 'file': name + '.stl'} for name, data in report['parts'].items()}
+    layouts = {}
+    for material in ('PETG', 'TPU'):
+        raw = json.loads((snapshot / f'workspace/layouts/v4-{material.lower()}.json').read_text())
+        layouts[material] = {key: (data[0][0], data[0][1], data[2]) for key, data in raw.items()}
+    validate_layouts(parts, layouts['PETG'], layouts['TPU'])
+    projects = {material: project(source, material, layouts[material], parts, 3.0, box(155.7, 151.7, 180, 180)) for material in layouts}
+    output.mkdir(parents=True, exist_ok=False)
+    commit = subprocess.check_output(['git', '-C', str(CAD), 'rev-parse', 'HEAD'], text=True).strip()
+    dirty = bool(subprocess.check_output(['git', '-C', str(CAD), 'status', '--porcelain', '--', 'source', 'versions/v3/source', 'versions/v4/source', 'workspace/release.py', 'workspace/plate_preview.py', 'workspace/layouts', 'pyproject.toml', 'uv.lock'], text=True).strip())
+    result = {'git_commit': commit, 'source_dirty': dirty, 'version': 'v4', 'revision': report['revision'], 'status': 'unsliced', 'bed_mm': [180, 180], 'minimum_projected_clearance_mm': 3.0, 'bed_exclusion_mm': [155.7, 151.7, 180, 180], 'source_sha256': run['source_sha256'], 'environment_sha256': run['environment_sha256'], 'projects': {}}
+    for material, (contents, rels, model, objects) in projects.items():
+        filename, preview = f'{material}.3mf', f'{material}.png'
+        write_project(output / filename, contents, rels, model)
+        if render_preview(output / filename, output / preview, material) != Counter(o['design'] for o in objects):
+            raise ValueError(f'{material} preview object counts differ from project')
+        result['projects'][material] = {'file': filename, 'sha256': digest(output / filename), 'preview': preview, 'preview_sha256': digest(output / preview), 'objects': objects}
+    (output / 'manifest.json').write_text(json.dumps(result, indent=2) + '\n')
+    (output / 'README.md').write_text(f'''# Too Much Trash V4 — unsliced review projects
+
+PETG.3mf contains seven rigid pieces; TPU.3mf contains seventeen flexible pieces. These portable generic 3MF files embed the current V4 manufacturing geometry in millimetres at 100% scale. They contain no printer, filament or process profiles and no G-code.
+
+![PETG plate preview](PETG.png)
+
+![TPU plate preview](TPU.png)
+
+Previews show geometry and placement, not supports or toolpaths. Open in a slicer, select the actual printer and materials, and review the complete slices before printing. Layouts fit the 180 × 180 mm bed with at least 3 mm projected separation and avoid the specified bed exclusion; brims, supports and purge areas require separate review.
+
+These are review prototypes, not qualified print jobs. A previous full-plate automatic-support audit found approximately 0.1972 g of support on the fixed jaw and 0.0271 g on the sliding jaw, and none on TPU. The PETG plate therefore does not meet the project's zero-support gate. Fit, strength, grip, button travel and routing remain unvalidated. See the [V4 documentation](https://github.com/ericlabouve/too-much-trash/blob/{commit}/cad/versions/v4/README.md) for current limitations. Source commit `{commit}`; manifest.json records input hashes and local source-change status.
+''')
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', help='new release directory (default: unique cad/build/v3 directory)')
+    parser.add_argument('--output', help='new release directory')
+    parser.add_argument('--version', choices=('v3', 'v4'), default='v4')
     args = parser.parse_args()
     sys.path.insert(0, str(CAD))
     from cad import output_path
-    output = output_path('v3', 'release', args.output)
+    output = output_path(args.version, 'release', args.output)
     # The snapshot is a sibling, so the released directory is self-contained.
     snapshot = output.with_name(output.name + '-build')
-    subprocess.run([sys.executable, str(CAD / 'cad.py'), 'build', 'v3', '--output', str(snapshot)], check=True)
-    package(snapshot, output)
+    if args.version == 'v3':
+        subprocess.run([sys.executable, str(CAD / 'cad.py'), 'build', 'v3', '--output', str(snapshot)], check=True)
+        package(snapshot, output)
+    else:
+        run = build_v4(snapshot)
+        package_v4(snapshot, output, run)
     print(f'Unsliced release: {output}')
 
 

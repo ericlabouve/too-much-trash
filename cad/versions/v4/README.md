@@ -364,3 +364,18 @@ travel, then review the plates before a separately authorized fit print.
 Manual string tension and the unchanged pulley remain the selected approach.
 Physical checks include harness slip/creep, pad retention, phone alignment,
 plunger stop/key retention, button force and string staying in the pulley.
+
+V4 uses one continuous piece of string, manually tensioned. The BOM shows
+it as a spiral (schematic, not a cut-length specification), quantity one.
+
+### Complete material-plate audit — 2026-11-09
+
+Prepared one PETG plate (7 pieces) and one TPU plate (17 pieces), using the current compact mount, common keys, liners and jaws. Automatic supports enabled; bridge-support suppression off. TPU has zero support/interface paths. PETG has 0.1972 g support/interface on the fixed jaw and 0.0271 g on the sliding jaw; all other rigid parts have zero. These plates are review-only and no print was sent. Resolve the jaw support regions before calling the complete set support-free. Full deposited-path spacing and bed exclusion checks passed.
+
+Rebuild with `PYTHONPATH=versions/v4/source:versions/v3/source uv run python versions/v4/source/prepare_material_plates.py build/NEW-OUTPUT`; `--resume` reuses exported source and completed slices after interruptions. Outputs remain ignored. Current local review: `build/v4-full-plates-20261109/`.
+
+The 1 mm straight string-lead audit found far-side pulley-to-cap contact with the actuator bracket (about 0.33 mm overlap in bare/small/wallet, 0.5 mm in large) at 0, 6.3 and 12.6 mm travel. Near-side sampled straight leads had no flagged contacts. This excludes flexible routing, knot, full return-band and friction validation. See `source/check_v4_routing.py`. Existing common-key insertion/travel checks remain applicable; this audit does not qualify real button force or fit.
+
+### V3-to-V4 PETG reuse audit
+
+Boolean solid comparisons against final canonical V3 found zero added/removed volume for the sliding jaw, redirect pulley and extended diamond-hole smooth axle. Reuse those three components, including the October 31 extended axle (not the earlier short axle). The shaft cap, fixed jaw, actuator bracket and plunger differ and form the four-piece upgrade plate. Current slice: 55.31 g, 418 minutes, 0.1972 g support/interface on the fixed jaw only. Review output: `build/v4-petg-upgrade-20261109/`. No print sent; fixed-jaw supports still violate the zero-support requirement. `source/compare_petg.py` reproduces the canonical solid comparison.

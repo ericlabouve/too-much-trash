@@ -32,7 +32,7 @@ def build(output):
     for r in bom:
         if r['id'] in notes:r['note']=notes[r['id']]
         if r['id']=='twine':
-            r['name']='Manually tensioned string';r['note']='Manual tension adjustment; no inline rubber band. Routing remains schematic.'
+            r['name']='String';r['quantity']=1;r['note']='One continuous length, manually tensioned; no inline rubber band. BOM spiral is schematic, not a cut-length specification.'
         if r['id']=='rubber_bands':
             r['quantity']=2;r['note']='One actuator return band and one jaw-closing band. No inline overtravel or axle-key keeper band.'
         if r['id']=='pulley_key':

@@ -13,6 +13,7 @@ const design=new URLSearchParams(location.search).get('design')==='v4'?'v4':'v3'
 const dataRoot=design==='v4'?'../v4/':'';
 if(design==='v4'){
  document.title='V4 · Lined compact harness';
+ document.querySelectorAll('header .metrics > span')[1].innerHTML='<b>1</b>continuous string';
  $('label[for=stroke]').textContent='Mechanical travel';
  $('#animate').textContent='▶ Animate travel';
  $('#stroke-help').textContent='Mechanical travel inspection keeps the complete assembly visible. Full travel may pass phone contact; the 12.6 mm escape limit is not safe button travel.';
@@ -334,7 +335,11 @@ try{
   let geometry;
   const part=manifest.parts.find(p=>p.name===row.id);
   if(part)geometry=await loader.loadAsync(freshAsset(base+part.file));
-  else if(row.id==='twine')geometry=tube([[0,0,0],[20,20,0],[40,0,0],[60,20,0],[80,0,0]],2);
+  else if(row.id==='twine'){
+   // One continuous schematic coil; spacing is illustrative, not a cut length.
+   const points=Array.from({length:241},(_,i)=>{const t=i/240,a=t*Math.PI*6,r=5+30*t;return [r*Math.cos(a),r*Math.sin(a),0];});
+   geometry=design==='v4'?tube(points,manifest.parameters.twine_diameter):tube([[0,0,0],[20,20,0],[40,0,0],[60,20,0],[80,0,0]],2);
+  }
   else geometry=tube(bandPoints(new THREE.Vector3(0,0,0),new THREE.Vector3(0,50,0),12),1.4);
   // Printed parts use source millimetres, just like the assembly. Never
   // normalize each part independently: a screw must look smaller than a jaw.
@@ -343,8 +348,8 @@ try{
   const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=1;inventory.add(mesh);bomMeshes.set(row.id,mesh);
   geometry.computeBoundingBox();
   tr.dataset.displayScale=String(mesh.userData.displayScale);tr.dataset.modelSizeMm=JSON.stringify(geometry.boundingBox.getSize(new THREE.Vector3()).toArray());
-  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'TPU T/V snap key',phone_cuff:'Rounded cuff',collar_screw:'Common TPU screw',thumb_screw:'Thumb screw',thumb_nut:'TPU nut',clip_string_guide:'TPU clip guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
-  label(`${titles[row.id]||row.name||row.id} ×${row.quantity}${part?'':' · schematic'}`,mesh.position.x,mesh.position.y-Math.max(65,extent.y/2+12),0,row.id);
+  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'TPU T/V snap key',phone_cuff:'Rounded cuff',collar_screw:'Common TPU screw',thumb_screw:'Thumb screw',thumb_nut:'TPU nut',clip_string_guide:'TPU clip guide',twine:design==='v4'?'String':'Twine sections + inline band',rubber_bands:'Rubber bands'};
+  label(`${titles[row.id]||row.name||row.id} ×${row.quantity}${part||design==='v4'&&['twine','rubber_bands'].includes(row.id)?'':' · schematic'}`,mesh.position.x,mesh.position.y-Math.max(65,extent.y/2+12),0,row.id);
  }
  for(const [i,step] of steps.entries()){const option=document.createElement('option');option.value=i;option.textContent=`${i+1}. ${step.title}`;$('#assembly-step').append(option);}
  $('#assembly-toggle').onclick=()=>stepIndex<0?showStep(0):exitSteps();$('#assembly-exit').onclick=()=>exitSteps();$('#step-back').onclick=()=>showStep(stepIndex-1);$('#step-next').onclick=()=>showStep(stepIndex+1);$('#assembly-step').onchange=e=>showStep(Number(e.target.value));
