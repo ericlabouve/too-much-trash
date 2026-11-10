@@ -73,7 +73,9 @@ loaded derailment prevention remain physical/routing checks. No print sent.
 
 ## Remaining agreed V4 work
 
-- String tension: make initial adjustment and maintaining tension easier.
+- String tension is manually managed by the user for now. The cleat, loop
+  ladder and TPU flexure concepts are not selected; no inline rubber band
+  is assumed as a V4 requirement.
 - Physically verify the implemented plunger stop, tail handle and volume-button
   centering; measure safe button travel and check insertion/key retention.
 - Validate the liner grip against harness movement toward the handle,
@@ -93,9 +95,10 @@ review design. Field validation remains outstanding; V3 is preserved.
 
 The user approved the current harness as the official V4 design. This
 promotes design status, not physical validation or a production release.
-V4 is the default viewer. V3 is preserved; V4 currently uses the V3
-actuator pending separate concept selection. The maintained V4 generator
-is source/build_preview.py; manufacturing bundle promotion is still pending.
+V4 is the default viewer; V3 is preserved. The official assembly/BOM generator
+is source/build_viewer.py, using build_preview.py for the harness and
+build_compact_mount_concept.py for the promoted actuator. Manufacturing
+bundle promotion is still pending.
 
 
 ### Mandatory support gate
@@ -256,3 +259,108 @@ remain unverified. The 12.6 mm escape limit is not a button stroke prescription.
 V3/V4 share the V3 viewer app; V4 supplies its own generated manifest and meshes.
 Do not fork a second dashboard. Validate with
 `uv run python tests/check_v4_viewer.py build/v4-review` from cad.
+
+## Phone seating visualization — 2026-11-09
+
+The official V4 phone, camera keepout and volume-button envelope now share one
+rigid transform derived from the cuff seat centers. The fixed edge center is
+Z8.0 mm and the sliding edge center Z11.28 mm. The 76 mm phone tilts 2.474°
+about Y; its projected outer edge moves inward only 0.071 mm. The phone is
+centered in the cuffs instead of retaining V3's fixed rear-face Z18 datum.
+This changes only visualization/envelope placement, not manufacturing parts.
+All eight configurations report actual undeformed cuff overlaps in
+`manifest.json:phone_seating`; TPU compression and real camera/button alignment
+remain physical checks, and the 18/20 mm examples remain incompatible.
+The refreshed eight-configuration check finds zero solid cuff/phone overlap for
+bare (8 mm) and small (7.5 mm) phones. Wallet and large proxies still intersect
+the undeformed cuffs: about 195 mm³ at the fixed cuff and 153 mm³ per sliding
+cuff. These conflicts are recorded, not hidden by the new placement.
+
+## Cuff contact and mechanical-travel display — 2026-11-09
+
+The thin-phone display now translates the tilted phone to first contact with
+its fixed cuff, then closes the complete sliding jaw and both cuffs to first
+contact with the opposite edge. Jaw-band endpoints follow the closed jaw.
+The solver uses the actual undeformed cuff surfaces, not just their center
+planes. It does not simulate TPU squeeze/preload; the 18/20 mm phone examples
+remain incompatible and are not artificially forced into the cuffs.
+
+V4's slider maps linearly to the 12.6 mm closed-slot/key escape travel instead
+of V3's 0.65 mm nominal button motion. This is **mechanical free-travel
+inspection**, not a loaded squeeze simulation. Phone/camera/button proxies,
+string and bands remain visible throughout travel, respecting the view and
+Phone toggle. The prior hide-on-motion behavior was rejected. The schematic
+string endpoint and return-band attachment follow the plunger. Full travel may
+pass phone contact: 12.6 mm is not safe button travel. The stock trigger is not
+driven by this inspection. Safe button stroke, actual routing and force remain
+physical checks. Regression: `node tests/check_v4_travel_visibility.mjs`.
+No manufactured geometry changes; V1–V3 animation remains unchanged.
+
+Bare-phone contact check: phone shifts +1.68454 mm along local X; the sliding
+jaw closes +3.73990 mm. All three cuff gaps are approximately 0.00001 mm,
+with zero rigid intersection volume. Closed sliding/fixed jaws do not
+intersect. Plunger/phone and bracket/phone rest overlaps are zero; their
+minimum distances are 9.343 mm and 15.622 mm respectively. These distances
+are geometric checks, not a qualified button setting or measured grip force.
+
+## Rubber bands — 2026-11-09
+
+User specifies two bands total: one actuator return band and one band closing
+the fixed/sliding jaws. No inline tension band or separate axle-key keeper
+band is required. String tension is managed manually. The two T/V keys now reuse the identical original axle-key geometry; see
+the common-key promotion below.
+
+## Current cord attachment visualization — 2026-11-09
+
+The string is now continuous from the stock trigger through the selected
+3 × 2 mm cap passage, around the pulley, and into the shifted tail handle's
+wrap. The old inline-band gap and lower string fragment are removed. The
+return band's moving loop is translated with the handle; its bracket anchor
+stays fixed. Twenty-one geometric route frames recompute pulley tangency
+through the 12.6 mm inspection range. Both near/far guide choices and all
+phone configurations are exported. No manufacturing geometry changes.
+
+The string lead coincides with a point on the handle wrap; the visible
+return loop follows the actual 8 mm handle relocation. This is a schematic
+route, not an elastic/knot simulation or a complete clearance audit: entry
+angles, local rubbing, tied knots and achievable band stretch still need
+review. String tension remains manual and only two rubber bands are used.
+
+## One common T/V key — 2026-11-09
+
+V4 now uses two identical copies of the original 14.7 mm TPU axle key: one
+for the pulley axle and one moving with the plunger. The plunger has an
+integral raised seat and small through-hole; the closed travel slot is in
+the stationary actuator plate. Insert the plunger first, then push its key
+from above. The V spreads across the slot, with nominal 0.8 mm retention
+on each side. Pinch the arms below the plate before removing the key.
+
+The seat is now 1.8 mm above the neck (8.4 mm total stack), leaving
+0.8 mm axial play with the unchanged original key. Nominal minimum clearance
+to the pulley key is 0.15 mm at full pull. Clear pull is
+12.6 mm; this is an escape limit, not safe phone-button travel. Sampled
+end-on insertion without the key and operating motion pass, including
+surrounding V4 hardware and stock-neck checks for all eight configurations.
+Automatic-support PETG bracket/plunger and TPU key slices contain zero
+support/interface paths. New TPU insertion force, recovery, loaded stop
+retention and wear remain untested. See `review/common-key-validation.json`.
+
+## Centered compact mount promoted — 2026-11-09
+
+The approved compact bracket now drives the official V4 assembly and BOM
+through `build_viewer.py` and `geometry_compact()`. Its mounting face is
+16.8 mm high with the screw bore centered at local Z8.4. The assembly screw
+and nut move +1.4 mm along the rail to match; the mechanism stays in place.
+The actual shown hex nut has 0.606 mm top/bottom margin and 97.2% bearing
+contact. Nut rotation changes its projected envelope; loaded clamping is
+unverified. Fresh automatic-support PETG slices contain zero support or
+interface paths (bridge suppression off): bracket 4.7285 g, plunger 1.2433 g.
+The 1.8 mm key seat and 12.6 mm mechanical travel remain unchanged.
+See `review/concepts/compact-actuator-mount/` for slice and bearing evidence.
+
+Remaining work: regenerate complete V4 manufacturing plates (including
+revised jaw and TPU pads), audit assembly/service and string routing across
+travel, then review the plates before a separately authorized fit print.
+Manual string tension and the unchanged pulley remain the selected approach.
+Physical checks include harness slip/creep, pad retention, phone alignment,
+plunger stop/key retention, button force and string staying in the pulley.

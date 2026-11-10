@@ -1,0 +1,15 @@
+{
+  "nut_face_area_mm2": 149.6229393461202,
+  "supported_contact_area_mm2": 145.46824778950932,
+  "supported_fraction": 0.9722322554631819,
+  "nut_z_bounds_mm": [
+    0.6057713659400523,
+    16.194228634059957
+  ],
+  "mount_z_bounds_mm": [
+    0,
+    16.8
+  ],
+  "center_z_mm": 8.4,
+  "method": "Actual nut bearing face extruded 0.01 mm into mount; intersected area. Face relief aperture remains excluded from contact."
+}
