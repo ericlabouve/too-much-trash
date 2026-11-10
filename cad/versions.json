@@ -23,7 +23,7 @@
       "id": "v4",
       "label": "Version 4 \u00b7 lined compact harness",
       "viewer": "versions/v4/viewer.html",
-      "note": "Approved V4 design baseline \u00b7 flush TPU liners, compact clamp and rails, aligned fixed cuff and integrated string guides. Actuator refinements in review; field validation pending.",
+      "note": "Approved V4 design baseline \u00b7 flush TPU liners, compact clamp and rails, aligned fixed cuff and integrated string guides. Approved captured actuator with underside T/V travel stop; field validation pending.",
       "build_mode": "preview"
     }
   ]

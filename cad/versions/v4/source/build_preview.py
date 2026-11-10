@@ -94,8 +94,7 @@ def liner(seat, face: float, half_width: float, windows: tuple[tuple[float, floa
     return skin
 
 
-def build(output: Path) -> None:
-    params = Parameters(phone_thickness=8, button_from_screen=4)
+def clamp_geometry(params):
     original_cap = cap_string_passages(shorter_cap_rails(shorten_clamp(shaft_cap(params))))
     original_jaw = shorten_clamp(aligned_fixed_jaw(params))
     face = params.collar_opening_x / 2
@@ -119,6 +118,13 @@ def build(output: Path) -> None:
             if abs(surface.Center().x - side * face) < 1e-5:
                 print(f'{"Cap" if side == 1 else "Fixed jaw"} TPU contact area: {surface.Area():.1f} mm²')
 
+    return cap, jaw, cap_liner, jaw_liner
+
+
+def build(output: Path) -> None:
+    params = Parameters(phone_thickness=8, button_from_screen=4)
+    cap, jaw, cap_liner, jaw_liner = clamp_geometry(params)
+    face, half_width = params.collar_opening_x / 2, params.collar_opening_y / 2
     shaft = box(-face, face, -half_width, half_width, -54, 83)
     output.mkdir(parents=True, exist_ok=True)
     shapes = {'cap': cap, 'jaw': jaw, 'cap-liner': cap_liner,

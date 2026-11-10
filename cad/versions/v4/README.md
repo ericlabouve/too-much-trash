@@ -74,8 +74,8 @@ loaded derailment prevention remain physical/routing checks. No print sent.
 ## Remaining agreed V4 work
 
 - String tension: make initial adjustment and maintaining tension easier.
-- Actuator: add a positive plunger travel stop and move its handle to meet
-  the end rail. Verify volume-button centering with the lowered fixed cuff.
+- Physically verify the implemented plunger stop, tail handle and volume-button
+  centering; measure safe button travel and check insertion/key retention.
 - Validate the liner grip against harness movement toward the handle,
   including whether clamping loosens in use.
 - Validate the integrated cap guides prevent pulley derailment and do not
@@ -176,3 +176,83 @@ open handle lane and end-loading insertion. Retain inward capture; fully
 vertical walls alone would not prevent lift-out. A 60-degree face is a candidate,
 not a verified support-free result. Check both parts with automatic supports
 on, bridge suppression off, and rerun insertion/motion clearances before adoption.
+
+### 70-degree captured guide and underside T/V stop study
+
+The isolated `review/concepts/steep-stop/` retains the accepted tail handle and
+widens the plunger upper section from 1.6 to 5.67 mm. Both guide faces are 70°
+from the bed, with a 7.19 mm top opening capturing the 8 mm shaft base. A closed
+through-slot accepts a shortened TPU T/V stop installed from underneath after
+the plunger. This key is not interchangeable with the pulley axle key. Its
+free arm ends remain separated from the stem to allow inward flexure.
+
+Nominal pull limit is 6.2 mm; this is not a verified safe button stroke. The
+0–53 mm sampled insertion path clears the bracket and pulley context with the
+stop removed. Physical snap retention, underside service access, string/band
+routing and loaded sliding still need checks. Official assembly is unchanged.
+Reproduce with `source/build_steep_stop.py OUTPUT`, then
+`source/check_steep_stop_slices.py SLICE SOURCE petg` and a separate `tpu` run.
+
+Both PETG parts and the final TPU key sliced with **zero support/interface**
+extrusion (automatic supports ON, bridge suppression OFF, A1 mini 0.4 mm
+nozzle / 0.12 mm layers). Exact settings and hashes are retained in the study
+`support-status.json`. No print sent.
+
+The stop key is now rotated 90° around its insertion axis: its V opens along
+the travel direction. The plunger slot narrows from 5.6 to 3.6 mm, retaining
+0.3 mm nominal lateral clearance per side of the 3 mm key thickness. The slot
+is lengthened to keep approximately 6.2 mm pull travel. Refreshed PETG and TPU
+slices still contain zero support/interface extrusion. This remains a concept.
+
+### Extended plunger stop slot — 2026-11-09
+
+The review slot extends in both directions to Y15.35..33.0, 17.65 mm long
+and 3.6 mm wide. Retain 2 mm solid bridges before the shaft/foot transition
+and handle root at Y35. Nominal forward travel grows from 6.2 to 10.6 mm;
+the existing bracket tail wall limits reverse travel. The key and bracket are
+unchanged. The full sampled insertion path still clears the bracket and pulley;
+key contact begins at 11 mm in the 0.5 mm sampling. Fresh PETG slicing with
+automatic supports on and bridge suppression off produces zero support/interface.
+This geometric escape limit is not a qualified phone-button stroke; the longer
+slot and its ligaments need physical strength/retention checks. No print sent.
+
+Handle-side extension: slot now ends at Y33.5, adding 0.5 mm and leaving
+1.5 mm before the handle root. Length 18.15 mm; nominal pull 11.1 mm.
+Fresh PETG slice remains zero support/interface with automatic support on.
+Sampled insertion clearance passes; thinner end bridge strength is untested.
+
+The extended stop slot was accepted. The next review rounds the transverse
+neck/foot shoulder with a 0.5 mm fillet, preserving the concave contact face,
+slot and sliding surfaces. Valid single solid and 0–53 mm sampled insertion
+clearance pass. Refreshed automatic-support PETG slice has zero support/interface.
+This is a local shoulder refinement; physical fit/strength remains untested.
+
+Superseding shoulder refinement: replace the small fillet with a 3.35 mm
+long cubic tangent transition from Z7.4 to Z6.6 (Y10..13.35), removing the
+raised transverse step. Foot contact curve and slot remain unchanged.
+Valid solid and full sampled insertion checks pass; fresh PETG slice remains
+zero support/interface. Added Foot junction camera preset for review.
+
+User accepted the curved junction and requested the slot end meet the handle
+start. Slot now Y15.35..35.0, 19.65 mm long. No separate bridge ahead of
+the handle; the solid tail behind Y35 connects it. Nominal pull limit 12.6 mm.
+The foot transition and 3.6 mm slot width are retained. This supersedes the
+prior conservative 1.5 mm front-of-handle bridge allowance.
+Valid single-solid and sampled insertion/motion checks pass. Fresh automatic-
+support PETG slice reports zero support/interface; loaded strength remains untested.
+
+## Approved actuator promotion — 2026-11-09
+
+The user approved the 70° guide, thicker plunger with curved foot transition,
+19.65 mm slot ending at the tail handle, and shortened underside TPU T/V key.
+`source/build_steep_stop.py:geometry_stop` is the canonical actuator generator;
+`source/build_viewer.py` uses it for all eight official V4 configurations.
+The BOM now contains 14 designs / 24 pieces (7 rigid, 17 TPU). The plunger
+stop is distinct from the pulley axle key. This supersedes earlier notes saying
+these parts are a separate study. Automatic-support slices have zero support
+and interface extrusion; physical retention, strength and safe button travel
+remain unverified. The 12.6 mm escape limit is not a button stroke prescription.
+
+V3/V4 share the V3 viewer app; V4 supplies its own generated manifest and meshes.
+Do not fork a second dashboard. Validate with
+`uv run python tests/check_v4_viewer.py build/v4-review` from cad.

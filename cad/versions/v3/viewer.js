@@ -9,6 +9,25 @@ import {STLLoader} from 'three/addons/loaders/STLLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 const $=s=>document.querySelector(s);
+const design=new URLSearchParams(location.search).get('design')==='v4'?'v4':'v3';
+const dataRoot=design==='v4'?'../v4/':'';
+if(design==='v4'){
+ document.title='V4 · Lined compact harness';
+ $('header .eyebrow').textContent='VERSION 4 / LINED COMPACT HARNESS';
+ $('header h1').textContent='Compact clamp. Flush TPU liners.';
+ $('header p').textContent='Shorter clamp and actuator rails, integrated string guides, aligned fixed cuff and the accepted tail-positioned plunger handle.';
+ const notes=document.querySelectorAll('body > p[role=note]');
+ notes[0].textContent='V4 design baseline: flush liners replace 0.8 mm of rigid contact material. Clamp length 97 mm; rail projections 30% shorter. Physical grip and full assembly fit remain unverified.';
+ notes[1].textContent='Three interchangeable cuffs. Fixed cuff lowered 3.28 mm to the plunger-foot center. The approved 70° guide and underside T/V key limit nominal plunger escape travel to 12.6 mm.';
+ $('#view').setAttribute('aria-label','Interactive V4 CAD assembly');
+ $('#status').textContent='Loading V4 CAD…';
+ $('#legend').innerHTML=$('#legend').innerHTML.replace('Cuffs + fasteners + guide','Cuffs + fasteners + liners');
+ $('#inventory > p').textContent='Fourteen printed designs, twenty-four pieces. Two separate TPU liners; cap string passages replace the separate guide. String and bands are additional consumables.';
+ $('footer').textContent='V4 design baseline. Stock geometry remains historical reference; grip, tension, button force and routing need physical checks. Approved travel-stop actuator; physical retention and button-safe travel remain unverified.';
+ document.querySelectorAll('aside > a').forEach(a=>a.remove());
+ const link=document.createElement('a');link.href='../v4/README.md';link.textContent='V4 design notes ↗';$('aside').append(link);
+}
+
 const canvas=$('#view'),status=$('#status');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0xf8f7f3);
@@ -16,7 +35,7 @@ const scene=new THREE.Scene();scene.add(new THREE.HemisphereLight(0xffffff,0x8d9
 const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-150,250,180);scene.add(light);
 const camera=new THREE.PerspectiveCamera(35,1,.1,4000),controls=new OrbitControls(camera,canvas);controls.enableDamping=true;
 const viewCube=installViewCube({canvas,camera,controls,clickStepDegrees:90});
-let marking=false,featureOverlay=null,featureHit=null,stepIndex=-1,painting=false,paintLast=null;const featureOverlays=[];let shapeStart=null,shapePreview=null;let paintTime=0;const steps=assemblySteps();
+let marking=false,featureOverlay=null,featureHit=null,stepIndex=-1,painting=false,paintLast=null;const featureOverlays=[];let shapeStart=null,shapePreview=null;let paintTime=0;const steps=assemblySteps(design);
 const featureLabel=document.createElement('div');featureLabel.className='feature-label';featureLabel.hidden=true;$('#stage').append(featureLabel);
 const root=new THREE.Group();root.rotation.x=-Math.PI/2;scene.add(root);
 const assembly=new THREE.Group(),inventory=new THREE.Group();root.add(assembly,inventory);
@@ -49,6 +68,12 @@ const details={
  bom:['TWELVE PRINTED DESIGNS','Twenty-two pieces. True relative scale.','Three identical 21.6 mm TPU cuffs and integral studs on the rigid jaws. Only the pulley axle uses a loose T-key. Local TPU/stud fit is reported successful; full assembly retention and strength remain unqualified.']
 };
 
+if(design==='v4'){
+ details.phone=['V4 LINED COMPACT HARNESS','Shorter clamp. Flush liners.','Two separate TPU liners maximize shaft contact while retaining the original opening. Integrated 3 × 2 mm string passages, shorter rails and a lowered fixed cuff. Field validation pending.'];
+ details.full=['V4 FULL TOOL','Integrated shaft-cap guides.','The cap passages replace the separate clip. Twine and band routes are schematic; tension, full-stroke clearance and reliable button operation remain unresolved.'];
+ details.actuator=['V4 ACCEPTED TAIL HANDLE','Handle seated at the tail groove.','The accepted handle moves 8 mm tailward. Approved 70° captured guide, curved foot transition and underside T/V travel stop; original wheel retained. Cord/band routing needs physical checks.'];
+ details.bom=['FOURTEEN PRINTED DESIGNS','Twenty-four pieces. True relative scale.','Seven rigid pieces and seventeen TPU pieces, including two liners. Current V4 cap, jaw and accepted tail handle; integrated guides and a distinct plunger stop key.'];
+}
 function setDetail(label,title,text){$('#detail-label').textContent=label;$('#detail-title').textContent=title;$('#detail-text').textContent=text;}
 function material(rgb){return new THREE.MeshStandardMaterial({color:new THREE.Color(...rgb),roughness:.7});}
 function allowed(name){
@@ -56,7 +81,7 @@ function allowed(name){
  if(name==='stock_neck_context')return mode==='phone';
  if(name==='twine_phone')return mode==='phone'||mode==='actuator';
  if(mode==='full')return true;
- if(mode==='actuator')return ['twine_attachment','plunger','pulley','pulley_axle','pulley_key','band_keeper','rail_screw_1','rail_nut_1','band_return','phone_volume_up'].includes(name);
+ if(mode==='actuator')return ['twine_attachment','plunger','plunger_stop','pulley','pulley_axle','pulley_key','band_keeper','rail_screw_1','rail_nut_1','band_return','phone_volume_up'].includes(name);
  if(name==='guide_1'||name==='band_guide_1')return true;
  return !name.startsWith('stock_')&&!name.startsWith('guide_')&&!name.startsWith('band_guide_')&&!['twine','twine_trigger','band_overtravel'].includes(name);
 }
@@ -111,7 +136,7 @@ function setMode(next){
  $('#flip').disabled=inventory.visible;$('#stroke').disabled=inventory.visible;$('#phone').disabled=inventory.visible;$('#transparent').disabled=inventory.visible;
  setDetail(...details[mode]);resize();
  // Crop actuator framing to the mechanism while retaining the integral carrier for context.
- const fit=mode==='actuator'?['plunger','pulley','pulley_axle','pulley_key','band_keeper','band_return','actuator_context'].map(n=>meshes.get(n)):visibleMeshes();
+ const fit=mode==='actuator'?['plunger','plunger_stop','pulley','pulley_axle','pulley_key','band_keeper','band_return','actuator_context'].map(n=>meshes.get(n)):visibleMeshes();
  frameObjects(fit);pose(strokeFraction);status.textContent=mode==='bom'?'Click a row or model to inspect. Right-click a model for assembly views. Review meshes, not print files.':'Drag to orbit · scroll to zoom · click a component to inspect. Prescribed motion, not a force simulation.';
 }
 function tube(points,diameter){
@@ -171,8 +196,8 @@ function setupPreview(){
  previewScene=new THREE.Scene();previewScene.add(new THREE.HemisphereLight(0xffffff,0x8d9698,2.6));
  const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-30,60,100);previewScene.add(light);
  previewRoot=new THREE.Group();previewRoot.rotation.copy(root.rotation);previewScene.add(previewRoot);
- for(const name of ['actuator_context','twine_attachment','plunger','pulley','pulley_axle','pulley_key','band_keeper','twine_phone','band_return','phone_volume_up']){
-  const original=meshes.get(name);const clone=new THREE.Mesh(original.geometry,original.material.clone());previewRoot.add(clone);previewMeshes.set(name,clone);
+ for(const name of ['actuator_context','twine_attachment','plunger','plunger_stop','pulley','pulley_axle','pulley_key','band_keeper','twine_phone','band_return','phone_volume_up']){
+  const original=meshes.get(name);if(!original)continue;const clone=new THREE.Mesh(original.geometry,original.material.clone());previewRoot.add(clone);previewMeshes.set(name,clone);
  }
  const ghost=new THREE.LineSegments(new THREE.EdgesGeometry(meshes.get('plunger').geometry),new THREE.LineBasicMaterial({color:0x77868b,transparent:true,opacity:.6,depthTest:false}));ghost.renderOrder=2;previewRoot.add(ghost);
  previewCamera=new THREE.PerspectiveCamera(35,1,.1,500);
@@ -267,9 +292,9 @@ function menu(id,e){
  el.hidden=false;el.style.left=`${Math.max(8,Math.min(e.clientX,innerWidth-el.offsetWidth-8))}px`;el.style.top=`${Math.max(8,Math.min(e.clientY,innerHeight-el.offsetHeight-8))}px`;
 }
 try{
- const params=new URLSearchParams(location.search);const sample=params.get('sample')||'wallet',side=params.get('side')||'near';const base=sample==='wallet'&&side==='near'?'review/':`review/${sample}-${side}/`;
+ const params=new URLSearchParams(location.search);const sample=params.get('sample')||(design==='v4'?'bare':'wallet'),side=params.get('side')||'near';const base=dataRoot+(sample==='wallet'&&side==='near'?'review/':`review/${sample}-${side}/`);
  $('#sample').value=sample;$('#side').value=side;
- for(const id of ['sample','side'])$('#'+id).onchange=()=>{location.search=new URLSearchParams({sample:$('#sample').value,side:$('#side').value});};
+ for(const id of ['sample','side'])$('#'+id).onchange=()=>{location.search=new URLSearchParams({sample:$('#sample').value,side:$('#side').value,...(design==='v4'?{design}: {})});};
  const response=await fetch(base+'manifest.json',{cache:'no-store'});if(!response.ok)throw new Error(`Manifest HTTP ${response.status}`);manifest=await response.json();
  $('#orientation').textContent=(side==='far'?'Phone rotated 180° · camera at opposite end · framing unresolved':'Phone in standard orientation')+(manifest.phone_center_y_mm?` · phone shifted ${Math.abs(manifest.phone_center_y_mm)} mm along jaws`:'');
  await Promise.all(manifest.assembly.map(async entry=>{
@@ -290,7 +315,7 @@ try{
   // Printed parts use source millimetres, just like the assembly. Never
   // normalize each part independently: a screw must look smaller than a jaw.
   geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);
-  const rgb=['phone_cuff','collar_screw','thumb_nut','clip_string_guide','pulley_key'].includes(row.id)?[0,.55,.60]:row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
+  const rgb=['phone_cuff','collar_screw','thumb_nut','clip_string_guide','pulley_key','cap_liner','jaw_liner','plunger_stop'].includes(row.id)?[0,.55,.60]:row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
   const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=1;inventory.add(mesh);bomMeshes.set(row.id,mesh);
   geometry.computeBoundingBox();
   tr.dataset.displayScale=String(mesh.userData.displayScale);tr.dataset.modelSizeMm=JSON.stringify(geometry.boundingBox.getSize(new THREE.Vector3()).toArray());
@@ -318,11 +343,11 @@ try{
  canvas.addEventListener('click',e=>{if(!pointerStart||Math.hypot(e.clientX-pointerStart[0],e.clientY-pointerStart[1])>5)return;const m=pick(e);if(m){if(marking)return;else focus(m.object.userData.bomId,m.object);}});
  canvas.addEventListener('contextmenu',e=>{e.preventDefault();const m=pick(e);if(m)menu(m.object.userData.bomId,e);});
  document.addEventListener('pointerdown',e=>{if(!$('#context').contains(e.target))$('#context').hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#context').hidden=true;});
- stopFraction=findStopFraction();setupPreview();pose(0);setMode('phone');
+ stopFraction=findStopFraction();setupPreview();pose(0);setMode(params.get('view')==='bom'?'bom':'phone');
  const drawingControls=[...document.querySelectorAll('nav button,nav input,nav select,#sample,#side,#viewer-fullscreen')];
  const surfacePen=installSurfacePen($('#stage'),()=>viewCube.camera,controls,
   ()=>Object.fromEntries(visibleMeshes().map((mesh,index)=>[index,mesh])));
- installFramePen($('#stage'),{sourceCanvas:canvas,controls:drawingControls,filename:'v3-annotation.png'});
+ installFramePen($('#stage'),{sourceCanvas:canvas,controls:drawingControls,filename:design+'-annotation.png'});
  window.addEventListener('surface-pen-state',event=>{
   if(event.detail){marking=false;$('#mark-feature').setAttribute('aria-pressed','false');}
  });
