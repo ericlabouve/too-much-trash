@@ -6,17 +6,19 @@ import ts from 'typescript';
 const element = () => ({ innerHTML: '', textContent: '', hidden: false, children: [], handlers: {}, attributes: {},
   setAttribute(name, value) { this.attributes[name] = value; },
   addEventListener(name, callback) { this.handlers[name] = callback; },
-  append(child) { this.children.push(child); },
+  append(...children) { this.children.push(...children); },
   replaceChildren() { this.children = []; },
 });
 const ids = ['app', 'invite-feedback', 'invite-form', 'new-code', 'invite-code',
   'logout', 'logout-feedback', 'dismiss-code', 'copy-code', 'refresh-access',
   'invites-list', 'installations-list', 'quota-mib', 'video-estimate',
-  'toggle-revoked-invites', 'toggle-revoked-installations', 'invites-empty', 'installations-empty'];
+  'toggle-revoked-invites', 'toggle-revoked-installations', 'invites-empty', 'installations-empty',
+  'development-keys-panel', 'development-key-form', 'development-key-result',
+  'development-key-value', 'development-key-feedback', 'development-keys-list', 'development-key-hide'];
 const nodes = Object.fromEntries(ids.map(id => ['#' + id, element()]));
 Object.assign(nodes['#quota-mib'], { value: '1024', valueAsNumber: 1024, validity: { valid: true } });
 const calls = [];
-let inviteData = [{ id: 'dummy-invite', label: 'Dummy', expires_at: '2099-01-01', redeemed_at: null, revoked_at: null }];
+let inviteData = [{ id: 'dummy-invite', label: 'Dummy', expires_at: '2099-01-01', redeemed_at: null, revoked_at: null, quota_bytes: 1048576, quota_uploads: 1 }];
 let installationData = [{ id: 'dummy-installation', installation_name: 'Dummy', tester_label: 'Field tester', revoked_at: null, used_bytes: 0, quota_bytes: 1024, used_uploads: 0, quota_uploads: 1 }];
 const source = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 const script = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022,
@@ -25,9 +27,12 @@ vm.runInNewContext(script, {
   document: { querySelector: selector => nodes[selector], createElement: element },
   fetch: async (path, options) => {
     calls.push({ path, method: options.method });
+    if (path.endsWith('/development-keys')) return { ok: false, status: 404 };
     if (options.method === 'POST') {
       const data = path.includes('/invites/') ? inviteData : installationData;
-      data.find(row => row.id === path.split('/')[5]).revoked_at = '2026-10-11';
+      const row = data.find(row => row.id === path.split('/')[5]);
+      if (path.endsWith('/quota')) Object.assign(row, JSON.parse(options.body));
+      else row.revoked_at = '2026-10-11';
       return { ok: true, status: 204 };
     }
     return { ok: true, status: 200, json: async () => structuredClone(path.endsWith('/invites') ? inviteData : installationData) };
@@ -35,7 +40,7 @@ vm.runInNewContext(script, {
   window: { confirm: () => true },
 });
 await new Promise(resolve => setImmediate(resolve));
-assert.deepEqual(calls, [
+assert.deepEqual(calls.filter(call => !call.path.endsWith('/development-keys')), [
   { path: '/api/v1/admin/invites', method: 'GET' },
   { path: '/api/v1/admin/installations', method: 'GET' },
 ]);
@@ -68,7 +73,14 @@ for (const selector of ['#invites-list', '#installations-list']) {
   assert.equal(nodes[selector].children.length, 1);
   assert.equal(nodes[selector].children[0].children[0].textContent, 'Revoke');
   assert.equal(typeof nodes[selector].children[0].children[0].handlers.click, 'function');
+  const [summary, form] = nodes[selector].children[0].children[1].children;
+  assert.equal(summary.textContent, 'Edit upload quota');
+  form.children[0].children[0].valueAsNumber = 2;
+  form.children[1].children[0].valueAsNumber = 3;
+  await form.handlers.submit({ preventDefault() {} });
 }
+assert.equal(inviteData[0].quota_bytes, 2 * 1048576);
+assert.equal(installationData[0].quota_uploads, 3);
 assert.ok(nodes['#installations-list'].children[0].textContent.startsWith('Field tester ·'));
 assert.ok(!nodes['#installations-list'].children[0].textContent.includes('dummy-installation'));
 const tick = () => new Promise(resolve => setImmediate(resolve));

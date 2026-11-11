@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct AppRootView: View {
     @StateObject private var account = AccountSession(configuration: APIConfiguration.initial(),
@@ -20,6 +21,9 @@ struct AppRootView: View {
                 account.syncTick()
                 do { try await Task.sleep(for: .seconds(3)) } catch { break }
             }
+        }
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            UIApplication.shared.isIdleTimerDisabled = phase == .active
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {

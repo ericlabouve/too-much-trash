@@ -21,7 +21,24 @@ docker compose ps
 
 The public site is at `http://localhost:8080`, the gated admin portal is at `http://localhost:8081`, and the iPhone API is at `http://localhost:8082` by default. Listeners bind only to localhost. The portal calls `/api/v1/...` on its own origin. Postgres, SeaweedFS blob storage, and Prefect are private to the Compose network. Volumes preserve captures across restarts. Back up existing data before deploying changes; the migration service updates existing databases before API startup.
 
-The token is saved at `backend/.secrets/admin-token`; only its SHA-256 hash is mounted in the API container. The directory is ignored by Git. Open the portal and paste the token on `/unlock`. To rotate it, run the tool with `--rotate` and recreate the API container with `docker compose up -d --force-recreate api`. Rotation ends existing sessions. This is a temporary shared admin gate, not passkey authentication. The portal issues single-use invites and revokes installation access. Collector uploads, status and downloads require enrollment credentials; the public API rejects admin routes.
+The token is saved at `backend/.secrets/admin-token`; only its SHA-256 hash is mounted in the API container. The directory is ignored by Git. Open the portal and paste the token on `/unlock`. To rotate it, run the tool with `--rotate` and recreate the API container with `docker compose up -d --force-recreate api`. Rotation ends existing sessions. This is a temporary shared admin gate, not passkey authentication. The portal issues single-use invites, edits upload quotas for unused invites and active regular installations, and revokes installation access. Development installations track usage without a storage or upload count quota. Collector uploads, status and downloads require enrollment credentials; the public API rejects admin routes.
+
+With the local development stack running, a Mac operator with Docker access can
+copy finalized episodes from a trusted, unlocked iPhone connected by USB.
+Use the development installation ID from the dashboard and the exact collector
+origin stored on the phone.
+
+```sh
+python3 backend/api/tools/import_usb_episodes.py --device <UDID> \
+  --origin <development-collector-origin> --installation <installation-ID>
+```
+
+Use `--snapshot <PrivateCaptures-directory>` in place of `--device` for an existing
+container copy. The tool reads the phone queue, imports pending episodes for the
+selected installation through the local backend, and verifies server receipts.
+Reopen the app on the development network to reconcile receipts. The USB
+helper uses the Mac operator's Docker access and the development backend's
+existing upload checks.
 
 ## One development stack, two access routes
 
