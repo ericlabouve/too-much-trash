@@ -389,6 +389,37 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(self.client.get(f"/api/v1/episodes/{episode}/files/video", headers=headers).content, payloads["video"])
 
     @unittest.skipUnless(os.environ.get("TMT_TEST_REAL_S3") == "1", "Requires isolated disposable S3")
+    def test_development_deletion_with_disposable_object_storage(self):
+        self.blob_patch.stop()
+        try:
+            from app.main import storage
+            client = storage()
+            with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
+                key = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers,
+                                       json={"label": "Deletion test"}).json()["key"]
+                dev = self.client.post("/api/v1/admin/development-enroll", json={"key": key}).json()
+                episode = uuid4()
+                manifest = {"schema_version": 1, "episode_id": str(episode), "complete": False,
+                            "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                            "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"},
+                            "sensor_metadata": {}}
+                files = {"video": ("video.mp4", b"synthetic-video", "video/mp4"),
+                         "imu": ("imu.jsonl", b"imu", "application/x-ndjson"),
+                         "poses": ("poses.jsonl", b"poses", "application/x-ndjson"),
+                         "manifest": ("manifest.json", json.dumps(manifest).encode(), "application/json")}
+                headers = {**self.bearer(dev), "Idempotency-Key": str(episode)}
+                response = self.client.post("/api/v1/episodes", headers=headers, files=files)
+                self.assertEqual(response.status_code, 202, response.text)
+                objects = client.list_objects_v2(Bucket=os.environ["S3_BUCKET"]).get("Contents", [])
+                self.assertEqual(len(objects), 4)
+                path = f"/api/v1/media/by-client/{episode}"
+                self.assertEqual(self.client.delete(path, headers=self.bearer(dev)).status_code, 200)
+                self.assertEqual(client.list_objects_v2(Bucket=os.environ["S3_BUCKET"]).get("Contents", []), [])
+                self.assertEqual(self.keyed_upload(dev, episode).status_code, 409)
+        finally:
+            self.blob_patch.start()
+
+    @unittest.skipUnless(os.environ.get("TMT_TEST_REAL_S3") == "1", "Requires isolated disposable S3")
     def test_resumable_round_trip_with_disposable_object_storage(self):
         self.blob_patch.stop()
         try:
