@@ -25,7 +25,9 @@ struct SessionDashboard: View {
     @State private var confirmEnd = false
     @State private var confirmDelete = false
     @State private var captureToDelete: QueuedCapture?
+    @State private var deleteFromBackend = false
     @State private var showDeleteFailure = false
+    @State private var deleteFailure = ""
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]
 
     var body: some View {
@@ -46,8 +48,10 @@ struct SessionDashboard: View {
                                 SessionVideoTile(capture: capture, file: queue.file(for: capture),
                                                  uploading: account.uploadProgress[capture.id] != nil,
                                                  stopPlayback: account.isEndingSession,
-                                                 canDelete: account.canDeleteLocalCapture) {
+                                                 canDelete: account.canDeleteLocalCapture,
+                                                 showsBackendDelete: account.supportsBackendVideoDeletion && capture.receipt?.clientCaptureID == capture.id) { fromBackend in
                                     captureToDelete = capture
+                                    deleteFromBackend = fromBackend
                                     confirmDelete = true
                                 }
                             }
@@ -77,16 +81,30 @@ struct SessionDashboard: View {
                     Task { if await account.endSession() { dismiss() } }
                 }
             } message: { Text(account.endSessionWarning) }
-            .alert("Delete video from this iphone", isPresented: $confirmDelete, presenting: captureToDelete) { capture in
+            .alert(deleteFromBackend ? "Delete here and backend?" : "Delete video from this iphone",
+                   isPresented: $confirmDelete, presenting: captureToDelete) { capture in
                 Button("Cancel", role: .cancel) {}
                 Button("Delete", role: .destructive) {
-                    Task { showDeleteFailure = !(await account.deleteLocalCapture(capture.id)) }
+                    let fromBackend = deleteFromBackend
+                    Task {
+                        if fromBackend {
+                            if let failure = await account.deleteCaptureHereAndBackend(capture.id) {
+                                deleteFailure = failure
+                                showDeleteFailure = true
+                            }
+                        } else if !(await account.deleteLocalCapture(capture.id)) {
+                            deleteFailure = "Wait for any upload to finish, then try again."
+                            showDeleteFailure = true
+                        }
+                    }
                 }
+            } message: { _ in
+                if deleteFromBackend { Text("This permanently removes the video from this iPhone and the backend.") }
             }
             .alert("Couldn’t delete video", isPresented: $showDeleteFailure) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text("Wait for any upload to finish, then try again.")
+                Text(deleteFailure)
             }
         }
     }
@@ -126,7 +144,8 @@ private struct SessionVideoTile: View {
     let uploading: Bool
     let stopPlayback: Bool
     let canDelete: Bool
-    let onDelete: () -> Void
+    let showsBackendDelete: Bool
+    let onDelete: (Bool) -> Void
     @State private var player: AVPlayer?
 
     var body: some View {
@@ -149,8 +168,12 @@ private struct SessionVideoTile: View {
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 14))
         .contextMenu {
-            Button("Delete", systemImage: "trash", role: .destructive, action: onDelete)
+            Button("Delete", systemImage: "trash", role: .destructive) { onDelete(false) }
                 .disabled(!canDelete)
+            if showsBackendDelete {
+                Button("Delete here and backend", systemImage: "trash", role: .destructive) { onDelete(true) }
+                    .disabled(!canDelete)
+            }
         }
         .task { if player == nil { player = AVPlayer(url: file) } }
         .onDisappear { player?.pause() }

@@ -124,6 +124,64 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(self.client.post(installation_path, headers=self.admin_headers, json={"quota_bytes": 128, "quota_uploads": 3}).status_code, 204)
         self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["quota_uploads"], 3)
 
+    def test_development_video_delete_is_scoped_and_resumable(self):
+        from app.video_deletion import sweep_deletions
+
+        regular, episode = self.enrolled(), uuid4()
+        path = f"/api/v1/media/by-client/{episode}"
+        transfer = f"/api/v1/episodes/{episode}/transfer"
+        manifest = {"schema_version": 1, "episode_id": str(episode), "complete": False,
+                    "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                    "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"}, "sensor_metadata": {}}
+        payloads = {"video": b"video", "imu": b"imu", "poses": b"poses", "manifest": json.dumps(manifest).encode()}
+        descriptors = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()} for name, data in payloads.items()}
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
+            key = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers,
+                                   json={"label": "Deletion test"}).json()["key"]
+            dev, stranger = (self.client.post("/api/v1/admin/development-enroll", json={"key": key}).json() for _ in range(2))
+            headers, other = self.bearer(dev), self.bearer(stranger)
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["development_video_delete_version"], 1)
+            self.assertIsNone(self.client.get("/api/v1/auth/me", headers=self.bearer(regular)).json()["development_video_delete_version"])
+            self.assertEqual(self.client.post(transfer, headers=headers, json={"files": descriptors}).status_code, 200)
+            binary = {**headers, "Content-Type": "application/octet-stream"}
+            for name, data in payloads.items():
+                self.assertEqual(self.client.put(f"{transfer}/{name}/0", headers=binary, content=data).status_code, 200)
+            uploaded = self.client.post(transfer + "/finish", headers=headers)
+            self.assertEqual(uploaded.status_code, 202, uploaded.text)
+            capture = uploaded.json()["id"]
+            self.assertEqual(self.client.delete(path).status_code, 401)
+            self.assertEqual(self.client.delete(path, headers=self.bearer(regular)).status_code, 403)
+            self.assertEqual(self.client.delete(path, headers=other).status_code, 404)
+            with database() as connection:
+                connection.execute("UPDATE captures SET status='processing' WHERE id=%s", (capture,))
+            self.assertEqual(self.client.delete(path, headers=headers).json()["detail"]["code"], "capture_processing")
+            poster = f"processed/{capture}/poster.jpg"
+            self.blob.objects[poster] = b"test poster"
+            with database() as connection:
+                connection.execute("UPDATE captures SET status='completed', processed_key=%s WHERE id=%s", (poster, capture))
+
+            actual_delete = self.blob.delete_object
+
+            def fail_after_first_object(Bucket, Key):
+                if Key == poster:
+                    raise HTTPException(503)
+                return actual_delete(Bucket=Bucket, Key=Key)
+
+            with patch.object(self.blob, "delete_object", side_effect=fail_after_first_object):
+                self.assertEqual(self.client.delete(path, headers=headers).status_code, 503)
+            self.assertEqual(self.client.get(path, headers=headers).status_code, 404)
+            self.assertIn(poster, self.blob.objects)
+            self.assertEqual(self.client.post(transfer, headers=headers, json={"files": descriptors}).json()["detail"]["code"], "capture_deleted")
+            self.assertEqual(self.client.put(transfer + "/video/0", headers=binary, content=payloads["video"]).status_code, 409)
+            self.assertEqual(self.client.post(transfer + "/finish", headers=headers).status_code, 409)
+            sweep_deletions()
+            self.assertEqual(self.client.delete(path, headers=headers).json(), {"client_capture_id": str(episode), "deleted": True})
+            self.assertFalse(self.blob.objects)
+            self.assertEqual(self.keyed_upload(dev, episode).status_code, 409)
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["used_uploads"], 1)
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "false"}):
+            self.assertEqual(self.client.delete(path, headers=headers).status_code, 404)
+
     def test_usb_import_resumes_phone_transfer_with_unlimited_development_quota(self):
         from tools.import_usb_episodes import FILES, import_episode
 

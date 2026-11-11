@@ -16,6 +16,7 @@ from starlette.concurrency import run_in_threadpool
 
 from app.db import database
 from app.onboarding import fail, require_installation
+from app.video_deletion import reject_deleted_video
 
 router = APIRouter(prefix="/api/v1/episodes", tags=["episode transfers"])
 CHUNK_SIZE = 1024 * 1024
@@ -138,6 +139,7 @@ def begin(episode_id: UUID, body: TransferInfo, installation=Depends(require_ins
         fail(413, "upload_too_large", "Episode exceeds upload limit")
     with database() as connection:
         owner = owner_locked(connection, installation)
+        reject_deleted_video(connection, owner, episode_id)
         sweep_owner(connection, owner["id"])
         capture = connection.execute("SELECT * FROM captures WHERE id=%s AND installation_id=%s",
             (keyed_capture_id(owner["id"], episode_id), owner["id"])).fetchone()
@@ -180,6 +182,7 @@ def store_chunk(installation, episode_id, name, index, data, requested_chunk_siz
         fail(404, "transfer_not_found", "Transfer not found")
     with database() as connection:
         owner = owner_locked(connection, installation)
+        reject_deleted_video(connection, owner, episode_id)
         transfer = transfer_locked(connection, owner["id"], episode_id)
         info = transfer["files"][name]
         chunk_size = transfer["chunk_size"]
@@ -226,6 +229,7 @@ def finish(episode_id: UUID, installation=Depends(require_installation)):
     capture_id = keyed_capture_id(installation["id"], episode_id)
     with database() as connection:
         owner = owner_locked(connection, installation)
+        reject_deleted_video(connection, owner, episode_id)
         existing = connection.execute("SELECT * FROM captures WHERE id=%s AND installation_id=%s", (capture_id, owner["id"])).fetchone()
         if existing:
             return receipt_from_row(existing)

@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 import time
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 
 import boto3
@@ -43,13 +44,13 @@ def claim_job():
                           OR (status = 'processing' AND processing_started_at < now() - interval '30 minutes')
                        ORDER BY created_at FOR UPDATE SKIP LOCKED LIMIT 1
                    )
-                   RETURNING id, original_key, content_type, media_kind"""
+                   RETURNING id, original_key, content_type, media_kind, processing_started_at"""
             )
             return cursor.fetchone()
 
 
 @flow(name="process-capture", log_prints=True)
-def process_capture(capture_id: str, original_key: str, content_type: str, kind: str):
+def process_capture(capture_id: str, original_key: str, content_type: str, kind: str, claim_started_at: datetime | None = None):
     client = storage()
     with tempfile.TemporaryDirectory() as directory:
         source = Path(directory) / "source"
@@ -74,7 +75,24 @@ def process_capture(capture_id: str, original_key: str, content_type: str, kind:
             )
             result = {"duration_seconds": duration}
         key = f"processed/{capture_id}/poster.jpg"
-        client.upload_file(str(poster), BUCKET, key, ExtraArgs={"ContentType": "image/jpeg"})
+        if claim_started_at is None:
+            # The isolated deployment smoke test supplies synthetic objects
+            # without creating a capture row.
+            client.upload_file(str(poster), BUCKET, key, ExtraArgs={"ContentType": "image/jpeg"})
+        else:
+            with psycopg.connect(os.environ["DATABASE_URL"]) as connection:
+                claim = connection.execute("""SELECT id FROM captures WHERE id=%s AND status='processing'
+                    AND processing_started_at=%s FOR UPDATE""", (capture_id, claim_started_at)).fetchone()
+                if claim is None:
+                    return None, result
+                # Serialize publishing with deletion and with replacement of an expired claim.
+                client.upload_file(str(poster), BUCKET, key, ExtraArgs={"ContentType": "image/jpeg"})
+                connection.execute(
+                    """UPDATE captures SET status = 'completed', processed_key = %s,
+                       processed_content_type = 'image/jpeg', result = %s, error = NULL, updated_at = now()
+                       WHERE id = %s""",
+                    (key, Jsonb(result), capture_id),
+                )
         return key, result
 
 
@@ -95,23 +113,17 @@ def main():
         if job is None:
             time.sleep(2)
             continue
-        capture_id, original_key, content_type, kind = job
+        capture_id, original_key, content_type, kind, claim_started_at = job
         log.info("Processing capture %s", capture_id)
         try:
-            key, result = process_capture(str(capture_id), original_key, content_type, kind)
-            with psycopg.connect(os.environ["DATABASE_URL"]) as connection:
-                connection.execute(
-                    """UPDATE captures SET status = 'completed', processed_key = %s,
-                       processed_content_type = 'image/jpeg', result = %s, error = NULL, updated_at = now()
-                       WHERE id = %s""",
-                    (key, Jsonb(result), capture_id),
-                )
+            process_capture(str(capture_id), original_key, content_type, kind, claim_started_at)
         except Exception as exc:
             log.exception("Capture %s failed", capture_id)
             with psycopg.connect(os.environ["DATABASE_URL"]) as connection:
                 connection.execute(
-                    "UPDATE captures SET status = 'failed', error = %s, updated_at = now() WHERE id = %s",
-                    (str(exc)[:500], capture_id),
+                    """UPDATE captures SET status = 'failed', error = %s, updated_at = now()
+                       WHERE id = %s AND status='processing' AND processing_started_at=%s""",
+                    (str(exc)[:500], capture_id, claim_started_at),
                 )
 
 

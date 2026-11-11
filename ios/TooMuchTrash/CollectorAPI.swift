@@ -70,6 +70,7 @@ protocol CollectorAPI {
     func upload(file: URL, captureID: UUID, token: String,
                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt
     func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt
+    func deleteVideo(captureID: UUID, token: String) async throws
     func endSession(refreshToken: String) async throws -> EndSessionReceipt
     func media(id: UUID, token: String) async throws -> MediaReceipt
     func adminReachable() async -> Bool
@@ -98,6 +99,7 @@ extension CollectorAPI {
         try await upload(file: file, token: token)
     }
     func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt { throw ClientError.missingMedia }
+    func deleteVideo(captureID: UUID, token: String) async throws { throw ClientError.developmentRequired }
     func endSession(refreshToken: String) async throws -> EndSessionReceipt { throw ClientError.configuration }
 }
 
@@ -148,6 +150,18 @@ final class LiveCollectorAPI: CollectorAPI {
 
     func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt {
         try await json(path: "api/v1/media/by-client/\(captureID.uuidString)", token: token)
+    }
+
+    func deleteVideo(captureID: UUID, token: String) async throws {
+        struct Deletion: Decodable { let client_capture_id: UUID; let deleted: Bool }
+        var request = URLRequest(url: configuration.endpoint("api/v1/media/by-client/\(captureID.uuidString)"))
+        request.httpMethod = "DELETE"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        let (data, response) = try await transport.data(for: request)
+        guard response.url == request.url else { throw ClientError.invalidResponse }
+        let result: Deletion = try decode(data, response, expected: 200)
+        guard result.deleted, result.client_capture_id == captureID else { throw ClientError.invalidResponse }
     }
 
     func endSession(refreshToken: String) async throws -> EndSessionReceipt {
@@ -472,6 +486,8 @@ final class LiveCollectorAPI: CollectorAPI {
             case 415: throw ClientError.unsupportedMedia
             case 422: throw ClientError.validation
             case 404: throw ClientError.missingMedia
+            case 403 where code == "development_required": throw ClientError.developmentRequired
+            case 409 where code == "capture_processing": throw ClientError.captureProcessing
             case 409 where code == "transfer_incomplete": throw ClientError.server
             case 409: throw ClientError.idempotencyConflict
             case 500...599: throw ClientError.server

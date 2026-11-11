@@ -22,11 +22,13 @@ from app.db import database
 from app.enrollment_limit import require_enrollment_permit
 from app.onboarding import fail, require_installation, router as onboarding_router
 from app.episode_transfer import check_quota, router as episode_transfer_router, sweep_expired
+from app.video_deletion import reject_deleted_video, router as video_deletion_router, sweep_deletions
 
 app = FastAPI(title="Too Much Trash API", version="0.2.0")
 app.include_router(admin_router)
 app.include_router(onboarding_router)
 app.include_router(episode_transfer_router)
+app.include_router(video_deletion_router)
 BUCKET = os.environ["S3_BUCKET"]
 MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 MEDIA_TYPES = {
@@ -46,6 +48,7 @@ async def start_transfer_sweeper():
         while True:
             try:
                 await run_in_threadpool(sweep_expired)
+                await run_in_threadpool(sweep_deletions)
             except Exception:
                 logging.getLogger(__name__).exception("Resumable transfer cleanup failed; it will be retried")
             await asyncio.sleep(3600)
@@ -145,6 +148,7 @@ def upload_media(file: UploadFile = File(...), installation=Depends(require_inst
                 if owner["revoked_at"]:
                     fail(401, "access_revoked", "Installation access has been revoked")
                 if idempotency_key:
+                    reject_deleted_video(connection, owner, idempotency_key)
                     existing = connection.execute("SELECT * FROM captures WHERE id=%s AND installation_id=%s", (capture_id, owner["id"])).fetchone()
                     if existing:
                         if (existing["original_key"] != key or existing["size_bytes"] != size
@@ -245,6 +249,7 @@ def upload_episode(video: UploadFile = File(...), imu: UploadFile = File(...), p
             owner = connection.execute("SELECT * FROM installations WHERE id=%s FOR UPDATE", (installation["id"],)).fetchone()
             if not owner or owner["revoked_at"]:
                 fail(401, "access_revoked", "Installation access has been revoked")
+            reject_deleted_video(connection, owner, idempotency_key)
             existing = connection.execute("SELECT * FROM captures WHERE id=%s AND installation_id=%s", (capture_id, owner["id"])).fetchone()
             if existing:
                 if existing["original_key"] != original_key or existing["size_bytes"] != total:
