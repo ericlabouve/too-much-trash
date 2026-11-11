@@ -618,10 +618,27 @@ final class AccountSession: ObservableObject {
         phase == .authorized && !busy && !isUploading && !isEndingSession && !isDeletingCapture && !queue.storageUnavailable
     }
 
+    var supportsBackendVideoDeletion: Bool {
+        phase == .authorized && installation?.developmentSession == true && installation?.developmentVideoDeleteVersion == 1
+    }
+
     func deleteLocalCapture(_ id: UUID) async -> Bool {
+        await deleteCapture(id, fromBackend: false) == nil
+    }
+
+    func deleteCaptureHereAndBackend(_ id: UUID) async -> String? {
+        await deleteCapture(id, fromBackend: true)
+    }
+
+    private func deleteCapture(_ id: UUID, fromBackend: Bool) async -> String? {
+        let retryMessage = "Wait for any upload to finish, then try again."
         guard canDeleteLocalCapture, uploadTask == nil, retentionTask == nil,
-              let owner = captureOwner else { return false }
-        guard currentCaptures.contains(where: { $0.id == id }) else { return true }
+              let owner = captureOwner else { return retryMessage }
+        guard let capture = currentCaptures.first(where: { $0.id == id }) else { return nil }
+        if fromBackend {
+            guard supportsBackendVideoDeletion else { return ClientError.developmentRequired.message }
+            guard capture.receipt?.clientCaptureID == id else { return "Wait for this video to sync, then try again." }
+        }
         isDeletingCapture = true
         defer {
             isDeletingCapture = false
@@ -629,13 +646,18 @@ final class AccountSession: ObservableObject {
         }
         // iOS can restore a transfer that has no in-memory upload task.
         let activeIDs = await BackgroundUploads.shared.activeCaptureIDs()
-        guard !activeIDs.contains(id) else { return false }
+        guard !activeIDs.contains(id) else { return retryMessage }
+        if fromBackend {
+            guard let api else { return ClientError.network.message }
+            do { try await authorized { try await api.deleteVideo(captureID: id, token: $0) } }
+            catch { return ((error as? ClientError) ?? .network).message }
+        }
         do {
             try BackgroundUploads.shared.removeStaged(captureIDs: [id])
             try queue.removeLocalCapture(id: id, origin: owner.origin, installationID: owner.installationID)
-            return true
+            return nil
         } catch {
-            return false
+            return fromBackend ? "The backend copy was deleted. Retry to remove the copy on this iPhone." : retryMessage
         }
     }
 

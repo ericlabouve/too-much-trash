@@ -81,8 +81,12 @@ class DevelopmentEnrollment(BaseModel):
     key: str = Field(min_length=1, max_length=256)
 
 
+def development_keys_enabled():
+    return os.environ.get("TMT_DEVELOPMENT_KEYS", "false").lower() == "true"
+
+
 def require_development_keys():
-    if os.environ.get("TMT_DEVELOPMENT_KEYS", "false").lower() != "true":
+    if not development_keys_enabled():
         fail(404, "not_found", "Not found")
 
 
@@ -331,7 +335,8 @@ def require_installation(request: Request):
 def me(response: Response, installation=Depends(require_installation)):
     no_store(response)
     return {"installation_id": installation["id"], "media_contract_version": 1, "episode_contract_version": 1, "resumable_episode_contract_version": 1,
-            "development_session": installation["development_key_id"] is not None, **{
+            "development_session": installation["development_key_id"] is not None,
+            "development_video_delete_version": 1 if installation["development_key_id"] is not None and development_keys_enabled() else None, **{
         key: installation[key] for key in
         ("installation_name", "quota_bytes", "quota_uploads", "used_bytes", "used_uploads")}}
 

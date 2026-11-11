@@ -134,9 +134,27 @@ final class APIContractTests: XCTestCase {
         let legacy = try JSONDecoder().decode(Installation.self, from: Data(String(format: template, "").utf8))
         let development = try JSONDecoder().decode(Installation.self, from: Data(String(format: template, ",\"development_session\":true").utf8))
         XCTAssertNil(legacy.developmentSession)
+        XCTAssertNil(legacy.developmentVideoDeleteVersion)
         XCTAssertEqual(development.developmentSession, true)
     }
 
+    func testBackendVideoDeletionRequiresMatchingAcknowledgment() async throws {
+        let id = UUID(), transport = ScriptedTransport()
+        transport.replies = [
+            .init(status: 200, json: "{\"client_capture_id\":\"\(UUID())\",\"deleted\":true}"),
+            .init(status: 200, json: "{\"client_capture_id\":\"\(id)\",\"deleted\":true}")
+        ]
+        let client = try api(transport)
+        do {
+            try await client.deleteVideo(captureID: id, token: "test-access")
+            XCTFail("Mismatched acknowledgement must retain the local video")
+        } catch { XCTAssertEqual(error as? ClientError, .invalidResponse) }
+        try await client.deleteVideo(captureID: id, token: "test-access")
+        let request = try XCTUnwrap(transport.requests.last)
+        XCTAssertEqual(request.httpMethod, "DELETE")
+        XCTAssertEqual(request.url?.path, "/api/v1/media/by-client/\(id.uuidString)")
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer test-access")
+    }
     func testDevelopmentEnrollmentUsesOnlyThePrivateDevelopmentOrigin() async throws {
         let transport = ScriptedTransport()
         transport.replies = [.init(status: 201, json: """
