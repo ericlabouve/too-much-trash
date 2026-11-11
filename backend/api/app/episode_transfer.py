@@ -43,6 +43,8 @@ def reserved(connection, owner_id, *, excluding=None):
 
 
 def check_quota(connection, owner, size, *, excluding=None):
+    if owner["development_key_id"] is not None:
+        return
     pending_bytes, pending_count = reserved(connection, owner["id"], excluding=excluding)
     if owner["used_bytes"] + pending_bytes + size > owner["quota_bytes"] or owner["used_uploads"] + pending_count >= owner["quota_uploads"]:
         fail(429, "quota_exceeded", "Installation upload quota reached")

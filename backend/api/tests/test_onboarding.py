@@ -4,6 +4,7 @@ import io
 import hashlib
 import json
 import os
+import tarfile
 import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -12,7 +13,7 @@ from contextlib import contextmanager
 from threading import Event
 from pathlib import Path
 from unittest.mock import patch
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi.testclient import TestClient
 from alembic import command
@@ -108,6 +109,63 @@ class OnboardingTests(unittest.TestCase):
 
     def bearer(self, credentials):
         return {"Authorization": "Bearer " + credentials["access_token"]}
+
+    def test_admin_can_edit_invite_and_active_collector_quotas(self):
+        invite = self.invite(quota_bytes=1, quota_uploads=1)
+        limits = {"quota_bytes": 64, "quota_uploads": 2}
+        invite_path = f"/api/v1/admin/invites/{invite['id']}/quota"
+        self.assertEqual(self.client.post(invite_path, json=limits).status_code, 403)
+        self.assertEqual(self.client.post(invite_path, headers=self.admin_headers, json=limits).status_code, 204)
+        credentials = self.client.post("/api/v1/auth/enroll", json={"invite_code": invite["invite_code"]}).json()
+        headers = self.bearer(credentials)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["quota_bytes"], 64)
+        self.assertEqual(self.client.post(invite_path, headers=self.admin_headers, json=limits).status_code, 404)
+        installation_path = f"/api/v1/admin/installations/{credentials['installation_id']}/quota"
+        self.assertEqual(self.client.post(installation_path, headers=self.admin_headers, json={"quota_bytes": 128, "quota_uploads": 3}).status_code, 204)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["quota_uploads"], 3)
+
+    def test_usb_import_resumes_phone_transfer_with_unlimited_development_quota(self):
+        from tools.import_usb_episodes import FILES, import_episode
+
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
+            key = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers,
+                                   json={"label": "Wired test"}).json()["key"]
+            credentials = self.client.post("/api/v1/admin/development-enroll", json={"key": key}).json()
+            installation = UUID(credentials["installation_id"])
+            with database() as connection:
+                connection.execute("UPDATE installations SET quota_bytes=1, quota_uploads=1, used_uploads=1 WHERE id=%s", (installation,))
+            episode = uuid4()
+            manifest = {"schema_version": 1, "episode_id": str(episode), "complete": False,
+                        "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                        "files": {name: filename for name, filename in FILES.items() if name != "manifest"},
+                        "sensor_metadata": {}}
+            chunk_size = 4 * 1024 * 1024
+            payloads = {"video": b"v" * chunk_size + b"last", "imu": b"imu", "poses": b"poses",
+                        "manifest": json.dumps(manifest).encode()}
+            descriptors = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+                           for name, data in payloads.items()}
+            path = f"/api/v1/episodes/{episode}/transfer"
+            headers = self.bearer(credentials)
+            phone_headers = {**headers, "X-TMT-Chunk-Size": str(chunk_size)}
+            started = self.client.post(path, headers=phone_headers, json={"files": descriptors})
+            self.assertEqual(started.json()["chunk_size"], chunk_size)
+            first_chunk = self.client.put(path + "/video/0",
+                                          headers={**phone_headers, "Content-Type": "application/octet-stream"},
+                                          content=payloads["video"][:chunk_size])
+            self.assertEqual(first_chunk.status_code, 200, first_chunk.text)
+            bundle = io.BytesIO()
+            with tarfile.open(fileobj=bundle, mode="w") as archive:
+                for name, filename in FILES.items():
+                    data = payloads[name]
+                    entry = tarfile.TarInfo(filename)
+                    entry.size = len(data)
+                    archive.addfile(entry, io.BytesIO(data))
+            for _ in range(2):
+                bundle.seek(0)
+                with patch("sys.stdin", io.TextIOWrapper(io.BytesIO(bundle.getvalue()))):
+                    import_episode(installation, episode)
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["used_uploads"], 2)
+            self.assertEqual(self.client.get(f"/api/v1/episodes/{episode}/files/video", headers=headers).content, payloads["video"])
 
     def test_development_key_is_scoped_audited_and_revocable(self):
         regular = self.enrolled()

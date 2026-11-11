@@ -53,7 +53,8 @@ root.innerHTML = `
   </main>
 `;
 
-type Invite = { id: string; label: string; expires_at: string; redeemed_at: string | null; revoked_at: string | null };
+type UploadQuota = { quota_bytes: number; quota_uploads: number };
+type Invite = UploadQuota & { id: string; label: string; expires_at: string; redeemed_at: string | null; revoked_at: string | null };
 type Installation = { id: string; installation_name: string; tester_label?: string; development_key_id?: string | null; revoked_at: string | null; used_bytes: number; quota_bytes: number; used_uploads: number; quota_uploads: number };
 const feedback = document.querySelector<HTMLParagraphElement>("#invite-feedback")!;
 const form = document.querySelector<HTMLFormElement>("#invite-form")!;
@@ -103,6 +104,10 @@ async function adminApi<T>(path: string, body?: unknown): Promise<T> {
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (response.status === 401) throw new Error("Admin session expired. Open /unlock to sign in again.");
+  if (response.status === 409 && path.endsWith("/quota")) {
+    const failure = await response.json();
+    throw new Error(failure.detail?.message || "Could not change this quota.");
+  }
   if (response.status === 503) throw new Error("Could not allocate invite words. Please try again later.");
   if (!response.ok) throw new Error(`Request failed (${response.status}). Check the form or retry.`);
   return response.status === 204 ? undefined as T : await response.json() as T;
@@ -187,15 +192,71 @@ function renderLists(): void {
     const item = document.createElement("li");
     const state = invite.revoked_at ? "Revoked" : invite.redeemed_at ? "Redeemed" : Date.parse(invite.expires_at) <= Date.now() ? "Expired" : "Available";
     item.textContent = `${invite.label} · ${state} · expires ${new Date(invite.expires_at).toLocaleString()} `;
-    if (state === "Available") item.append(revokeButton(`invites/${invite.id}/revoke`, refreshLists));
+    if (state === "Available") {
+      item.append(revokeButton(`invites/${invite.id}/revoke`, refreshLists),
+        quotaEditor(`invites/${invite.id}/quota`, invite));
+    }
     inviteList.append(item);
   }
   for (const installation of visibleInstallations) {
     const item = document.createElement("li");
-    item.textContent = `${installation.tester_label?.trim() || installation.installation_name} · ${installation.revoked_at ? "Revoked" : "Active"} · ${installation.used_uploads}/${installation.quota_uploads} uploads · ${(installation.used_bytes / 1048576).toFixed(1)}/${(installation.quota_bytes / 1048576).toFixed(1)} MiB${installation.development_key_id ? ` · Development key ${installation.development_key_id}` : ""} `;
-    if (!installation.revoked_at) item.append(revokeButton(`installations/${installation.id}/revoke`, refreshLists));
+    const usage = installation.development_key_id
+      ? `${installation.used_uploads} uploads · ${(installation.used_bytes / 1048576).toFixed(1)} MiB used · Unlimited quota`
+      : `${installation.used_uploads}/${installation.quota_uploads} uploads · ${(installation.used_bytes / 1048576).toFixed(1)}/${(installation.quota_bytes / 1048576).toFixed(1)} MiB`;
+    item.textContent = `${installation.tester_label?.trim() || installation.installation_name} · ${installation.revoked_at ? "Revoked" : "Active"} · ${usage}${installation.development_key_id ? ` · Development key ${installation.development_key_id}` : ""} `;
+    if (!installation.revoked_at) {
+      item.append(revokeButton(`installations/${installation.id}/revoke`, refreshLists));
+      if (!installation.development_key_id) item.append(quotaEditor(`installations/${installation.id}/quota`, installation));
+    }
     installationList.append(item);
   }
+}
+
+function quotaEditor(path: string, quota: UploadQuota): HTMLDetailsElement {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = "Edit upload quota";
+  const editor = document.createElement("form");
+  const fields = [
+    { label: "Storage (MiB)", value: Math.ceil(quota.quota_bytes / 1048576), max: 102400 },
+    { label: "Uploads", value: quota.quota_uploads, max: 10000 },
+  ].map(field => {
+    const label = document.createElement("label");
+    label.textContent = field.label;
+    const input = document.createElement("input");
+    input.type = "number";
+    input.required = true;
+    input.min = "1";
+    input.max = String(field.max);
+    input.value = String(field.value);
+    label.append(input);
+    editor.append(label);
+    return input;
+  });
+  const [storage, uploads] = fields;
+  const save = document.createElement("button");
+  save.type = "submit";
+  save.textContent = "Save quota";
+  const feedback = document.createElement("p");
+  feedback.setAttribute("role", "status");
+  editor.append(save, feedback);
+  editor.addEventListener("submit", async event => {
+    event.preventDefault();
+    save.disabled = true;
+    try {
+      await adminApi<void>(path, {
+        quota_bytes: storage.valueAsNumber * 1048576,
+        quota_uploads: uploads.valueAsNumber,
+      });
+      await refreshLists();
+    } catch (error) {
+      feedback.textContent = error instanceof Error ? error.message : "Could not update quota.";
+    } finally {
+      save.disabled = false;
+    }
+  });
+  details.append(summary, editor);
+  return details;
 }
 
 inviteToggle.addEventListener("click", () => { showRevokedInvites = !showRevokedInvites; renderLists(); });
