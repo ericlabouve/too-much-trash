@@ -25,10 +25,10 @@ def build(output):
     # The old guide is omitted; base.rows still expects it before filtering.
     bom=[copy.deepcopy(r) for r in base.BOM if r['id']!='clip_string_guide']
     notes={
-      'actuator_bracket':'V4 compact 16.8 mm mount with centered Z8.4 screw bore, 70-degree captured guide and closed base travel slot for the common key. Automatic-support slice: zero support. Physical fit pending.',
+      'actuator_bracket':'V4 compact mount with 0.5 mm extra rail-fit opening, matched 60-degree guide and plunger faces with 0.2 mm lateral clearance per side and 3.6 mm continuous tail-anchor recess (1 mm clearance per side) around the 1.6 mm handle stem. Closed base travel slot for the common key. Matched bracket/plunger PETG slice: zero supports. Physical fit pending.',
       'shaft_cap':'V4: 97 mm compact clamp with flush liner seat, 30% shorter rail projections and mirrored 3 × 2 mm integral string guides. Supports: zero in reviewed cap slice; loaded grip untested.',
       'carrier':'V4: compact fixed jaw, flush liner seat, extended arm window and cuff/stud lowered 3.28 mm to plunger foot center. Revised jaw still needs slicing and physical validation.',
-      'plunger':'V4: filled captured neck, curved foot, tail handle and integral raised common-key seat. Original axle key moves with plunger in plate slot; 12.6 mm escape limit, not button-safe stroke. Zero sliced supports; physical retention untested.'}
+      'plunger':'V4: matched 60-degree captured neck, curved foot, tail handle and integral raised common-key seat. Original axle key moves with plunger in plate slot; 12.6 mm escape limit, not button-safe stroke. Zero sliced supports; physical retention untested.'}
     for r in bom:
         if r['id'] in notes:r['note']=notes[r['id']]
         if r['id']=='twine':
@@ -62,7 +62,7 @@ def build(output):
         result.append(('plunger_stop',model.placed(ss['plunger_stop'],p),(0,.55,.60),'pulley_key'))
         result.extend((n,ss[n],(0,.55,.60),n) for n in ('cap_liner','jaw_liner'))
         return result
-    base.rows=rows;base.BOM=bom;base.OUT=output;base.REVISION='v4-compact-centered-mount'
+    base.rows=rows;base.BOM=bom;base.OUT=output;base.REVISION='v4-continuous-tail-anchor'
     export_solids={n:s for n,s in solids.items() if n not in ('clip_string_guide','plunger_stop')}
     # export_scene/rows need the clip internally only; omit it from BOM/parts.
     def compatible_rows(p,ss):return rows(p,{**ss,'clip_string_guide':solids['clip_string_guide'],'plunger_stop':solids['plunger_stop']})
@@ -73,7 +73,7 @@ def build(output):
             out=output if sample=='wallet' and side=='near' else output/f'{sample}-{side}'
             base.export_scene(p,export_solids,out)
             path=out/'manifest.json';data=json.loads(path.read_text())
-            data.update(version='v4',title='Lined compact harness',revision='v4-compact-centered-mount',printed_designs=13,printed_pieces=24,status='V4 approved travel-stop actuator. Physical validation pending.')
+            data.update(version='v4',title='Lined compact harness',revision='v4-continuous-tail-anchor',printed_designs=13,printed_pieces=24,status='V4 matched 60-degree guide and tighter lateral tail recess. Printed fit pending.')
             data['phone_seating']=seating(p)
             scene={name:shape for name,shape,_,_ in compatible_rows(p,export_solids)}
             data['phone_seating']['cuff_distance_mm']={name:scene['phone_envelope'].val().distance(scene[name].val()) for name in ('cuff_fixed','cuff_sliding_1','cuff_sliding_2')}

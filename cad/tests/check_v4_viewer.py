@@ -19,7 +19,7 @@ def check(site):
             folder = review if (sample, side) == ('wallet', 'near') else review / f'{sample}-{side}'
             data = json.loads((folder / 'manifest.json').read_text())
             assert data['version'] == 'v4'
-            assert data['revision'] == 'v4-compact-centered-mount'
+            assert data['revision'] == 'v4-continuous-tail-anchor'
             frames=data['motion']['v4_routes']
             assert len(frames)==21
             assert frames[0]['string_points'][-1]==[-42.0,0.0,-417.0]

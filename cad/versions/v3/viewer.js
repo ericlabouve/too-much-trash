@@ -23,7 +23,7 @@ if(design==='v4'){
  $('header p').textContent='Shorter clamp and actuator rails, integrated string guides, aligned fixed cuff and the accepted tail-positioned plunger handle.';
  const notes=document.querySelectorAll('body > p[role=note]');
  notes[0].textContent='V4 design baseline: flush liners replace 0.8 mm of rigid contact material. Clamp length 97 mm; rail projections 30% shorter. Physical grip and full assembly fit remain unverified.';
- notes[1].textContent='Three interchangeable cuffs. Fixed cuff lowered 3.28 mm to the plunger-foot center. The approved 70° guide and common moving T/V key limit nominal plunger escape travel to 12.6 mm.';
+ notes[1].textContent='Three interchangeable cuffs. Fixed cuff lowered 3.28 mm to the plunger-foot center. The revised 60° retaining guide and common moving T/V key limit nominal plunger escape travel to 12.6 mm.';
  $('#view').setAttribute('aria-label','Interactive V4 CAD assembly');
  $('#status').textContent='Loading V4 CAD…';
  $('#legend').innerHTML=$('#legend').innerHTML.replace('Cuffs + fasteners + guide','Cuffs + fasteners + liners');
@@ -76,7 +76,7 @@ const details={
 if(design==='v4'){
  details.phone=['V4 LINED COMPACT HARNESS','Shorter clamp. Flush liners.','Two separate TPU liners maximize shaft contact while retaining the original opening. Integrated 3 × 2 mm string passages, shorter rails and a lowered fixed cuff. Field validation pending.'];
  details.full=['V4 FULL TOOL','Integrated shaft-cap guides.','The cap passages replace the separate clip. Twine and band routes are schematic; tension, full-stroke clearance and reliable button operation remain unresolved.'];
- details.actuator=['V4 ACCEPTED TAIL HANDLE','Handle seated at the tail groove.','The accepted handle moves 8 mm tailward. Approved 70° captured guide, curved foot transition and top-down common T/V travel stop; original wheel retained. Cord/band routing needs physical checks.'];
+ details.actuator=['V4 ACCEPTED TAIL HANDLE','Handle seated at the tail groove.','The accepted handle moves 8 mm tailward. Matched 60° retaining guide and plunger, 0.2 mm side clearance (physical fit pending), curved foot transition and top-down common T/V travel stop; original wheel retained. Cord/band routing needs physical checks.'];
  details.bom=['THIRTEEN PRINTED DESIGNS','Twenty-four pieces. True relative scale.','Seven rigid pieces and seventeen TPU pieces, including two liners. Current V4 cap, jaw and accepted tail handle; integrated guides and two copies of one common T/V key.'];
 }
 function setDetail(label,title,text){$('#detail-label').textContent=label;$('#detail-title').textContent=title;$('#detail-text').textContent=text;}

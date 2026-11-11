@@ -6,11 +6,12 @@ import cadquery as cq
 from geometry_common_key import geometry_common_key
 from plunger_design import box
 from build_steep_stop import prism,CAD
+from build_tail_handle import geometry as original_guide_geometry
 from build import export,SAMPLES
 from build_preview import clamp_geometry
 import model as m
 
-def geometry_compact():
+def geometry_compact(tail_anchor=True):
  b,pl,key,ctx=geometry_common_key()
  # Restore the old front/back apertures within their straight bearing faces.
  for y0,y1 in [(21.85,24.25)]:
@@ -22,6 +23,49 @@ def geometry_compact():
  hole=cq.Workplane('XZ',origin=(-18,14,z)).circle(r).extrude(-18)
  roof=prism([(-18-q,z+q),(-18,z+2*q),(-18+q,z+q)],14,32)
  b=b.cut(hole.union(roof)).clean()
+ # Matched 60-degree sliding faces: retain the 8 mm plunger base and
+ # 0.2 mm nominal lateral clearance at every height of the straight faces.
+ original,_,_=original_guide_geometry()
+ slope70=math.tan(math.radians(70))
+ old_top=4.966-3.766/slope70
+ old_cavity=prism([(-4.966,3),(4.966,3),(old_top,6.766),
+                   (old_top,10),(-old_top,10),(-old_top,6.766)],13.35,41.4)
+ taper=1/math.tan(math.radians(60))
+ plunger_top=4-3.2*taper
+ # Trim the shaft and integral raised seat only outside their matched slopes;
+ # preserve the base, slot, handle, and all other plunger geometry.
+ pl_allowed=prism([(-4,3.4),(4,3.4),(plunger_top,6.6),
+                   (plunger_top+1.8*taper,8.4),
+                   (-(plunger_top+1.8*taper),8.4),(-plunger_top,6.6)],13.35,41.0)
+ trim=box(-5,5,13.35,41.0,3.4,8.4).cut(pl_allowed)
+ pl=pl.cut(trim).clean()
+ waist=plunger_top+0.2
+ lower=waist+(6.6-2.9)*taper
+ upper=waist+1.8*taper
+ cavity=prism([(-6,2.9),(6,2.9),(lower,2.9),(waist,6.6),
+               (upper,8.4),(upper,10),(-upper,10),(-upper,8.4),
+               (-waist,6.6),(-lower,2.9)],13.35,41.4)
+ fill=original.intersect(old_cavity).cut(cavity).intersect(
+     box(-10,10,13.35,41.4,3.1,8.4))
+ b=b.union(fill).cut(cavity).clean()
+ # Increase the rail-hook opening by 0.5 mm toward negative X. Translate
+ # the complete outer hook, then bridge its section back to the mount so its
+ # thickness and the screw bore's X/Z center are unchanged.
+ split=-28.2
+ left=b.intersect(box(-100,split,-100,100,-100,100)).translate((-.5,0,0))
+ right=b.cut(box(-100,split,-100,100,-100,100))
+ section=cq.Workplane('YZ',origin=(split,0,0)).newObject([b.val()]).section()
+ bridge=cq.Workplane(obj=cq.Compound.makeCompound([
+     cq.Solid.extrudeLinear(face.outerWire(),face.innerWires(),cq.Vector(-.5,0,0))
+     for face in section.val().Faces()]))
+ b=right.union(left).union(bridge).clean()
+ # Restore the existing rounded tail-anchor surface inward, rather than
+ # adding separate raised tabs. A 3.6 mm opening leaves 1 mm each side
+ # of the 1.6 mm stem; retain the original anchor top and underside.
+ tail_profile=prism([(3.6,7.2),(11,7.2),(11,10),(1.8,10),(1.8,9.0)],38.5,41.4)
+ tail_profile=tail_profile.union(prism([(-3.6,7.2),(-11,7.2),(-11,10),(-1.8,10),(-1.8,9.0)],38.5,41.4))
+ tail_extension=original.intersect(tail_profile)
+ if tail_anchor:b=b.union(tail_extension).clean()
  return b,pl,key,ctx
 
 def local(s,p):

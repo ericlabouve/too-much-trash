@@ -383,3 +383,35 @@ Boolean solid comparisons against final canonical V3 found zero added/removed vo
 ### PETG upgrade print started — 2026-11-09
 
 The user approved the reviewed four-piece upgrade plate, including its disclosed 0.1972 g fixed-jaw supports, and confirmed the textured PEI bed clear with Bambu PETG Translucent Blue loaded externally. Uploaded package and G-code checksums matched; the A1 mini reported RUNNING / heatbed preheating, no print error, and 417 minutes remaining. This confirms job start, not completion or physical fit. Exact identifiers and settings are in `review/petg-upgrade-print-2026-11-09.json`; the immutable local package remains in the ignored upgrade output directory.
+
+## Tighter 60° actuator guide — 2026-11-10
+
+The user reports the November 9 PETG plate completed. The printed 70° guide allows excessive plunger wiggle and twist-out with the T/V key absent. This supersedes its prior retention assumptions; completion does not approve the actuator fit.
+
+The bracket now uses 60° retaining faces around the unchanged plunger. At neck-top height Z6.6, the opening narrows from 7.31 to 5.97 mm, leaving 0.15 mm per side around the 5.67 mm plunger top. The lower opening remains about 9.67 mm at Z3.4: narrowing it with 60° straight faces would cut into the existing plunger. The guide opens above its waist to clear the raised key seat. The screw mount, pulley and T/V stop scheme are retained. Revised insertion, travel and slice checks are recorded separately; actual friction, loaded twist retention and print tolerance still need physical validation.
+
+The revised bracket passes sampled 53 mm end-on insertion, 12.6 mm operating travel, key clearance and positive-stop checks. A1 mini PETG at 0.12 mm layers produces zero support/interface extrusion with automatic supports enabled and bridge suppression off: 4.88 g, 46.4 minutes. See `source/check_tight_guide.py` and `review/tight-guide-validation.json`. No revised print sent.
+
+## Rail-fit allowance — 2026-11-10
+
+The user reports slight warping prevented the printed actuator from fitting the shaft-cap rail. Increase the bracket's rail opening from 20.4 to 20.9 mm around the unchanged 20 mm rail, retaining hook thickness and the screw position. This is a nominal clearance allowance, not a validated cure for warping. The plunger remains unchanged; the 60° guide has about 0.833 mm lateral clearance per side at Z3.4, tapering to 0.15 mm per side at Z6.6.
+
+Revised bracket: valid single solid; sampled 53 mm insertion and 12.6 mm operating travel/key-stop checks pass. All eight phone/side assemblies have no solid interference with cap, jaw, screw or nut. Automatic supports ON, bridge suppression OFF: zero support/interface, 4.96 g, 47.45 minutes at 0.12 mm PETG. Physical rail fit, preload and warping tolerance remain unverified. Rebuildable checks are in `build/20261110-rail-clearance/`; no print sent.
+
+## Matched 60° guide and tighter tail recess — 2026-11-10
+
+The user approved changing both plunger and bracket mating faces to 60°, preserving the plunger's 8 mm maximum neck width and targeting 0.2 mm horizontal clearance per side. This supersedes the earlier unchanged-plunger constraint and unequal lower/upper clearances. At Z3.4 the nominal neck/guide widths are 8.0/8.4 mm; at Z6.6 they are 4.305/4.705 mm. The raised key-seat transition must remain passable. Both parts now require reprinting.
+
+The user also requested a tighter recess around the tail handle at the return-band anchor. Preserve the 1 mm string/return-band paths, end-on insertion, full nominal travel and the extra 0.5 mm rail opening. Dimensional clearance is a design target, not established print accuracy. The recorded A1 mini configuration uses a 0.4 mm nozzle and 0.12 mm layer height (0.2 mm first layer); these are distinct from measured XY fit accuracy.
+
+Clarification: the actual November 9 print used matching 70° faces with 0.8204 mm horizontal clearance per side at both Z3.4 and Z6.6. The later unequal-clearance 60° bracket was an unprinted intermediate design. The red tail-recess request concerns lateral fit around the plunger neck, not axial end-stop distance; discard the proposed 0.2 mm axial stop advance and preserve the original 0.4 mm end gap.
+
+The lateral tail recess is distinct from the main sliding guide. The user rejected the raised inward tabs and requested extending the existing rounded anchor instead, leaving 1 mm per side around the 1.6 mm stem. The continuous anchor now has a 3.6 mm opening, retains its original Z9.6 top surface, and uses 45° underside transitions. The raised tabs are removed. The original axial stop and 0.4 mm end gap remain unchanged. This supersedes the earlier 2.0 mm recess and Z10.6 raised lips.
+
+The matched guide's key-hole side ligaments remain approximately 0.452 mm; deposited perimeter paths do not establish printed continuity or strength. Physical fit remains pending. No print sent.
+
+Continuous-anchor verification: sampled end-loading, 12.6 mm operating travel, common-key retention, eight mounting configurations, and added-material clearance to the schematic 1 mm cord/band pass. Matched PETG bracket + plunger slice uses 6.3175 g and zero support/interface paths with automatic supports enabled and bridge suppression disabled. See `review/matched-guide-tail-fit.json`.
+
+### Two-piece PETG reprint prepared — 2026-11-10
+
+The approved continuous-anchor bracket and matched 60° plunger are arranged base-down on one A1 mini plate: 6.32 g, approximately 58 minutes, 0.12 mm layers, textured PEI, zero support/interface paths with automatic supports enabled. Source hashes match the validated geometry. No print sent. Exact package hashes, profiles and preview location: `review/actuator-fit-reprint-2026-11-10.json`.

@@ -1,0 +1,163 @@
+{
+  "date": "2026-11-10",
+  "physical_feedback": "User reports slight warping prevented printed actuator fitting shaft-cap rail.",
+  "change": "Rail hook opening 20.4 to20.9 mm; negative-X hook shifted0.5 mm, original thickness and screw position retained.",
+  "lower_plunger_lateral_clearance_per_side_mm": 0.833,
+  "upper_plunger_lateral_clearance_per_side_mm": 0.15,
+  "print_sent": false,
+  "validation": {
+    "wallet-near": {
+      "shaft_cap": 0.0,
+      "carrier": 0.0,
+      "rail_screw_1": 0.0,
+      "rail_nut_1": 0.0
+    },
+    "wallet-far": {
+      "shaft_cap": 0.0,
+      "carrier": 0.0,
+      "rail_screw_1": 0.0,
+      "rail_nut_1": 0.0
+    },
+    "bare-near": {
+      "shaft_cap": 0.0,
+      "carrier": 0.0,
+      "rail_screw_1": 0.0,
+      "rail_nut_1": 0.0
+    },
+    "bare-far": {
+      "shaft_cap": 0.0,
+      "carrier": 0.0,
+      "rail_screw_1": 0.0,
+      "rail_nut_1": 0.0
+    },
+    "small-near": {
+      "shaft_cap": 0.0,
+      "carrier": 0.0,
+      "rail_screw_1": 0.0,
+      "rail_nut_1": 0.0
+    },
+    "small-far": {
+      "shaft_cap": 0.0,
+      "carrier": 0.0,
+      "rail_screw_1": 0.0,
+      "rail_nut_1": 0.0
+    },
+    "large-near": {
+      "shaft_cap": 0.0,
+      "carrier": 0.0,
+      "rail_screw_1": 0.0,
+      "rail_nut_1": 0.0
+    },
+    "large-far": {
+      "shaft_cap": 0.0,
+      "carrier": 0.0,
+      "rail_screw_1": 0.0,
+      "rail_nut_1": 0.0
+    }
+  },
+  "slice": {
+    "revision": "v4-rail-fit-clearance",
+    "reference_only": true,
+    "printer_contacted": false,
+    "pieces": 1,
+    "plates": 1,
+    "total_g": 4.961523532867432,
+    "total_minutes": 47.45403238932292,
+    "warning": "",
+    "deposited_g_by_role": {
+      "model": 4.8777
+    },
+    "objects": {
+      "bracket": {
+        "deposited_g_by_role": {
+          "model": 4.8777
+        },
+        "deposited_xy_bounds": [
+          [
+            55.672,
+            61.61
+          ],
+          [
+            104.328,
+            98.39
+          ]
+        ],
+        "support_z_mm": null
+      }
+    },
+    "gaps": [],
+    "effective_settings": {
+      "printer_model": "Bambu Lab A1 mini",
+      "nozzle_diameter": [
+        "0.4"
+      ],
+      "layer_height": "0.12",
+      "initial_layer_print_height": "0.2",
+      "curr_bed_type": "Textured PEI Plate",
+      "support_type": "normal(auto)",
+      "support_style": "snug",
+      "support_on_build_plate_only": "0",
+      "support_threshold_angle": "30",
+      "support_top_z_distance": "0.24",
+      "support_bottom_z_distance": "0.24",
+      "support_object_xy_distance": "0.4",
+      "support_interface_top_layers": "2",
+      "support_interface_bottom_layers": "2",
+      "support_interface_spacing": "0.5",
+      "nozzle_temperature": [
+        "245"
+      ],
+      "nozzle_temperature_initial_layer": [
+        "250"
+      ],
+      "textured_plate_temp": [
+        "70"
+      ],
+      "textured_plate_temp_initial_layer": [
+        "70"
+      ],
+      "print_sequence": "by layer",
+      "brim_type": "no_brim",
+      "raft_layers": "0",
+      "bridge_no_support": "0",
+      "bridge_flow": "1",
+      "bridge_speed": [
+        "50"
+      ],
+      "filament_bridge_speed": [
+        "25"
+      ]
+    },
+    "effective_object_settings": [
+      {
+        "name": "bracket",
+        "extruder": "1",
+        "wall_loops": "3",
+        "enable_support": "1",
+        "sparse_infill_density": "15%",
+        "sparse_infill_pattern": "gyroid"
+      }
+    ],
+    "verified_gcode_heat_waits_c": {
+      "bed": 70,
+      "nozzle": 250
+    },
+    "gcode_md5": "62ac91f9153f6fb8aea1f23c371f48f1",
+    "hashes": {
+      "cuff-fit-input.3mf": "a54c388e701854c23112117e534a35466610ea858f38bada7e1bfa3a57fc5810",
+      "cuff-fit.gcode.3mf": "af4bd647371882af856d0e8cca735cc7295d4b7c0b142e62bc4e1c64c8c5cfe5",
+      "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+      "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+      "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+    },
+    "limits": [
+      "Not sent to printer; loaded material/bed/nozzle not verified for a live job.",
+      "Support removal, fit, layer strength, retention and part function need physical checks.",
+      "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+      "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+      "Automatic supports ON; bridge suppression OFF.",
+      "Current V4 geometry; no print sent.",
+      "Full projected footprints separated by at least 3 mm; inspect actual paths."
+    ]
+  }
+}

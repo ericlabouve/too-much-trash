@@ -30,9 +30,10 @@
   "estimated_minutes": 417.626953125,
   "support_interface_g": 0.1972,
   "authorization": "User approved reviewed plate and confirmed bed clear, textured PEI installed and PETG ready. Disclosed fixed-jaw support accepted for this print; not a zero-support slice.",
-  "physical_result": "pending",
+  "physical_result": "User reported print completed on 2026-11-10. Actuator guide has excessive plunger wiggle; 70-degree retaining faces allow twisting plunger out without T/V key installed. Other component fit not assessed in this report.",
   "observed_printer_state": "RUNNING",
   "observed_stage": "heatbed_preheating",
   "observed_print_error": 0,
-  "observed_remaining_minutes": 417
+  "observed_remaining_minutes": 417,
+  "requested_revision": "Keep plunger width; tighten bracket slot and change retaining faces to 60 degrees."
 }
