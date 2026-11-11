@@ -1,0 +1,716 @@
+{
+  "samples": [
+    {
+      "travel_mm": 0.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 0.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 1.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 1.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 2.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 2.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 3.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 3.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 4.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 4.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 5.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 5.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 6.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 6.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 7.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 7.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 8.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 8.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 9.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 9.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 10.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 10.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 11.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 11.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 12.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 12.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 12.6,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0,
+      "key_bracket_lift_0_mm3": 0.0,
+      "key_context_lift_0_mm3": 0.0,
+      "key_bracket_lift_0.4_mm3": 0.0,
+      "key_context_lift_0.4_mm3": 0.0,
+      "key_bracket_lift_0.8_mm3": 0.0,
+      "key_context_lift_0.8_mm3": 0.0
+    },
+    {
+      "travel_mm": 13.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 13.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 14.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 14.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 15.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 15.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 16.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 16.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 17.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 17.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 18.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 18.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 19.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 19.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 20.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 20.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 21.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 21.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 22.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 22.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 23.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 23.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 24.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 24.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 25.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 25.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 26.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 26.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 27.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 27.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 28.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 28.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 29.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 29.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 30.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 30.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 31.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 31.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 32.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 32.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 33.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 33.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 34.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 34.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 35.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 35.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 36.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 36.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 37.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 37.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 38.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 38.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 39.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 39.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 40.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 40.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 41.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 41.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 42.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 42.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 43.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 43.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 44.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 44.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 45.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 45.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 46.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 46.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 47.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 47.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 48.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 48.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 49.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 49.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 50.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 50.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 51.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 51.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 52.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 52.5,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    },
+    {
+      "travel_mm": 53.0,
+      "bracket_mm3": 0.0,
+      "context_mm3": 0.0
+    }
+  ],
+  "positive_stops": {
+    "beyond_pull_mm3": 1.740000000000025,
+    "upward_escape_mm3": 0.4650000000000055
+  },
+  "unchanged_plunger": true,
+  "bracket_stl_sha256": "815554c28db97139f10cb86b7a3651724d30f275efaa010b2d9a7765ac524c68",
+  "limits": [
+    "Sampled rigid translation, not loaded movement or TPU flexure.",
+    "Twist escape and physical fit remain unverified."
+  ]
+}

@@ -35,7 +35,7 @@ jobs:
         run: uv sync --frozen
       - name: Build unsliced packages
         working-directory: cad
-        run: uv run --frozen inv release --output build/release
+        run: uv run --frozen inv release --version v4 --output build/release
       - name: Verify release contents and source geometry
         working-directory: cad
         env:

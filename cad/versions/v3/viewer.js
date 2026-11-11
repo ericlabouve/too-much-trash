@@ -1,3 +1,5 @@
+import {installFramePen} from './review/concepts/braced-tail-b/frame-pen.js';
+import {installSurfacePen} from './review/concepts/braced-tail-b/surface-pen.js';
 import {installViewCube} from '../../view_cube.js?revision=quarter-turns-v1';
 import {assemblySteps} from './assembly_steps.js';
 import {installFullscreen} from './viewer_fullscreen.js';
@@ -7,14 +9,38 @@ import {STLLoader} from 'three/addons/loaders/STLLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 const $=s=>document.querySelector(s);
+const design=new URLSearchParams(location.search).get('design')==='v4'?'v4':'v3';
+const dataRoot=design==='v4'?'../v4/':'';
+if(design==='v4'){
+ document.title='V4 · Lined compact harness';
+ document.querySelectorAll('header .metrics > span')[1].innerHTML='<b>1</b>continuous string';
+ $('label[for=stroke]').textContent='Mechanical travel';
+ $('#animate').textContent='▶ Animate travel';
+ $('#stroke-help').textContent='Mechanical travel inspection keeps the complete assembly visible. Full travel may pass phone contact; the 12.6 mm escape limit is not safe button travel.';
+ const travelNote=document.createElement('small');travelNote.textContent='Full mechanical range may pass phone contact; not safe button travel.';travelNote.id='v4-travel-note';$('#stroke-value').after(travelNote);
+ $('header .eyebrow').textContent='VERSION 4 / LINED COMPACT HARNESS';
+ $('header h1').textContent='Compact clamp. Flush TPU liners.';
+ $('header p').textContent='Shorter clamp and actuator rails, integrated string guides, aligned fixed cuff and the accepted tail-positioned plunger handle.';
+ const notes=document.querySelectorAll('body > p[role=note]');
+ notes[0].textContent='V4 design baseline: flush liners replace 0.8 mm of rigid contact material. Clamp length 97 mm; rail projections 30% shorter. Physical grip and full assembly fit remain unverified.';
+ notes[1].textContent='Three interchangeable cuffs. Fixed cuff lowered 3.28 mm to the plunger-foot center. The revised 60° retaining guide and common moving T/V key limit nominal plunger escape travel to 12.6 mm.';
+ $('#view').setAttribute('aria-label','Interactive V4 CAD assembly');
+ $('#status').textContent='Loading V4 CAD…';
+ $('#legend').innerHTML=$('#legend').innerHTML.replace('Cuffs + fasteners + guide','Cuffs + fasteners + liners');
+ $('#inventory > p').textContent='Thirteen printed designs, twenty-four pieces. Two separate TPU liners; cap string passages replace the separate guide. String and bands are additional consumables.';
+ $('footer').textContent='V4 design baseline. Stock geometry remains historical reference; grip, tension, button force and routing need physical checks. Approved travel-stop actuator; physical retention and button-safe travel remain unverified.';
+ document.querySelectorAll('aside > a').forEach(a=>a.remove());
+ const link=document.createElement('a');link.href='../v4/README.md';link.textContent='V4 design notes ↗';$('aside').append(link);
+}
+
 const canvas=$('#view'),status=$('#status');
-const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setClearColor(0xf8f7f3);
 const scene=new THREE.Scene();scene.add(new THREE.HemisphereLight(0xffffff,0x8d9698,2.6));
 const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-150,250,180);scene.add(light);
 const camera=new THREE.PerspectiveCamera(35,1,.1,4000),controls=new OrbitControls(camera,canvas);controls.enableDamping=true;
 const viewCube=installViewCube({canvas,camera,controls,clickStepDegrees:90});
-let marking=false,featureOverlay=null,featureHit=null,stepIndex=-1,painting=false,paintLast=null;const featureOverlays=[];let shapeStart=null,shapePreview=null;let paintTime=0;const steps=assemblySteps();
+let marking=false,featureOverlay=null,featureHit=null,stepIndex=-1,painting=false,paintLast=null;const featureOverlays=[];let shapeStart=null,shapePreview=null;let paintTime=0;const steps=assemblySteps(design);
 const featureLabel=document.createElement('div');featureLabel.className='feature-label';featureLabel.hidden=true;$('#stage').append(featureLabel);
 const root=new THREE.Group();root.rotation.x=-Math.PI/2;scene.add(root);
 const assembly=new THREE.Group(),inventory=new THREE.Group();root.add(assembly,inventory);
@@ -47,6 +73,12 @@ const details={
  bom:['TWELVE PRINTED DESIGNS','Twenty-two pieces. True relative scale.','Three identical 21.6 mm TPU cuffs and integral studs on the rigid jaws. Only the pulley axle uses a loose T-key. Local TPU/stud fit is reported successful; full assembly retention and strength remain unqualified.']
 };
 
+if(design==='v4'){
+ details.phone=['V4 LINED COMPACT HARNESS','Shorter clamp. Flush liners.','Two separate TPU liners maximize shaft contact while retaining the original opening. Integrated 3 × 2 mm string passages, shorter rails and a lowered fixed cuff. Field validation pending.'];
+ details.full=['V4 FULL TOOL','Integrated shaft-cap guides.','The cap passages replace the separate clip. Twine and band routes are schematic; tension, full-stroke clearance and reliable button operation remain unresolved.'];
+ details.actuator=['V4 ACCEPTED TAIL HANDLE','Handle seated at the tail groove.','The accepted handle moves 8 mm tailward. Matched 60° retaining guide and plunger, 0.2 mm side clearance (physical fit pending), curved foot transition and top-down common T/V travel stop; original wheel retained. Cord/band routing needs physical checks.'];
+ details.bom=['THIRTEEN PRINTED DESIGNS','Twenty-four pieces. True relative scale.','Seven rigid pieces and seventeen TPU pieces, including two liners. Current V4 cap, jaw and accepted tail handle; integrated guides and two copies of one common T/V key.'];
+}
 function setDetail(label,title,text){$('#detail-label').textContent=label;$('#detail-title').textContent=title;$('#detail-text').textContent=text;}
 function material(rgb){return new THREE.MeshStandardMaterial({color:new THREE.Color(...rgb),roughness:.7});}
 function allowed(name){
@@ -54,7 +86,7 @@ function allowed(name){
  if(name==='stock_neck_context')return mode==='phone';
  if(name==='twine_phone')return mode==='phone'||mode==='actuator';
  if(mode==='full')return true;
- if(mode==='actuator')return ['twine_attachment','plunger','pulley','pulley_axle','pulley_key','band_keeper','rail_screw_1','rail_nut_1','band_return','phone_volume_up'].includes(name);
+ if(mode==='actuator')return ['twine_attachment','plunger','plunger_stop','pulley','pulley_axle','pulley_key','band_keeper','rail_screw_1','rail_nut_1','band_return','phone_volume_up'].includes(name);
  if(name==='guide_1'||name==='band_guide_1')return true;
  return !name.startsWith('stock_')&&!name.startsWith('guide_')&&!name.startsWith('band_guide_')&&!['twine','twine_trigger','band_overtravel'].includes(name);
 }
@@ -109,7 +141,7 @@ function setMode(next){
  $('#flip').disabled=inventory.visible;$('#stroke').disabled=inventory.visible;$('#phone').disabled=inventory.visible;$('#transparent').disabled=inventory.visible;
  setDetail(...details[mode]);resize();
  // Crop actuator framing to the mechanism while retaining the integral carrier for context.
- const fit=mode==='actuator'?['plunger','pulley','pulley_axle','pulley_key','band_keeper','band_return','actuator_context'].map(n=>meshes.get(n)):visibleMeshes();
+ const fit=mode==='actuator'?['plunger','plunger_stop','pulley','pulley_axle','pulley_key','band_keeper','band_return','actuator_context'].map(n=>meshes.get(n)).filter(Boolean):visibleMeshes();
  frameObjects(fit);pose(strokeFraction);status.textContent=mode==='bom'?'Click a row or model to inspect. Right-click a model for assembly views. Review meshes, not print files.':'Drag to orbit · scroll to zoom · click a component to inspect. Prescribed motion, not a force simulation.';
 }
 function tube(points,diameter){
@@ -125,6 +157,25 @@ function replaceTube(name,points,diameter){const mesh=meshes.get(name);mesh.geom
 function pose(fraction){
  const previous=strokeFraction;strokeFraction=Math.max(0,Math.min(1,fraction));fraction=strokeFraction;
  $('#stroke').value=String(fraction*100);$('#stroke-value').value=`${Math.round(fraction*100)}%`;
+ if(design==='v4'){
+  const m=manifest.motion,advance=m.mechanical_travel_mm*fraction,travel=fraction>1e-6;
+  const plunger=meshes.get('plunger');if(plunger)plunger.position.x=-advance;
+  if(m.plunger_stop_moves_with_plunger){const key=meshes.get('plunger_stop');if(key)key.position.x=-advance;}
+  // Recompute the moving wrap/tangent/return path; leave fixed guides and trigger fixed.
+  const frames=m.v4_routes;
+  if(frames){
+   const sample=fraction*(frames.length-1),lo=Math.floor(sample),hi=Math.min(lo+1,frames.length-1),t=sample-lo;
+   const path=key=>frames[lo][key].map((p,i)=>p.map((v,j)=>v+(frames[hi][key][i][j]-v)*t));
+   for(const [name,key] of [['twine','string_points'],['twine_phone','phone_points'],['twine_attachment','attachment_points'],['band_return','return_points']]){
+    const mesh=meshes.get(name);if(!mesh)continue;mesh.position.set(0,0,0);replaceTube(name,path(key),name==='band_return'?1.2:manifest.parameters.twine_diameter);
+   }
+  }
+  $('#stroke-phase').textContent=travel?'Mechanical travel inspection · assembly remains visible':'Released · phone seated against cuff surfaces';
+  $('#motion-info').textContent=`Plunger: ${advance.toFixed(2)} / ${manifest.motion.mechanical_travel_mm.toFixed(2)} mm available pull. Full range may pass phone contact; this is not safe button travel or a trigger/string-force simulation. String tension is managed manually; cord and return-band paths remain schematic.`;
+  canvas.dataset.buttonTravel='0';canvas.dataset.stroke=String(fraction);canvas.dataset.plungerTravel=String(advance);
+  if(outline){root.updateWorldMatrix(true,true);outline.box.makeEmpty();for(const mesh of selectionTargets)outline.box.expandByObject(mesh);}
+  return;
+ }
  const m=manifest.motion,axis=new THREE.Vector3(0,1,0),tp=new THREE.Vector3(...m.trigger_pivot),restAttach=new THREE.Vector3(...m.trigger_attach);
  const angle=m.trigger_angle*fraction;
  const attach=restAttach.clone().sub(tp).applyAxisAngle(axis,angle).add(tp),last=new THREE.Vector3(...m.string_points.at(-2));
@@ -155,10 +206,11 @@ function pose(fraction){
  if(outline){root.updateWorldMatrix(true,true);outline.box.makeEmpty();for(const mesh of selectionTargets)outline.box.expandByObject(mesh);}
 }
 function setPlaying(value){
- playing=value;$('#animate').textContent=value?'Ⅱ Pause animation':'▶ Animate squeeze';$('#animate').setAttribute('aria-pressed',String(value));
+ playing=value;$('#animate').textContent=value?'Ⅱ Pause animation':design==='v4'?'▶ Animate travel':'▶ Animate squeeze';$('#animate').setAttribute('aria-pressed',String(value));
  lastFrame=null;lastPoseTime=0;
 }
 function findStopFraction(){
+ if(design==='v4')return .5;
  const m=manifest.motion,pivot=new THREE.Vector3(...m.trigger_pivot),attach=new THREE.Vector3(...m.trigger_attach),last=new THREE.Vector3(...m.string_points.at(-2));
  const rest=attach.distanceTo(last),axis=new THREE.Vector3(0,1,0);let lo=0,hi=1;
  for(let i=0;i<40;i++){const mid=(lo+hi)/2;const point=attach.clone().sub(pivot).applyAxisAngle(axis,m.trigger_angle*mid).add(pivot);if(point.distanceTo(last)-rest<m.twine_to_stop)lo=mid;else hi=mid;}
@@ -169,8 +221,8 @@ function setupPreview(){
  previewScene=new THREE.Scene();previewScene.add(new THREE.HemisphereLight(0xffffff,0x8d9698,2.6));
  const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-30,60,100);previewScene.add(light);
  previewRoot=new THREE.Group();previewRoot.rotation.copy(root.rotation);previewScene.add(previewRoot);
- for(const name of ['actuator_context','twine_attachment','plunger','pulley','pulley_axle','pulley_key','band_keeper','twine_phone','band_return','phone_volume_up']){
-  const original=meshes.get(name);const clone=new THREE.Mesh(original.geometry,original.material.clone());previewRoot.add(clone);previewMeshes.set(name,clone);
+ for(const name of ['actuator_context','twine_attachment','plunger','plunger_stop','pulley','pulley_axle','pulley_key','band_keeper','twine_phone','band_return','phone_volume_up']){
+  const original=meshes.get(name);if(!original)continue;const clone=new THREE.Mesh(original.geometry,original.material.clone());previewRoot.add(clone);previewMeshes.set(name,clone);
  }
  const ghost=new THREE.LineSegments(new THREE.EdgesGeometry(meshes.get('plunger').geometry),new THREE.LineBasicMaterial({color:0x77868b,transparent:true,opacity:.6,depthTest:false}));ghost.renderOrder=2;previewRoot.add(ghost);
  previewCamera=new THREE.PerspectiveCamera(35,1,.1,500);
@@ -185,7 +237,7 @@ function renderPreview(){
   previewRenderer.setSize(c.clientWidth,c.clientHeight,false);previewCamera.aspect=c.clientWidth/c.clientHeight;previewCamera.updateProjectionMatrix();
  }
  for(const [name,clone] of previewMeshes){
-  const source=meshes.get(name);clone.geometry=source.geometry;clone.position.copy(source.position);clone.quaternion.copy(source.quaternion);
+  const source=meshes.get(name);if(design==='v4')clone.visible=source.visible;clone.geometry=source.geometry;clone.position.copy(source.position);clone.quaternion.copy(source.quaternion);
   if(name==='actuator_context'){clone.material.transparent=true;clone.material.opacity=.15;clone.material.depthWrite=false;}
   if(name==='phone_volume_up')clone.material.emissive.copy(source.material.emissive);
  }
@@ -265,9 +317,9 @@ function menu(id,e){
  el.hidden=false;el.style.left=`${Math.max(8,Math.min(e.clientX,innerWidth-el.offsetWidth-8))}px`;el.style.top=`${Math.max(8,Math.min(e.clientY,innerHeight-el.offsetHeight-8))}px`;
 }
 try{
- const params=new URLSearchParams(location.search);const sample=params.get('sample')||'wallet',side=params.get('side')||'near';const base=sample==='wallet'&&side==='near'?'review/':`review/${sample}-${side}/`;
+ const params=new URLSearchParams(location.search);const sample=params.get('sample')||(design==='v4'?'bare':'wallet'),side=params.get('side')||'near';const base=dataRoot+(sample==='wallet'&&side==='near'?'review/':`review/${sample}-${side}/`);
  $('#sample').value=sample;$('#side').value=side;
- for(const id of ['sample','side'])$('#'+id).onchange=()=>{location.search=new URLSearchParams({sample:$('#sample').value,side:$('#side').value});};
+ for(const id of ['sample','side'])$('#'+id).onchange=()=>{location.search=new URLSearchParams({sample:$('#sample').value,side:$('#side').value,...(design==='v4'?{design}: {})});};
  const response=await fetch(base+'manifest.json',{cache:'no-store'});if(!response.ok)throw new Error(`Manifest HTTP ${response.status}`);manifest=await response.json();
  $('#orientation').textContent=(side==='far'?'Phone rotated 180° · camera at opposite end · framing unresolved':'Phone in standard orientation')+(manifest.phone_center_y_mm?` · phone shifted ${Math.abs(manifest.phone_center_y_mm)} mm along jaws`:'');
  await Promise.all(manifest.assembly.map(async entry=>{
@@ -283,17 +335,21 @@ try{
   let geometry;
   const part=manifest.parts.find(p=>p.name===row.id);
   if(part)geometry=await loader.loadAsync(freshAsset(base+part.file));
-  else if(row.id==='twine')geometry=tube([[0,0,0],[20,20,0],[40,0,0],[60,20,0],[80,0,0]],2);
+  else if(row.id==='twine'){
+   // One continuous schematic coil; spacing is illustrative, not a cut length.
+   const points=Array.from({length:241},(_,i)=>{const t=i/240,a=t*Math.PI*6,r=5+30*t;return [r*Math.cos(a),r*Math.sin(a),0];});
+   geometry=design==='v4'?tube(points,manifest.parameters.twine_diameter):tube([[0,0,0],[20,20,0],[40,0,0],[60,20,0],[80,0,0]],2);
+  }
   else geometry=tube(bandPoints(new THREE.Vector3(0,0,0),new THREE.Vector3(0,50,0),12),1.4);
   // Printed parts use source millimetres, just like the assembly. Never
   // normalize each part independently: a screw must look smaller than a jaw.
   geometry.computeVertexNormals();geometry.computeBoundingBox();const center=geometry.boundingBox.getCenter(new THREE.Vector3()),extent=geometry.boundingBox.getSize(new THREE.Vector3());geometry.translate(-center.x,-center.y,-center.z);
-  const rgb=['phone_cuff','collar_screw','thumb_nut','clip_string_guide','pulley_key'].includes(row.id)?[0,.55,.60]:row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
+  const rgb=['phone_cuff','collar_screw','thumb_nut','clip_string_guide','pulley_key','cap_liner','jaw_liner','plunger_stop'].includes(row.id)?[0,.55,.60]:row.id==='twine'?[.62,.42,.19]:row.id==='rubber_bands'?[.57,.29,.68]:[.96,.36,.08];
   const mesh=new THREE.Mesh(geometry,material(rgb));mesh.position.set((i%3)*155,-Math.floor(i/3)*170,0);mesh.userData.bomId=row.id;mesh.userData.displayScale=1;inventory.add(mesh);bomMeshes.set(row.id,mesh);
   geometry.computeBoundingBox();
   tr.dataset.displayScale=String(mesh.userData.displayScale);tr.dataset.modelSizeMm=JSON.stringify(geometry.boundingBox.getSize(new THREE.Vector3()).toArray());
-  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'TPU T/V snap key',phone_cuff:'Rounded cuff',collar_screw:'Common TPU screw',thumb_screw:'Thumb screw',thumb_nut:'TPU nut',clip_string_guide:'TPU clip guide',twine:'Twine sections + inline band',rubber_bands:'Rubber bands'};
-  label(`${titles[row.id]||row.name||row.id} ×${row.quantity}${part?'':' · schematic'}`,mesh.position.x,mesh.position.y-Math.max(65,extent.y/2+12),0,row.id);
+  const titles={shaft_cap:'Shaft cap',carrier:'Fixed jaw',sliding_jaw:'Sliding jaw',actuator_bracket:'Actuator bracket',plunger:'Sliding plunger',pulley:'Redirect pulley',pulley_axle:'Smooth axle',pulley_key:'TPU T/V snap key',phone_cuff:'Rounded cuff',collar_screw:'Common TPU screw',thumb_screw:'Thumb screw',thumb_nut:'TPU nut',clip_string_guide:'TPU clip guide',twine:design==='v4'?'String':'Twine sections + inline band',rubber_bands:'Rubber bands'};
+  label(`${titles[row.id]||row.name||row.id} ×${row.quantity}${part||design==='v4'&&['twine','rubber_bands'].includes(row.id)?'':' · schematic'}`,mesh.position.x,mesh.position.y-Math.max(65,extent.y/2+12),0,row.id);
  }
  for(const [i,step] of steps.entries()){const option=document.createElement('option');option.value=i;option.textContent=`${i+1}. ${step.title}`;$('#assembly-step').append(option);}
  $('#assembly-toggle').onclick=()=>stepIndex<0?showStep(0):exitSteps();$('#assembly-exit').onclick=()=>exitSteps();$('#step-back').onclick=()=>showStep(stepIndex-1);$('#step-next').onclick=()=>showStep(stepIndex+1);$('#assembly-step').onchange=e=>showStep(Number(e.target.value));
@@ -316,7 +372,20 @@ try{
  canvas.addEventListener('click',e=>{if(!pointerStart||Math.hypot(e.clientX-pointerStart[0],e.clientY-pointerStart[1])>5)return;const m=pick(e);if(m){if(marking)return;else focus(m.object.userData.bomId,m.object);}});
  canvas.addEventListener('contextmenu',e=>{e.preventDefault();const m=pick(e);if(m)menu(m.object.userData.bomId,e);});
  document.addEventListener('pointerdown',e=>{if(!$('#context').contains(e.target))$('#context').hidden=true;});document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#context').hidden=true;});
- stopFraction=findStopFraction();setupPreview();pose(0);setMode('phone');
+ stopFraction=findStopFraction();setupPreview();pose(0);setMode(params.get('view')==='bom'?'bom':'phone');
+ const drawingControls=[...document.querySelectorAll('nav button,nav input,nav select,#sample,#side,#viewer-fullscreen')];
+ const surfacePen=installSurfacePen($('#stage'),()=>viewCube.camera,controls,
+  ()=>Object.fromEntries(visibleMeshes().map((mesh,index)=>[index,mesh])));
+ installFramePen($('#stage'),{sourceCanvas:canvas,controls:drawingControls,filename:design+'-annotation.png'});
+ window.addEventListener('surface-pen-state',event=>{
+  if(event.detail){marking=false;$('#mark-feature').setAttribute('aria-pressed','false');}
+ });
+ $('#mark-feature').addEventListener('click',()=>surfacePen.setEnabled(false));
+ window.addEventListener('frame-pen-state',event=>{
+  if(event.detail)setPlaying(false);
+  $('#stage').querySelector('.view-cube').inert=event.detail;
+ });
+
  if(params.get('focus')==='cuffs')frameObjects([...meshes.values()].filter(m=>m.userData.bomId==='phone_cuff'));
  canvas.dataset.ready='true';
 }catch(error){status.textContent=`Load failed: ${error.message}`;console.error(error);}
@@ -328,6 +397,7 @@ installFullscreen($('#stage'),$('#viewer-fullscreen'),resize);
 $('#stage').append($('#context'));
 function frame(now){
  requestAnimationFrame(frame);
+ if(window.annotationFrozen)return;
  if(playing&&manifest){
   if(lastFrame!==null)elapsedMs+=Math.min(100,now-lastFrame);
   lastFrame=now;

@@ -93,12 +93,13 @@ source. The catalog does not rewrite history or provide an independent backup.
 
 From `cad/`, run `uv run inv release` (unique ignored output directory), or
 `uv run inv release --output build/release` for an explicit new directory.
-The command builds current V3 in a fresh isolated snapshot, verifies the build
-inputs against the checkout, and composes six flat files:
+The command builds current V4 manufacturing geometry in a fresh isolated snapshot, verifies the build
+inputs against the checkout, and composes six flat files. Use `--version v3`
+for the preserved V3 release:
 
 - `PETG.3mf`: seven rigid pieces.
-- `TPU.3mf`: fifteen flexible pieces (three cuffs, five screws, five nuts,
-  one axle key and one clip).
+- `TPU.3mf`: seventeen flexible pieces (three cuffs, five screws, five nuts,
+  two common keys and two liners).
 - `PETG.png` and `TPU.png`: compact top views rendered from the exported 3MF geometry and placement transforms.
 - `README.md`: material, slicing, assembly and design-limit instructions.
 - `manifest.json`: geometry, placement, source hashes and package checksums.
@@ -108,9 +109,9 @@ visual inspection and the manifest provides provenance and preview hashes. These
 and arranged quantities, not Bambu-specific saved presets or sliced printer
 jobs. Recipients must choose their actual printer, bed, filament and process
 settings, then slice and inspect supports/brims and excluded bed areas.
-The packager checks 180 x 180 mm geometric bed fit and at least 2 mm projected
+The packager checks 180 x 180 mm geometric bed fit and at least 3 mm projected
 model spacing; this does not qualify the sliced plate or physical device.
-No printer is contacted. Existing output directories are rejected. Build
+The current full-plate PETG audit found support on both jaws, so the plate fails the zero-support gate and remains a review prototype. No printer is contacted. Existing output directories are rejected. Build
 snapshots are siblings of the output directory and are not release assets.
 
 `.github/workflows/cad-release.yml` builds and checks these packages on an

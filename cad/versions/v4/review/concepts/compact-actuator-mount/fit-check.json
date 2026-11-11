@@ -1,0 +1,69 @@
+{
+  "original_volume_mm3": 4720.290931636676,
+  "compact_volume_mm3": 4416.324662712913,
+  "bore_original_local_z": 9.8,
+  "bore_new_local_z": 8.4,
+  "rail_screw_global_y_shift_mm": 1.4,
+  "sleeve_z_range_mm": [
+    0,
+    16.8
+  ],
+  "lower_bore_ligament_mm": 4.0,
+  "highest_roof_mm": 14.622539674441619,
+  "checks": {
+    "wallet-near": {
+      "cap": 0.0,
+      "carrier": 0.0,
+      "shaft_cap_slot_overlap": 0.0,
+      "nut_bracket_overlap": 0.0
+    },
+    "wallet-far": {
+      "cap": 0.0,
+      "carrier": 0.0,
+      "shaft_cap_slot_overlap": 0.0,
+      "nut_bracket_overlap": 0.0
+    },
+    "bare-near": {
+      "cap": 0.0,
+      "carrier": 0.0,
+      "shaft_cap_slot_overlap": 0.0,
+      "nut_bracket_overlap": 0.0
+    },
+    "bare-far": {
+      "cap": 0.0,
+      "carrier": 0.0,
+      "shaft_cap_slot_overlap": 0.0,
+      "nut_bracket_overlap": 0.0
+    },
+    "small-near": {
+      "cap": 0.0,
+      "carrier": 0.0,
+      "shaft_cap_slot_overlap": 0.0,
+      "nut_bracket_overlap": 0.0
+    },
+    "small-far": {
+      "cap": 0.0,
+      "carrier": 0.0,
+      "shaft_cap_slot_overlap": 0.0,
+      "nut_bracket_overlap": 0.0
+    },
+    "large-near": {
+      "cap": 0.0,
+      "carrier": 0.0,
+      "shaft_cap_slot_overlap": 55.706118397226255,
+      "nut_bracket_overlap": 0.0
+    },
+    "large-far": {
+      "cap": 0.0,
+      "carrier": 0.0,
+      "shaft_cap_slot_overlap": 78.95594933879656,
+      "nut_bracket_overlap": 0.0
+    }
+  },
+  "sampled_plunger_overlap_max_mm3": 0.0,
+  "key_rest_overlap_mm3": 0.0,
+  "limits": [
+    "A single preliminary candidate. Check actual shortened V4 rail, bolt and nut placement, common-key access and support extrusion before use.",
+    "No mechanical strength or physical fit validation."
+  ]
+}

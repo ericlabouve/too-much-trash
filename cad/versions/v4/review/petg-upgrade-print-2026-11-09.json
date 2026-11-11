@@ -1,0 +1,39 @@
+{
+  "job": "v4-petg-upgrade-20261109",
+  "status": "start_verified",
+  "parts": {
+    "shaft_cap": 1,
+    "carrier": 1,
+    "actuator_bracket": 1,
+    "plunger": 1
+  },
+  "reused": [
+    "sliding_jaw",
+    "pulley",
+    "extended_diamond_hole_pulley_axle"
+  ],
+  "local_package": "cad/build/v4-petg-upgrade-20261109/v4-petg-upgrade-20261109.gcode.3mf",
+  "remote_package": "/v4-petg-upgrade-20261109.gcode.3mf",
+  "package_sha256": "98bba02488e8b96141c9c0c756e588bbcadfe4afc09bffc91d3b7bc4a6893137",
+  "plate_gcode_md5": "c2929df5bd959eb510b635b5778f6790",
+  "plate": 1,
+  "printer": "Bambu Lab A1 mini",
+  "nozzle_mm": 0.4,
+  "material": "Bambu PETG Translucent Blue",
+  "feed": "external spool; AMS disabled",
+  "bed": "Textured PEI",
+  "layer_mm": 0.12,
+  "nozzle_first_c": 250,
+  "nozzle_other_c": 245,
+  "bed_c": 70,
+  "estimated_g": 55.30660629272461,
+  "estimated_minutes": 417.626953125,
+  "support_interface_g": 0.1972,
+  "authorization": "User approved reviewed plate and confirmed bed clear, textured PEI installed and PETG ready. Disclosed fixed-jaw support accepted for this print; not a zero-support slice.",
+  "physical_result": "User reported print completed on 2026-11-10. Actuator guide has excessive plunger wiggle; 70-degree retaining faces allow twisting plunger out without T/V key installed. Other component fit not assessed in this report.",
+  "observed_printer_state": "RUNNING",
+  "observed_stage": "heatbed_preheating",
+  "observed_print_error": 0,
+  "observed_remaining_minutes": 417,
+  "requested_revision": "Keep plunger width; tighten bracket slot and change retaining faces to 60 degrees."
+}
