@@ -4,6 +4,12 @@
 
 Eric confirmed the Too Much Trash dashboard opened on his physical Apple Watch SE (first generation), watchOS 10.6.2, after a USB-relayed developer installation. The companion was an iPhone 15 Pro. Free Personal Team signing worked; paid membership was not needed for this installation. Installation completion and bundle lookup were verified separately before the user confirmed launch. Dashboard launch does not validate every Watch action or synchronization behavior.
 
+## Start here for the next update
+
+Try the saved USB helper's read-only check **before** restarting devices, changing networks, or trying to repair Xcode's wireless tunnel. If existing Watch trust is accepted and app lookup works, build/sign and use the streaming installer. Do not wait for Device Hub to say connected or for a developer disk image (DDI) to mount: neither was required by the successful relay installation.
+
+The physical test environment was Xcode 27.2 (27B52), macOS 26.6.2, iPhone 15 Pro on iOS 26.6.2, and first-generation Watch SE on watchOS 10.6.2 (21U594). Xcode 26.6 was also tried but did not solve the tunnel problem. These are observed versions, not minimum requirements. Re-discover device IDs and signing team; never reuse Simulator destinations or temporary build paths from old logs.
+
 ## Setup and signing
 
 1. Preserve the user's normal iPhone–Watch pairing and app data. Connect the paired iPhone to the Mac by USB, unlock both devices, keep them nearby, and accept legitimate Trust prompts. Prefer the existing Mac account; do not reset trust, erase devices, or use the production Mac mini as routine setup.
@@ -12,6 +18,30 @@ Eric confirmed the Too Much Trash dashboard opened on his physical Apple Watch S
 4. In the Watch target's Signing & Capabilities, select the existing Personal Team with automatic signing. The GUI had Team **None** even though CLI builds had passed a team. Selecting the team **and physical Watch destination** let Xcode register the Watch and generate a profile including it. Confirm the selected destination actually changed; an accessibility click on the destination label alone previously failed to select it.
 5. Build the signed iPhone companion and Watch app for devices. Use the current deployment target compatible with the Watch (10.0 in the successful build). Inspect the embedded Watch provisioning profile locally: its `ProvisionedDevices` must include the Watch UDID, it must be unexpired, and identifiers/signatures must match. An iPhone-only profile inside the Watch bundle is insufficient. Do not print private signing material.
 6. Install the companion on the iPhone in place, preserving its bundle ID, signing team and data. Then install the signed Watch `.app` using the route below if ordinary Xcode deployment remains unreliable.
+
+## Rebuild and deploy commands
+
+From the repository root, set `TEAM_ID` to the existing development team and discover `PHONE_UDID` / `WATCH_UDID`. Do not create or revoke signing certificates just to refresh the app. If project generation is needed, run `xcodegen generate --spec ios/project.yml` and recheck the generated target's signing configuration.
+
+After the physical Watch has been registered in the profile, a generic destination builds without waiting on the unstable Watch tunnel:
+
+```sh
+WATCH_BUILD_DIR=$(mktemp -d /private/tmp/tmt-watch-build.XXXXXX)
+xcodebuild -project ios/TooMuchTrash.xcodeproj -scheme TooMuchTrash \
+  -configuration Debug -destination 'generic/platform=iOS' \
+  -derivedDataPath "$WATCH_BUILD_DIR" -allowProvisioningUpdates \
+  DEVELOPMENT_TEAM="$TEAM_ID" build
+
+SIGNED_PHONE_APP="$WATCH_BUILD_DIR/Build/Products/Debug-iphoneos/TooMuchTrash.app"
+SIGNED_WATCH_APP="$SIGNED_PHONE_APP/Watch/TooMuchTrashWatch.app"
+
+xcrun devicectl device install app --device "$PHONE_UDID" "$SIGNED_PHONE_APP"
+# Then run the USB Watch installer below against "$SIGNED_WATCH_APP".
+```
+
+The full companion build embeds the Watch app. For a Watch-only build, the successful alternative used scheme `TooMuchTrashWatch`, destination `generic/platform=watchOS`, and output `Build/Products/Debug-watchos/TooMuchTrashWatch.app`. Update the phone companion too when WatchConnectivity contracts or phone-side logic change.
+
+Before installing, inspect `embedded.mobileprovision` with `security cms -D -i` using a local parser; report only whether the target UDID is included, the expiration date, and matching application/team identifiers. Use `codesign --verify --deep --strict` for bundle integrity. Do not dump the full profile or pairing record into chat. The crucial historical check was **WatchAuthorized=True**, with two devices in the newly generated Watch profile; device count alone does not establish that the right Watch is included.
 
 ## Verified USB developer relay
 
@@ -51,3 +81,31 @@ Discover physical devices using `xcrun devicectl list devices` and the paired Wa
 - The successful run occurred with iPhone Bluetooth off, USB connected, and the Watch on home Wi-Fi. This does not prove Bluetooth must always be off or that the relay works without Watch Wi-Fi. Restore normal connectivity when troubleshooting is over, and verify rather than prescribe the workaround universally.
 - Personal Team provisioning is temporary (normally seven days); renew/rebuild/reinstall when it expires. A successful install does not remove that limit.
 - Diagnostic logging profiles were used during investigation, not required by this installation procedure. Remove temporary logging profiles when diagnostics are no longer needed, with user involvement for device settings.
+
+## Diagnose the failing stage, not the generic alert
+
+| Evidence | Interpretation and next step |
+| --- | --- |
+| Watch not in Xcode / Developer Mode hidden | Establish initial physical-device discovery through the USB companion. The helper cannot bootstrap missing Watch trust. Confirm the actual Watch model/OS; the Series 12 destination seen earlier was a Simulator. |
+| `Existing Watch trust record available: False` | Establish Mac–Watch trust through Xcode first. Never substitute the iPhone's pairing record or automatically create a second Watch identity. |
+| `kAMDPasswordProtectedError` | Unlock the Watch with its passcode, keep it awake, then retry the relevant operation. A green iPhone connection icon proves companion connectivity, not Mac developer trust. |
+| `UserDeniedPairing` / Watch lockdownd retains a denied connection | Earlier Watch diagnostics showed a denied pairing connection persisting. A fresh connection after Watch unlock and accepted Trust eventually paired successfully. Do not interpret this alone as deliberate user denial or repeat destructive resets. |
+| Generic “integrity could not be verified” | Inspect the current installation error and signed profile. The first failure had no Watch UDID in the profile; that was corrected through Xcode physical-device signing. |
+| `MIInstallerErrorDomain 111`, free profile not permitted “from this source” | Stop retrying Install in the iPhone Watch app. Use the trusted USB **developer** installation route. This error was observed even after the Watch profile was corrected. |
+| USB QueryType returns `com.apple.mobile.lockdown`, trust succeeds | The relay is reaching the Watch. Move on to installation; don't keep debugging Bonjour. The helper also checks that its returned UDID matches the requested Watch. |
+| AFC `InvalidServiceError` | Use `StreamingZipConduitService` with `developer=True`; ordinary `InstallationProxyService.install_from_local` attempts AFC and failed on this Watch. Lookup through InstallationProxyService still works. |
+| Xcode CoreDevice 4 / RemotePairing 1007, development-port timeouts | These blocked the direct network route but did not block the USB relay. Cached Bonjour advertisements can survive after their ports stop accepting connections. |
+| DDI 12040 / read error / existing transfer in progress | Do not start overlapping DDI mounts. Our successful streaming installation did not need a mounted DDI. Launch debugging is a separate task from getting the app installed. |
+
+The successful sequence was: existing Watch pairing accepted → physical Watch registered in signing profile → full companion installed → USB relay QueryType succeeded → existing Watch trust validated → streaming developer install reached 100% → independent bundle lookup confirmed installation → Eric opened the dashboard. No paid membership, normal iPhone–Watch unpairing, Watch erase, new Mac account, or signing bypass was needed.
+
+Repeated Mac/iPhone/Watch restarts, Developer Mode cycling, Bluetooth cycling, mDNS/cache refreshes and switching Xcode versions did not establish a reliable direct tunnel. Do not repeat that entire sequence without new evidence. The user rejected using the production Mac mini and wanted the current Watch setup preserved. Do not reset Location & Privacy or clear trusted computers as routine deployment steps.
+
+If new errors require diagnostics, collect a narrowly timed install log locally and distinguish the current error from older failures. The prior Watch sysdiagnose's `logs/MobileLockdown/lockdownd.log` helped diagnose trust; iPhone installation logs exposed error 111. Do not commit diagnostic archives or output pairing secrets (`remoteUnlockHostKey` may appear in raw discovery output). The temporary **CoreDevice Host Logging Profile** and **WatchOS Logging Profile** were diagnostic aids, not prerequisites.
+
+## Remaining validation
+
+- Confirm live score, synced/pending counts, progress, quota updates and 10%/0% foreground alerts.
+- Confirm Sync now and Undo on disposable recordings, including the development-only backend-delete option; do not delete the user's real recordings as an automated smoke test.
+- Confirm connection-loss/recovery behavior and normal Bluetooth connectivity after troubleshooting.
+- Wireless installation and relay installation without Watch Wi-Fi remain unverified. No particular SSID is embedded in the app or installer.
