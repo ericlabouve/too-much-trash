@@ -9,6 +9,9 @@ targets:
     platform: iOS
     sources:
       - TooMuchTrash
+    dependencies:
+      - target: TooMuchTrashWatch
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.toomuchtrash.app
@@ -26,6 +29,19 @@ targets:
       configs:
         Debug:
           "INFOPLIST_FILE[sdk=iphonesimulator*]": SimulatorDebugInfo.plist
+  TooMuchTrashWatch:
+    type: application
+    platform: watchOS
+    deploymentTarget: "10.0"
+    sources:
+      - TooMuchTrashWatch
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.toomuchtrash.app.watchkitapp
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: org.toomuchtrash.app
+        SWIFT_VERSION: 5.9
+        TARGETED_DEVICE_FAMILY: "4"
   TooMuchTrashTests:
     type: bundle.unit-test
     platform: iOS
@@ -55,3 +71,8 @@ schemes:
       targets:
         - TooMuchTrashTests
         - TooMuchTrashUITests
+
+  TooMuchTrashWatch:
+    build:
+      targets:
+        TooMuchTrashWatch: all

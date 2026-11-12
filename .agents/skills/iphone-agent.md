@@ -91,6 +91,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Build and validation workflow
 
+- 2026-11-11: physical Watch SE / watchOS 10.6.2 installed successfully with free Personal Team signing; Eric confirmed the dashboard opens. Preserve the [verified setup and USB developer-relay procedure](iphone-agent/references/watch-deployment.md) and its reusable helper. The Watch app's consumer installation route rejected the free profile, while the trusted developer streaming-install route succeeded. Do not repeat network/trust resets as routine deployment steps. Full action/sync validation remains separate from launch confirmation.
+
 - Prefer wireless deployment to Eric's paired iPhone for development updates when it is available on the local network. On 2026-11-01 a signed Xcode build was installed successfully over Wi-Fi with `devicectl`; Developer Mode was enabled. Personal Team provisioning expires after seven days, and signing or developer-trust prompts may require Eric's interaction. Preserve existing app data and credentials when updating.
 - 2026-11-01: Dev Proceed is scoped to the development server and gated by its private HTTPS reachability. A separate revocable development key is saved in device-only Keychain, never the admin password; production is disabled. An uncertain enrollment must not be automatically retried. Preserve existing installation credentials and let users replace a revoked key.
 - Generate the Xcode project in `ios/`, build/test the `TooMuchTrash` scheme, and discover the currently booted Simulator instead of assuming a remembered device UUID or runtime.
