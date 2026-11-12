@@ -14,6 +14,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Product and architecture
 
+- 2026-11-11: Eric chose genuine cleanup-walk workout sessions to support Watch dashboard persistence without requiring testers to change Return to Clock. Use explicit Start/End actions and HealthKit permission; do not start a workout merely on app launch or fabricate an audio session. The Watch opens on a dedicated green circular leaf button labeled “Press to start cleanup walk,” followed by a 3–2–1 countdown; successful startup opens the dashboard. Actions lists Sync now, Undo last, and Stop cleanup walk last, using matching large colored buttons. Stop requires confirmation and returns to the leaf screen. The iPhone Dashboard can also launch the walk. Workouts stay in Health, outside backend capture uploads. Simulator builds passed; physical HealthKit provisioning/start/end/wrist-wake validation remains pending. Existing Personal Team signing profile lacks HealthKit and a CLI probe reported No Accounts; this is not evidence that paid membership is required.
+
 - 2026-11-04: Eric deferred calibration and requested removal of the iPhone timing-reference/calibration workflow and its tests. Do not reintroduce a calibration screen without agreement. Preserve ordinary raw capture timestamps and camera intrinsics metadata.
 
 - App icon selected 2026-10-12: bright green leaf gently turning as it falls above

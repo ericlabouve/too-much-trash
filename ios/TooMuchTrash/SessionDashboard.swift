@@ -39,6 +39,7 @@ struct SessionDashboard: View {
                         .accessibilityIdentifier("backToCamera")
                     SyncIndicator(account: account, queue: queue)
                     if account.isEndingSession { ProgressView("Ending session…") }
+                    CleanupWalkButton()
                     Text("Session videos").font(.headline)
                     if account.currentCaptures.isEmpty {
                         ContentUnavailableView("No videos yet", systemImage: "video")

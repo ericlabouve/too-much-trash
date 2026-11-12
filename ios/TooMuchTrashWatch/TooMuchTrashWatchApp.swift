@@ -1,5 +1,6 @@
 import SwiftUI
 import WatchConnectivity
+import WatchKit
 
 @MainActor
 final class WatchModel: NSObject, ObservableObject, WCSessionDelegate {
@@ -46,29 +47,52 @@ final class WatchModel: NSObject, ObservableObject, WCSessionDelegate {
 
 @main
 struct TooMuchTrashWatchApp: App {
+    @WKApplicationDelegateAdaptor(CleanupAppDelegate.self) private var delegate
     @StateObject private var model = WatchModel()
-    var body: some Scene { WindowGroup { Dashboard(model: model) } }
+    var body: some Scene { WindowGroup { Dashboard(model: model).environmentObject(CleanupAppDelegate.workout) } }
 }
 
 struct Dashboard: View {
     @ObservedObject var model: WatchModel
+    @EnvironmentObject private var workout: CleanupWorkout
     #if DEBUG
     @State private var selectedPage = ProcessInfo.processInfo.arguments.contains("-watch-preview-actions") ? 1 : 0
     #else
     @State private var selectedPage = 0
     #endif
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var countdown: Int?
+    @State private var startTask: Task<Void, Never>?
+    @State private var confirmStop = false
     @State private var confirmUndo = false
     @State private var quotaAlert = false
     @AppStorage("quotaAlertLevel") private var quotaAlertLevel = 2
     var body: some View {
         GeometryReader { geometry in
-            TabView(selection: $selectedPage) {
-                dashboardPage(size: geometry.size).tag(0)
-                actionsPage(size: geometry.size).tag(1)
+            if showsSession {
+                TabView(selection: $selectedPage) {
+                    dashboardPage(size: geometry.size).tag(0)
+                    actionsPage(size: geometry.size).tag(1)
+                }
+                .tabViewStyle(.verticalPage)
+            } else {
+                startPage(size: geometry.size)
             }
-            .tabViewStyle(.verticalPage)
         }
         .background(.black)
+        .onDisappear { startTask?.cancel(); countdown = nil }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { startTask?.cancel(); countdown = nil }
+        }
+        .onChange(of: workout.active) { _, active in
+            if active { selectedPage = 0 }
+        }
+        .confirmationDialog("Stop cleanup walk?", isPresented: $confirmStop, titleVisibility: .visible) {
+            Button("Stop cleanup walk", role: .destructive) { workout.end() }
+            Button("Keep walking", role: .cancel) {}
+        } message: {
+            Text("End this walking workout and save it to Health?")
+        }
         .confirmationDialog("Delete the latest video?", isPresented: $confirmUndo, titleVisibility: .visible) {
             Button("Delete from iPhone", role: .destructive) { model.send("undo") }
             if model.state["dev"] as? Bool == true && model.state["latestSynced"] as? Bool == true {
@@ -91,6 +115,82 @@ struct Dashboard: View {
         } message: {
             Text((model.state["quota"] as? Double ?? 1) <= 0 ? "Your upload quota is exhausted." : "10% or less of your upload quota remains.")
         }
+    }
+
+    private var showsSession: Bool {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-watch-preview-session") { return true }
+        #endif
+        return workout.active
+    }
+
+    private var displayedCountdown: Int? {
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if let index = arguments.firstIndex(of: "-watch-preview-countdown"),
+           arguments.indices.contains(index + 1), let value = Int(arguments[index + 1]), (1...3).contains(value) {
+            return value
+        }
+        #endif
+        return countdown
+    }
+
+    private func beginCountdown() {
+        guard countdown == nil, !workout.busy else { return }
+        countdown = 3
+        startTask = Task { @MainActor in
+            defer { countdown = nil; startTask = nil }
+            do {
+                for value in (1...3).reversed() {
+                    countdown = value
+                    try await Task.sleep(for: .seconds(1))
+                }
+                try Task.checkCancellation()
+                await workout.start()
+            } catch { /* Leaving the screen cancels a pending countdown. */ }
+        }
+    }
+
+    private func startPage(size: CGSize) -> some View {
+        let diameter = min(size.width * 0.79, size.height * 0.64)
+        return VStack(spacing: 8) {
+            Spacer(minLength: 0)
+            Button { beginCountdown() } label: {
+                ZStack {
+                    Circle()
+                        .fill(Color(red: 0.08, green: 0.40, blue: 0.12).gradient)
+                    Circle().strokeBorder(leafGreen.opacity(0.7), lineWidth: 2)
+                    if let value = displayedCountdown {
+                        Text("\(value)")
+                            .font(.system(size: 80, weight: .heavy, design: .rounded))
+                            .monospacedDigit().foregroundStyle(leafGreen)
+                            .accessibilityLabel("Starting in \(value)")
+                    } else {
+                        FriendlyLeaf().frame(width: diameter * 0.70, height: diameter * 0.70)
+                    }
+                }
+                .frame(width: diameter, height: diameter)
+                .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .disabled(workout.busy || model.state["authorized"] as? Bool != true)
+            .allowsHitTesting(displayedCountdown == nil)
+            .accessibilityLabel("Press to start cleanup walk")
+            .accessibilityIdentifier("watchStartCleanup")
+            Text(displayedCountdown != nil ? "Get ready…" : workout.busy ? "Starting walk…" : "Press to start cleanup walk")
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundStyle(leafGreen).multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            if model.state["authorized"] as? Bool != true {
+                Text("Open Too Much Trash on your iPhone.")
+                    .font(.caption2).multilineTextAlignment(.center)
+            } else if !workout.message.isEmpty {
+                Text(workout.message).font(.caption2).multilineTextAlignment(.center)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 10).padding(.top, 22).padding(.bottom, 6)
+        .frame(width: size.width, height: size.height)
     }
 
     private let leafGreen = Color(red: 0.49, green: 1, blue: 0.04)
@@ -120,7 +220,7 @@ struct Dashboard: View {
 
     private func dashboardPage(size: CGSize) -> some View {
         VStack(alignment: .leading, spacing: 3) {
-            brand
+            brand.padding(.top, 20)
             if model.state["authorized"] as? Bool == true {
                 Spacer(minLength: 0)
                 HStack(alignment: .bottom, spacing: 2) {
@@ -158,6 +258,7 @@ struct Dashboard: View {
                 }.padding(.vertical, 3)
                 Spacer(minLength: 0)
                 quotaRow
+                if workout.active { Text("Cleanup walk active").font(.system(size: 9)).foregroundStyle(leafGreen) }
             } else {
                 Spacer()
                 Image(systemName: "iphone.and.arrow.forward").font(.largeTitle).foregroundStyle(leafGreen)
@@ -191,7 +292,6 @@ struct Dashboard: View {
 
     private func actionsPage(size: CGSize) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            brand
             Text("Actions").font(.system(size: 25, weight: .bold, design: .rounded))
             if model.state["authorized"] as? Bool == true {
                 Button { model.send("sync") } label: {
@@ -211,17 +311,28 @@ struct Dashboard: View {
                 .background(RoundedRectangle(cornerRadius: 18).fill(Color.red.gradient))
                 .disabled(model.state["latestID"] == nil)
                 .accessibilityIdentifier("watchUndoLast")
+                Button { confirmStop = true } label: {
+                    Label("Stop cleanup walk", systemImage: "stop.fill")
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .lineLimit(1).minimumScaleFactor(0.75).padding(.horizontal, 8)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.plain)
+                .background(RoundedRectangle(cornerRadius: 18).fill(Color.orange.gradient))
+                .disabled(workout.busy)
+                .accessibilityIdentifier("watchStopCleanup")
             }
             Spacer(minLength: 0)
+            if !workout.message.isEmpty {
+                Text(workout.message).font(.system(size: 9)).foregroundStyle(.secondary)
+            }
             if !model.message.isEmpty {
                 Text(model.message).font(.system(size: 10)).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-            } else {
-                Text("Scroll back for dashboard").font(.system(size: 9)).foregroundStyle(.secondary)
             }
-        }.padding(.horizontal, 7).padding(.bottom, 5)
-            .frame(width: size.width, height: size.height)
-            .accessibilityIdentifier("watchActions")
+        }.padding(.horizontal, 7).padding(.top, 24).padding(.bottom, 5)
+        .frame(width: size.width, height: size.height)
+        .accessibilityIdentifier("watchActions")
     }
 
 }
