@@ -14,6 +14,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 
 ## Product and architecture
 
+- 2026-11-11: Eric chose genuine cleanup-walk workout sessions to support Watch dashboard persistence without requiring testers to change Return to Clock. Use explicit Start/End actions and HealthKit permission; do not start a workout merely on app launch or fabricate an audio session. The Watch opens on a dedicated green circular leaf button labeled “Press to start cleanup walk,” followed by a 3–2–1 countdown; successful startup opens the dashboard. Actions lists Sync now, Undo last, and Stop cleanup walk last, using matching large colored buttons. Stop requires confirmation and returns to the leaf screen. The walk starts only from the Watch; Eric removed the redundant iPhone start button on 2026-11-13. The Watch display name is TooMuchTrash and its app icon reuses the smiling dashboard leaf. The phone no longer requests HealthKit capability. Workouts stay in Health, outside backend capture uploads. Simulator builds passed. On 2026-11-13, signed device builds succeeded and both Personal Team profiles and signed entitlements included HealthKit with the correct physical device UDIDs. The earlier No Accounts error was transient; paid membership was not required for HealthKit provisioning. Physical workout start/end/save/wrist-wake validation remains pending.
+
 - 2026-11-04: Eric deferred calibration and requested removal of the iPhone timing-reference/calibration workflow and its tests. Do not reintroduce a calibration screen without agreement. Preserve ordinary raw capture timestamps and camera intrinsics metadata.
 
 - App icon selected 2026-10-12: bright green leaf gently turning as it falls above
@@ -90,6 +92,8 @@ Maintained project preferences, architectural decisions, and evidence for Too Mu
 - For exact endpoint/error schemas, read current `backend/onboarding.md` from the backend checkout/PR and `ios/TooMuchTrash/CollectorAPI.swift`; coordinate contract changes before implementation rather than maintaining a second schema here.
 
 ## Build and validation workflow
+
+- 2026-11-11: physical Watch SE / watchOS 10.6.2 installed successfully with free Personal Team signing; Eric confirmed the dashboard opens. Preserve the [verified setup and USB developer-relay procedure](iphone-agent/references/watch-deployment.md) and its reusable helper. The Watch app's consumer installation route rejected the free profile, while the trusted developer streaming-install route succeeded. Do not repeat network/trust resets as routine deployment steps. Full action/sync validation remains separate from launch confirmation.
 
 - Prefer wireless deployment to Eric's paired iPhone for development updates when it is available on the local network. On 2026-11-01 a signed Xcode build was installed successfully over Wi-Fi with `devicectl`; Developer Mode was enabled. Personal Team provisioning expires after seven days, and signing or developer-trust prompts may require Eric's interaction. Preserve existing app data and credentials when updating.
 - 2026-11-01: Dev Proceed is scoped to the development server and gated by its private HTTPS reachability. A separate revocable development key is saved in device-only Keychain, never the admin password; production is disabled. An uncertain enrollment must not be automatically retried. Preserve existing installation credentials and let users replace a revoked key.

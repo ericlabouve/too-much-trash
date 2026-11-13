@@ -32,10 +32,17 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 
 ## Architecture and current decisions
 
+- Development installations track usage without storage or upload count quotas. The admin portal can edit quotas for unused regular invites and active regular installations. Changes to active quotas account for reserved uploads.
+- Developer video deletion requires development mode and the owning installation. Keep its durable deletion record for cleanup retries and to block stale uploads. Deploy the API and claim-checked worker together when enabling this feature.
+
 - 2026-11-01 development shortcut: private admin dashboard can create/list/revoke hashed scoped development-enrollment keys; last use, linked installation and revocation are recorded. Local Tailscale overlay explicitly enables the feature; default and production remain disabled. Revoking a key does not revoke existing installations. Protect the private admin route and preserve separate admin and development secrets.
 - FastAPI/uv API, PostgreSQL, SeaweedFS blob storage, Prefect media worker, Caddy
   reverse proxy and admin portal. API migration startup is `alembic upgrade head`;
   credentials come from environment, not committed Alembic configuration.
+- Reuse the S3 client and its connection pool within each API process. A local
+  paired benchmark with real SeaweedFS reduced the median time for two episodes
+  from 1.17 to 1.05 seconds without simulated delay. Keep transfer ownership,
+  revocation, and quota checks serialized for each installation.
 - Invite-only access is our own authentication, not Apple App Attest. Admin
   creates short-lived single-use codes; enrollment issues installation-bound
   credentials; refresh, revocation, ownership checks and quotas protect media.

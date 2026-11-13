@@ -340,7 +340,9 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 200)
         put = lambda name, index, data: self.client.put(f"{path}/{name}/{index}", headers={**headers, "Content-Type": "application/octet-stream"}, content=data)
         self.assertEqual(put("video", 0, payloads["video"][:1024 * 1024]).status_code, 200)
-        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).json()["chunks"]["video"], [0])
+        resumed = self.client.post(path, headers={**headers, "X-TMT-Chunk-Size": "4194304"}, json={"files": files}).json()
+        self.assertEqual(resumed["chunk_size"], 1024 * 1024)
+        self.assertEqual(resumed["chunks"]["video"], [0])
         self.assertEqual(put("video", 1, payloads["video"][1024 * 1024:]).status_code, 200)
         for name in ("imu", "poses", "manifest"):
             self.assertEqual(put(name, 0, payloads[name]).status_code, 200)
