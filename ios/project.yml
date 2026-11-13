@@ -15,9 +15,6 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.toomuchtrash.app
-        CODE_SIGN_ENTITLEMENTS: TooMuchTrash/TooMuchTrash.entitlements
-        INFOPLIST_KEY_NSHealthShareUsageDescription: Support your cleanup walking workout on Apple Watch.
-        INFOPLIST_KEY_NSHealthUpdateUsageDescription: Save cleanup walks as outdoor walking workouts in Health.
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: Info.plist
         SWIFT_VERSION: 5.9
@@ -41,6 +38,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.toomuchtrash.app.watchkitapp
+        INFOPLIST_KEY_CFBundleDisplayName: TooMuchTrash
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: TooMuchTrashWatch/TooMuchTrashWatch.entitlements
         INFOPLIST_KEY_NSHealthShareUsageDescription: Support your cleanup walking workout on Apple Watch.
         INFOPLIST_KEY_NSHealthUpdateUsageDescription: Save cleanup walks as outdoor walking workouts in Health.
