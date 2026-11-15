@@ -4,6 +4,7 @@ import UIKit
 struct AppRootView: View {
     @StateObject private var account = AccountSession(configuration: APIConfiguration.initial(),
         automaticUploads: true, discoverAdminServers: true)
+    @State private var watchBridge = WatchBridge()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -15,6 +16,7 @@ struct AppRootView: View {
             }
         }
         .task {
+            watchBridge.start(account: account)
             await account.bootstrap()
             while !Task.isCancelled {
                 await account.probeAdmin()

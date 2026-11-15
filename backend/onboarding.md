@@ -509,4 +509,8 @@ Staging is retained for seven days after the last begin or chunk upload; an hour
 
 Apply Alembic revision `006_episode_chunk_size` before serving larger chunks. It assigns the existing 1 MiB layout to transfers already in progress. Before rolling back to an API that supports only 1 MiB chunks, finish or clear any active 4 MiB transfers so clients can retry from their local files.
 
-Development installations can delete a previously uploaded video and its episode files using `DELETE /api/v1/media/by-client/{client_capture_id}` when development keys are enabled. Deletion is restricted to the owning installation. A durable tombstone prevents stale uploads from restoring the deleted capture; object cleanup is retried if storage is unavailable. Processing captures must finish before deletion.
+## Developer video deletion
+
+With `TMT_DEVELOPMENT_KEYS` enabled, `/api/v1/auth/me` advertises `development_video_delete_version: 1` to development installations. `DELETE /api/v1/media/by-client/{client_capture_id}` requires the owning development installation and a committed video. If a worker is processing it, wait for processing to finish and retry. The API returns `{client_capture_id, deleted: true}` after removing the original, any episode sidecars, preview and staging. The phone waits for this receipt before deleting its copy.
+
+Revision `007_dev_video_deletion` persists a deletion record before touching object storage. If cleanup fails, another DELETE or the hourly sweep can finish it. A completed deletion acknowledges retries and rejects stale uploads with `capture_deleted`. Cumulative usage remains in installation accounting. Apply the revision and deploy both the API and worker so a worker with an expired claim cannot publish a preview after deletion.

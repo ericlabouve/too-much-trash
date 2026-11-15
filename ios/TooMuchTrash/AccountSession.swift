@@ -22,6 +22,7 @@ final class AccountSession: ObservableObject {
     @Published private(set) var isEndingSession = false
     @Published private(set) var isUploading = false
     @Published private(set) var isDeletingCapture = false
+    @Published private(set) var watchServerReachable: Bool?
     private(set) var adminNetworkConfiguration: APIConfiguration?
     @Published private(set) var uploadMessage = "Local videos expire 24 hours after upload or 72 hours after recording if unsynced."
     let queue: CaptureQueue
@@ -253,6 +254,12 @@ final class AccountSession: ObservableObject {
         installation = confirmed
     }
 
+    func refreshWatchQuota() async {
+        guard phase == .authorized, !busy, !isEndingSession else { return }
+        do { try await validateInstallation(); watchServerReachable = true }
+        catch { watchServerReachable = false }
+    }
+
     private func refreshCredential() async throws {
         if let credentialRefresh {
             try await credentialRefresh.value
@@ -319,6 +326,7 @@ final class AccountSession: ObservableObject {
         }
         do {
             try queue.enqueue(file: file, origin: owner.origin, installationID: owner.installationID)
+            WatchBridge.record(queue.matching(origin: owner.origin, installationID: owner.installationID), owner: owner)
             uploadMessage = "Video saved and queued on this iPhone."
             kickUploads()
         } catch { uploadMessage = "Video saved locally, but its upload could not be queued. Please keep the app installed." }
@@ -331,6 +339,7 @@ final class AccountSession: ObservableObject {
         }
         do {
             try queue.enqueueEpisode(folder: folder, id: id, origin: owner.origin, installationID: owner.installationID)
+            WatchBridge.record(queue.matching(origin: owner.origin, installationID: owner.installationID), owner: owner)
             uploadMessage = "Episode saved and queued on this iPhone."
             kickUploads()
         } catch { uploadMessage = "Episode saved locally, but it could not be queued. Please keep the app installed." }
@@ -509,6 +518,10 @@ final class AccountSession: ObservableObject {
     }
 
     func syncTick() { kickUploads() }
+    func requestWatchSync() {
+        retryUploadAt = nil
+        kickUploads()
+    }
     var endCleanupPending: Bool { credential?.endingSession == true }
 
     private var mayStartUpload: Bool {

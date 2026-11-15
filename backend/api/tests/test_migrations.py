@@ -36,7 +36,7 @@ class MigrationTests(unittest.TestCase):
         command.upgrade(config, "head")
         command.upgrade(config, "head")
         with database() as connection:
-            self.assertEqual(connection.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"], "006_episode_chunk_size")
+            self.assertEqual(connection.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"], "007_dev_video_deletion")
             self.assertEqual(connection.execute("SELECT chunk_size FROM episode_transfers WHERE episode_id=%s", (episode,)).fetchone()["chunk_size"], 1048576)
             staged = connection.execute("""SELECT chunk_index, size_bytes, sha256
                 FROM episode_transfer_chunks WHERE episode_id=%s""", (episode,)).fetchone()
