@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training label review</title>
+<style>
+:root { color-scheme: dark; font: 16px system-ui,sans-serif; background: #111918; color: #e8f1ef; }
+* { box-sizing: border-box }
+main { max-width: 900px; margin: auto; padding: 18px 24px 26px }
+h1 { margin: 0; font-size: clamp(1.45rem, 4vw, 2rem) }
+p { margin: .45rem 0; color: #b2c6c1 }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 }
+video, #image { display: block; object-fit: contain; width: 100%; height: min(58vh,540px); background: #080b0a; border: 1px solid #374845; border-radius: 9px }
+[hidden] { display: none !important }
+button { background: #243531; border: 1px solid #506662; color: inherit; border-radius: 7px; font: inherit; padding: 9px 14px; cursor: pointer }
+button:disabled { cursor: default; opacity: .45 }
+button:focus-visible { outline: 2px solid #bdeecb; outline-offset: 3px }
+#approve { background: #153f2a; border-color: #568968 }
+#deny { background: #452826; border-color: #956563 }
+button[aria-pressed="true"] { box-shadow: 0 0 0 2px #fff }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px }
+.actions button { flex: 1 1 auto }
+#prediction { margin: 0 0 10px; padding: 8px 12px; border: 1px solid #53655e; border-radius: 8px; background: #202e2a; }
+#prediction span { display: block; font-size: .75rem; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; color: #c0d2cc; }
+#prediction strong { display: block; font-size: clamp(1.65rem, 5vw, 2.65rem); line-height: 1.1; color: #ffdc85; }
+#save { min-height: 1.4em }
+details { margin-top: .6rem; color: #b2c6c1 }
+summary { cursor: pointer }
+</style>
+<main>
+  <h1 id="title">Training label review</h1>
+  <p>Approve if you agree with the prediction. Deny if you disagree.</p>
+  <p id="review-stats" aria-live="polite">Loading totals…</p>
+  <nav class="bar" aria-label="Review navigation">
+    <button id="prev" type="button">← Previous</button>
+    <strong id="position" aria-live="polite">Loading clips…</strong>
+    <button id="next" type="button">Next →</button>
+  </nav>
+  <div id="prediction" aria-live="polite"><span>Current prediction</span><strong id="prediction-label">Loading…</strong></div>
+  <video id="video" controls muted playsinline preload="auto" hidden></video>
+  <img id="image" alt="Sample under review" hidden>
+  <p id="timing"></p>
+  <div class="actions">
+    <button id="replay" type="button">Replay from review start</button>
+    <button id="approve" type="button" aria-pressed="false">Approve prediction</button>
+    <button id="deny" type="button" aria-pressed="false">Deny prediction</button>
+  </div>
+  <p id="save" role="status"></p>
+  <details id="evidence"><summary>Review evidence</summary><p id="note"></p></details>
+</main>
+<script type="module">
+const byId = id => document.getElementById(id);
+const video = byId("video");
+const image = byId("image");
+const prev = byId("prev");
+const next = byId("next");
+const approve = byId("approve");
+const deny = byId("deny");
+const replay = byId("replay");
+let clips = [];
+let decisions = {};
+let index = 0;
+let saving = false;
+let source = "";
+function choice(clip) {
+  const saved = decisions[clip.id];
+  return saved?.prediction === clip.prediction ? saved.decision : undefined;
+}
+const reviewed = clip => Boolean(choice(clip));
+function nextUnreviewed(from) {
+  const later = clips.findIndex((clip, i) => i > from && !reviewed(clip));
+  return later >= 0 ? later : clips.findIndex(clip => !reviewed(clip));
+}
+function paintStats() {
+  const saved = clips.filter(reviewed).length;
+  const approved = clips.filter(clip => choice(clip) === "approve").length;
+  const denied = clips.filter(clip => choice(clip) === "deny").length;
+  const scored = approved + denied;
+  const accuracy = scored ? `${(100 * approved / scored).toFixed(1)}% accuracy on reviewed predictions` : "Accuracy pending";
+  const superseded = clips.filter(clip => Object.hasOwn(decisions, clip.id) && !reviewed(clip)).length;
+  byId("review-stats").textContent = `${source ? source + " · " : ""}${saved}/${clips.length} reviewed · ${approved} approved · ${denied} denied · ${approved}:${denied} approve/deny · ${accuracy}${superseded ? ` · ${superseded} decisions for earlier predictions` : ""}`;
+}
+function paint() {
+  paintStats();
+  const clip = clips[index];
+  prev.disabled = index === 0;
+  next.disabled = index >= clips.length - 1;
+  approve.disabled = deny.disabled = saving || !clip;
+  replay.disabled = !clip;
+  if (!clip) return;
+  byId("position").textContent = `${clip.id} · ${index + 1}/${clips.length}`;
+  byId("timing").textContent = clip.timing;
+  for (const [button, value] of [[approve, "approve"], [deny, "deny"]])
+    button.setAttribute("aria-pressed", choice(clip) === value);
+  byId("prediction-label").textContent = clip.label;
+  byId("note").textContent = clip.note || "No review note.";
+}
+function playFromStart() {
+  if (video.readyState < 1 || !clips[index]) return;
+  const start = Math.max(0, Math.min(video.duration - 0.01, clips[index].start));
+  video.currentTime = start;
+  video.play().catch(() => {});
+}
+function show(i) {
+  if (i < 0 || i >= clips.length) return;
+  index = i;
+  sessionStorage.setItem("review-clip", clips[index].id);
+  video.pause();
+  const clip = clips[index];
+  const url = `/media/${encodeURIComponent(clip.id)}`;
+  video.hidden = replay.hidden = clip.kind !== "video";
+  image.hidden = !video.hidden;
+  if (video.hidden) {
+    video.removeAttribute("src");
+    video.load();
+    image.src = url;
+  } else {
+    image.removeAttribute("src");
+    video.src = url;
+  }
+  const saved = decisions[clip.id];
+  byId("save").textContent = choice(clip) ? "Decision saved" : saved ? `Earlier decision saved (${saved.decision} on ${saved.prediction})` : "";
+  byId("evidence").open = false;
+  paint();
+}
+async function save(value) {
+  if (saving || !clips[index]) return;
+  const clip = clips[index];
+  saving = true;
+  paint();
+  try {
+    const result = await fetch("/prediction-review", {method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({clip:clip.id, prediction:clip.prediction, decision:value})});
+    if (result.status === 409) {
+      byId("save").textContent = "Prediction updated. Refresh the page to continue.";
+      return;
+    }
+    if (!result.ok) throw Error();
+    decisions = await result.json();
+    if (clip === clips[index]) {
+      const pending = nextUnreviewed(index);
+      if (pending >= 0) show(pending);
+      byId("save").textContent = pending >= 0 ? `Decision saved for ${clip.id}` : `Decision saved for ${clip.id}. All clips reviewed.`;
+    }
+  } catch { byId("save").textContent = "Could not save. Try again."; }
+  finally { saving = false; paint(); }
+}
+video.addEventListener("loadedmetadata", () => { if (!video.hidden) playFromStart(); });
+for (const media of [video, image]) {
+  media.addEventListener("error", () => { if (!media.hidden) byId("save").textContent = "Media could not load."; });
+}
+replay.onclick = playFromStart;
+prev.onclick = () => show(index - 1);
+next.onclick = () => show(index + 1);
+approve.onclick = () => save("approve");
+deny.onclick = () => save("deny");
+window.addEventListener("keydown", event => {
+  if (event.defaultPrevented || event.altKey || event.metaKey || event.ctrlKey ||
+      event.target.closest?.("video, input, textarea, select, [contenteditable]")) return;
+  if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+    event.preventDefault();
+    show(index + (event.key === "ArrowLeft" ? -1 : 1));
+  }
+});
+try {
+  const response = await fetch("/data", {cache:"no-store"});
+  if (!response.ok) throw Error();
+  const data = await response.json();
+  ({clips, decisions, source} = data);
+  document.title = byId("title").textContent = data.title;
+  const saved = clips.findIndex(clip => clip.id === sessionStorage.getItem("review-clip"));
+  const pending = saved >= 0 && !reviewed(clips[saved]) ? saved : nextUnreviewed(saved);
+  show(pending >= 0 ? pending : Math.max(0, saved));
+  if (clips.length && pending < 0) byId("save").textContent = "All clips reviewed.";
+} catch { byId("position").textContent = "Review data unavailable"; paint(); }
+</script>
+</html>

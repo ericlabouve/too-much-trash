@@ -33,7 +33,8 @@ class SearchSpace:
     rank_key: Callable[[dict], tuple] = fitness_order
 
 
-def run_round(pool, round_number, seen, evaluate, space, *, policy=Policy(), seed=0, plan=None):
+def run_round(pool, round_number, seen, evaluate, space, *, policy=Policy(), seed=0, plan=None,
+              portfolio=None, protected=()):
     """Score one round and add evaluated genotypes to the caller's resume set."""
     if not 1 <= len(pool) <= policy.pool_size:
         raise ValueError("Supply a nonempty pool within the policy limit")
@@ -41,7 +42,8 @@ def run_round(pool, round_number, seen, evaluate, space, *, policy=Policy(), see
     rng = Random(f"{seed}:{round_number}")
     if plan is None:
         return _evolve(pool, round_number, seen, evaluate, rng, space, policy)
-    return _evolve_researched(pool, round_number, seen, evaluate, plan, rng, space, policy)
+    return _evolve_researched(pool, round_number, seen, evaluate, plan, rng, space, policy,
+                              portfolio, protected)
 
 
 def _mutate(parent, seen, round_number, rng, space):
@@ -115,7 +117,18 @@ def _evolve(pool, round_number, seen, evaluate, rng, space, policy):
             "next_pool": [entry["candidate"] for entry in retained]}
 
 
-def _evolve_researched(pool, round_number, seen, evaluate, plan, rng, space, policy):
+def select_lineages(parents, children, ideas, space, policy):
+    best_by_parent = {entry["candidate"]["name"]: entry for entry in parents}
+    for entry in children:
+        parent = entry["candidate"]["parent"]
+        if entry["fitness"] - best_by_parent[parent]["fitness"] >= policy.minimum_gain:
+            best_by_parent[parent] = entry
+    lineages = sorted(best_by_parent.values(), key=space.rank_key)
+    return sorted(lineages[:-policy.research_slots] + ideas, key=space.rank_key), lineages[-policy.research_slots:]
+
+
+def _evolve_researched(pool, round_number, seen, evaluate, plan, rng, space, policy,
+                       portfolio, protected):
     """Evaluate incumbent mutations, then give fresh ideas reserved pool slots."""
     if not policy.research_slots:
         raise ValueError("Enable research slots to run a planned round")
@@ -128,7 +141,6 @@ def _evolve_researched(pool, round_number, seen, evaluate, plan, rng, space, pol
         return sorted(scores, key=space.rank_key)
 
     parents = rank(evaluate(candidate) for candidate in pool)
-    best_by_parent = {entry["candidate"]["name"]: entry for entry in parents}
     challengers = []
     for parent in pool:
         proposal = plan["mutations"][parent.name]
@@ -146,22 +158,27 @@ def _evolve_researched(pool, round_number, seen, evaluate, plan, rng, space, pol
         if "rationale" in proposal:
             entry["rationale"] = proposal["rationale"]
         challengers.append(entry)
-        if entry["fitness"] - best_by_parent[parent.name]["fitness"] >= policy.minimum_gain:
-            best_by_parent[parent.name] = entry
-
-    ranked_lineages = rank(best_by_parent.values())
-    survivors = ranked_lineages[:-policy.research_slots]
-    removed = ranked_lineages[-policy.research_slots:]
     ideas = []
     for data in plan["ideas"]:
-        child = space.candidate_type(**(data | {"created_round": round_number}))
+        child = space.candidate_type(**({k: v for k, v in data.items() if k != "rationale"}
+                                       | {"created_round": round_number}))
         if space.genotype(child) in seen:
             raise ValueError(f"Already scored research proposal: {child.name}")
-        ideas.append(evaluate(child))
+        entry = evaluate(child)
+        if "rationale" in data:
+            entry["rationale"] = data["rationale"]
+        ideas.append(entry)
         seen.add(space.genotype(child))
-    retained = rank(survivors + ideas)
+    selection = {}
+    if portfolio is None:
+        retained, removed = select_lineages(parents, challengers, ideas, space, policy)
+        admitted = ideas
+    else:
+        retained, removed, selection = portfolio.select(parents, challengers, ideas, space, policy, protected)
+        former = {entry["candidate"]["name"] for entry in parents}
+        admitted = [entry for entry in retained if entry["candidate"]["name"] not in former]
     return {"round": round_number, "ranked": retained, "challengers": rank(challengers + ideas),
             "pruned": [entry["candidate"] for entry in removed],
             "pruned_scores": removed, "incumbents": parents,
-            "admitted": [entry["candidate"] for entry in ideas],
-            "next_pool": [entry["candidate"] for entry in retained]}
+            "admitted": [entry["candidate"] for entry in admitted],
+            "next_pool": [entry["candidate"] for entry in retained], **selection}

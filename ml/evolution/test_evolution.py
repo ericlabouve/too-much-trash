@@ -6,6 +6,7 @@ import unittest
 
 from ml.evolution import Policy, SearchSpace, run_round
 from ml.evolution.agent_briefs import build_briefs
+from ml.evolution.portfolio import Portfolio
 
 
 @dataclass(frozen=True)
@@ -78,6 +79,35 @@ class EvolutionTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             run_round(self.pool, 2, self.seen, failing, SPACE, policy=POLICY, plan=self.plan)
         self.assertNotIn((10,), self.seen)
+
+    def test_portfolio_preserves_specialist_and_counts_real_mutations(self):
+        champion, jaw_parent, filler, seed = [
+            {"candidate": asdict(Number(label, index)), "fitness": fitness, "jaw": jaw}
+            for index, (label, fitness, jaw) in enumerate([
+                ("champion", 1.0, 0.7), ("parent", 0.8, 0.5),
+                ("filler", 0.7, 0.5), ("seed", 0.2, 0.2),
+            ])
+        ]
+        specialist = {"candidate": asdict(Number("specialist", 4, parent="champion")),
+                      "fitness": 0.9, "jaw": 0.9}
+        worse_child = {"candidate": asdict(Number("seed child", 5, parent="seed")),
+                       "fitness": 0.1, "jaw": 0.1}
+        portfolio = Portfolio(lambda e: (("jaw specialist", e["jaw"]),),
+                              lambda e: [e["jaw"]], protected_slots=1)
+        parents = [champion, jaw_parent, filler, seed]
+        lane = [{"name": "seed", "root": "seed", "attempts": 1}]
+        retained, _, result = portfolio.select(parents, [specialist], [], SPACE, POLICY, lane)
+        self.assertIn(champion, retained)
+        self.assertIn(specialist, retained)
+        self.assertIn(seed, retained)
+        self.assertEqual(result["protected"], lane)
+        retained, _, result = portfolio.select(parents, [specialist, worse_child], [],
+                                               SPACE, POLICY, lane)
+        self.assertEqual(result["protected"][0]["attempts"], 2)
+        retained, _, result = portfolio.select(parents, [specialist, worse_child], [],
+                                               SPACE, POLICY, result["protected"])
+        self.assertEqual(result["protected"], [])
+        self.assertNotIn(seed, retained)
 
 
 if __name__ == "__main__":

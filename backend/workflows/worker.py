@@ -16,6 +16,8 @@ from pillow_heif import register_heif_opener
 from prefect import flow
 from psycopg.types.json import Jsonb
 
+from episode_quality import episode_sidecar_prefix, summarize_episode
+
 register_heif_opener()
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("capture-worker")
@@ -73,6 +75,10 @@ def process_capture(capture_id: str, original_key: str, content_type: str, kind:
                 check=True, capture_output=True, timeout=120,
             )
             result = {"duration_seconds": duration}
+            if prefix := episode_sidecar_prefix(capture_id, original_key):
+                for name in ("manifest.json", "imu.jsonl", "poses.jsonl"):
+                    client.download_file(BUCKET, f"{prefix}/{name}", str(Path(directory) / name))
+                result["episode_quality"] = summarize_episode(Path(directory))
         key = f"processed/{capture_id}/poster.jpg"
         client.upload_file(str(poster), BUCKET, key, ExtraArgs={"ContentType": "image/jpeg"})
         return key, result

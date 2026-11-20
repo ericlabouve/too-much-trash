@@ -48,6 +48,14 @@ fitness rules in the experiment.
   `{"mutations": {"parent name": {"changes": {"parameter": 1}, "rationale":
   "..."}}, "ideas": [...]}`. Each idea is a complete candidate record.
   Plain change dictionaries are accepted for older plans.
+- **Portfolio search** uses the same plan and evaluation budget. Pass a
+  `Portfolio` with callbacks for objectives and per-case coverage to
+  `run_round`. The selector retains the best overall candidate, holds up
+  to three exploration lineages for three scored mutations each, then
+  fills the pool with objective specialists and candidates that add
+  coverage. An exploration leader can also be the overall champion.
+  Persist `protected` and pass it back on resume. Use `--portfolio` when
+  generating the agent briefs for this mode.
 
 From the repository root, generate domain-specific briefs with
 `python -m ml.evolution.agent_briefs RESULTS_JSON --context "Evaluation and constraints"`.

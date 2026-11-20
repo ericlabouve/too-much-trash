@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jaw Trigger Experiment</title>
   <link rel="stylesheet" href="style.css">
-  <script src="app.js" defer></script>
+  <script src="trend.js?v=development-jaw-metrics" defer></script>
+  <script src="app.js?v=withheld-jaw-results" defer></script>
   <script src="replay.js" defer></script>
 </head>
 <body>
@@ -13,21 +14,33 @@
     <header>
       <p class="eyebrow">TOO MUCH TRASH / RESEARCH</p>
       <h1>Jaw trigger experiment</h1>
-      <p>Compare marker-free squeeze detectors and carry the best candidate into the next round.</p>
+      <p>Compare detectors for jaw events.</p>
       <p class="status" id="status" role="status">Waiting for experiment data</p>
     </header>
 
     <section aria-labelledby="pool-title">
       <div class="section-head"><h2 id="pool-title">Candidates</h2><p id="pool-count"></p></div>
-      <p id="fitness-note" class="note">Fitness combines development accuracy and laptop speed. Select a candidate for details.</p>
-      <div class="table-wrap">
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable candidate scores">
         <table>
-          <thead><tr><th scope="col">Candidate</th><th scope="col">Status</th><th scope="col">Created</th><th scope="col">Pooled F1</th><th scope="col">Matched</th><th scope="col">Missed</th><th scope="col">False triggers</th><th scope="col">Laptop p95 ms</th><th scope="col">iPhone p95 ms</th><th scope="col">Fitness</th></tr></thead>
-          <tbody id="candidates"><tr><td colspan="10">Scores appear when a round starts.</td></tr></tbody>
+          <thead><tr><th scope="col">Candidate</th><th scope="col">Fitness</th><th scope="col">Created</th><th scope="col">Development jaw F1</th><th scope="col">Laptop p95 ms</th><th scope="col">iPhone p95 ms</th></tr></thead>
+          <tbody id="candidates"><tr><td colspan="6">Scores appear when a round starts.</td></tr></tbody>
         </table>
       </div>
-      <p class="holdout" id="holdout" hidden></p>
-      <p class="holdout" id="phone-result" hidden></p>
+    </section>
+
+    <section aria-labelledby="trend-title">
+      <h2 id="trend-title">Leader scores by round</h2>
+      <p class="note">Development scores use clips that helped fit or tune the candidates. Withheld scores appear in candidate details when available.</p>
+      <div id="leader-trend" class="trend" hidden>
+        <ul class="trend-legend" aria-label="Chart legend">
+          <li class="trend-fitness">Fitness</li>
+          <li class="trend-jaw">Development jaw F1</li>
+        </ul>
+        <svg id="trend-plot" role="img" aria-label="Fitness and development jaw F1 for the leading candidate in each completed round"></svg>
+        <label class="trend-scrubber">Round <input id="trend-round" type="range" min="0" value="0"></label>
+        <output id="trend-scores" for="trend-round"></output>
+      </div>
+      <p id="trend-empty" class="note">Scores appear after a joint round finishes.</p>
     </section>
 
     <section id="video-replay" aria-labelledby="replay-title">
@@ -47,17 +60,38 @@
     <section aria-labelledby="loop-title">
       <h2 id="loop-title">Experiment loop</h2>
       <div class="flow">
-        <div class="step" data-step="prepare"><strong>Prepare clips</strong><small>Label events and choose the fitting and comparison clips. Candidates can use video and any available sensor data.</small></div>
-        <div class="branches" id="candidate-families" data-step="candidates" aria-label="Candidate families">
-          <div>Jaw edges and tips</div><div>Bilateral motion</div>
-          <div>Small Core ML model</div><div>Reference images or sensor fusion</div>
-        </div>
-        <div class="step" data-step="replay"><strong>Replay on laptop</strong><small>Score candidates on the fitting clips. New ideas may come from published research or the web.</small></div>
-        <div class="step" data-step="holdout"><strong>Check comparison clips if available</strong><small>Measure misses, false triggers and delay.</small></div>
-        <div class="step" data-step="selected"><strong>Select and reproduce</strong><small>Try one mutation per candidate. Researched rounds replace the three lowest-ranked lineages with new ideas.</small></div>
-        <div class="step" data-step="review"><strong>Meaningful improvement on laptop?</strong><small><a href="#candidate-families">Keep iterating ↺ Refine and replay candidates</a></small></div>
-        <div class="step" data-step="iphone"><strong>Benchmark on iPhone</strong><small>Check promising candidates for latency, dropped frames and heat.</small></div>
-        <div class="step" data-step="live"><strong>Validate during live pickups</strong><small>If it meets the targets, test with the grabber in use.</small></div>
+        <details class="step" name="experiment-step" data-step="prepare">
+          <summary>Prepare the clips</summary>
+          <p>Review jaw timing. Split by recording session to reserve fresh clips for validation.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="candidates">
+          <summary>Propose candidates</summary>
+          <p>Propose a change for each parent and new ideas that explore other signals, features, or compact models.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="replay">
+          <summary>Score on the laptop</summary>
+          <p>Replay labeled clips and measure event matches, misses, false triggers, and detector timing.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="holdout">
+          <summary>Check held-out clips</summary>
+          <p>Compare detection accuracy and delay on reserved clips when a held-out set is available.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="selected">
+          <summary>Select the next pool</summary>
+          <p>Keep the stronger parent or child. Use the slots from the three lowest-ranked lineages to explore new ideas.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="review">
+          <summary>Review the results</summary>
+          <p>Inspect difficult clips and decide which errors to address in the next round.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="iphone">
+          <summary>Benchmark on iPhone</summary>
+          <p>Check detector latency, dropped frames, and heat on the target device.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="live">
+          <summary>Test real pickups</summary>
+          <p>Check jaw timing and bucket outcome detection during new field recordings.</p>
+        </details>
       </div>
     </section>
 

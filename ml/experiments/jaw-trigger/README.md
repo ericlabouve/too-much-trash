@@ -217,3 +217,77 @@ replay exactly. The full detector step measured 0.0315 ms p95, including
 the median and state decision. The four-method suite finished in 261 ms
 with nominal thermal state. These figures do not include live capture
 or preparation.
+
+## Reviewed development corpus
+
+Use `evaluate_development.py MANIFEST BASELINE OUTPUT` to replay the frozen
+Round 23 video detector on the local 62-clip, 960 × 720 development
+manifest. Capture button cues are the reference for squeeze and release.
+Use the human-reviewed deposit outcome as the deposit reference. Earlier
+deposit predictions are review provenance. Report results as in-sample.
+The success target is 0.95 jaw-event F1. Track squeeze and release results
+separately and confirm the target on fresh recording sessions when available.
+
+Fitness uses 80% jaw event F1 and 20% normalized laptop jaw p95 speed.
+For supplementary deposit reporting, pass `--deposit-predictions PREDICTIONS_JSON`
+with a binary `predictions` mapping keyed by clip ID and `p95_ms` measured
+for the joint detector. Full speed credit extends
+through 4.17 ms per prepared frame, one quarter of a 60 fps phone frame.
+Speed credit then falls linearly to zero at 16.67 ms. The fitness benchmark
+covers jaw features and event logic on prepared frames. Measure frame
+preparation and iPhone runtime separately. The earlier joint rounds used 40%
+precision-weighted jaw accuracy, 20% balanced deposit accuracy, and 40%
+speed. Saved reports retain the fitness used for selection. Keep
+prediction inputs and results in private storage.
+
+Agent-guided joint rounds use
+`run_joint_round.py MANIFEST PRIOR_RESULTS PLAN OUTPUT --progress dashboard/progress.json`.
+Generate the research and parent briefs with `python agent_briefs.py PRIOR_RESULTS --portfolio`.
+Pass `--target-f1 0.95` to end the run after the first round with an
+evaluated candidate at the target. Use `--feature-parameters` to supply a
+JSON object keyed by candidate method for fitted models. Parameters are
+copied into the private result for replay.
+Use `validate_withheld.py MANIFEST FOLDS OUTPUT CANDIDATE...` to replay
+training-specific models and decoders on withheld capture blocks.
+Supply its output with `--withheld-report` and use `--target-basis withheld`
+when the threshold applies to that replay.
+Candidates may propose new code, train policies, SVMs, or other models on
+the fitting set, and combine video, IMU, ARKit, or other runtime signals.
+They may spend more compute for accuracy and report laptop p95 under the
+common scoring protocol.
+The plan uses the shared evolution schema. Joint candidates add
+`deposit_method`, `deposit_threshold`, and optional `release_ratio`,
+`release_cooldown`, and `release_confirm` to the jaw candidate record.
+The release ratio defaults to 0.70. By default both edges use the same
+cooldown and confirmation.
+Deposit heuristics operate around the candidate's predicted release and
+are reported for diagnosis. Fitness and specialist selection use jaw metrics.
+The brightest-region gate only selects where to look for transfer
+evidence. It cannot on its own produce a positive prediction. Record
+the combined laptop p95 separately and report these results as
+in-sample. Phone timing requires a new joint benchmark.
+
+For a preplanned batch, `--batch-rounds N` takes a plan with `parents`
+(one ranked-slot recipe list and rationale per incumbent) and `ideas`
+(three fresh candidate configurations per round). The adapter materializes
+the recipes against each new pool and saves each round separately by
+appending its round number to the output stem. Use a single-round plan when
+fresh agent proposals must respond to that round's replay results.
+
+Use `--portfolio` for champion, specialist, and protected selection.
+To keep decoded clips cached while gathering fresh agent plans, pass a
+directory as `PLAN` and set `--batch-rounds N`. Publish
+`joint-plan-ROUND.json` atomically in that directory after reviewing the
+previous round. The runner waits for the next plan between rounds.
+Score and log the clips with no matched jaw event alongside the official
+fitness.
+The dashboard plots the fitness and jaw F1 of each completed
+joint round's recorded leader. It recomputes the fitness trace using the
+current weights. Archived joint runs earned full speed credit even with
+deposit processing included. Use the round slider to inspect exact scores.
+
+`replay_selection.py RESULT OUTPUT --from-round 27` compares the original
+and portfolio selectors on recorded joint trials. It reveals each
+continuation only when requested, counts requests with no recorded
+continuation, and compares scores at the same number of revealed trials.
+Prospective runs are needed to measure branches missing from the archive.

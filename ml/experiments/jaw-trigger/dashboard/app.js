@@ -8,53 +8,75 @@ const messages = {
   live: "Validating live pickups",
   failed: "Experiment stopped. See the runner output."
 };
-const alternateSignals = {
-  angle: "Measures the angle between lines near the jaw hinge",
-  patch: "Tracks the lower jaw relative to a fixed shaft patch",
-  gradient: "Compares local edge directions with the open reference",
-  occupancy: "Counts changes concentrated between the jaws",
-  imu: "Looks for spikes in the phone’s accelerometer samples"
-};
 const status = document.querySelector("#status");
-const fitnessNote = document.querySelector("#fitness-note");
 const table = document.querySelector("#candidates");
 const count = document.querySelector("#pool-count");
-const holdout = document.querySelector("#holdout");
-const phoneResult = document.querySelector("#phone-result");
 const nodes = document.querySelectorAll("[data-step]");
+const flow = document.querySelector(".flow");
+new ResizeObserver(([entry]) => {
+  const gap = parseFloat(getComputedStyle(flow).columnGap);
+  const columns = Math.max(1, Math.min(nodes.length, Math.floor((entry.contentRect.width + gap) / (132 + gap))));
+  flow.style.setProperty("--step-columns", columns);
+  nodes.forEach((node, index) => {
+    const row = Math.floor(index / columns);
+    const offset = index % columns;
+    const forward = row % 2 === 0;
+    node.style.gridRow = row + 1;
+    node.style.gridColumn = forward ? offset + 1 : columns - offset;
+    node.dataset.next = index === nodes.length - 1 ? "" :
+      offset === columns - 1 ? "down" : forward ? "right" : "left";
+  });
+}).observe(flow);
+
 const format = (value) => Number.isFinite(value) ? value.toFixed(3) : "—";
 let previous;
+const completedKey = "jaw-dashboard:completed";
+let completed;
+try {
+  completed = JSON.parse(sessionStorage.getItem(completedKey));
+} catch {
+  // The current pool still renders when browser storage is unavailable.
+}
+
+function metricGroup(label, metrics, falseLabel, zeroClips) {
+  const group = document.createElement("div");
+  group.className = "candidate-metrics";
+  const title = document.createElement("strong");
+  title.textContent = label;
+  const counts = document.createElement("p");
+  counts.textContent = metrics
+    ? `${metrics.matched} matched · ${metrics.missed} missed · ${metrics.false_positives} ${falseLabel}`
+    : "Awaiting scores";
+  if (Number.isInteger(zeroClips)) counts.textContent += ` · ${zeroClips} clips with no matches`;
+  group.append(title, counts);
+  return group;
+}
 
 function render(snapshot) {
+  if (typeof updateLeaderTrend === "function") updateLeaderTrend(snapshot);
   const {step, round, active_candidate: active, ranked, pool, result, iphone_benchmark: phone, iphone_timing: phoneTiming} = snapshot;
-  const topScore = ranked[0];
-  if (Number.isFinite(topScore?.pooled_accuracy)) {
-    fitnessNote.textContent = "Fitness weights accuracy and laptop speed equally. False triggers cost twice a miss, and the weakest clip contributes 25% of accuracy.";
-    if (phoneTiming) {
-      fitnessNote.textContent += " iPhone p95 uses prepared-frame feature extraction and is shared by candidates using the same extractor.";
-      if (Number.isFinite(phoneTiming.champion_detector_p95_ms)) {
-        fitnessNote.textContent += ` The winner's complete prepared-frame detector measured ${format(phoneTiming.champion_detector_p95_ms)} ms p95 on iPhone.`;
-      }
-    }
-    if (result?.phone_target_fps) {
-      const budget = (1000 * result.detector_frame_share / result.phone_target_fps).toFixed(2);
-      fitnessNote.textContent += ` Full speed credit at or below ${budget} ms per sampled frame, with headroom for ${result.phone_target_fps} fps capture.`;
-    }
-  } else if (Number.isFinite(topScore?.worst_clip_f1)) {
-    fitnessNote.textContent = "Fitness gives accuracy and laptop speed equal weight. Accuracy averages mean and weakest development-clip F1.";
-  } else {
-    fitnessNote.textContent = "Fitness gives mean development-clip F1 and laptop speed equal weight.";
-  }
   const activePool = result?.next_pool ?? pool;
+  const retained = new Set(activePool.map((candidate) => candidate.name));
+  if (step === "selected" && ranked.length) {
+    completed = { round, ranked: ranked.filter(({ candidate }) => retained.has(candidate.name)) };
+    try {
+      sessionStorage.setItem(completedKey, JSON.stringify(completed));
+    } catch {
+      // Keep the latest completed round in memory.
+    }
+  }
+  const previousRanked = completed?.round === round - 1 ? completed.ranked : [];
+  const leader = step === "selected" ? ranked[0]?.candidate.name : previousRanked[0]?.candidate.name;
   status.textContent = messages[step] ?? "Experiment update";
   if (round) status.textContent = `Round ${round} · ${status.textContent}`;
   if (active) status.textContent += ` · ${active}`;
+  else if (retained.has(leader)) status.textContent += ` · Leading candidate: ${leader}`;
   const current = stages.indexOf(step);
   for (const node of nodes) {
     const index = stages.indexOf(node.dataset.step);
     const complete = index < current || (step === "selected" && index === current);
     const phoneNode = node.dataset.step === "iphone" && phone;
-    const running = phoneNode ? phone.state === "running" : index === current && step !== "selected";
+    const running = (index === current && step !== "selected") || (phoneNode && phone.state === "running");
     node.dataset.state = running ? "active" : complete || (phoneNode && phone.state === "complete") ? "complete" : "pending";
     if (running) node.setAttribute("aria-current", "step");
     else node.removeAttribute("aria-current");
@@ -62,30 +84,25 @@ function render(snapshot) {
   count.textContent = `${activePool.length} / 10 in the pool`;
   const trialScores = result?.challengers ?? [];
   const scores = new Map([...trialScores, ...(result?.pruned_scores ?? []), ...ranked].map((entry) => [entry.candidate.name, entry]));
-  const candidates = new Set([...ranked.map((entry) => entry.candidate.name),
-    ...activePool.map((candidate) => candidate.name),
-    ...trialScores.map((entry) => entry.candidate.name)]);
-  if (active) candidates.add(active);
-  const retained = new Set(activePool.map((candidate) => candidate.name));
+  const previousScores = new Map(previousRanked.map((entry) => [entry.candidate.name, entry]));
+  const candidates = new Set([
+    ...(active ? [active] : []),
+    ...[...ranked, ...previousRanked].map(({ candidate }) => candidate.name).filter((name) => retained.has(name)),
+    ...retained
+  ]);
   const known = new Map([...pool, ...activePool, ...[...scores.values()].map((entry) => entry.candidate)]
     .map((candidate) => [candidate.name, candidate]));
   const expanded = new Set([...table.querySelectorAll("details[open]")].map((item) => item.dataset.candidate));
   const pruned = new Set([result?.pruned ?? []].flat().map((candidate) => candidate.name));
   for (const name of pruned) candidates.add(name);
-  const admitted = new Set((result?.admitted ?? [result?.offspring]).filter(Boolean).map((candidate) => candidate.name));
   const rows = [...candidates].map((name) => {
     const row = document.createElement("tr");
-    const score = scores.get(name);
-    let state = score ? (score.parent ? "Trial scored" : "Scored") : "Queued";
-    if (name === active) state = "Running";
-    else if (result) {
-      if (pruned.has(name)) state = "Pruned";
-      else if (name === ranked[0]?.candidate.name) state = "Winner";
-      else if (admitted.has(name)) state = score ? "Admitted" : "New variant";
-      else if (retained.has(name)) state = "Retained";
-      else state = "Trial only";
-    }
-    row.dataset.state = state.toLowerCase();
+    const currentScore = scores.get(name);
+    const priorScore = name !== active && !currentScore ? previousScores.get(name) : undefined;
+    const score = currentScore ?? priorScore;
+    if (name === active) row.dataset.state = "running";
+    else if (pruned.has(name)) row.dataset.state = "pruned";
+    else if (name === leader && step === "selected") row.dataset.state = "winner";
     const candidate = known.get(name);
     const created = candidate?.created_round;
     const heading = document.createElement("th");
@@ -96,29 +113,26 @@ function render(snapshot) {
     const summary = document.createElement("summary");
     summary.textContent = name;
     details.append(summary);
-    const description = document.createElement("p");
-    description.className = "candidate-detail";
-    const attributes = [];
-    if (candidate) {
-      if (alternateSignals[candidate.method]) attributes.push(alternateSignals[candidate.method]);
-      if (candidate.parent) attributes.push(`Parent: ${candidate.parent}`);
-      attributes.push(`Threshold ${candidate.threshold}`, `${candidate.confirm} confirming frames`);
-      if (candidate.smoothing > 1) attributes.push(`Smoothing over ${candidate.smoothing} frames`);
-      if (candidate.cooldown > 0) attributes.push(`${candidate.cooldown}-frame cooldown`);
-      if (candidate.signal === "opposed") attributes.push("Requires opposing motion on both sides");
-      if (candidate.signal === "shaft") attributes.push("Crop aligned to the shaft");
+    const lane = result?.protected?.find((entry) => entry.name === name);
+    const role = result?.roles?.[name];
+    if (lane || (role && role !== "deposit specialist")) {
+      const note = document.createElement("p");
+      note.className = "candidate-metrics";
+      note.textContent = lane ? `Protected lineage · ${lane.attempts}/3 mutations` : role;
+      details.append(note);
     }
-    if (score) {
-      attributes.push(`${score.development.matched} matched, ${score.development.missed} missed, ${score.development.false_positives} false triggers`);
-      if (Number.isInteger(score.development.clean_clips)) {
-        attributes.push(`${score.development.clean_clips} of ${score.clip_f1.length} clips with one matched squeeze and release and zero false triggers`);
-      }
-      if (score.clip_f1) attributes.push(`F1 by clip: ${score.clip_f1.map(format).join(", ")}`);
-      if (Number.isFinite(score.worst_clip_f1)) attributes.push(`Weakest clip F1: ${format(score.worst_clip_f1)}`);
+    details.append(metricGroup("Jaw events", score?.development, "false triggers", score?.zero_jaw_clips));
+    if (score?.jaw_by_event) {
+      details.append(
+        metricGroup("Squeezes", score.jaw_by_event.close, "false triggers"),
+        metricGroup("Releases", score.jaw_by_event.open, "false triggers")
+      );
     }
-    description.textContent = attributes.join(" · ") || "Candidate details will appear after scoring.";
-    details.append(description);
-    if (score) {
+    if (score?.withheld) {
+      details.append(metricGroup(`Withheld jaw events · F1 ${format(score.withheld.jaw.f1)}`,
+        score.withheld.jaw, "false triggers"));
+    }
+    if (score && !candidate?.deposit_method) {
       const replayLink = document.createElement("a");
       replayLink.className = "candidate-replay-link";
       replayLink.href = "#video-replay";
@@ -130,29 +144,18 @@ function render(snapshot) {
     }
     heading.append(details);
     row.append(heading);
-    const values = [state, created ? `Round ${created}` : "—",
-      format(score?.development.f1), score?.development.matched ?? "—",
-      score?.development.missed ?? "—", score?.development.false_positives ?? "—", format(score?.p95_ms), format(candidate?.signal === "default" ? phoneTiming?.methods?.[candidate.method]?.phone_p95_ms : undefined), format(score?.fitness)];
+    const phoneP95 = candidate?.signal === "default" && !candidate.deposit_method ? phoneTiming?.methods?.[candidate.method]?.phone_p95_ms : undefined;
+    const values = [format(score?.fitness), created ? `Round ${created}` : "—",
+      format(score?.development.f1), format(score?.p95_ms), format(phoneP95)];
     for (const value of values) {
       const cell = document.createElement("td");
       cell.textContent = value;
+      if (priorScore && row.cells.length === 1) cell.title = `Fitness from Round ${completed.round}`;
       row.append(cell);
     }
     return row;
   });
   table.replaceChildren(...rows);
-  const evaluation = result?.winner_holdout;
-  holdout.hidden = !evaluation && !result?.fit_all_clips;
-  if (result?.fit_all_clips) {
-    const fit = result.ranked[0].development;
-    holdout.textContent = `Fit on all five clips · ${fit.matched} of ${fit.matched + fit.missed} matched · ${fit.false_positives} false triggers · ${fit.clean_clips} clean clips`;
-  } else if (evaluation) {
-    holdout.textContent = `Comparison clips · ${evaluation.matched} of ${evaluation.matched + evaluation.missed} reference events matched · ${evaluation.false_positives} false triggers. The press reference is 3 s from the start of the recording window. Release is typically 3 s before the end. Both references come from recorded button timestamps.`;
-  }
-  phoneResult.hidden = phone?.state !== "complete";
-  if (!phoneResult.hidden) {
-    phoneResult.textContent = `iPhone replay of original bilateral flow · ${format(phone.p95_ms)} ms p95 detector time · ${phone.matched} of ${phone.matched + phone.missed} reference events matched · ${phone.false_positives} false triggers.`;
-  }
 }
 
 async function refresh() {

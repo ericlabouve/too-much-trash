@@ -4,6 +4,7 @@ import argparse
 from bisect import bisect_right
 from collections import deque
 from dataclasses import asdict, dataclass, replace
+from importlib import import_module
 import json
 import math
 from pathlib import Path
@@ -19,6 +20,9 @@ import numpy as np
 from alternative_signals import (
     fit_jaw_projection, imu_features, motion_samples, projected_jaw_features, sparse_jaw_flow, visual_features,
 )
+from joint_fitness import (
+    DETECTOR_FRAME_SHARE, MATCH_SECONDS, PHONE_TARGET_FPS, detector_speed_score, fitness_for,
+)
 
 
 # Keep the experiment executable directly from its directory and from the repository root.
@@ -27,13 +31,13 @@ from ml.evolution import Policy, SearchSpace, run_round
 
 
 SAMPLE_HZ = 15
-MATCH_SECONDS = 0.5
-PHONE_TARGET_FPS = 60
-DETECTOR_FRAME_SHARE = 0.25
 CALIBRATION_FRAMES = 8
 POLICY = Policy()
 FALSE_TRIGGER_COST = 2
 PROJECTION_METHODS = {"linear_hog", "linear_hog_rearm", "linear_hog_median", "linear_hog_slope", "linear_hog_regularized"}
+EXPERIMENTAL_METHODS = {"geometry47", "geometry48", "geometry49", "motion47", "motion48", "motion49",
+                        "temporal47", "temporal48", "temporal49"}
+POSE_METHODS = {"motion47"}
 
 
 @dataclass(frozen=True)
@@ -83,6 +87,17 @@ RESEARCH_CANDIDATES = [
     Candidate("fitted HOG with median squeeze", "linear_hog_median", 0.70),
     Candidate("fitted HOG with rising squeeze", "linear_hog_slope", 0.62),
     Candidate("regularized fitted HOG", "linear_hog_regularized", 0.78),
+    Candidate("development-calibrated HOG", "linear_hog_refit", 0.60),
+    Candidate("development-calibrated median HOG", "linear_hog_refit_median", 0.60),
+    Candidate("tracked jaw geometry", "geometry47", 0.50),
+    Candidate("pose-aware jaw tracking", "motion47", 0.50),
+    Candidate("trained temporal jaw detector", "temporal47", 0.50),
+    Candidate("regularized jaw geometry", "geometry48", 0.50),
+    Candidate("inertial jaw impulses", "motion48", 0.40),
+    Candidate("compact temporal jaw detector", "temporal48", 0.50),
+    Candidate("tracked jaw landmarks", "geometry49", 0.50),
+    Candidate("IMU-only signed jaw edges", "motion49", 0.40),
+    Candidate("causal jaw phase and boundaries", "temporal49", 0.50),
 ]
 
 
@@ -107,7 +122,21 @@ def correlate_difference(left, right):
     return 1 - float(cv2.matchTemplate(left, right, cv2.TM_CCOEFF_NORMED)[0, 0])
 
 
+def pose_samples(path, episode_start):
+    if path is None:
+        return []
+    with path.open() as file:
+        return [(row["commonTime"] - episode_start, row["sample"]) for row in map(json.loads, file)]
+
+
 def features(method, frames, signal="default", samples=None, parameters=None):
+    if method in EXPERIMENTAL_METHODS:
+        if parameters is None or method not in parameters:
+            raise ValueError(f"Missing feature parameters for {method}")
+        module = import_module("motion48" if method == "motion49" else method)
+        return module.features(frames, samples, parameters[method])
+    if method in {"linear_hog_refit", "linear_hog_refit_median"}:
+        return projected_jaw_features(frames, parameters["linear_hog_refit"], CALIBRATION_FRAMES)
     if method in PROJECTION_METHODS:
         key = "linear_hog_regularized" if method == "linear_hog_regularized" else "linear_hog"
         return projected_jaw_features(frames, parameters[key], CALIBRATION_FRAMES)
@@ -206,12 +235,19 @@ def features(method, frames, signal="default", samples=None, parameters=None):
 
 def events(candidate, samples, confirmation_time=False):
     closed, streak, output = False, [], []
-    flow = candidate.method in {"flow", "gyro_flow", "local_gradient", "sparse_flow"}
+    flow = candidate.method in {"flow", "gyro_flow", "local_gradient", "motion48", "motion49", "sparse_flow"}
     recent = deque(maxlen=candidate.smoothing)
     last_event = -candidate.cooldown
     evidence = 0.0
     rearm_remaining = 0
     slope = deque(maxlen=4)
+    release_ratio = getattr(candidate, "release_ratio", 0.70)
+    release_cooldown = getattr(candidate, "release_cooldown", None)
+    release_confirm = getattr(candidate, "release_confirm", None)
+    if release_cooldown is None:
+        release_cooldown = candidate.cooldown
+    if release_confirm is None:
+        release_confirm = candidate.confirm
     for index, (time, value) in enumerate(samples[CALIBRATION_FRAMES:]):
         if not math.isfinite(value):
             recent.clear()
@@ -224,11 +260,11 @@ def events(candidate, samples, confirmation_time=False):
         if candidate.method == "linear_hog_slope":
             slope.append(mean_value)
         if rearm_remaining:
-            rearm_remaining = (rearm_remaining - 1 if mean_value < candidate.threshold * 0.70 else 3)
+            rearm_remaining = (rearm_remaining - 1 if mean_value < candidate.threshold * release_ratio else 3)
             continue
-        if index - last_event < candidate.cooldown:
+        if index - last_event < (release_cooldown if closed else candidate.cooldown):
             continue
-        value = median(recent) if candidate.method == "linear_hog_median" and not closed else mean_value
+        value = median(recent) if candidate.method in {"linear_hog_median", "linear_hog_refit_median"} and not closed else mean_value
         threshold = candidate.threshold
         if candidate.method == "gradient_cusum":
             evidence = max(0.0, evidence + (0.20 - value if closed else value - 0.15))
@@ -238,14 +274,14 @@ def events(candidate, samples, confirmation_time=False):
         elif candidate.method == "imu":
             crosses = value > threshold
         else:
-            crosses = (value < -threshold if flow else value < threshold * 0.70) if closed else value > threshold
+            crosses = (value < -threshold if flow else value < threshold * release_ratio) if closed else value > threshold
         if candidate.method == "linear_hog_slope" and not closed:
             crosses = crosses and len(slope) == slope.maxlen and value - slope[0] > 0.04
         if not crosses:
             streak.clear()
             continue
         streak.append(time)
-        if len(streak) == candidate.confirm:
+        if len(streak) == (release_confirm if closed else candidate.confirm):
             closed = not closed
             last_event = index
             evidence = 0.0
@@ -298,9 +334,19 @@ def write_progress(path, step, ranked, *, pool, round_number=1, active_candidate
     }
     if path.exists():
         prior = json.loads(path.read_text())
-        for field in ("iphone_benchmark", "iphone_timing"):
+        for field in ("iphone_benchmark", "iphone_timing", "leader_trend"):
             if field in prior:
                 snapshot[field] = prior[field]
+    if result and "history" in result:
+        history = []
+        for item in result["history"]:
+            leader = (result if item["round"] == round_number else item)["ranked"][0]
+            if "deposit" in leader:
+                history.append({"round": item["round"], "name": leader["candidate"]["name"],
+                                "fitness": fitness_for(leader), "jaw": leader["development"]["f1"],
+                                "deposit": leader["deposit"]["f1"]})
+        if history:
+            snapshot["leader_trend"] = history
     with NamedTemporaryFile(mode="w", dir=path.parent, prefix=".progress-", suffix=".json", delete=False) as pending:
         json.dump(snapshot, pending)
     Path(pending.name).replace(path)
@@ -368,12 +414,21 @@ def precision_weighted_accuracy(metrics):
     return matched / (matched + metrics["missed"] + FALSE_TRIGGER_COST * metrics["false_positives"])
 
 
-def score(candidate, measured, labels, confirmation_time=False):
+def measure_events(candidate, measured):
+    predictions, timings = [], []
+    for samples, feature_ms in measured:
+        begin = perf_counter_ns()
+        predictions.append(events(candidate, samples, confirmation_time=True))
+        event_ms = (perf_counter_ns() - begin) / 1_000_000 / len(samples)
+        timings.append(np.asarray(feature_ms) + event_ms)
+    return predictions, timings
+
+
+def score(candidate, measured, labels, confirmation_time=False, *, predictions=None):
     p95 = float(np.percentile([time for _, times in measured for time in times], 95))
-    frame_ms = 1000 / PHONE_TARGET_FPS
-    detector_budget = frame_ms * DETECTOR_FRAME_SHARE
-    speed = min(1.0, max(0.0, (frame_ms - p95) / (frame_ms - detector_budget)))
-    predictions = [events(candidate, samples, confirmation_time) for samples, _ in measured]
+    speed = detector_speed_score(p95)
+    if predictions is None:
+        predictions = [events(candidate, samples, confirmation_time) for samples, _ in measured]
     metrics = accuracy(predictions, labels)
     per_clip = [accuracy([predicted], [expected])
                 for predicted, expected in zip(predictions, labels, strict=True)]

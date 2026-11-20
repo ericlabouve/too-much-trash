@@ -65,21 +65,29 @@ def jaw_descriptor(frame):
     return gradient_histograms(frame[105:207, 148:207]).ravel()
 
 
-def fit_jaw_projection(clips, labels, calibration_frames, ridge=0.01):
-    rows, targets = [], []
+def fit_jaw_projection(clips, labels, calibration_frames, ridge=0.01, *, balance_clips=False):
+    rows, targets, clip_weights = [], [], []
     for frames, label in zip(clips, labels, strict=True):
         descriptors = np.asarray([jaw_descriptor(frame) for _, frame in frames])
         timestamps = np.asarray([timestamp for timestamp, _ in frames])
         reference = np.median(descriptors[:calibration_frames], axis=0)
-        stable = (abs(timestamps - label["close"]) > 0.20) & (abs(timestamps - label["open"]) > 0.20)
+        # Keep a stable center even for squeezes shorter than the usual 0.4 s exclusion.
+        margin = min(0.20, (label["open"] - label["close"]) / 4) if balance_clips else 0.20
+        stable = (abs(timestamps - label["close"]) > margin) & (abs(timestamps - label["open"]) > margin)
         rows.extend(descriptors[stable] - reference)
-        targets.extend((timestamps[stable] >= label["close"]) & (timestamps[stable] <= label["open"]))
+        target = (timestamps[stable] >= label["close"]) & (timestamps[stable] <= label["open"])
+        targets.extend(target)
+        if balance_clips:
+            if not 0 < target.mean() < 1:
+                raise ValueError("Every development clip needs stable open and closed examples")
+            clip_weights.extend(np.where(target, 0.5 / target.sum(), 0.5 / (~target).sum()))
     matrix = np.column_stack((rows, np.ones(len(rows))))
     target = np.asarray(targets)
     prevalence = target.mean()
     if not 0 < prevalence < 1:
         raise ValueError("Jaw projection requires stable open and closed examples")
-    weights = np.where(target, 0.5 / prevalence, 0.5 / (1 - prevalence))
+    weights = (np.asarray(clip_weights) / len(clips) if balance_clips else
+               np.where(target, 0.5 / prevalence, 0.5 / (1 - prevalence)))
     regularizer = np.eye(matrix.shape[1]) * ridge
     regularizer[-1, -1] = 0
     return np.linalg.solve(matrix.T @ (weights[:, None] * matrix) + regularizer,

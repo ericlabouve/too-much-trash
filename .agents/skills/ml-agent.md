@@ -1,6 +1,6 @@
 # Too Much Trash: ML working memory
 
-Last updated: 2026-11-06. Read before project ML work; verify current code/runtime when needed.
+Last updated: 2026-11-08. Read before project ML work; verify current code/runtime when needed.
 
 ## Maintain this memory
 
@@ -8,8 +8,10 @@ Update freely and frequently when user preferences, architectural decisions, mea
 
 ## Preferences and semantics
 
-- Use pretrained models; training our own model is out of scope for now.
+- Use pretrained models for the segmentation pipeline. Evolution candidates may train their own policies, SVMs, or other models on the designated fitting data. They may propose new implementations, spend more compute for accuracy, and use any available runtime sensor signals, including video, IMU, and ARKit. Measure laptop p95 under the common protocol.
 - Prefer native Apple MPS. CPU decode/encode/evaluation is fine; do not silently benchmark CPU model inference as MPS. Docker Desktop Linux containers cannot gain Mac MPS through mounted files. Native host inference is acceptable, with container clients using `host.docker.internal`.
+- Future policy training video is 960 × 720, square pixels, 4:3. Downscale 1920 × 1440 by half on both axes. Preserve full framing, frame order and capture timing. Keep originals and sidecars and flag incompatible display aspect ratios for review.
+- Policy targets include squeeze, unsqueeze, and whether the item enters the waste bucket. Review the release through the visible outcome. Record failed pickup and missed deposit separately and retain uncertain or occluded outcomes for review. A visible bucket alone is insufficient evidence of deposit.
 - Segment the item picked up by the reacher claw without requiring its category name. `cylinder of yarn` was only a benchmark aid.
 - Observed bin deposit means `trash`; no separate `deposited_in_bin` product class. The complete negative example is `not trash` because the item was not deposited. Retain ambiguous evidence, misses, drops and failed attempts for review.
 - Off-policy means the clip contains no relevant pickup footage (for example, an accidental recording), not that a relevant pickup ended outside the bin. Keep capture relevance separate from pickup outcome and uncertainty.
@@ -28,6 +30,32 @@ Update freely and frequently when user preferences, architectural decisions, mea
 ## Ground truth and evaluation
 
 - Marker-free jaw event research uses an evolutionary pool of at most ten candidates, with equal weight for event accuracy and measured speed. Try one seeded, bounded mutation per incumbent each round while unseen neighbors remain. Each benchmark clip has one squeeze and one release. Count all unmatched detections as false triggers. Use matched / (matched + missed + 2 × false triggers), weighted 75% pooled development score and 25% weakest development clip. Fill the ten retained slots before pruning, with at most five per detector method. Once full, replace at most one incumbent with a higher-scoring challenger and preserve at least one of each represented method. Iterate on the laptop and validate meaningful improvements on iPhone. Candidates may combine video with any available sensors and draw on web research. The first laptop round used the three-second press reference and recorded release as proxy labels. See `ml/experiments/jaw-trigger/README.md` for the holdout result and iPhone validation status.
+
+- On the five Round 23 fitting clips, the frozen jaw winner scored F1 1.00 on the originals and 0.70 on the 960 × 720 encoded copies (7 matches, 3 misses, 3 false triggers). Both are 4:3. Rebaseline the resized input before adding deposit scoring and reserve fresh captures for independent evaluation. The paired check includes encoding as well as resizing.
+
+- Human bucket-deposit review on 2026-11-08 approved 59 of 62 binary predictions. All three denials came from six explicitly low-confidence calls that had originally been uncertain. This prediction set combines earlier prelabels and agent reviews. Preserve the predictions and their evidence alongside the human outcome in the local dataset, and exclude the three clips without a visible grabber from deposit scoring. Clips 003–005 were removed from both deposit dataset copies because they show no grabber. The 62-clip dataset has 50 deposits and 12 non-deposits. The local copy located by `/tmp/tmt-jaw-policy-stage-current` and the backup on `ERICS_DRIVE/jaw-deposit-720p-62/` share the same reviewed label file. Use its clip IDs as the allowlist. Five non-deposits were used for Round 23 fitting. All 57 fresh clips are in one provisional upload block, so confirm recording sessions before splitting. The deposit review did not validate squeeze or unsqueeze timestamps. Use the `review-labels` skill for future local review batches.
+
+- Round 24 uses all 62 reviewed clips as development data, with in-sample reporting. Joint fitness weights jaw accuracy 40%, balanced bucket-deposit accuracy 20%, and speed 40%. Use capture button cues as the squeeze and release ground truth. Use human-reviewed deposit outcomes as deposit ground truth and keep prior predictions as review provenance. Keep the frozen jaw-only baseline as a comparison.
+
+- Joint Rounds 24–26 evaluated 39 proposals on the 62 development clips. Best fitness rose 0.571 → 0.590 → 0.596. Round 26 combined rising HOG with held-release optical flow. It matched 28 of 50 deposits with no false deposits, achieved 78% balanced deposit accuracy, and scored 0.322 jaw F1 against button cues. Laptop prepared-frame p95 was 0.105 ms. Keep these in-sample results separate from independent or live validation.
+
+- Joint Rounds 27–36 evaluated 130 new genotypes on those same 62 clips using preplanned agent recipes and three researched seeds per round. The Round 29 winner remained first through Round 36 at 0.6145 fitness, 0.433 jaw F1 (53 matched, 71 missed, 68 false), and 76.7% balanced deposit accuracy (35 of 50 deposits and two false positives). Laptop prepared-frame p95 was 0.135 ms, earning full speed credit. The highest jaw F1 was 0.463 from a Round 33 challenger. The winner refits signed HOG with equal clip and class weighting and uses optical flow near its predicted release. Private reports are `joint-round-27.json` through `joint-round-36.json` in the current local stage. These are in-sample laptop replays.
+
+- Retrospective selection audit of Rounds 27–36: 22 of 27 eligible new lineages received just one mutation opportunity, eight final slots used fitted HOG variants, and Round 33's best jaw candidate ranked second in its round but lost its head-to-head against the overall winner. All 130 new trials earned full speed credit and scored zero on the single worst clip. The winner had 22 zero-F1 clips; other trials found at least one matched jaw event on each of those clips.
+
+- Joint Rounds 37–46 used the portfolio selector with one champion, complementary competitors, and up to three exploration lineages with three scored mutation attempts each. Three fresh ideas and ten parent proposals used each preceding round's actual results. Seven protected roots completed three attempts, and fitted HOG fell from eight active slots to three. The Round 44 winner held through Round 46 at fitness 0.6265, jaw F1 0.4810, 19 clips without a jaw match, 27 of 50 deposits, and zero false deposits. Deposit F1 was 0.7013 versus 0.8046 for the Round 36 winner. These are laptop development results on the same 62 clips.
+
+- After Round 46, fitness shifted to 80% jaw-event F1 and 20% normalized laptop jaw p95 speed. Deposit accuracy and runtime are supplementary diagnostics. The dashboard re-scores recorded leaders on the current formula, and archived reports retain their original selection scores. All 299 archived joint trials already earned full speed credit, with maximum combined laptop p95 of 1.269 ms against the 4.17 ms full-credit threshold.
+
+- Include scoring and runtime budgets in every jaw research and parent brief. Laptop p95 earns full credit through 4.17 ms per prepared frame and falls linearly to zero at 16.67 ms. The phone target is 60 fps. Ask candidates for their expected accuracy gain, p95, and how often expensive conditional work runs.
+
+- The jaw-event success target is 0.95 F1. Track squeeze and release results separately and verify the combined target on fresh recording sessions when available.
+
+- Jaw-only diagnostic on the 62 development clips: the Round 46 leader matched 19 of 62 squeezes and 38 of 62 releases at 15 Hz. Replaying the same detector at 30 Hz with comparable timing windows lowered total F1 from 0.481 to 0.464. This single-candidate comparison supports prioritizing squeeze evidence and testing new detector implementations. It does not establish that a higher frame rate is ineffective for other detectors.
+
+- Round 47 completed 13 trials under 80% jaw F1 and 20% jaw runtime fitness. A causal video plus IMU model scored 1.000 F1 on its 62 fitting clips (124 matches, zero false triggers, 0.213 ms laptop p95). The shaft-registered geometry readout scored 0.940 and ARKit-assisted tracking scored 0.518 in development. Retrospective block-withheld refits scored 0.563 pooled F1 for the temporal model, with 107 matches, 149 false triggers, and 17 misses. Its five-clip earlier capture block scored 0.889 after training on the later 57 clips. Keep fitting scores and withheld results distinct. The progress dashboard reports squeeze and release counts separately.
+
+- Dream-RSI-inspired replay of Rounds 27–36 reproduced all ten baseline pools. At 69 revealed trials, baseline fitness was 0.6145 versus 0.6071 for the portfolio selector. The portfolio requested 61 unlogged continuations, so the replay is a coverage audit rather than a comparison of how those new branches would perform. The ten subsequent live rounds changed the selector and proposals together. The local dashboard plots each completed joint round's leader fitness, jaw F1, and deposit F1.
 
 - Shared evolutionary runner and agent briefs live in `ml/evolution/`. Use the `evolve` project skill for agent-guided rounds and new domain adapters. Jaw-specific scoring and candidate code remain under `ml/experiments/jaw-trigger/`.
 
