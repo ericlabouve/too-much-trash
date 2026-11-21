@@ -1,0 +1,6 @@
+{
+  "name": "too-much-trash-data-review",
+  "private": true,
+  "scripts": { "build": "tailwindcss -i styles.css -o dist/reviewer.css --minify", "test:ui": "node --test test_ui.mjs" },
+  "devDependencies": { "@tailwindcss/cli": "4.3.0", "tailwindcss": "4.3.0", "daisyui": "5.8.1" }
+}

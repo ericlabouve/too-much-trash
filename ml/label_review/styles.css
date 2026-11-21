@@ -1,0 +1,45 @@
+@import "tailwindcss" source(none);
+@source "./index.html";
+@plugin "daisyui" { themes: dark --default; logs: false; }
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: true;
+  color-scheme: dark;
+  --color-base-100: #111a19;
+  --color-base-200: #0b1211;
+  --color-base-300: #22312e;
+  --color-base-content: #e7f0ed;
+  --color-primary: #a3e5b7;
+  --color-primary-content: #10271a;
+  --color-secondary: #78bfc8;
+  --color-secondary-content: #0d262a;
+  --color-accent: #b9dba5;
+  --color-neutral: #293d36;
+  --color-neutral-content: #e7f0ed;
+  --color-success: #a3e5b7;
+  --color-success-content: #10271a;
+  --color-error: #f3a7a4;
+  --color-error-content: #3e1718;
+  --color-warning: #efd38c;
+  --color-warning-content: #302506;
+  --radius-box: 1rem;
+  --radius-field: .65rem;
+}
+@layer base {
+  [hidden] { display: none !important; }
+  body { min-height: 100vh; }
+  button { cursor: pointer; }
+  button:disabled { cursor: default; }
+}
+@layer components {
+  .shell { @apply mx-auto max-w-5xl px-4 py-7 sm:px-8 sm:py-10; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-widest text-primary; }
+  .muted { @apply text-sm text-base-content/60; }
+  .surface { @apply rounded-2xl border border-base-content/10 bg-base-100; }
+  .field-label { @apply mb-2 block text-sm font-medium; }
+  .review-media { @apply block w-full rounded-xl border border-base-content/10 bg-black object-contain; height: min(53vh, 500px); }
+  .progress { @apply w-full; }
+  .folder-button { @apply btn btn-ghost justify-start text-left normal-case; overflow-wrap: anywhere; height: auto; min-height: 2.7rem; }
+}
+dialog::backdrop { background: rgb(0 0 0 / .75); backdrop-filter: blur(5px); }
+#approve[aria-pressed="true"], #deny[aria-pressed="true"] { outline: 2px solid currentColor; outline-offset: 3px; }
