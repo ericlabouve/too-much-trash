@@ -1,177 +1,247 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Training label review</title>
-<style>
-:root { color-scheme: dark; font: 16px system-ui,sans-serif; background: #111918; color: #e8f1ef; }
-* { box-sizing: border-box }
-main { max-width: 900px; margin: auto; padding: 18px 24px 26px }
-h1 { margin: 0; font-size: clamp(1.45rem, 4vw, 2rem) }
-p { margin: .45rem 0; color: #b2c6c1 }
-.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 }
-video, #image { display: block; object-fit: contain; width: 100%; height: min(58vh,540px); background: #080b0a; border: 1px solid #374845; border-radius: 9px }
-[hidden] { display: none !important }
-button { background: #243531; border: 1px solid #506662; color: inherit; border-radius: 7px; font: inherit; padding: 9px 14px; cursor: pointer }
-button:disabled { cursor: default; opacity: .45 }
-button:focus-visible { outline: 2px solid #bdeecb; outline-offset: 3px }
-#approve { background: #153f2a; border-color: #568968 }
-#deny { background: #452826; border-color: #956563 }
-button[aria-pressed="true"] { box-shadow: 0 0 0 2px #fff }
-.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px }
-.actions button { flex: 1 1 auto }
-#prediction { margin: 0 0 10px; padding: 8px 12px; border: 1px solid #53655e; border-radius: 8px; background: #202e2a; }
-#prediction span { display: block; font-size: .75rem; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; color: #c0d2cc; }
-#prediction strong { display: block; font-size: clamp(1.65rem, 5vw, 2.65rem); line-height: 1.1; color: #ffdc85; }
-#save { min-height: 1.4em }
-details { margin-top: .6rem; color: #b2c6c1 }
-summary { cursor: pointer }
-</style>
-<main>
-  <h1 id="title">Training label review</h1>
-  <p>Approve if you agree with the prediction. Deny if you disagree.</p>
-  <p id="review-stats" aria-live="polite">Loading totals…</p>
-  <nav class="bar" aria-label="Review navigation">
-    <button id="prev" type="button">← Previous</button>
-    <strong id="position" aria-live="polite">Loading clips…</strong>
-    <button id="next" type="button">Next →</button>
-  </nav>
-  <div id="prediction" aria-live="polite"><span>Current prediction</span><strong id="prediction-label">Loading…</strong></div>
-  <video id="video" controls muted playsinline preload="auto" hidden></video>
-  <img id="image" alt="Sample under review" hidden>
-  <p id="timing"></p>
-  <div class="actions">
-    <button id="replay" type="button">Replay from review start</button>
-    <button id="approve" type="button" aria-pressed="false">Approve prediction</button>
-    <button id="deny" type="button" aria-pressed="false">Deny prediction</button>
+<title>Data review · Too Much Trash</title>
+<link rel="stylesheet" href="/assets/reviewer.css">
+<body class="bg-base-200 text-base-content antialiased">
+<main class="shell">
+  <header class="mb-7 flex flex-wrap items-center justify-between gap-4">
+    <div><p class="eyebrow mb-2">Too Much Trash / Data review</p><h1 id="title" class="text-2xl font-semibold tracking-tight sm:text-3xl">Training label review</h1></div>
+    <div id="review-stats" class="ml-auto text-right text-xs text-base-content/70 sm:text-sm" aria-live="polite"><p id="review-counts" class="whitespace-nowrap">Loading totals…</p><p id="label-counts" class="mt-1 whitespace-nowrap"></p></div>
+  </header>
+  <section class="surface mb-6 p-4" aria-label="Dataset selection">
+    <div class="mb-3"><span id="dataset-storage" class="badge badge-neutral badge-outline" role="status" aria-live="polite">Loading dataset location…</span></div>
+    <div class="flex flex-wrap items-center gap-2"><label for="datasets" class="text-sm font-medium">Dataset</label><select id="datasets" class="select select-bordered min-w-40 flex-1"></select><button id="browse" class="btn btn-ghost btn-sm">Browse folders</button><button id="refresh" class="btn btn-ghost btn-sm">Refresh</button></div>
+  </section>
+  <div class="mb-3 flex items-center justify-between gap-3">
+    <div class="flex min-w-0 items-center gap-2"><label for="filter" class="text-xs text-base-content/60">Show</label><select id="filter" class="select select-sm min-w-0 max-w-80"><option value="all">All samples</option><option id="needs-human-option" value="needs-human" selected>Need human review</option><option value="ai">AI Reviewed</option><option value="human">Human Reviewed</option></select></div><button id="run" class="btn btn-primary btn-sm shrink-0">Run Predictions</button>
   </div>
-  <p id="save" role="status"></p>
-  <details id="evidence"><summary>Review evidence</summary><p id="note"></p></details>
+  <section class="surface p-3 sm:p-5" aria-label="Sample review">
+    <nav class="mb-4 flex items-center justify-between gap-3" aria-label="Review navigation">
+      <button id="prev" class="btn btn-ghost btn-sm" type="button">← Previous</button><strong id="position" class="text-sm font-medium" aria-live="polite">Loading clips…</strong><button id="next" class="btn btn-ghost btn-sm" type="button">Next →</button>
+    </nav>
+    <div id="prediction" class="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-base-200 px-4 py-3" aria-live="polite"><span class="text-xs uppercase tracking-widest text-base-content/50">Prediction</span><strong id="prediction-label" class="font-semibold text-warning">Loading…</strong></div>
+    <p id="human-label" class="mb-3 text-sm text-primary" hidden></p>
+    <video id="video" class="review-media" controls muted playsinline preload="auto" hidden></video><img id="image" class="review-media" alt="Sample under review" hidden>
+    <p id="timing" class="muted my-3"></p>
+    <div class="flex flex-wrap gap-2">
+      <button id="replay" class="btn btn-ghost flex-1" type="button">Replay</button><button id="approve" class="btn btn-success flex-1" type="button" aria-pressed="false">Deposited</button><button id="deny" class="btn btn-error btn-soft flex-1" type="button" aria-pressed="false">Not deposited</button>
+    </div>
+    <p id="save" class="muted mt-2 min-h-5" role="status"></p>
+    <details id="evidence" class="mt-2 border-t border-base-content/10 pt-3 text-sm"><summary class="cursor-pointer text-base-content/70">Review evidence</summary><p id="note" class="mt-3 whitespace-pre-line leading-relaxed text-base-content/60"></p></details>
+  </section>
+  <section class="mt-5" aria-label="Agent predictions">
+    <div id="dashboard-job" class="surface mt-4 p-4" hidden>
+      <div class="mb-2 flex items-center justify-between gap-3"><p id="job" class="text-sm" role="status"></p><button id="job-details" class="btn btn-ghost btn-xs">Details</button></div>
+      <progress id="dashboard-progress" class="progress progress-primary" value="0" max="1" aria-label="Prediction progress"></progress>
+    </div>
+  </section>
 </main>
+<dialog id="prediction-dialog" class="modal" aria-labelledby="prediction-heading">
+  <div class="modal-box border border-base-content/10 bg-base-100 p-6 sm:p-7">
+    <div class="mb-3 flex items-center justify-between"><h2 id="prediction-heading" class="text-xl font-semibold">Run Predictions</h2><button id="prediction-close" class="btn btn-ghost btn-sm btn-circle" aria-label="Close predictions dialog">✕</button></div>
+    <p class="text-sm leading-relaxed text-base-content/70">Predict bucket deposits with a fresh Codex agent per sample. Reviews use video and available sensor data through your signed-in Codex account.</p>
+    <div class="my-5 rounded-xl bg-base-200 p-4 text-sm"><p id="selection" class="font-medium">Checking eligible samples…</p><p class="mt-1 text-xs leading-relaxed text-base-content/55">Missing predictions or medium / low / unknown confidence. Human-approved and denied samples are always excluded.</p></div>
+    <div class="mb-4 grid grid-cols-2 gap-4">
+      <label><span class="field-label">Samples to run</span><select id="scope" class="select w-full"><option value="all">All eligible samples</option><option value="limit">Limit sample count</option></select></label>
+      <label id="limit-field" hidden><span class="field-label">Maximum samples</span><input id="sample-limit" class="input w-full" type="number" min="1" value="10"></label>
+    </div>
+    <p id="run-count" class="muted mb-4" aria-live="polite"></p>
+    <div class="grid grid-cols-2 gap-4">
+      <label><span class="field-label">Parallel agents</span><input id="workers" class="input w-full" type="number" min="1" max="10" value="2"></label>
+      <label><span class="field-label">Thinking level</span><select id="effort" class="select w-full"></select></label>
+      <label class="col-span-2"><span class="field-label">Model</span><select id="model" class="select w-full"></select></label>
+    </div>
+    <p class="muted mt-3">Confidence is self-reported, not calibrated.</p>
+    <div id="dialog-job" class="mt-5" hidden><p id="dialog-status" class="mb-2 text-sm" role="status"></p><progress id="dialog-progress" class="progress progress-primary" value="0" max="1" aria-label="Prediction progress in dialog"></progress><p id="job-root" class="muted mt-2 break-all"></p></div>
+    <p id="prediction-error" class="mt-3 text-sm text-error" role="alert"></p>
+    <div class="modal-action"><button id="cancel-job" class="btn btn-error btn-soft" hidden>Cancel run</button><button id="start-job" class="btn btn-primary" disabled>Start predictions</button></div>
+  </div>
+</dialog>
+<dialog id="browser" class="modal" aria-labelledby="browse-heading"><div class="modal-box max-w-2xl border border-base-content/10"><h2 id="browse-heading" class="mb-5 text-xl font-semibold">Choose dataset folder</h2><label for="browse-path" class="field-label">Folder path</label><input id="browse-path" class="input mb-3 w-full"><div class="flex flex-wrap gap-2"><button id="browse-go" class="btn btn-sm">Go</button><button id="browse-up" class="btn btn-sm">Parent folder</button><button id="browse-use" class="btn btn-primary btn-sm">Use this dataset</button><button id="browse-close" class="btn btn-ghost btn-sm">Cancel</button></div><p id="browse-error" class="my-2 text-sm text-error" role="status"></p><div id="folders" class="grid max-h-80 gap-1 overflow-auto"></div></div></dialog>
 <script type="module">
-const byId = id => document.getElementById(id);
-const video = byId("video");
-const image = byId("image");
-const prev = byId("prev");
-const next = byId("next");
-const approve = byId("approve");
-const deny = byId("deny");
-const replay = byId("replay");
-let clips = [];
-let decisions = {};
-let index = 0;
-let saving = false;
-let source = "";
-function choice(clip) {
-  const saved = decisions[clip.id];
-  return saved?.prediction === clip.prediction ? saved.decision : undefined;
-}
-const reviewed = clip => Boolean(choice(clip));
-function nextUnreviewed(from) {
-  const later = clips.findIndex((clip, i) => i > from && !reviewed(clip));
-  return later >= 0 ? later : clips.findIndex(clip => !reviewed(clip));
-}
-function paintStats() {
-  const saved = clips.filter(reviewed).length;
-  const approved = clips.filter(clip => choice(clip) === "approve").length;
-  const denied = clips.filter(clip => choice(clip) === "deny").length;
-  const scored = approved + denied;
-  const accuracy = scored ? `${(100 * approved / scored).toFixed(1)}% accuracy on reviewed predictions` : "Accuracy pending";
-  const superseded = clips.filter(clip => Object.hasOwn(decisions, clip.id) && !reviewed(clip)).length;
-  byId("review-stats").textContent = `${source ? source + " · " : ""}${saved}/${clips.length} reviewed · ${approved} approved · ${denied} denied · ${approved}:${denied} approve/deny · ${accuracy}${superseded ? ` · ${superseded} decisions for earlier predictions` : ""}`;
+const $ = id => document.getElementById(id);
+const video=$('video'), image=$('image');
+let all=[], clips=[], decisions={}, index=0, saving=false, dataset='', root='', source='', folder='';
+let job=null, predictionOptions=null, selectionDataset='', readOnly=false;
+const labelName=value=>({confirmed:'Deposited',not_deposited:'Not deposited',uncertain:'Uncertain'}[value]||value);
+const reviewed=c=>decisions[c.id]?.prediction===c.prediction && Boolean(c.prediction);
+const humanReviewed=c=>Boolean(c.human_evaluated||reviewed(c));
+const humanReview=c=>(reviewed(c)?decisions[c.id]:c.human_review)||null;
+const effectiveLabel=c=>{
+ const review=humanReview(c);
+ if(review)return review.corrected_label||(review.decision==='approve'?review.prediction:null);
+ return humanReviewed(c)?null:c.prediction;
+};
+const needsHumanEvidence=c=>!c.prediction||c.prediction==='uncertain'||c.confidence!=='high';
+const needsHumanReview=c=>humanReviewed(c)
+ ? !['confirmed','not_deposited'].includes(effectiveLabel(c))
+ : needsHumanEvidence(c);
+async function api(path,body) {
+ const response=await fetch(path,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{cache:'no-store'});
+ if(!response.ok) throw Error(response.status===409?'Dataset or prediction changed. Refresh before reviewing.':await response.text());
+ return response.json();
 }
 function paint() {
-  paintStats();
-  const clip = clips[index];
-  prev.disabled = index === 0;
-  next.disabled = index >= clips.length - 1;
-  approve.disabled = deny.disabled = saving || !clip;
-  replay.disabled = !clip;
-  if (!clip) return;
-  byId("position").textContent = `${clip.id} · ${index + 1}/${clips.length}`;
-  byId("timing").textContent = clip.timing;
-  for (const [button, value] of [[approve, "approve"], [deny, "deny"]])
-    button.setAttribute("aria-pressed", choice(clip) === value);
-  byId("prediction-label").textContent = clip.label;
-  byId("note").textContent = clip.note || "No review note.";
-}
-function playFromStart() {
-  if (video.readyState < 1 || !clips[index]) return;
-  const start = Math.max(0, Math.min(video.duration - 0.01, clips[index].start));
-  video.currentTime = start;
-  video.play().catch(() => {});
+ const c=clips[index];
+ $('prev').disabled=index<=0; $('next').disabled=index>=clips.length-1;
+ $('approve').disabled=$('deny').disabled=readOnly||saving||!c?.prediction;
+ $('run').disabled=readOnly;
+ $('approve').textContent='Deposited';
+ $('deny').textContent='Not deposited';
+ $('replay').disabled=!c;
+ const done=all.filter(humanReviewed), ai=all.filter(c=>Boolean(c.prediction));
+ const labels=all.map(effectiveLabel), deposited=labels.filter(x=>x==='confirmed').length;
+ const notDeposited=labels.filter(x=>x==='not_deposited').length, unresolved=all.length-deposited-notDeposited;
+ $('review-counts').textContent=`Human reviewed: ${done.length}/${all.length} · AI reviewed: ${ai.length}/${all.length}`;
+ $('label-counts').textContent=`${deposited} deposited · ${notDeposited} not deposited`+(unresolved?` · ${unresolved} unresolved`:'');
+ $('position').textContent=c?`${c.id} · ${index+1}/${clips.length}`:'No items match this filter';
+ $('prediction-label').textContent=c?.label||c?.prediction||'Awaiting prediction';
+ $('timing').textContent=c?`${c.timing||''}${c.prediction?' · Confidence: '+(c.confidence||'unknown'):''}`:'';
+ $('note').textContent=c?.note||'No prediction evidence yet.';
+ const review=c&&reviewed(c)?decisions[c.id]:null;
+ $('human-label').hidden=!review;
+ $('human-label').textContent=review?(review.corrected_label?'Your label: '+labelName(review.corrected_label):review.decision==='approve'?'Your label: '+labelName(c.prediction):'Choose Deposited or Not deposited to record the outcome.'):'';
+ const humanLabel=review?.corrected_label||(review?.decision==='approve'?c.prediction:null);
+ for(const [id,label] of [['approve','confirmed'],['deny','not_deposited']]) $(id).setAttribute('aria-pressed',Boolean(review&&humanLabel===label));
 }
 function show(i) {
-  if (i < 0 || i >= clips.length) return;
-  index = i;
-  sessionStorage.setItem("review-clip", clips[index].id);
-  video.pause();
-  const clip = clips[index];
-  const url = `/media/${encodeURIComponent(clip.id)}`;
-  video.hidden = replay.hidden = clip.kind !== "video";
-  image.hidden = !video.hidden;
-  if (video.hidden) {
-    video.removeAttribute("src");
-    video.load();
-    image.src = url;
-  } else {
-    image.removeAttribute("src");
-    video.src = url;
-  }
-  const saved = decisions[clip.id];
-  byId("save").textContent = choice(clip) ? "Decision saved" : saved ? `Earlier decision saved (${saved.decision} on ${saved.prediction})` : "";
-  byId("evidence").open = false;
-  paint();
+ video.pause(); index=Math.max(0,Math.min(i,clips.length-1)); const c=clips[index];
+ video.hidden=!c||c.kind!=='video'; image.hidden=!c||c.kind!=='image'; $('replay').hidden=video.hidden;
+ video.removeAttribute('src'); image.removeAttribute('src');
+ if(c) { const url=`/media/${encodeURIComponent(c.id)}?dataset=${encodeURIComponent(dataset)}`; if(c.kind==='video')video.src=url;else image.src=url; }
+ else video.load();
+ $('save').textContent=c&&reviewed(c)?'Decision saved':'';paint();
 }
-async function save(value) {
-  if (saving || !clips[index]) return;
-  const clip = clips[index];
-  saving = true;
-  paint();
-  try {
-    const result = await fetch("/prediction-review", {method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({clip:clip.id, prediction:clip.prediction, decision:value})});
-    if (result.status === 409) {
-      byId("save").textContent = "Prediction updated. Refresh the page to continue.";
-      return;
-    }
-    if (!result.ok) throw Error();
-    decisions = await result.json();
-    if (clip === clips[index]) {
-      const pending = nextUnreviewed(index);
-      if (pending >= 0) show(pending);
-      byId("save").textContent = pending >= 0 ? `Decision saved for ${clip.id}` : `Decision saved for ${clip.id}. All clips reviewed.`;
-    }
-  } catch { byId("save").textContent = "Could not save. Try again."; }
-  finally { saving = false; paint(); }
+function matches(c) {
+ switch($('filter').value) {
+  case 'needs-human': return needsHumanReview(c);
+  case 'ai': return Boolean(c.prediction);
+  case 'human': return humanReviewed(c);
+  default: return true;
+ }
 }
-video.addEventListener("loadedmetadata", () => { if (!video.hidden) playFromStart(); });
-for (const media of [video, image]) {
-  media.addEventListener("error", () => { if (!media.hidden) byId("save").textContent = "Media could not load."; });
+function applyReviewDefault(force=false) {
+ const hasNeeds=all.some(needsHumanReview);
+ $('needs-human-option').disabled=!hasNeeds;
+ if(force||($('filter').value==='needs-human'&&!hasNeeds))$('filter').value=hasNeeds?'needs-human':'all';
 }
-replay.onclick = playFromStart;
-prev.onclick = () => show(index - 1);
-next.onclick = () => show(index + 1);
-approve.onclick = () => save("approve");
-deny.onclick = () => save("deny");
-window.addEventListener("keydown", event => {
-  if (event.defaultPrevented || event.altKey || event.metaKey || event.ctrlKey ||
-      event.target.closest?.("video, input, textarea, select, [contenteditable]")) return;
-  if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-    event.preventDefault();
-    show(index + (event.key === "ArrowLeft" ? -1 : 1));
-  }
-});
-try {
-  const response = await fetch("/data", {cache:"no-store"});
-  if (!response.ok) throw Error();
-  const data = await response.json();
-  ({clips, decisions, source} = data);
-  document.title = byId("title").textContent = data.title;
-  const saved = clips.findIndex(clip => clip.id === sessionStorage.getItem("review-clip"));
-  const pending = saved >= 0 && !reviewed(clips[saved]) ? saved : nextUnreviewed(saved);
-  show(pending >= 0 ? pending : Math.max(0, saved));
-  if (clips.length && pending < 0) byId("save").textContent = "All clips reviewed.";
-} catch { byId("position").textContent = "Review data unavailable"; paint(); }
+function filter() {
+ applyReviewDefault();
+ const selected=clips[index]?.id;
+ clips=all.filter(matches);
+ show(Math.max(0,clips.findIndex(c=>c.id===selected)));
+}
+async function refresh(preserve=true) {
+ const data=await api('/data'); const old=dataset; const oldRoot=root; const oldClip=clips[index]; const current=oldClip?.id;
+ dataset=data.dataset; root=data.path; source=data.source; all=data.clips; decisions=data.decisions;
+ document.title=$('title').textContent=data.title;
+ readOnly=Boolean(data.storage?.read_only);
+ $('dataset-storage').textContent=data.storage?.label || 'Dataset location unknown';
+ $('dataset-storage').className='badge badge-outline '+({working:'badge-success',reference:'badge-warning',golden:'badge-error'}[data.storage?.kind]||'badge-neutral');
+ const choices=await api('/datasets'); $('datasets').replaceChildren(...choices.map(x=>{const o=document.createElement('option');o.value=x.path;o.textContent=(x.storage?.label?x.storage.label+' · ':'')+x.path+(x.available?'':' (unavailable)');o.disabled=!x.available;o.selected=x.path===root;return o;}));
+ paintJob(data.job);
+ applyReviewDefault(!preserve||oldRoot!==root);
+ if(preserve&&old===dataset&&oldClip&&JSON.stringify(oldClip)===JSON.stringify(all.find(c=>c.id===current))){ clips=all.filter(matches);index=Math.max(0,clips.findIndex(c=>c.id===current));paint(); }else{ filter();if(preserve&&old===dataset&&current)show(Math.max(0,clips.findIndex(c=>c.id===current))); }
+}
+async function select(path) { if(saving)return; await api('/datasets/select',{path});await refresh(false); }
+async function save(value, correctedLabel) {
+ if(readOnly)return false;
+ const c=clips[index];if(saving||!c?.prediction)return false;
+ saving=true;paint();const key=dataset;
+ try { const result=await api('/prediction-review',{dataset:key,clip:c.id,prediction:c.prediction,decision:value,...(correctedLabel?{corrected_label:correctedLabel}:{})});
+  if(dataset!==key)return;decisions=result;const next=clips.findIndex((x,i)=>i>index&&!reviewed(x));const any=clips.findIndex(x=>!reviewed(x));const nextId=clips[next>=0?next:any>=0?any:index]?.id;applyReviewDefault();clips=all.filter(matches);show(Math.max(0,clips.findIndex(x=>x.id===nextId)));$('save').textContent=`${correctedLabel?'Label':'Decision'} saved for ${c.id}`;return true;
+ } catch(e){$('save').textContent=e.message;return false;}finally{saving=false;paint();}
+}
+async function browse(path) {
+ try {const data=await api('/filesystem?path='+encodeURIComponent(path));folder=data.path;$('browse-path').value=folder;$('browse-up').dataset.path=data.parent;$('browse-use').disabled=!data.dataset;$('browse-error').textContent='';
+ $('folders').replaceChildren(...data.directories.map(x=>{const b=document.createElement('button');b.className='folder-button';b.textContent=(x.dataset?'Dataset: ':'Folder: ')+x.name;b.onclick=()=>browse(x.path);return b;}));
+ }catch(e){$('browse-error').textContent=e.message;}
+}
+$('datasets').onchange=()=>select($('datasets').value).catch(e=>alert(e.message));
+$('refresh').onclick=()=>refresh().catch(e=>alert(e.message));$('filter').onchange=filter;
+$('browse').onclick=()=>{$('browser').showModal();browse(root||'/Volumes');};
+$('browse-go').onclick=()=>browse($('browse-path').value);$('browse-up').onclick=()=>browse($('browse-up').dataset.path);
+$('browse-use').onclick=async()=>{try{await select(folder);$('browser').close();}catch(e){$('browse-error').textContent=e.message;}};
+$('browse-close').onclick=()=>$('browser').close();
+function paintJob(value) {
+ job=value;
+ const running=job?.state==='running';
+ $('dashboard-job').hidden=$('dialog-job').hidden=!job;
+ $('cancel-job').hidden=!running;
+ for(const id of ['workers','model','effort','scope','sample-limit']) $(id).disabled=Boolean(running);
+ $('start-job').disabled=readOnly||Boolean(running)||!predictionOptions?.selection.eligible||selectionDataset!==dataset;
+ if(!job)return;
+ const count=job.completed+job.failed;
+ const state={running:'Predicting',completed:'Finished',cancelled:'Cancelled',failed:'Failed'}[job.state]||job.state;
+ const text=`${state} · ${job.completed} / ${job.total} predicted${job.failed?' · '+job.failed+' failed':''}${job.error||job.last_error?' — '+(job.error||job.last_error):''}`;
+ $('job').textContent=$('dialog-status').textContent=text;
+ for(const id of ['dashboard-progress','dialog-progress']) {$(id).max=job.total||1;$(id).value=count;$(id).setAttribute('aria-valuetext',`${count} of ${job.total} samples processed`);}
+ $('job-root').textContent=job.root+(job.error?' · '+job.error:'');
+}
+function updateRunCount() {
+ const eligible=predictionOptions?.selection.eligible||0;
+ const limited=$('scope').value==='limit';
+ $('limit-field').hidden=!limited;
+ const count=Number($('sample-limit').value);
+ $('run-count').textContent=limited&&(!Number.isInteger(count)||count<1)?'Enter a positive whole number.':`Will run ${limited?Math.min(count,eligible):eligible} of ${eligible} eligible samples, in clip order.`;
+}
+$('scope').onchange=updateRunCount;
+$('sample-limit').oninput=updateRunCount;
+function thinkingLevels(preferred) {
+ const selected=predictionOptions?.models.find(x=>x.id===$('model').value);
+ const options=selected?.efforts||[];
+ $('effort').replaceChildren(...(options.length?options:['']).map(x=>{const o=document.createElement('option');o.value=x;o.textContent=x?({xhigh:'Extra high',max:'Maximum'}[x]||x[0].toUpperCase()+x.slice(1)):'Configured default';return o;}));
+ $('effort').value=options.includes(preferred)?preferred:selected?.default_effort||'';
+}
+async function openPredictions() {
+ $('prediction-dialog').showModal();$('prediction-error').textContent='';$('start-job').disabled=true;
+ try {
+  const previous=$('model').value, previousEffort=$('effort').value;
+  predictionOptions=await api('/prediction-options');selectionDataset=predictionOptions.dataset;
+  $('selection').textContent=`${predictionOptions.selection.eligible} eligible / ${predictionOptions.selection.total} samples · ${predictionOptions.selection.human_reviewed} human-reviewed`;
+  $('model').replaceChildren(...[{id:'',name:'Configured Codex default'},...predictionOptions.models].map(x=>{const o=document.createElement('option');o.value=x.id;o.textContent=x.name;return o;}));
+  $('model').value=(job?.state==='running'?job.model:previous)||predictionOptions.default_model||'';
+  if(!$('model').value)$('model').value='';
+  if(job?.state==='running'){$('workers').value=job.workers;$('scope').value=job.limit===null||job.limit===undefined?'all':'limit';if(job.limit)$('sample-limit').value=job.limit;}
+  updateRunCount();
+  thinkingLevels(job?.state==='running'?job.effort:previous=== $('model').value?previousEffort:predictionOptions.default_effort);
+  paintJob(job);
+ }catch(e){$('prediction-error').textContent=e.message;}
+}
+$('model').onchange=()=>thinkingLevels();
+$('run').onclick=$('job-details').onclick=openPredictions;
+$('prediction-close').onclick=()=>$('prediction-dialog').close();
+for(const id of ['prediction-dialog','browser']) $(id).addEventListener('click',e=>{if(e.target===$(id))$(id).close();});
+$('start-job').onclick=async()=>{
+ const workers=Number($('workers').value);
+ if(!Number.isInteger(workers)||workers<1||workers>10){$('prediction-error').textContent='Choose 1–10 parallel agents.';return;}
+ const limit=$('scope').value==='limit'?Number($('sample-limit').value):null;
+ if(limit!==null&&(!Number.isInteger(limit)||limit<1)){$('prediction-error').textContent='Enter a positive whole number for the sample limit.';return;}
+ $('start-job').disabled=true;$('prediction-error').textContent='';
+ try {
+  const result=await api('/jobs/start',{dataset:selectionDataset,workers,model:$('model').value||null,effort:$('effort').value||null,limit});
+  paintJob(result);await refresh();
+ }catch(e){$('prediction-error').textContent=e.message;paintJob(job);}
+};
+$('cancel-job').onclick=async()=>{try{await api('/jobs/cancel',{});await refresh();}catch(e){$('prediction-error').textContent=e.message;}};
+function saveOutcome(label){const c=clips[index];if(!c?.prediction)return;return save(label===c.prediction?'approve':'deny',label);}
+$('prev').onclick=()=>show(index-1);$('next').onclick=()=>show(index+1);
+$('approve').onclick=()=>saveOutcome('confirmed');
+$('deny').onclick=()=>saveOutcome('not_deposited');
+function replay(){if(video.readyState<1||!clips[index])return;video.currentTime=Math.max(0,Math.min(video.duration-.01,clips[index].start));video.play().catch(()=>{});}
+$('replay').onclick=replay;video.onloadedmetadata=replay;
+for(const media of [video,image])media.addEventListener('error',()=>{if(!media.hidden)$('save').textContent='Media could not load.';});
+window.addEventListener('keydown',e=>{if(e.defaultPrevented||e.altKey||e.metaKey||e.ctrlKey||e.target.closest?.('video,input,textarea,select,[contenteditable]')||document.querySelector('dialog[open]'))return;if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();show(index+(e.key==='ArrowLeft'?-1:1));}});
+let polling=false;
+setInterval(async()=>{
+ if(polling||saving||$('browser').open)return;
+ polling=true;
+ try{const d=await api('/data');paintJob(d.job);if(d.dataset!==dataset||JSON.stringify(d.clips)!==JSON.stringify(all)||JSON.stringify(d.decisions)!==JSON.stringify(decisions))await refresh();}
+ catch{}finally{polling=false;}
+},2000);
+refresh(false).catch(e=>{$('position').textContent='Review data unavailable';$('save').textContent=e.message;});
 </script>
+</body>
 </html>
