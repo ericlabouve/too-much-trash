@@ -11,11 +11,11 @@
     <div id="review-stats" class="ml-auto text-right text-xs text-base-content/70 sm:text-sm" aria-live="polite"><p id="review-counts" class="whitespace-nowrap">Loading totals…</p><p id="label-counts" class="mt-1 whitespace-nowrap"></p></div>
   </header>
   <section class="surface mb-6 p-4" aria-label="Dataset selection">
-    <div class="mb-3"><span id="dataset-storage" class="badge badge-warning badge-outline" role="status" aria-live="polite">Loading dataset location…</span></div>
+    <div class="mb-3"><span id="dataset-storage" class="badge badge-neutral badge-outline" role="status" aria-live="polite">Loading dataset location…</span></div>
     <div class="flex flex-wrap items-center gap-2"><label for="datasets" class="text-sm font-medium">Dataset</label><select id="datasets" class="select select-bordered min-w-40 flex-1"></select><button id="browse" class="btn btn-ghost btn-sm">Browse folders</button><button id="refresh" class="btn btn-ghost btn-sm">Refresh</button></div>
   </section>
   <div class="mb-3 flex items-center justify-between gap-3">
-    <div class="flex min-w-0 items-center gap-2"><label for="filter" class="text-xs text-base-content/60">Show</label><select id="filter" class="select select-sm min-w-0 max-w-80"><option value="all">All samples</option><option value="needs-human" selected>Need human review</option><option value="ai">AI Reviewed</option><option value="human">Human Reviewed</option></select></div><button id="run" class="btn btn-primary btn-sm shrink-0">Run Predictions</button>
+    <div class="flex min-w-0 items-center gap-2"><label for="filter" class="text-xs text-base-content/60">Show</label><select id="filter" class="select select-sm min-w-0 max-w-80"><option value="all">All samples</option><option id="needs-human-option" value="needs-human" selected>Need human review</option><option value="ai">AI Reviewed</option><option value="human">Human Reviewed</option></select></div><button id="run" class="btn btn-primary btn-sm shrink-0">Run Predictions</button>
   </div>
   <section class="surface p-3 sm:p-5" aria-label="Sample review">
     <nav class="mb-4 flex items-center justify-between gap-3" aria-label="Review navigation">
@@ -64,7 +64,7 @@
 const $ = id => document.getElementById(id);
 const video=$('video'), image=$('image');
 let all=[], clips=[], decisions={}, index=0, saving=false, dataset='', root='', source='', folder='';
-let job=null, predictionOptions=null, selectionDataset='';
+let job=null, predictionOptions=null, selectionDataset='', readOnly=false;
 const labelName=value=>({confirmed:'Deposited',not_deposited:'Not deposited',uncertain:'Uncertain'}[value]||value);
 const reviewed=c=>decisions[c.id]?.prediction===c.prediction && Boolean(c.prediction);
 const humanReviewed=c=>Boolean(c.human_evaluated||reviewed(c));
@@ -75,6 +75,9 @@ const effectiveLabel=c=>{
  return humanReviewed(c)?null:c.prediction;
 };
 const needsHumanEvidence=c=>!c.prediction||c.prediction==='uncertain'||c.confidence!=='high';
+const needsHumanReview=c=>humanReviewed(c)
+ ? !['confirmed','not_deposited'].includes(effectiveLabel(c))
+ : needsHumanEvidence(c);
 async function api(path,body) {
  const response=await fetch(path,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{cache:'no-store'});
  if(!response.ok) throw Error(response.status===409?'Dataset or prediction changed. Refresh before reviewing.':await response.text());
@@ -83,7 +86,8 @@ async function api(path,body) {
 function paint() {
  const c=clips[index];
  $('prev').disabled=index<=0; $('next').disabled=index>=clips.length-1;
- $('approve').disabled=$('deny').disabled=saving||!c?.prediction;
+ $('approve').disabled=$('deny').disabled=readOnly||saving||!c?.prediction;
+ $('run').disabled=readOnly;
  $('approve').textContent='Deposited';
  $('deny').textContent='Not deposited';
  $('replay').disabled=!c;
@@ -112,14 +116,15 @@ function show(i) {
 }
 function matches(c) {
  switch($('filter').value) {
-  case 'needs-human': return !humanReviewed(c)&&needsHumanEvidence(c);
+  case 'needs-human': return needsHumanReview(c);
   case 'ai': return Boolean(c.prediction);
   case 'human': return humanReviewed(c);
   default: return true;
  }
 }
 function applyReviewDefault(force=false) {
- const hasNeeds=all.some(c=>!humanReviewed(c)&&needsHumanEvidence(c));
+ const hasNeeds=all.some(needsHumanReview);
+ $('needs-human-option').disabled=!hasNeeds;
  if(force||($('filter').value==='needs-human'&&!hasNeeds))$('filter').value=hasNeeds?'needs-human':'all';
 }
 function filter() {
@@ -132,14 +137,17 @@ async function refresh(preserve=true) {
  const data=await api('/data'); const old=dataset; const oldRoot=root; const oldClip=clips[index]; const current=oldClip?.id;
  dataset=data.dataset; root=data.path; source=data.source; all=data.clips; decisions=data.decisions;
  document.title=$('title').textContent=data.title;
+ readOnly=Boolean(data.storage?.read_only);
  $('dataset-storage').textContent=data.storage?.label || 'Dataset location unknown';
- const choices=await api('/datasets'); $('datasets').replaceChildren(...choices.map(x=>{const o=document.createElement('option');o.value=x.path;o.textContent=x.path+(x.available?'':' (unavailable)');o.selected=x.path===root;return o;}));
+ $('dataset-storage').className='badge badge-outline '+({working:'badge-success',reference:'badge-warning',golden:'badge-error'}[data.storage?.kind]||'badge-neutral');
+ const choices=await api('/datasets'); $('datasets').replaceChildren(...choices.map(x=>{const o=document.createElement('option');o.value=x.path;o.textContent=(x.storage?.label?x.storage.label+' · ':'')+x.path+(x.available?'':' (unavailable)');o.disabled=!x.available;o.selected=x.path===root;return o;}));
  paintJob(data.job);
  applyReviewDefault(!preserve||oldRoot!==root);
  if(preserve&&old===dataset&&oldClip&&JSON.stringify(oldClip)===JSON.stringify(all.find(c=>c.id===current))){ clips=all.filter(matches);index=Math.max(0,clips.findIndex(c=>c.id===current));paint(); }else{ filter();if(preserve&&old===dataset&&current)show(Math.max(0,clips.findIndex(c=>c.id===current))); }
 }
 async function select(path) { if(saving)return; await api('/datasets/select',{path});await refresh(false); }
 async function save(value, correctedLabel) {
+ if(readOnly)return false;
  const c=clips[index];if(saving||!c?.prediction)return false;
  saving=true;paint();const key=dataset;
  try { const result=await api('/prediction-review',{dataset:key,clip:c.id,prediction:c.prediction,decision:value,...(correctedLabel?{corrected_label:correctedLabel}:{})});
@@ -163,7 +171,7 @@ function paintJob(value) {
  $('dashboard-job').hidden=$('dialog-job').hidden=!job;
  $('cancel-job').hidden=!running;
  for(const id of ['workers','model','effort','scope','sample-limit']) $(id).disabled=Boolean(running);
- $('start-job').disabled=Boolean(running)||!predictionOptions?.selection.eligible||selectionDataset!==dataset;
+ $('start-job').disabled=readOnly||Boolean(running)||!predictionOptions?.selection.eligible||selectionDataset!==dataset;
  if(!job)return;
  const count=job.completed+job.failed;
  const state={running:'Predicting',completed:'Finished',cancelled:'Cancelled',failed:'Failed'}[job.state]||job.state;

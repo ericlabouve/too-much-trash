@@ -85,9 +85,12 @@ passed to the CLI, then stored with each run. Close the dialog by clicking outsi
 using its close button, or pressing Escape; inference continues and the dashboard
 keeps showing the same progress bar. The viewer process must stay running.
 
-A yellow badge above the dataset selector identifies the loaded root as a
-Working copy, Read-only reference, or ERICS_DRIVE · Golden copy. Other writable
-locations show Local dataset. Read-only detection checks filesystem mount flags
+A badge above the dataset selector identifies the loaded root: green **Working
+copy**, yellow **Frozen Reference**, or red **Golden set** for ERICS_DRIVE.
+The dropdown automatically discovers mounted frozen local sets, local review
+copies, and connected drive collections, prefixed with their storage labels.
+Disconnected drive entries are omitted; other unavailable history entries are
+disabled. Other writable locations show Local dataset. Read-only detection checks filesystem mount flags
 and write access, rather than trusting a folder name. The header displays explicit
 Human reviewed and AI reviewed counts across the full dataset on its first line,
 and deposited/not deposited totals on a separate line. Human reviewed means a saved human decision, including historical
@@ -98,6 +101,11 @@ An unresolved denial never flips a class; unresolved/uncertain labels are counte
 separately when present. Filtering does not change these dataset-wide totals.
 Run identifiers and shown counts are omitted. Show is left-aligned and Run
 Predictions right-aligned on the same horizontal row.
+
+Frozen references support browsing and video playback; label editing and
+prediction runs are disabled in the UI and rejected by the backend. Loading or
+selecting them never regenerates labels or changes their selected-run metadata.
+Recent selection is stored outside the snapshot in the local viewer registry.
 
 By default a run selects clips with missing predictions or medium/low/unknown
 confidence. High-confidence predictions are retained. Any saved human approval
@@ -130,9 +138,11 @@ failed/cancelled clips retain any earlier prediction. A rerun creates a separate
 run. Restarting the server does not resume inference automatically.
 
 The dashboard polls progress. Show offers All samples, Need human review,
-AI Reviewed, and Human Reviewed. Need human review excludes all saved human
-reviews and includes missing predictions, uncertain predictions at any confidence,
-and medium/low/unknown-confidence predictions. AI Reviewed means an AI prediction
+AI Reviewed, and Human Reviewed. Need human review includes unresolved human
+decisions (such as a denial without a corrected label), missing predictions,
+uncertain predictions at any confidence, and unreviewed medium/low/unknown-confidence
+predictions. Resolved binary human outcomes are excluded. The option is disabled
+when its queue is empty and re-enabled when an eligible sample appears. AI Reviewed means an AI prediction
 exists (including uncertain results); Human Reviewed includes historical saved
 approvals/denials. A newly saved human label leaves Need human review immediately. The viewer defaults to that queue on opening or switching datasets and automatically falls back to All samples when the queue is empty. Explicitly selected filters remain selected on ordinary refresh.
 New runs switch the active review manifest for that dataset and save

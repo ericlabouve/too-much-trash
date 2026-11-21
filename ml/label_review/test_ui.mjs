@@ -84,7 +84,7 @@ test('invalid sample limit never starts a run',async()=>{
   assert.match(e.get('prediction-error').textContent,/positive whole number/);
 });
 
-test('review-status filters include high-confidence uncertainty and exclude human-reviewed needs',async()=>{
+test('review-status filters include unresolved history and exclude resolved human labels',async()=>{
  const {elements:e,state,context}=dashboard();await settle();
  state.data.clips=[
   {id:'high-binary',prediction:'confirmed',confidence:'high'},
@@ -99,7 +99,7 @@ test('review-status filters include high-confidence uncertainty and exclude huma
  await e.get('refresh').onclick();
  const ids=()=>Array.from(vm.runInContext('clips.map(c=>c.id)',context));
  e.get('filter').value='needs-human';e.get('filter').onchange();
- assert.deepEqual(ids(),['high-uncertain','medium','low','unknown-confidence','pending']);
+ assert.deepEqual(ids(),['high-uncertain','medium','low','unknown-confidence','historic-human','pending']);
  e.get('filter').value='ai';e.get('filter').onchange();assert.equal(ids().length,7);assert.ok(ids().includes('high-uncertain'));
  e.get('filter').value='human';e.get('filter').onchange();assert.deepEqual(ids(),['historic-human','current-human']);
  e.get('filter').value='all';e.get('filter').onchange();assert.equal(ids().length,8);
@@ -179,10 +179,16 @@ test('refresh preserves an explicitly selected filter while a review queue exist
 
 test('dataset storage badge follows the loaded dataset on refresh',async()=>{
  const {elements:e,state}=dashboard();await settle();
- for(const label of ['Working copy','Read-only reference','ERICS_DRIVE · Golden copy','Local dataset']) {
-  state.data.storage={label};await e.get('refresh').onclick();
+ state.data.clips=[{id:'fixture',prediction:'confirmed',confidence:'high'}];
+ for(const [kind,label,color,readOnly] of [['working','Working copy','badge-success',false],['reference','Frozen Reference','badge-warning',true],['golden','Golden set','badge-error',false],['local','Local dataset','badge-neutral',false]]) {
+  state.data.storage={kind,label,read_only:readOnly};await e.get('refresh').onclick();
   assert.equal(e.get('dataset-storage').textContent,label);
+  assert.match(e.get('dataset-storage').className,new RegExp(color));
+  assert.equal(e.get('run').disabled,readOnly);
+  assert.equal(e.get('approve').disabled,readOnly);
+  if(readOnly) {await e.get('approve').onclick();assert.equal(state.review,undefined);}
  }
+
 });
 
 test('header counts humans and saved predictions across the full dataset',async()=>{
@@ -201,4 +207,26 @@ test('header counts humans and saved predictions across the full dataset',async(
  e.get('filter').value='human';e.get('filter').onchange();
  assert.equal(e.get('review-counts').textContent,expected);
  assert.equal(e.get('label-counts').textContent,'0 deposited · 2 not deposited · 2 unresolved');
+});
+
+test('unresolved human denials remain eligible until explicit outcomes empty and disable the queue',async()=>{
+ const {elements:e,state,context}=dashboard();await settle();
+ state.data.clips=[
+  {id:'legacy-denial',prediction:'not_deposited',confidence:'high',human_evaluated:true,human_review:{prediction:'not_deposited',decision:'deny'}},
+  {id:'approved',prediction:'confirmed',confidence:'low',human_evaluated:true,human_review:{prediction:'confirmed',decision:'approve'}},
+  {id:'corrected',prediction:'confirmed',confidence:'low',human_evaluated:true,human_review:{prediction:'confirmed',decision:'deny',corrected_label:'not_deposited'}}];
+ state.data.decisions={'legacy-denial':{prediction:'not_deposited',decision:'deny'}};
+ await vm.runInContext('refresh(false)',context);
+ assert.equal(e.get('filter').value,'needs-human');
+ assert.equal(e.get('needs-human-option').disabled,false);
+ assert.deepEqual(Array.from(vm.runInContext('clips.map(c=>c.id)',context)),['legacy-denial']);
+ await e.get('approve').onclick();
+ assert.equal(state.review.corrected_label,'confirmed');
+ assert.equal(e.get('filter').value,'all');
+ assert.equal(e.get('needs-human-option').disabled,true);
+ state.data.clips.push({id:'new-uncertain',prediction:'uncertain',confidence:'high'});
+ await e.get('refresh').onclick();
+ assert.equal(e.get('needs-human-option').disabled,false);
+ e.get('filter').value='needs-human';e.get('filter').onchange();
+ assert.deepEqual(Array.from(vm.runInContext('clips.map(c=>c.id)',context)),['new-uncertain']);
 });

@@ -14,11 +14,9 @@ def storage_info(root):
     root = Path(root).resolve()
     read_only = bool(os.statvfs(root).f_flag & os.ST_RDONLY) or not os.access(root, os.W_OK)
     if root.is_relative_to(Path('/Volumes/ERICS_DRIVE')):
-        kind, label = 'golden', 'ERICS_DRIVE · Golden copy'
-        if read_only:
-            label += ' · Read-only'
+        kind, label = 'golden', 'Golden set'
     elif read_only:
-        kind, label = 'reference', 'Read-only reference'
+        kind, label = 'reference', 'Frozen Reference'
     elif root.is_relative_to(Path.home()/'Datasets/too-much-trash/working'):
         kind, label = 'working', 'Working copy'
     else:
@@ -89,10 +87,13 @@ class Dataset:
             if not isinstance(self.decisions, dict):
                 raise ValueError('Decision log must be keyed by sample ID')
             from labels import export_labels
-            export_labels(self)
+            if not storage_info(self.root)['read_only']:
+                export_labels(self)
 
     def record(self, item, prediction, decision, corrected_label=None):
         with self.lock:
+            if storage_info(self.root)['read_only']:
+                raise ValueError('Frozen references are read-only; select a working copy to edit labels')
             if not prediction or self.samples[item]['prediction'] != prediction:
                 raise ValueError('Prediction changed; reload before reviewing')
             if decision not in ('approve', 'deny'):
@@ -130,7 +131,7 @@ class Workspace:
 
     def remember(self, dataset):
         entry = dict(path=str(dataset.root), manifest=str(dataset.manifest))
-        if layout.organized(dataset.root):
+        if layout.organized(dataset.root) and not storage_info(dataset.root)['read_only']:
             config_path = dataset.root/'metadata/dataset.json'
             config = json.loads(config_path.read_text())
             selected = layout.relative(dataset.manifest, dataset.root)
@@ -153,6 +154,12 @@ class Workspace:
 
     def catalog(self):
         paths = [x['path'] for x in self.history]
+        local = Path.home()/'Datasets/too-much-trash'
+        for parent in (local/'reference/current', local/'working/review'):
+            try:
+                paths.extend(str(x) for x in parent.iterdir() if is_dataset(x))
+            except OSError:
+                pass
         volumes = Path('/Volumes')
         if volumes.exists():
             for volume in volumes.iterdir():
@@ -161,7 +168,13 @@ class Workspace:
                         paths.extend(str(x) for x in volume.iterdir() if is_dataset(x))
                     except OSError:
                         pass
-        return [dict(path=p, available=Path(p).is_dir()) for p in dict.fromkeys(paths)]
+        choices = []
+        for p in dict.fromkeys(paths):
+            available = Path(p).is_dir()
+            if Path(p).is_relative_to(Path('/Volumes/ERICS_DRIVE')) and not available:
+                continue
+            choices.append(dict(path=p, available=available, storage=storage_info(Path(p)) if available else None))
+        return choices
 
     def browse(self, path):
         root = Path(path or '/Volumes').expanduser().resolve()

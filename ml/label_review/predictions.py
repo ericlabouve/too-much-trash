@@ -174,6 +174,9 @@ class Jobs:
                            skipped=len(videos)-len(clips))
 
     def start(self, dataset, workers, model=None, effort=None, limit=None):
+        from workspace import storage_info
+        if storage_info(dataset.root)['read_only']:
+            raise ValueError('Frozen references are read-only; select a working copy to run predictions')
         if type(workers) is not int or not 1 <= workers <= 10:
             raise ValueError('Choose between 1 and 10 parallel agents')
         if limit is not None and (type(limit) is not int or limit < 1):

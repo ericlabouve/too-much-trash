@@ -47,6 +47,36 @@ class OrganizedLayoutTests(unittest.TestCase):
     def workspace(self, path=None, state='history.json'):
         return Workspace(path or self.root, state=Path(self.temp.name) / state)
 
+    def test_frozen_dataset_selection_and_reads_never_write_annotations(self):
+        workspace = self.workspace()
+        original = {p:p.read_bytes() for p in self.root.rglob('*.json')}
+        frozen = dict(kind='reference', label='Frozen Reference', read_only=True)
+        with patch('workspace.storage_info', return_value=frozen), patch('labels.export_labels') as export:
+            workspace.select(self.root)
+            workspace.current.refresh()
+            export.assert_not_called()
+            with self.assertRaisesRegex(ValueError, 'read-only'):
+                workspace.current.record('clip-001','uncertain','deny','confirmed')
+            with self.assertRaisesRegex(ValueError, 'read-only'):
+                Jobs(workspace).start(workspace.current, 1)
+        for path,data in original.items():
+            self.assertEqual(path.read_bytes(),data)
+
+    def test_catalog_discovers_local_reference_and_working_datasets_without_history(self):
+        home = Path(self.temp.name)/'home'
+        expected = []
+        for group in ('reference/current','working/review'):
+            dataset = home/'Datasets/too-much-trash'/group/'beach'
+            folder = dataset/'episodes/001'; folder.mkdir(parents=True)
+            (folder/'video.mp4').write_bytes(b'fixture')
+            expected.append(str(dataset))
+        workspace = self.workspace()
+        with patch('workspace.Path.home',return_value=home):
+            choices = {x['path']:x for x in workspace.catalog()}
+        for path in expected:
+            self.assertTrue(choices[path]['available'])
+            self.assertIsNotNone(choices[path]['storage'])
+
     def test_numeric_episode_folders_preserve_review_ids_and_worker_selection(self):
         rows = []
         for number, item in enumerate(self.items, 1):
