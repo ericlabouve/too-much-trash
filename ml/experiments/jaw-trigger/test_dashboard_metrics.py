@@ -83,6 +83,25 @@ class LeaderMetricTests(unittest.TestCase):
             self.assertEqual(len(history.snapshot()), 1)  # historical chart remains available
             self.assertEqual(history.views, [])  # current table can't inherit old-snapshot scores
 
+    def test_supervised_source_snapshots_supply_history_without_legacy_hash_manifest(self):
+        result, inputs, _ = self.fixture()
+        result['round'] = 51
+        result['settings']['clip_limit'] = 12
+        with TemporaryDirectory() as directory:
+            root = Path(directory); snapshot = root / 'SNAPSHOT.json'; snapshot.write_bytes(b'fixture')
+            job = root / 'dashboard-001'
+            source = job / 'protected-source/ml/experiments/jaw-trigger'; source.mkdir(parents=True)
+            for name in ('round_one.py', 'joint_fitness.py'):
+                (source / name).write_text('frozen evaluator fixture')
+            for name, value in {'status.json': {'state': 'completed', 'mode': 'agent_guided'},
+                                'config.json': {'settings': result['settings']},
+                                'results.json': result, 'inputs.json': inputs}.items():
+                (job / name).write_text(json.dumps(value))
+            contexts = LeaderHistory(root, snapshot).snapshot()
+            self.assertEqual(contexts[0]['points'][0]['round'], 51)
+            self.assertTrue(contexts[0]['points'][0]['isolated'])
+            self.assertEqual(contexts[0]['identity']['protocol']['round_one.py'], sha256(b'frozen evaluator fixture').hexdigest())
+
     def test_source_hash_key_style_does_not_split_comparable_rounds(self):
         result, inputs, protocol = self.fixture()
         with TemporaryDirectory() as directory:

@@ -77,18 +77,25 @@ class LeaderHistory:
                 # Publication is a trust boundary, so don't let a cached chart bypass
                 # a changed model, review, result, or stripped review configuration.
                 verified_path, verified_result = verify_publication(job)
+                legacy_hashes = job / 'evaluator-source/sha256.json'
+                frozen_sources = [job / 'protected-source/ml/experiments/jaw-trigger' / name
+                                  for name in ('round_one.py', 'joint_fitness.py')]
                 paths = [status_path, verified_path, job / 'inputs.json',
-                         job / 'evaluator-source/sha256.json']
+                         *([legacy_hashes] if legacy_hashes.exists() else frozen_sources)]
                 stamp = tuple((path.stat().st_mtime_ns, path.stat().st_size) for path in paths)
                 cached = self.cache.get(job)
                 if cached is None or cached[0] != stamp:
                     context = None
                     view = None
                     if status.get('state') == 'completed' and status.get('mode') == 'agent_guided':
-                        hashes = json.loads(paths[3].read_text())
-                        protocol = {name: (hashes[name] if name in hashes else
-                                           hashes[f'ml/experiments/jaw-trigger/{name}'])
-                                    for name in ('round_one.py', 'joint_fitness.py')}
+                        if legacy_hashes.exists():
+                            hashes = json.loads(legacy_hashes.read_text())
+                            protocol = {name: (hashes[name] if name in hashes else
+                                               hashes[f'ml/experiments/jaw-trigger/{name}'])
+                                        for name in ('round_one.py', 'joint_fitness.py')}
+                        else:
+                            # Supervised workers pin these snapshots in their receipt.
+                            protocol = {path.name: sha256(path.read_bytes()).hexdigest() for path in frozen_sources}
                         result, inputs = verified_result, json.loads(paths[2].read_text())
                         context = leader_context(result, inputs, job.name, protocol)
                         if context:
