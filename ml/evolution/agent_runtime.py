@@ -274,6 +274,11 @@ class Supervisor:
             common += f'Your ONLY assigned candidate is {task["candidate_name"]}. This is a fresh context.\n'
             if task.get('review_bundle'):
                 bundle = task['review_bundle']
+                common += ('Export your own verdict/findings/checks/inspected_paths using '
+                           'ml.evolution.review_bundles.write_review_report; it fills frozen metadata '
+                           'without manual transcription. Findings must be a list of text strings. '
+                           f'Pass required_probe_kinds={self.config.get("review_report_probe_kinds")!r}. '
+                           'Keep extra consistency audits separate from the required checks list. ')
                 common += (f'Authoritative frozen review package: {bundle["path"]}; SHA256 '
                            f'{bundle["sha256"]}. Verify this package and review its assigned graph only.\n')
                 common += ('Before returning ready, call ml.evolution.review_bundles.preflight_report '
@@ -332,7 +337,8 @@ class Supervisor:
         if not task['thread_id']:
             raise ValueError('Cannot continue a child without its actual thread identity')
         if report['status'] == 'ready' and task['kind'] == 'integrity_review' and task.get('review_bundle'):
-            packaged = preflight_report(self.job, artifact, task['review_bundle'], task['thread_id'])
+            packaged = preflight_report(self.job, artifact, task['review_bundle'], task['thread_id'],
+                                         self.config.get('review_report_probe_kinds'))
             correction = task.get('report_export_correction')
             if correction and review_decision_digest(packaged) != correction['decision_sha256']:
                 raise ReviewReportError('Report export cannot change verdict, findings, inspected paths or probes')

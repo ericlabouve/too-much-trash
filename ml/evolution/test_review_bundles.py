@@ -9,7 +9,7 @@ import unittest
 
 from .agent_runtime import Supervisor
 from .agent_budgets import verify_agent_budgets
-from .review_bundles import PROTOCOL, preflight_bundle, preflight_report, ReviewReportError
+from .review_bundles import PROTOCOL, preflight_bundle, preflight_report, ReviewReportError, write_review_report
 from .test_agent_runtime import Clock, ProcessFactory
 from . import test_agent_budgets as budget_fixtures
 
@@ -72,7 +72,29 @@ class ReviewBundleTests(unittest.TestCase):
         return {'reviewer_id': 'thread-1', 'candidate_name': 'child', 'fresh_context': True,
                 'context_sha256': 'a' * 64, 'candidates': [{
                     'candidate': self.bundle['candidate'] if candidate is None else candidate,
-                    'verdict': verdict, 'artifact_hashes': {r['path']: r['sha256'] for r in self.bundle['files']}}]}
+                    'verdict': verdict, 'findings': ['Synthetic source-inspection finding.'],
+                    'inspected_paths': [r['path'] for r in self.bundle['files']],
+                    'checks': [{'kind': 'synthetic', 'passed': True, 'evidence': 'model.json'}],
+                    'artifact_hashes': {r['path']: r['sha256'] for r in self.bundle['files']}}]}
+
+    def test_findings_and_required_probe_structure_are_validated_before_completion(self):
+        pinned = preflight_bundle(self.job, str(self.package), 'child')
+        path = self.job / 'report.json'
+        report = self.report()
+        report['candidates'][0]['findings'] = [{'finding': 'Wrong type'}]
+        path.write_text(json.dumps(report))
+        with self.assertRaisesRegex(ReviewReportError, 'text strings'):
+            preflight_report(self.job, str(path), pinned, 'thread-1')
+        report = self.report()
+        report['candidates'][0]['checks'].append({'kind': 'extra', 'passed': True, 'evidence': 'model.json'})
+        path.write_text(json.dumps(report))
+        with self.assertRaisesRegex(ReviewReportError, 'exactly the required'):
+            preflight_report(self.job, str(path), pinned, 'thread-1', ['synthetic'])
+        body = self.report()['candidates'][0]
+        write_review_report(self.job, 'report.json', pinned, 'thread-1', verdict='rejected',
+                            findings=body['findings'], checks=body['checks'], inspected_paths=body['inspected_paths'],
+                            required_probe_kinds=['synthetic'])
+        self.assertEqual(json.loads(path.read_text())['candidates'][0]['verdict'], 'rejected')
 
     def test_report_requires_exact_candidate_object_and_preserves_rejected_verdict(self):
         path = self.job / 'report.json'

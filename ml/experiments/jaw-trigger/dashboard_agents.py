@@ -15,7 +15,7 @@ import tempfile
 from time import monotonic
 
 from dashboard_round import architecture, candidate_catalog, candidate_family, write_json
-from dashboard_integrity import REVIEW_PROTOCOL, review_context, verify_integrity_reviews
+from dashboard_integrity import REVIEW_PROTOCOL, PROBE_KINDS, review_context, verify_integrity_reviews
 from ml.evolution.agent_briefs import EXPERIMENT_GUIDELINES
 from ml.evolution.training import PROTOCOL as TRAINING_PROTOCOL, policy_for
 from ml.evolution.agent_budgets import PROTOCOL as BUDGET_PROTOCOL, budget_policy, verify_agent_budgets
@@ -136,6 +136,7 @@ def supervisor_configuration(prior, settings, job, binary):
     counts = agent_counts(prior, settings)
     return {'protocol': BUDGET_PROTOCOL, 'job': str(job.resolve()),
             'repository': str(REPOSITORY), 'binary': binary, 'settings': settings,
+            'review_report_probe_kinds': list(PROBE_KINDS),
             'expected': {'parent': [parent['name'] for parent in evolution_parents(prior, settings)],
                          **{kind: counts[key] for kind, key in
                             (('research', 'research'), ('review', 'review'), ('integrity_review', 'integrity_review'))}},
@@ -703,6 +704,17 @@ def verify_architecture_reviews(job, receipts, settings, candidates=None, metada
         raise ValueError('Architecture acceptance must cover every evaluated research proposal')
 
 
+def requires_training_record(result, name, entry):
+    """Use the already verified frozen bundle, not an architecture display label."""
+    bundle = result.get('candidate_artifacts', {}).get(name)
+    if bundle is not None:
+        if type(bundle.get('learned')) is not bool:
+            raise ValueError('Frozen bundle needs an explicit learned status')
+        return bundle['learned']
+    family = result.get('candidate_metadata', {}).get(name, {}).get('family', architecture(entry['candidate']['method']))
+    return family.casefold() not in {'threshold', 'geometry', 'template', 'optical flow', 'hog'}
+
+
 def verify_completion(job, final, config, manifests):
     from round_one import accuracy
     from run_joint_round import JointCandidate, joint_genotype, read_genotype
@@ -877,10 +889,8 @@ def verify_completion(job, final, config, manifests):
     labels = [row['jaw_reference'] for row in validation]
     round_one.MATCH_SECONDS = settings['match_seconds']
     fitted = set(evaluation.get('fitted_candidates', []))
-    handcrafted = {'threshold', 'geometry', 'template', 'optical flow', 'hog'}
     learned = {name for name, entry in observed.items()
-               if result.get('candidate_metadata', {}).get(name, {}).get(
-                   'family', architecture(entry['candidate']['method'])).casefold() not in handcrafted}
+               if requires_training_record(result, name, entry)}
     if not learned <= fitted:
         raise ValueError('Every learned candidate needs training-only refit provenance')
     if 'training_protocol' in settings:

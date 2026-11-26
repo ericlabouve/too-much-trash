@@ -68,7 +68,7 @@ def preflight_bundle(job, filename, candidate_name):
             'context_sha256': context}
 
 
-def preflight_report(job, filename, pinned, reviewer_id):
+def preflight_report(job, filename, pinned, reviewer_id, required_probe_kinds=None):
     """Check report structure before a reviewer loses its live export context.
 
     This never approves a verdict or substitutes for the outer integrity audit.
@@ -89,4 +89,46 @@ def preflight_report(job, filename, pinned, reviewer_id):
         raise ReviewReportError('Review report artifact_hashes must cover the exact dispatched frozen graph')
     if rows[0].get('verdict') not in ('approved', 'rejected'):
         raise ReviewReportError('Review report must preserve an explicit approved or rejected verdict')
+    findings = rows[0].get('findings')
+    if not isinstance(findings, list) or not findings or any(not isinstance(s, str) or not s.strip() for s in findings):
+        raise ReviewReportError('findings must be a nonempty list of text strings, not objects')
+    inspected = rows[0].get('inspected_paths')
+    if not isinstance(inspected, list):
+        raise ReviewReportError('inspected_paths must list every inspected frozen artifact')
+    try:
+        covered = {str(local_file(job, p).relative_to(Path(job).resolve())) for p in inspected}
+    except (OSError, ValueError) as error:
+        raise ReviewReportError('Inspected files must exist inside this job') from error
+    if not set(expected) <= covered:
+        raise ReviewReportError('Report must inspect every frozen artifact')
+    checks = rows[0].get('checks')
+    if (not isinstance(checks, list) or not checks or any(not isinstance(c, dict) or not isinstance(c.get('kind'), str)
+            or type(c.get('passed')) is not bool or not isinstance(c.get('evidence'), str) for c in checks)):
+        raise ReviewReportError('checks must be structured kind/passed/evidence records')
+    kinds = [c['kind'] for c in checks]
+    if len(kinds) != len(set(kinds)) or (required_probe_kinds is not None and set(kinds) != set(required_probe_kinds)):
+        raise ReviewReportError('checks must contain exactly the required probe kinds, once each; put extra audits in a separate field')
+    for check in checks:
+        try:
+            local_file(job, check['evidence'])
+        except (OSError, ValueError) as error:
+            raise ReviewReportError('Probe evidence must exist inside this job') from error
     return report
+
+
+def write_review_report(job, filename, pinned, reviewer_id, *, verdict, findings, checks,
+                        inspected_paths, required_probe_kinds=None):
+    """Serialize a reviewer's own decision without hand-copying frozen metadata."""
+    path = (Path(job) / filename).resolve()
+    if not path.is_relative_to(Path(job).resolve()):
+        raise ValueError('Review report must stay inside the job')
+    candidate = pinned['graph']['candidate']
+    report = {'reviewer_id': reviewer_id, 'candidate_name': candidate['name'], 'fresh_context': True,
+              'context_sha256': pinned['context_sha256'], 'candidates': [{
+                  'candidate': candidate, 'verdict': verdict, 'findings': findings, 'checks': checks,
+                  'inspected_paths': inspected_paths,
+                  'artifact_hashes': {k: v['sha256'] for k, v in pinned['graph']['files'].items()}}]}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(report, indent=2) + '\n')
+    preflight_report(job, str(path), pinned, reviewer_id, required_probe_kinds)
+    return str(path)

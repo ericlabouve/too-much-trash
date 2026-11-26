@@ -43,7 +43,11 @@ frozen evidence and exactly one candidate. All assigned reviews must approve;
 missing, rejected or stale evidence blocks publication. Historical shared-review
 jobs keep their saved protocol. See the domain README for receipt requirements.
 Reviewer report export must pass preflight_report before the task is marked
-ready. candidates[0].candidate is the full frozen candidate object. A structural
+ready. candidates[0].candidate is the full frozen candidate object.
+Use write_review_report to serialize the reviewer's own verdict, findings as
+text strings, inspected paths and exactly the domain's required probe kinds.
+The writer supplies pinned metadata; extra diagnostics stay outside checks.
+Missing/extra probes and findings objects are report-format failures. A structural
 packaging error can use one same-context export-only correction under finish-v1;
 preserve the original report and its verdict/findings/inspected paths/probes.
 The supervisor and outer audit hash-bind those substantive fields. This does

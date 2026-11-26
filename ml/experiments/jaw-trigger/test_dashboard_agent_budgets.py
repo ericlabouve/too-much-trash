@@ -7,7 +7,7 @@ import tomllib
 import unittest
 from unittest.mock import patch
 
-from dashboard_agents import (coordinator_command, coordinator_prompt, execute,
+from dashboard_agents import (coordinator_command, coordinator_prompt, execute, requires_training_record,
                               supervisor_configuration, verify_completion, completed_export_wall_seconds)
 from dashboard_server import validate_settings
 from ml.evolution.agent_budgets import PROTOCOL
@@ -15,6 +15,18 @@ import test_dashboard_agents as receipt_fixtures
 
 
 class DashboardAgentBudgetTests(unittest.TestCase):
+    def test_display_family_cannot_override_verified_learned_status(self):
+        entry = {'candidate': {'method': 'custom-native-rule'}}
+        result = {'candidate_metadata': {'rule': {'family': 'Edge energy'}},
+                  'candidate_artifacts': {'rule': {'learned': False}}}
+        self.assertFalse(requires_training_record(result, 'rule', entry))
+        result['candidate_artifacts']['rule']['learned'] = True
+        result['candidate_metadata']['rule']['family'] = 'Threshold'
+        self.assertTrue(requires_training_record(result, 'rule', entry))
+        result['candidate_artifacts']['rule']['learned'] = 'false'
+        with self.assertRaises(ValueError):
+            requires_training_record(result, 'rule', entry)
+
     def settings(self, payload=None):
         with patch('dashboard_server.discover_datasets', return_value=[
                 {'name': 'beach', 'clip_count': 242}, {'name': 'home', 'clip_count': 5},

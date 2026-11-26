@@ -257,6 +257,12 @@ report bytes are preserved; verdict, findings, inspected paths and probe evidenc
 are hash-bound and cannot change during correction. Review analysis still has
 its hard deadline. The outer timeout includes report-export pauses too. This
 structural check never approves a rejection or replaces the final integrity audit.
+Reviewers should export through `write_review_report`: supply their own verdict,
+text-string findings, inspected paths and native check records. The writer fills
+the full frozen candidate/context/hash metadata and validates it. Domain adapters
+pin `review_report_probe_kinds` in supervisor configuration; exactly those kinds
+belong in `checks`, with other diagnostics kept separately. Findings objects,
+missing/extra/duplicate checks and incomplete inspection are rejected before ready.
 
 If training loss improves while validation worsens, investigate capacity,
 weight decay, dropout, label-preserving augmentation and simpler baselines.
