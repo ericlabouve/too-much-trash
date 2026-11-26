@@ -222,6 +222,15 @@ with TrainingMonitor(job, trial_id, plan, context,
     export_model(checkpoint['parameters'])
 ```
 
+`validation_predictions` must be a nonempty object keyed by the frozen
+validation example IDs, never a positional list. For jaw events, use
+`{clip_id: [["close", time_seconds], ["open", time_seconds]], ...}`,
+including empty event lists for clips with no predictions. The monitor rejects
+invalid container shapes before saving an epoch, so an author can correct the
+format within its original allocation. The domain audit still verifies exact
+validation membership and recomputes F1 from every saved epoch; this early
+check does not relax that audit or repair previously frozen receipts.
+
 JSON-safe parameters can reference hashed opaque framework checkpoints; keep
 referenced weight filenames immutable for each checkpoint. The
 monitor does not require tensor weights to be serialized as JSON. Genuinely

@@ -177,6 +177,10 @@ class TrainingMonitor:
         if any(type(value) not in (int, float) or not isfinite(value) for value in
                (train_loss, validation_loss, validation_score)) or min(train_loss, validation_loss) < 0 or not 0 <= validation_score <= 1:
             raise ValueError('Record finite losses and a validation score between zero and one')
+        if (not isinstance(validation_predictions, dict) or not validation_predictions
+                or any(not isinstance(key, str) or not key.strip()
+                       for key in validation_predictions)):
+            raise ValueError('Validation predictions must be a nonempty JSON object keyed by example/clip ID; ordered lists are not accepted')
         epoch = len(self.points) + 1
         if epoch > self.plan['max_epochs']:
             raise ValueError('Declared epoch ceiling exceeded')

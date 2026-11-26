@@ -32,8 +32,11 @@ declare hypotheses/resources, journal every attempted fit, monitor validation
 after each epoch, retain the best validation-task checkpoint and stop for
 patience/budget. Keep objective loss distinct from fitness and task accuracy.
 Rising validation loss calls for analysis of capacity/regularization; it does
-not alone invalidate improved event F1. Keep frozen evaluators and test inputs
-outside candidate edits. These safeguards reduce overtraining, not guarantee
+not alone invalidate improved event F1. Pass validation_predictions as a nonempty
+object keyed by frozen example/clip IDs, including empty event lists when no
+events were predicted. Never use a positional list. The writer now fails early
+on that shape error; exact membership/F1 still require the final domain audit.
+Keep frozen evaluators and test inputs outside candidate edits. These safeguards reduce overtraining, not guarantee
 generalization from small or overlapping datasets.
 
 For an agent-guided round, generate shared briefs with domain context.

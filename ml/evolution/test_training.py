@@ -67,6 +67,25 @@ class TrainingMonitorTests(unittest.TestCase):
             monitor.finish()
             self.assertEqual(monitor.selected_checkpoint()['epoch'], 3)
 
+    def test_invalid_prediction_shapes_fail_before_an_epoch_is_saved(self):
+        for predictions in ([], [[['close', 3.1]]], None, 'events', {},
+                            {'': []}, {'  ': []}, {1: []}):
+            with self.subTest(predictions=predictions), TemporaryDirectory() as directory:
+                with self.monitor(directory, plan=self.plan(epochs=1)) as monitor:
+                    with self.assertRaisesRegex(ValueError, 'keyed by example/clip ID'):
+                        monitor.observe(train_loss=.1, validation_loss=.2,
+                                        validation_score=.8,
+                                        validation_predictions=predictions,
+                                        parameters={'weight': 1})
+                    self.assertEqual(monitor.points, [])
+                    self.assertIsNone(monitor.best)
+                    self.assertFalse((monitor.directory / 'validation-0001.json').exists())
+                    self.assertFalse((monitor.directory / 'history.json').exists())
+                    self.assertFalse((monitor.directory / 'selected-checkpoint.json').exists())
+                    # The author can correct the format in the same fit/allocation.
+                    self.record(monitor, .8)
+                    monitor.finish()
+
     def test_patience_ignores_loss_only_improvements_and_tiny_score_gains(self):
         with TemporaryDirectory() as directory:
             monitor = self.monitor(directory, plan=self.plan(epochs=100),

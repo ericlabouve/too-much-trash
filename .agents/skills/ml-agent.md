@@ -199,3 +199,48 @@ One-second baseline, 2026-11-06: six usable anchors from nine fresh SAM 3 calls 
 Forward-after-first comparison, same clip and pixel-identical SAM 3 outputs: 243 Cutie predictions instead of 388, 68.68 seconds processing (3.63 FPS; 23% less time) and 77.18 seconds including startup. Measured: SAM 3 24.51 s, Cutie forward 20.86 s, backward 2.96 s, seeds 0.70 s. Mean visible Dice 0.9636, p10 0.9534, same two visible frames below 0.80 and 0/54 empty-frame false positives. Largest frame-level drop: frame 58, 0.969 to 0.915. Artifacts: `ml/data/cutie-benchmark/2026-11-06/sam3-1s-forward-positive/`. This speed/quality tradeoff is measured on one clip, not a generalization claim.
 
 Follow-up branch/PR: verify subscription-backed authentication with image input, then evaluate Agent review of SAM 3 anchors without an object name. Later tackle capture relevance, grasp/release timestamps and deposit-based labeling with uncertainty review. Defer further anchor-schedule optimization until more reviewed clips are available. No custom training.
+
+
+## Round 52 six-agent restart — 2026-11-26
+
+User authorized starting with the best eight R50 parents (drop the bottom two
+acceleration candidates), two researchers, six concurrent agents, at most two
+concurrent fits, twenty minutes per started agent, and test reserved. Preserved
+R50 and recorded the manual trim in working/runs/pool-trim-r52-20261126T223521Z/.
+The full restart working/runs/dashboard-20261126T223554Z-54cc26ea is FAILED
+admission, not a new official pool: all ten authors, eighteen serial native
+train/validation evaluations, ten fresh reviewers and fifty integrity probes
+finished. All reviewer verdicts approve their candidate's structural evidence,
+but twelve temporal-fusion training trials saved positional prediction lists
+where the unchanged canonical receipt checker requires clip-keyed objects.
+The other eighty-nine completed fits pass that checker. Do not rewrite the
+frozen receipts, override the failed gate or promote the unadmitted pool.
+The original eight-parent trim remains the dashboard checkpoint.
+
+Unpublished native leader: absolute temporal fusion, train F1 0.903475,
+validation F1 0.877470, p95 0.135625 ms, fitness 0.901976. Its malformed training
+receipts block admission; do not treat this as an audited champion. Best
+clip-replay accuracy is still below the 0.95 validation goal. The 182/61/61
+seed-0 partition remains unchanged and test predictions were not generated.
+
+All 101 completed fitting leases passed the concurrency audit, observed peak
+two. Root memory watcher saved 123 samples at 30-second intervals: maximum
+tracked agent RSS 3286 MiB (shared pages may overlap), maximum kernel pressure
+2/warning, no critical event, maximum swap 10971.62 MiB (includes preexisting
+system swap). The watcher measures supervised agent trees, not every Mac app
+or coordinator benchmark child; do not report its RSS as whole-machine usage.
+
+Saved 73 paired iterative loss histories (1906 epochs), preserving failed and
+overfit trials. Post-epoch train/validation objective losses use the same
+inference-mode calculation; checkpoint selection remains validation event F1,
+then lower validation loss, then earlier epoch. Real curves show widening gaps
+in some baselines. Losses alone do not prove independent generalization and
+new screenshots/plots must disclose that this run failed admission.
+
+After worker exit, tightened TrainingMonitor.observe to reject empty/non-object
+validation prediction containers or blank/non-string example IDs before writing
+an epoch/checkpoint. This addresses the late-found schema failure for FUTURE
+fits, preserves existing immutable evidence, and does not waive domain
+membership/F1 checks. A regression test verifies same-allocation correction
+without saving a malformed epoch. Do not start another round without user
+authorization.
