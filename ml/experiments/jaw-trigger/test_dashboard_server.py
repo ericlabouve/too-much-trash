@@ -60,7 +60,7 @@ class RoundServiceTests(unittest.TestCase):
                          {'evolution_agents': 11}, {'evolution_agents': True}, {'research_slots': 0},
                          {'jaw_weight': float('nan')}, {'full_speed_ms': 30},
                          {'target_basis': 'withheld'}, {'command': 'echo'},
-                         {'agent_concurrency': 6}, {'agent_prompt': 123}, {'agent_prompt': 'x' * 8001},
+                         {'agent_concurrency': 7}, {'agent_prompt': 123}, {'agent_prompt': 'x' * 8001},
                          {'review_agents': 0}, {'review_agents': 6}, {'review_agents': True},
                          {'mode': 'bounded_mutations'}):
             with self.subTest(settings=settings), self.assertRaises(ValueError):
@@ -74,6 +74,12 @@ class RoundServiceTests(unittest.TestCase):
         self.assertEqual(validate_settings({})['review_agents'], 1)
         self.assertEqual(validate_settings({})['review_protocol'], 'per-candidate-v1')
         self.assertEqual(validate_settings({'agent_concurrency': 5})['agent_concurrency'], 5)
+        self.assertEqual(validate_settings({})['agent_concurrency'], 6)
+        self.assertEqual(validate_settings({'agent_concurrency': 6})['agent_concurrency'], 6)
+        self.assertEqual(validate_settings({})['fit_concurrency'], 2)
+        for update in ({'fit_concurrency': 0}, {'fit_concurrency': True}, {'fit_slot_protocol': None}):
+            with self.subTest(update=update), self.assertRaises(ValueError):
+                validate_settings(update)
 
     def test_obsolete_reproduction_cap_cannot_silently_limit_a_new_round(self):
         with self.assertRaisesRegex(ValueError, 'obsolete.*every selected pool candidate'):

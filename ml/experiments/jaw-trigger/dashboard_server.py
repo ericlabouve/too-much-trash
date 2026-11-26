@@ -28,10 +28,11 @@ from dashboard_agents import REPRODUCTION_PROTOCOL
 from dashboard_integrity import REVIEW_PROTOCOL
 from ml.evolution.agent_budgets import PROTOCOL as BUDGET_PROTOCOL
 from ml.evolution.review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL
+from ml.evolution.resources import PROTOCOL as FIT_SLOT_PROTOCOL
 
 DEFAULTS = BOUNDED_DEFAULTS | {
     "mode": "agent_guided", "target_basis": "validation",
-    "pool_size": 8, "research_slots": 2, "agent_minutes": 20, "agent_concurrency": 3,
+    "pool_size": 8, "research_slots": 2, "agent_minutes": 20, "agent_concurrency": 6,
     "agent_prompt": "", "review_agents": 1, "review_protocol": REVIEW_PROTOCOL,
     "evaluation_protocol": "clip_replay-v1",
     "benchmark_protocol": "deployment-v1",
@@ -42,6 +43,7 @@ DEFAULTS = BOUNDED_DEFAULTS | {
     "agent_export_min_seconds": 60,
     "agent_export_completion": "finish-v1",
     "review_bundle_protocol": REVIEW_BUNDLE_PROTOCOL,
+    "fit_concurrency": 2, "fit_slot_protocol": FIT_SLOT_PROTOCOL,
     **SELECTION_DEFAULTS,
     "target_fps": 60, "full_speed_frame_fraction": 0.25, "zero_speed_frame_fraction": 1.0,
 }
@@ -80,7 +82,7 @@ def validate_settings(payload, families=FAMILIES):
         raise ValueError('The round prompt must be text up to 8,000 characters')
     if settings['family'] not in ['all', 'new_family', *families]:
         raise ValueError('Select an available candidate family')
-    for key, lower, upper in [('clip_limit', 0, sum(item['clip_count'] for item in available)), ('pool_size', 1, 10), ('seed', 0, 2147483647), ('research_slots', 1, 10), ('agent_minutes', 1, 120), ('agent_concurrency', 1, 5), ('review_agents', 1, 5)]:
+    for key, lower, upper in [('clip_limit', 0, sum(item['clip_count'] for item in available)), ('pool_size', 1, 10), ('seed', 0, 2147483647), ('research_slots', 1, 10), ('agent_minutes', 1, 120), ('agent_concurrency', 1, 6), ('fit_concurrency', 1, 6), ('review_agents', 1, 5)]:
         if type(settings[key]) is not int or not lower <= settings[key] <= upper:
             raise ValueError(f'{key} must be an integer between {lower} and {upper}')
     for key in ['jaw_weight', 'target_f1', 'match_seconds', 'full_speed_ms', 'frame_budget_ms']:
@@ -120,6 +122,8 @@ def validate_settings(payload, families=FAMILIES):
         raise ValueError('New rounds must allow an in-progress export to finish')
     if settings['review_bundle_protocol'] != REVIEW_BUNDLE_PROTOCOL:
         raise ValueError('New rounds require frozen-bundle-v1 preflight before reviewer dispatch')
+    if settings['fit_slot_protocol'] != FIT_SLOT_PROTOCOL:
+        raise ValueError('New rounds require kernel-enforced flock-v1 fitting slots')
     selection_parameters(settings)
     expected_basis = 'validation' if settings['mode'] == 'agent_guided' else 'development'
     if settings['target_basis'] != expected_basis:

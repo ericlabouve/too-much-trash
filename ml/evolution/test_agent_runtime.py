@@ -176,6 +176,24 @@ class SupervisorTests(unittest.TestCase):
         self.assertEqual(current['cycles'][0]['started_monotonic'], 12)
         self.assertEqual(current['cycles'][0]['deadline_monotonic'], 72)
 
+    def test_six_slots_start_six_agents_and_queue_seventh_without_spending_time(self):
+        self.runtime.shutdown()
+        self.config['settings']['agent_concurrency'] = 6
+        self.config['expected']['integrity_review'] = 7
+        self.runtime = Supervisor(self.config, clock=self.clock, popen=self.factory,
+                                  killpg=self.factory.killpg, snapshot=lambda: {})
+        self.addCleanup(self.runtime.shutdown)
+        tasks = [self.start('integrity_review', candidate_name=f'candidate-{i}') for i in range(7)]
+        self.assertEqual(len(self.factory.processes), 6)
+        self.assertEqual(tasks[-1]['status'], 'queued')
+        self.assertEqual(tasks[-1]['cycles'], [])
+        self.clock.value = 12
+        self.factory.processes[0].finish(self.artifact, candidate='candidate-0')
+        self.runtime.tick()
+        last = self.runtime.get_agents([tasks[-1]['task_id']])['agents'][0]
+        self.assertEqual(last['cycles'][0]['started_monotonic'], 12)
+        self.assertEqual(last['cycles'][0]['deadline_monotonic'], 72)
+
     def test_reviewers_finish_early_and_keep_independent_ids(self):
         first = self.start('integrity_review', candidate_name='A')
         self.factory.processes[-1].finish(self.artifact, candidate='A')

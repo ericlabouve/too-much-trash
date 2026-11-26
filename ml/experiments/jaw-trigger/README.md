@@ -207,15 +207,35 @@ JSON has `metric`, `points` (`epoch`, `train_loss`, `validation_loss`) and optio
 models or candidate configurations invalidate the displayed history. These are
 objective-loss diagnostics, separate from deployment F1 and fitness.
 Hover or focus a parameter for its definition. The default
-agent allocation is 20 minutes per candidate, with up to three child agents
+agent allocation is 20 minutes per candidate, with up to six child agents
 working concurrently. The controls show actual evolution, research and review
 counts before launch; the coordinator is fixed at one and hidden from parameters.
-The parallel-agent control supports up to five (default three). Agents may
-research, implement and fit concurrently, but final candidate latency replay
+The parallel-agent control supports up to six (default six). Parallel fits
+defaults to two. New jobs require `fit_slot_protocol=flock-v1`; TrainingMonitor
+holds a kernel file lock through each fit and records a hashed lease in its
+receipt. Slot waiting is outside the trial timer but inside the original agent
+allocation. All monitored fits count conservatively, including small closed-form
+fits and baseline refits. Independent review verifies that optimization did not
+occur before/beside the monitor. Prepare shared caches once and avoid private
+copies of the complete frame corpus. Agents may research and implement
+concurrently, but final candidate latency replay
 must run sequentially after all fitting stops, using the same runtime, prepared
 inputs and timing scope. Concurrent preparation or tuning timings cannot be
 substituted for those final isolated measurements.
 Pool size only limits retained competitors.
+For the next Round52 restart, the user explicitly requested trimming the current
+pool to its top eight first; preserve original R50 and record that manual
+checkpoint adjustment. Those eight parents plus two researchers produce ten
+proposals, followed by ten independently scoped final reviewers.
+
+Run `python -m ml.evolution.monitor_resources --job JOB --worker-pid PID` to
+sample Mac memory and active fits every30seconds. Logs stay outside the writable
+job in `working/runs/.resource-monitor/`. A fresh critical-pressure observation
+pauses admission of new fits without killing active work. RSS can double-count
+shared pages; system pressure, compression and swap are recorded separately.
+Loss charts use actual paired per-epoch inference-mode measurements, mark the
+selected checkpoint epoch and flag falling training/rising validation loss.
+No epoch curves are invented for trees or other genuinely noniterative fits.
 Completion requires a distinct research-agent receipt mapped to each fresh candidate.
 The round prompt textbox supplies additional direction verbatim to the coordinator
 and every child agent. Settings and child prompt files preserve it with the run.

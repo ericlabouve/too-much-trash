@@ -47,6 +47,11 @@ function makeCandidateLossCurve(history, candidate, presentation) {
     add('text', { x: x(epoch), y: 213, 'text-anchor': 'middle' }, epoch);
   }
   add('text', { x: 340, y: 235, 'text-anchor': 'middle' }, 'Epoch');
+  if (Number.isInteger(history.selected_epoch) && history.selected_epoch >= first && history.selected_epoch <= last) {
+    add('line', { x1: x(history.selected_epoch), x2: x(history.selected_epoch), y1: 20, y2: 194,
+      stroke: '#d5b6ff', 'stroke-width': 2, 'stroke-dasharray': '5 4' });
+    add('text', { x: x(history.selected_epoch), y: 14, 'text-anchor': 'middle' }, `Selected epoch ${history.selected_epoch}`);
+  }
   const legend = document.createElement('ul');
   legend.className = 'loss-legend';
   for (const line of series) {
@@ -69,6 +74,11 @@ function makeCandidateLossCurve(history, candidate, presentation) {
   }
   const metric = document.createElement('p'); metric.textContent = `${history.metric} · lower is better`;
   figure.append(metric, legend, svg);
+  if (history.possible_overfitting) {
+    const warning = document.createElement('p');
+    warning.textContent = 'Possible overfitting: training loss decreased while validation loss increased.';
+    figure.append(warning);
+  }
   if (history.note) { const note = document.createElement('p'); note.textContent = history.note; figure.append(note); }
   return figure;
 }

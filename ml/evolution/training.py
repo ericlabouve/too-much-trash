@@ -12,6 +12,7 @@ from math import isfinite
 from pathlib import Path
 import re
 from time import monotonic
+from .resources import FittingLease, fitting_settings
 
 PROTOCOL = 'validation-checkpoints-v1'
 
@@ -125,6 +126,7 @@ class TrainingMonitor:
             raise ValueError('Training clock must produce finite timestamps')
         self.points, self.best, self.gain_score, self.gain_epoch = [], None, None, 0
         self.stop_reason, self.closed = None, False
+        self.fitting_lease = None
         self._checkpoint_record = None
         self._history_record = None
         self.directory.mkdir(parents=True, exist_ok=False)
@@ -133,6 +135,14 @@ class TrainingMonitor:
         self._plan_record = evidence(self.job, self.directory / 'plan.json')
         journal(self.job, {'trial_id': trial_id, 'status': 'started',
                            'plan': self._plan_record})
+        try:
+            limit = fitting_settings(self.job)
+            if limit is not None:
+                self.fitting_lease = FittingLease(self.job, self.directory, limit).acquire()
+                self.started = clock()  # Queueing is not optimization time.
+        except BaseException as error:
+            self.fail(error)
+            raise
 
     def __enter__(self):
         return self
@@ -238,6 +248,8 @@ class TrainingMonitor:
                    'trained_epochs': len(self.points), 'stop_reason': self.stop_reason,
                    'elapsed_seconds': self._elapsed(),
                    'history': self._history_record}
+        if self.fitting_lease is not None:
+            receipt['fit_lease'] = evidence(self.job, self.fitting_lease.release())
         write(self.directory / 'receipt.json', receipt)
         self.closed = True
         record = evidence(self.job, self.directory / 'receipt.json')
@@ -246,5 +258,7 @@ class TrainingMonitor:
 
     def fail(self, reason):
         if not self.closed:
+            if self.fitting_lease is not None:
+                self.fitting_lease.release()
             journal(self.job, {'trial_id': self.trial_id, 'status': 'crash', 'reason': str(reason)[:1000]})
             self.closed = True

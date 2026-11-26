@@ -20,6 +20,7 @@ from ml.evolution.agent_briefs import EXPERIMENT_GUIDELINES
 from ml.evolution.training import PROTOCOL as TRAINING_PROTOCOL, policy_for
 from ml.evolution.agent_budgets import PROTOCOL as BUDGET_PROTOCOL, budget_policy, verify_agent_budgets
 from ml.evolution.review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL
+from ml.evolution.resources import PROTOCOL as FIT_SLOT_PROTOCOL, verify_fitting_slots
 from dashboard_selection import PROTOCOL as SELECTION_PROTOCOL, selection_parameters, verify_selection
 
 HERE = Path(__file__).resolve().parent
@@ -281,6 +282,16 @@ periodic validation, after input preparation. Do not change this cap between can
 record device, threads, elapsed time and any epoch-boundary overrun. Parallel search is
 permitted, so disclose resource contention rather than claim identical effective compute.
 The existing agent_minutes allocation still bounds all of each agent's trials/research.
+At most {settings.get('fit_concurrency', settings['agent_concurrency'])} fits may run concurrently.
+For new flock-v1 jobs TrainingMonitor acquires a process-shared kernel slot before fitting;
+create it BEFORE allocating a large training working set or starting optimization. Keep every
+fit, including baseline refits and noniterative fits, inside that monitor through finish/fail.
+Do not fit in a separate unmonitored process or before constructing the monitor. Shared prepared
+inputs should be streamed or memory-mapped, not copied in full into every agent. Slot waiting
+is excluded from the trial's optimization timer but remains within the author's original
+wall allocation; use other time for research/coding and do not reset clocks. Independent reviewers
+must inspect actual slot usage and both inference-mode loss calculations. Final benchmarking
+still runs serially after ALL fitting stops. Never confuse agent concurrency with fit concurrency.
 Use TrainingMonitor(job, unique_trial_id, plan, context, policy=policy_for(settings)).
 The plan kind is iterative or noniterative; include candidate_name, hypothesis, objective,
 capacity, regularization, seed and resources={{device,threads}}. Seed is a nonnegative
@@ -898,6 +909,8 @@ def verify_completion(job, final, config, manifests):
             raise ValueError('Unknown training checkpoint protocol')
         from dashboard_training import verify_training_records
         result['training_audit'] = verify_training_records(job, result, evaluation, settings, manifests, eligible)
+        if 'fit_slot_protocol' in settings:
+            result['fit_resource_audit'] = verify_fitting_slots(job)
     for name, entry in observed.items():
         training_predictions = evaluation.get('training_predictions', {}).get(name, {})
         if set(training_predictions) != set(training_ids):
@@ -1072,6 +1085,8 @@ def execute(config_path):
             raise ValueError('New jobs require the 60-second short-budget export minimum')
         if settings.get('agent_export_completion') != 'finish-v1':
             raise ValueError('New jobs must allow an in-progress export to finish')
+        if settings.get('fit_slot_protocol') != FIT_SLOT_PROTOCOL:
+            raise ValueError('New jobs require kernel-enforced fitting slots')
         selection_parameters(settings)
         status('running', .01, 'Preparing the pinned train and validation inputs', phase='prepare')
         ready = readiness()
@@ -1088,7 +1103,7 @@ def execute(config_path):
                                           for path in manifests.values()}
         # Freeze trusted source before agents run. Publication later checks these
         # copies, so future legitimate repository edits do not erase old history.
-        protected = ['ml/evolution/training.py', 'ml/evolution/agent_briefs.py',
+        protected = ['ml/evolution/training.py', 'ml/evolution/resources.py', 'ml/evolution/agent_briefs.py',
                      'ml/evolution/agent_runtime.py', 'ml/evolution/agent_budgets.py', 'ml/evolution/review_bundles.py',
                      'ml/evolution/portfolio.py', 'ml/evolution/__init__.py',
                      *[f'ml/experiments/jaw-trigger/{name}' for name in

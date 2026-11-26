@@ -156,6 +156,19 @@ no evolutionary round or training. Goal support can change with CLI versions.
 
 ## Validation checkpoints and experiment records
 
+New jaw jobs use `fit_slot_protocol=flock-v1`, with `fit_concurrency=2` and up to
+six independently scheduled agents. TrainingMonitor acquires a process-shared
+kernel fitting slot before optimization and releases it on finish/failure;
+process exit also releases the kernel lock. Waiting does not consume the trial's
+optimization budget but stays inside its author's original wall allocation.
+All completed fits need hash-bound leases, checked for overlapping slot use.
+Agents must construct the monitor before allocating heavy working sets or
+optimizing, not fit first and manufacture a receipt afterward. Shared caches
+and independent source review remain necessary; advisory locks are not a
+security boundary against deliberately dishonest code. Legacy jobs retain their
+original protocol. The standalone monitor_resources command records memory and
+pauses new fitting admissions during fresh critical memory pressure.
+
 The workflow adapts the fixed evaluator, bounded experiments, baseline and
 failure-log principles of [autoresearch](https://github.com/karpathy/autoresearch/blob/master/program.md).
 Our existing multi-family portfolio, requested round limits and deployment

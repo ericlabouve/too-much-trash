@@ -10,7 +10,7 @@
   <script src="round-controls.js?v=jaw-matching-graphic" defer></script>
   <script src="architecture.js?v=architecture-diagrams" defer></script>
   <script src="candidate-names.js?v=architectural-names" defer></script>
-  <script src="loss-curves.js?v=recorded-losses" defer></script>
+  <script src="loss-curves.js?v=selected-epoch-losses" defer></script>
   <script src="table-resize.js?v=columns" defer></script>
   <script src="trend.js?v=integrity-gate" defer></script>
   <script src="app.js?v=concise-candidate-context" defer></script>
@@ -58,7 +58,10 @@
             <input name="agent_minutes" type="number" min="1" max="120" value="20" required>
           </label>
           <label data-help="Maximum candidate agents working at once. Additional parent tasks run in later batches.">Parallel agents
-            <input name="agent_concurrency" type="number" min="1" max="5" value="3" required>
+            <input name="agent_concurrency" type="number" min="1" max="6" value="6" required>
+          </label>
+          <label data-help="Maximum concurrent fitting jobs, enforced by process-shared training slots. Research and coding can continue in other agents. Slot waiting stays inside each agent's allocation; final performance benchmarks remain serial.">Parallel fits
+            <input name="fit_concurrency" type="number" min="1" max="6" value="2" required>
           </label>
         </div>
         <details class="breeding-settings" open>

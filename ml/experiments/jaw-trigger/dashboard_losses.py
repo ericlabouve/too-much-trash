@@ -64,7 +64,8 @@ def load_training_histories(job, result):
             histories[name] = {**normalize_history(history), 'candidate': candidate,
                                'source': record['history']['path'], 'sha256': history_hash,
                                'model_sha256': checkpoint_hash,
-                               'selected_epoch': record.get('selected_epoch')}
+                               'selected_epoch': record.get('selected_epoch'),
+                               'possible_overfitting': record.get('possible_overfitting', False)}
         except (OSError, ValueError, KeyError, TypeError):
             continue
     for name, candidate in candidates.items():

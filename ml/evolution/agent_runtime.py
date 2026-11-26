@@ -76,7 +76,7 @@ class Supervisor:
         self.concurrency = self.settings['agent_concurrency']
         if (type(self.minutes) not in (int, float) or not isfinite(self.minutes)
                 or self.minutes <= 0 or type(self.concurrency) is not int
-                or not 1 <= self.concurrency <= 5):
+                or not 1 <= self.concurrency <= 6):
             raise ValueError('Invalid agent deadline or concurrency')
         self.clock, self.popen, self.killpg = clock, popen, killpg
         self.kill, self.snapshot = kill, snapshot

@@ -15,6 +15,16 @@ Before a run, establish the domain's fitness, dataset split, compute budget,
 pool policy, round count and stopping condition from the current request.
 Keep existing approved settings when the user requests continuation.
 Disclose fitting-set results and independent validation separately.
+Jaw defaults now allow six agents but at most two concurrent fits. New
+flock-v1 jobs enforce slots inside TrainingMonitor; construct it BEFORE
+optimization/heavy working-set allocation and hold it through finish/fail.
+Do not fit outside the monitor or duplicate the full frame corpus per agent.
+Fit-slot waiting excludes trial optimization time, but not the author's wall
+allocation. The memory monitor pauses new fits at critical pressure; active
+exports/fits may finish. Final deployment benchmarks remain strictly serial.
+For the next Round52 restart the user explicitly authorized trimming the two
+lowest-scoring parents before reproduction; use a provenance-recorded eight-
+member starting checkpoint rather than evolving all ten historical parents.
 
 Read `ml/evolution/README.md`'s validation-checkpoint workflow before learned
 experiments. Use its shared training monitor and domain completion audit:
