@@ -19,6 +19,7 @@ from dashboard_integrity import REVIEW_PROTOCOL, review_context, verify_integrit
 from ml.evolution.agent_briefs import EXPERIMENT_GUIDELINES
 from ml.evolution.training import PROTOCOL as TRAINING_PROTOCOL, policy_for
 from ml.evolution.agent_budgets import PROTOCOL as BUDGET_PROTOCOL, budget_policy, verify_agent_budgets
+from ml.evolution.review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL
 from dashboard_selection import PROTOCOL as SELECTION_PROTOCOL, selection_parameters, verify_selection
 
 HERE = Path(__file__).resolve().parent
@@ -171,6 +172,13 @@ No new task identity or budget reset may be used to evade a deadline. Do not clo
 tasks: collect their ready artifacts. close_agent is cancellation, not completion.
 The outer worker copies and hashes the supervisor's private lifecycle ledger and independently
 binds every agents.json task to it. Self-reported timestamps cannot replace this evidence.
+BEFORE starting a final reviewer, save its candidate-scoped review package as JSON with candidate,
+artifact_bundle (exact candidate, learned flag and files), and context including context_sha256.
+Pass its job-local path as review_bundle to start_agent. The supervisor checks unique file paths,
+all hashes, required roles and candidate scope BEFORE creating the reviewer task or charging time.
+One file must have one record: do not list an evaluator again as a dependency. Fix any preflight
+error and retry dispatch; never spend reviewer allocations on structurally invalid packages.
+The package and its artifact graph are pinned at dispatch and must still equal the final result.
 Do not activate native Goals in CLI children: external continuation is authoritative and bounded.
 '''
 
@@ -800,7 +808,8 @@ def verify_completion(job, final, config, manifests):
         if settings.get('agent_prompt') and settings['agent_prompt'] not in artifact(job, task.get('prompt_path', '')).read_text():
             raise ValueError('Each child prompt must include the dashboard research direction')
     if 'agent_budget_protocol' in settings:
-        result['agent_budget_audit'] = verify_agent_budgets(job, receipts, settings, challengers)
+        result['agent_budget_audit'] = verify_agent_budgets(job, receipts, settings, challengers,
+                                                         result.get('candidate_artifacts'))
     if settings['family'] == 'new_family':
         verify_architecture_reviews(job, receipts, settings,
                                     {entry['candidate']['name']: entry['candidate'] for entry in research},
@@ -1012,6 +1021,8 @@ def execute(config_path):
             raise ValueError('New jobs require all-pool-v1 reproduction of every selected incumbent')
         if settings.get('agent_budget_protocol') != BUDGET_PROTOCOL:
             raise ValueError('New jobs require supervised-v1 per-agent lifecycle control')
+        if settings.get('review_bundle_protocol') != REVIEW_BUNDLE_PROTOCOL:
+            raise ValueError('New jobs require frozen-bundle-v1 review-package preflight')
         selection_parameters(settings)
         status('running', .01, 'Preparing the pinned train and validation inputs', phase='prepare')
         ready = readiness()
@@ -1029,7 +1040,7 @@ def execute(config_path):
         # Freeze trusted source before agents run. Publication later checks these
         # copies, so future legitimate repository edits do not erase old history.
         protected = ['ml/evolution/training.py', 'ml/evolution/agent_briefs.py',
-                     'ml/evolution/agent_runtime.py', 'ml/evolution/agent_budgets.py',
+                     'ml/evolution/agent_runtime.py', 'ml/evolution/agent_budgets.py', 'ml/evolution/review_bundles.py',
                      'ml/evolution/portfolio.py', 'ml/evolution/__init__.py',
                      *[f'ml/experiments/jaw-trigger/{name}' for name in
                        ('round_one.py', 'joint_fitness.py', 'dashboard_agents.py',

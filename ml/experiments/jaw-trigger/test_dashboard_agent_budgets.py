@@ -27,6 +27,12 @@ class DashboardAgentBudgetTests(unittest.TestCase):
             with self.subTest(protocol=protocol), self.assertRaisesRegex(ValueError, 'supervised-v1'):
                 self.settings({'agent_budget_protocol': protocol})
 
+    def test_review_packages_are_checked_before_dispatch_and_cannot_opt_out(self):
+        self.assertEqual(self.settings()['review_bundle_protocol'], 'frozen-bundle-v1')
+        for protocol in (None, '', 'unchecked'):
+            with self.subTest(protocol=protocol), self.assertRaisesRegex(ValueError, 'frozen-bundle-v1'):
+                self.settings({'review_bundle_protocol': protocol})
+
     def test_coordinator_has_only_the_required_supervised_dispatch_mcp(self):
         with TemporaryDirectory() as directory:
             job = Path(directory).resolve()

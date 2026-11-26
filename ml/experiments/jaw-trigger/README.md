@@ -368,6 +368,16 @@ The verifier checks exact coverage, independence, hashes and existing probes,
 and publishes `candidate_reviewers` for candidate-scoped approval badges.
 Legacy jobs without `review_protocol` retain their original shared-review rules.
 
+New jobs require `review_bundle_protocol=frozen-bundle-v1`. Before dispatch,
+save a candidate-scoped review package containing `candidate`, `artifact_bundle`
+and frozen `context`; pass its path as `review_bundle` to the supervisor. The
+supervisor rejects duplicate artifact paths, stale hashes, missing roles or
+wrong candidate scope before spending a reviewer task. The package hash and
+graph are pinned for final comparison with the published candidate artifacts.
+Do not silently deduplicate a reviewed package after rejection or bypass a
+negative verdict. Fix structural errors before dispatch; changed reviewed
+artifacts require legitimate fresh review evidence.
+
 Reviewers inspect exact code, model and configuration hashes and save numeric
 evidence for timestamp-origin shifts, variable prefixes, continuous multiple-event
 and chunk-equivalence tests, long open/closed no-event streams, and prefix causality.

@@ -229,6 +229,17 @@ limits batching, not the number of assignments. Historical jobs without this
 protocol retain their saved shared-review interpretation. The domain README
 documents the exact frozen-artifact and streaming-probe receipts.
 
+Final reviewer starts also require `review_bundle_protocol=frozen-bundle-v1`.
+The coordinator passes `review_bundle` to `start_agent`: a candidate-scoped
+JSON envelope with `candidate`, `artifact_bundle={candidate, learned, files}`
+and `context.context_sha256`. `review_bundles.py` checks exact scope, every hash,
+unique resolved artifact paths and required roles before a reviewer task is
+created. One file has one record; do not repeat an evaluator as a dependency.
+Invalid packages consume no review allocation and can be corrected before
+dispatch. The supervisor pins the package and graph, and completion rejects
+later changes or disagreement with the published graph. This preflight does
+not replace independent source inspection or streaming probes.
+
 If training loss improves while validation worsens, investigate capacity,
 weight decay, dropout, label-preserving augmentation and simpler baselines.
 Increasing validation loss alone is not a rejection if task F1 improves.

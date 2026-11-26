@@ -3,6 +3,7 @@
 from math import isclose, isfinite
 from pathlib import Path
 import json
+from .review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL, preflight_bundle, artifact_graph
 
 PROTOCOL = 'supervised-v1'
 SHUTDOWN_GRACE_SECONDS = 2.0
@@ -31,7 +32,7 @@ def _artifact(job, name):
     return path
 
 
-def verify_agent_budgets(job, receipts, settings, challengers=()):
+def verify_agent_budgets(job, receipts, settings, challengers=(), candidate_artifacts=None):
     """Read the outer worker's copied ledger; never trust agent-written times.
 
     The worker copies this file from the MCP supervisor's private location and
@@ -44,6 +45,9 @@ def verify_agent_budgets(job, receipts, settings, challengers=()):
     if protocol != PROTOCOL:
         raise ValueError('Unknown supervised agent-budget protocol')
     policy = budget_policy(settings)
+    package_protocol = settings.get('review_bundle_protocol')
+    if 'review_bundle_protocol' in settings and package_protocol != REVIEW_BUNDLE_PROTOCOL:
+        raise ValueError('Unknown frozen review-bundle protocol')
     ledger = json.loads(_artifact(job, 'agent-runtime.json').read_text())
     if ledger.get('protocol') != PROTOCOL or Path(ledger.get('job', '')).resolve() != job.resolve():
         raise ValueError('Agent runtime ledger must identify this job and protocol')
@@ -51,6 +55,8 @@ def verify_agent_budgets(job, receipts, settings, challengers=()):
     if any(knobs.get(key) != settings.get(key) for key in
            ('agent_minutes', 'agent_concurrency', 'family')):
         raise ValueError('Agent runtime budget settings differ from the frozen job')
+    if package_protocol is not None and knobs.get('review_bundle_protocol') != package_protocol:
+        raise ValueError('Supervisor cannot disable frozen review-package preflight')
     runtime = ledger.get('tasks', [])
     tasks = receipts.get('tasks', [])
     if not runtime or len(runtime) != len(tasks):
@@ -81,6 +87,14 @@ def verify_agent_budgets(job, receipts, settings, challengers=()):
             raise ValueError('Supervised research task must own the evaluated fresh proposal')
         if kind == 'integrity_review' and record.get('candidate_name') != task.get('candidate_name'):
             raise ValueError('Supervised reviewer must own exactly the assigned candidate')
+        if kind == 'integrity_review' and package_protocol is not None:
+            pinned = record.get('review_bundle', {})
+            current = preflight_bundle(job, pinned.get('path'), record['candidate_name'])
+            if current != pinned:
+                raise ValueError('Frozen review package changed after reviewer dispatch')
+            expected = (candidate_artifacts or {}).get(record['candidate_name'], {})
+            if current['graph'] != artifact_graph(job, expected, record['candidate_name']):
+                raise ValueError('Published candidate graph differs from the reviewer-dispatched package')
         if _artifact(job, record.get('artifact')) != _artifact(job, task.get('artifact')):
             raise ValueError('Task artifact must be the supervisor-observed final artifact')
         if _artifact(job, record.get('prompt_path')) != _artifact(job, task.get('prompt_path')):

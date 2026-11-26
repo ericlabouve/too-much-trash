@@ -42,6 +42,13 @@ reviewer, or another candidate's reviewer/context. Give it the shared rubric,
 frozen evidence and exactly one candidate. All assigned reviews must approve;
 missing, rejected or stale evidence blocks publication. Historical shared-review
 jobs keep their saved protocol. See the domain README for receipt requirements.
+Before final reviewer dispatch, write one candidate-scoped JSON package with
+candidate, artifact_bundle (candidate/learned/files) and frozen context hash.
+Pass review_bundle to start_agent. New jobs require frozen-bundle-v1 preflight:
+unique artifact paths, current hashes, required roles and exact candidate scope.
+One file gets one record; do not repeat an evaluator as a dependency. Invalid
+packages consume no reviewer task slot. Correct and retry before dispatch;
+after dispatch the package and published artifact graph must remain identical.
 New dashboard jobs also require agent_budget_protocol=supervised-v1. Dispatch
 through the runner-owned evolution_agents MCP supervisor, never unsupervised
 spawn/shell delegation. Every started task has its own hard wall deadline;

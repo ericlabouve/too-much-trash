@@ -19,6 +19,7 @@ import sys
 from threading import Event, RLock, Thread
 from time import monotonic
 from uuid import uuid4
+from .review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL, preflight_bundle
 
 PROTOCOL = 'supervised-v1'
 KINDS = ('parent', 'research', 'review', 'integrity_review')
@@ -61,6 +62,9 @@ class Supervisor:
             raise ValueError('Unsupported agent supervisor protocol')
         self.config = deepcopy(config)
         self.settings = config['settings']
+        if ('review_bundle_protocol' in self.settings
+                and self.settings['review_bundle_protocol'] != REVIEW_BUNDLE_PROTOCOL):
+            raise ValueError('Unknown frozen review-bundle protocol')
         self.job = Path(config['job']).resolve(strict=True)
         self.repository = Path(config['repository']).resolve(strict=True)
         self.ledger = Path(config['ledger_path']).resolve()
@@ -89,10 +93,10 @@ class Supervisor:
         atomic_json(self.ledger, {'protocol': PROTOCOL, 'job': str(self.job),
                     'supervisor_pid': os.getpid(),
                     'settings': {key: self.settings.get(key) for key in
-                                 ('agent_minutes', 'agent_concurrency', 'family')},
+                                 ('agent_minutes', 'agent_concurrency', 'family', 'review_bundle_protocol')},
                     'tasks': [self._public(task) for task in self.tasks.values()]})
 
-    def start_agent(self, kind, prompt, parent=None, candidate_name=None):
+    def start_agent(self, kind, prompt, parent=None, candidate_name=None, review_bundle=None):
         with self.lock:
             if self.stopping.is_set():
                 raise ValueError('Agent supervisor has stopped; new work is forbidden')
@@ -109,12 +113,17 @@ class Supervisor:
                     raise ValueError('Only parent tasks accept a parent')
                 if len(same) >= expected.get(kind, 0):
                     raise ValueError('The configured agent count for this kind is exhausted')
+            frozen_review = None
             if kind == 'integrity_review':
                 if not isinstance(candidate_name, str) or not candidate_name.strip():
                     raise ValueError('Final reviewer needs its one assigned candidate')
                 count = sum(task['candidate_name'] == candidate_name for task in same)
                 if count >= self.settings['review_agents']:
                     raise ValueError('This candidate already has its configured reviewers')
+                if self.settings.get('review_bundle_protocol') == REVIEW_BUNDLE_PROTOCOL:
+                    frozen_review = preflight_bundle(self.job, review_bundle, candidate_name)
+            elif review_bundle is not None:
+                raise ValueError('Only final review tasks accept a frozen review bundle')
             identifier = str(uuid4())
             folder = self.root / identifier
             folder.mkdir()
@@ -130,6 +139,8 @@ class Supervisor:
                     '_folder': folder, '_prompt': prompt, '_process': None,
                     '_output_handles': [], '_queued_cycle': 1, '_phase_requested': None}
             task['owned_processes'] = []
+            if frozen_review is not None:
+                task['review_bundle'] = frozen_review
             self.tasks[identifier] = task
             self.tick()
             return self._public(task)
@@ -247,6 +258,10 @@ class Supervisor:
                        'and evidence are complete; do not develop or change the candidate.\n')
         if task['kind'] == 'integrity_review':
             common += f'Your ONLY assigned candidate is {task["candidate_name"]}. This is a fresh context.\n'
+            if task.get('review_bundle'):
+                bundle = task['review_bundle']
+                common += (f'Authoritative frozen review package: {bundle["path"]}; SHA256 '
+                           f'{bundle["sha256"]}. Verify this package and review its assigned graph only.\n')
         return common + '\n' + prompt
 
     def _events(self, task):
@@ -542,7 +557,8 @@ def tools():
     return [
         spec('start_agent', 'Start one independent bounded task; timing starts when its process runs.',
              {'kind': {'type': 'string', 'enum': list(KINDS)}, 'prompt': text,
-              'parent': text, 'candidate_name': text}, ('kind', 'prompt')),
+              'parent': text, 'candidate_name': text,
+              'review_bundle': {'type': 'string', 'description': 'Required frozen candidate package for final reviews; validated before dispatch.'}}, ('kind', 'prompt')),
         spec('get_agents', 'Get actual supervised task IDs, states, artifacts and timing evidence.', {'task_ids': ids}),
         spec('wait_agents', 'Wait at most30 seconds for a selected task to finish; watchdog remains active.',
              {'task_ids': ids, 'timeout_seconds': {'type': 'number', 'minimum': 0, 'maximum': 30}}),

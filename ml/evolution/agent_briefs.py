@@ -37,6 +37,9 @@ authors, early architecture review and other candidate reviews. Expect inspectio
 of the actual deployed code, checkpoint and native streaming probes; do not exploit
 episode offsets, labels, clip identity, future inputs or hidden labeled resets.
 Answer findings with evidence; changed artifacts require a fresh review of their hashes.
+Package each frozen file once, with its correct role. The coordinator must pass
+candidate-scoped bundles through the supervisor's preflight before reviewer dispatch;
+duplicate evaluator/dependency records and stale hashes are structural failures.
 Candidate authors should use their remaining allocated search time: inspect validation
 failures, compare previous attempts, and try another credible hypothesis while retaining
 the best validated checkpoint. A first valid proposal or patience-stopped fit does not
