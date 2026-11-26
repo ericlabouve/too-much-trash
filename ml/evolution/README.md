@@ -113,7 +113,11 @@ growing the round population with every internal trial. Concrete operational
 blockers stop honestly; reviewers can finish once their evidence is complete.
 
 The last 10% of an author's allocation, capped at 120 seconds, is reserved for
-finalization (at least 5 seconds for ordinary dashboard settings). At that cutoff,
+finalization. New dashboard jobs freeze `agent_export_min_seconds=60` to leave
+room for CLI resume startup on short allocations; the export window cannot
+exceed half the total allocation. Thus a two-minute smoke has 60 seconds of
+search and 60 seconds of export, within the same two-minute hard deadline.
+Legacy jobs without this field retain the five-second floor. At that cutoff,
 active search is interrupted and the same thread gets an export-only turn: no new
 fitting or parameter search, restore/package the best checkpoint and evidence.
 Shared deployment export and serial final benchmarking remain separate phases

@@ -93,7 +93,7 @@ class Supervisor:
         atomic_json(self.ledger, {'protocol': PROTOCOL, 'job': str(self.job),
                     'supervisor_pid': os.getpid(),
                     'settings': {key: self.settings.get(key) for key in
-                                 ('agent_minutes', 'agent_concurrency', 'family', 'review_bundle_protocol')},
+                                 ('agent_minutes', 'agent_concurrency', 'family', 'review_bundle_protocol', 'agent_export_min_seconds')},
                     'tasks': [self._public(task) for task in self.tasks.values()]})
 
     def start_agent(self, kind, prompt, parent=None, candidate_name=None, review_bundle=None):

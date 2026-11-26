@@ -33,6 +33,12 @@ class DashboardAgentBudgetTests(unittest.TestCase):
             with self.subTest(protocol=protocol), self.assertRaisesRegex(ValueError, 'frozen-bundle-v1'):
                 self.settings({'review_bundle_protocol': protocol})
 
+    def test_short_budget_export_floor_cannot_be_disabled(self):
+        self.assertEqual(self.settings()['agent_export_min_seconds'], 60)
+        for value in (None, 5, 0, 120):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'export minimum'):
+                self.settings({'agent_export_min_seconds': value})
+
     def test_coordinator_has_only_the_required_supervised_dispatch_mcp(self):
         with TemporaryDirectory() as directory:
             job = Path(directory).resolve()

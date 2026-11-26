@@ -55,6 +55,10 @@ spawn/shell delegation. Every started task has its own hard wall deadline;
 queued time is excluded. Early author finishes resume the same context and
 original deadline to improve validation fitness and retain the best checkpoint.
 Reserve the last 10% (at most 120 seconds) for finalization only, with no new fit.
+New dashboard jobs freeze agent_export_min_seconds=60 to allow CLI resume startup
+on short budgets, capped at half the total allocation. A two-minute smoke has
+60 seconds search and 60 seconds export; its hard deadline remains two minutes.
+Legacy jobs without the setting retain their earlier five-second minimum.
 Export one best child/fresh proposal, preserving failed trials. A concrete
 documented blocker can stop work early; reviewers may finish after their checks.
 Only bounded New Family architecture cycles 2/3 renew the existing identities'

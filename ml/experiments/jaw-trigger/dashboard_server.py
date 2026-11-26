@@ -39,6 +39,7 @@ DEFAULTS = BOUNDED_DEFAULTS | {
     "selection_protocol": SELECTION_PROTOCOL,
     "reproduction_protocol": REPRODUCTION_PROTOCOL,
     "agent_budget_protocol": BUDGET_PROTOCOL,
+    "agent_export_min_seconds": 60,
     "review_bundle_protocol": REVIEW_BUNDLE_PROTOCOL,
     **SELECTION_DEFAULTS,
     "target_fps": 60, "full_speed_frame_fraction": 0.25, "zero_speed_frame_fraction": 1.0,
@@ -112,6 +113,8 @@ def validate_settings(payload, families=FAMILIES):
         raise ValueError('New rounds require fresh per-candidate-v1 final reviewers')
     if settings['agent_budget_protocol'] != BUDGET_PROTOCOL:
         raise ValueError('New rounds require supervised-v1 per-agent deadlines and continuation')
+    if settings['agent_export_min_seconds'] != 60:
+        raise ValueError('New rounds require the 60-second short-budget export minimum')
     if settings['review_bundle_protocol'] != REVIEW_BUNDLE_PROTOCOL:
         raise ValueError('New rounds require frozen-bundle-v1 preflight before reviewer dispatch')
     selection_parameters(settings)

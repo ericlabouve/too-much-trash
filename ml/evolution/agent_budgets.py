@@ -14,8 +14,11 @@ def budget_policy(settings):
     if type(minutes) not in (int, float) or not isfinite(minutes) or minutes <= 0:
         raise ValueError('Agent minutes must be finite and positive')
     seconds = minutes * 60
+    export_minimum = settings.get('agent_export_min_seconds', 5.)
+    if type(export_minimum) not in (int, float) or not isfinite(export_minimum) or not 5 <= export_minimum <= 120:
+        raise ValueError('Agent export minimum must be between 5 and 120 seconds')
     return {'protocol': PROTOCOL, 'seconds': seconds,
-            'export_seconds': min(seconds / 2, 120., max(5., seconds * .1)),
+            'export_seconds': min(seconds / 2, 120., max(export_minimum, seconds * .1)),
             'shutdown_grace_seconds': SHUTDOWN_GRACE_SECONDS}
 
 
@@ -57,6 +60,8 @@ def verify_agent_budgets(job, receipts, settings, challengers=(), candidate_arti
         raise ValueError('Agent runtime budget settings differ from the frozen job')
     if package_protocol is not None and knobs.get('review_bundle_protocol') != package_protocol:
         raise ValueError('Supervisor cannot disable frozen review-package preflight')
+    if 'agent_export_min_seconds' in settings and knobs.get('agent_export_min_seconds') != settings['agent_export_min_seconds']:
+        raise ValueError('Supervisor export minimum differs from the frozen job')
     runtime = ledger.get('tasks', [])
     tasks = receipts.get('tasks', [])
     if not runtime or len(runtime) != len(tasks):

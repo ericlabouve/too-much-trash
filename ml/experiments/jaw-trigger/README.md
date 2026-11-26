@@ -249,7 +249,11 @@ deadlines, same-thread continuation and cancellation. Minutes per agent starts
 at actual launch; early candidate-author replies resume automatically with the
 original remaining budget. Authors inspect failures, try further hypotheses
 and retain the best validated checkpoint. Their final 10% (up to 120 seconds)
-is reserved for finalization only; shared deployment export and isolated final
+is reserved for finalization only. New jobs freeze `agent_export_min_seconds=60`
+as a CLI-startup allowance, capped at half the total agent allocation. At two
+minutes this gives 60 seconds search and 60 seconds export; the hard deadline
+does not grow. Older jobs without the field keep their recorded policy.
+Shared deployment export and isolated final
 benchmarks still happen afterward. At the hard deadline, the supervisor stops
 the process group, allowing only a short cleanup grace. Ordinary feedback
 cannot reset clocks; only bounded New Family architecture cycles 2/3 renew

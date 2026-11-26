@@ -1023,6 +1023,8 @@ def execute(config_path):
             raise ValueError('New jobs require supervised-v1 per-agent lifecycle control')
         if settings.get('review_bundle_protocol') != REVIEW_BUNDLE_PROTOCOL:
             raise ValueError('New jobs require frozen-bundle-v1 review-package preflight')
+        if settings.get('agent_export_min_seconds') != 60:
+            raise ValueError('New jobs require the 60-second short-budget export minimum')
         selection_parameters(settings)
         status('running', .01, 'Preparing the pinned train and validation inputs', phase='prepare')
         ready = readiness()

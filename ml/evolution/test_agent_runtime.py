@@ -122,6 +122,22 @@ class SupervisorTests(unittest.TestCase):
         self.assertEqual(current['cycles'][0]['ended_monotonic'], 61)
         self.assertEqual({pid for pid, _ in self.factory.signals}, {800000})
 
+    def test_two_minute_export_floor_uses_same_identity_and_original_deadline(self):
+        self.runtime.shutdown()
+        self.config['settings'].update(agent_minutes=2, agent_export_min_seconds=60)
+        self.runtime = Supervisor(self.config, clock=self.clock, popen=self.factory,
+                                  killpg=self.factory.killpg, snapshot=lambda: {})
+        self.addCleanup(self.runtime.shutdown)
+        task = self.start()
+        self.assertEqual(task['cycles'][0]['export_monotonic'], 60)
+        self.assertEqual(task['cycles'][0]['deadline_monotonic'], 120)
+        self.export_finish(task)
+        current = self.runtime.get_agents()['agents'][0]
+        self.assertEqual(current['status'], 'ready')
+        self.assertEqual(current['agent_id'], 'thread-1')
+        self.assertEqual(current['cycles'][0]['deadline_monotonic'], 120)
+        self.assertLess(current['cycles'][0]['ended_monotonic'], 120)
+
     def test_queued_agent_clock_starts_when_slot_becomes_available(self):
         self.start('review')
         second = self.start('research')

@@ -69,6 +69,25 @@ class AgentBudgetTests(unittest.TestCase):
             with self.subTest(protocol=protocol), self.assertRaisesRegex(ValueError, 'Unknown'):
                 verify_agent_budgets(Path('/unused'), {}, {'agent_budget_protocol': protocol})
 
+    def test_short_allocations_reserve_startup_room_inside_original_deadline(self):
+        for minutes, expected in ((2, 60.), (1, 30.), (20, 120.)):
+            policy = budget_policy({'agent_minutes': minutes, 'agent_export_min_seconds': 60})
+            self.assertEqual(policy['export_seconds'], expected)
+            self.assertEqual(policy['seconds'], minutes * 60)
+        for value in (True, 0, 121, float('nan'), '60'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                budget_policy({'agent_minutes': 2, 'agent_export_min_seconds': value})
+
+    def test_export_minimum_is_bound_to_the_supervised_ledger(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory).resolve()
+            settings, ledger, receipts, challengers = self.fixture(job)
+            settings['agent_export_min_seconds'] = 60
+            with self.assertRaisesRegex(ValueError, 'export minimum differs'):
+                self.audit(job, settings, ledger, receipts, challengers)
+            ledger['settings']['agent_export_min_seconds'] = 60
+            self.assertEqual(self.audit(job, settings, ledger, receipts, challengers)['export_seconds'], 120.)
+
     def test_ready_authors_and_independent_reviewers_are_bound_to_actual_artifacts(self):
         with TemporaryDirectory() as directory:
             job = Path(directory).resolve()
