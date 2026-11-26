@@ -32,6 +32,11 @@
             <textarea name="agent_prompt" id="agent-prompt" rows="1" maxlength="8000" placeholder="Optional direction for this round"></textarea>
           </label>
         </div>
+        <div id="round-progress-wrap" class="round-progress-wrap" hidden>
+          <progress id="round-progress" max="1" value="0" aria-label="Round progress"></progress>
+          <output id="round-progress-label">0%</output>
+        </div>
+        <p id="round-message" class="round-message" role="status" aria-live="polite"></p>
         <details class="parameter-group round-configuration top-section" open>
           <summary>Population &amp; agents</summary>
         <div class="population-layout">
@@ -112,11 +117,6 @@
             <output id="split-summary" aria-live="polite"></output>
           </div>
         </details>
-        <div id="round-progress-wrap" class="round-progress-wrap" hidden>
-          <progress id="round-progress" max="1" value="0" aria-label="Round progress"></progress>
-          <output id="round-progress-label">0%</output>
-        </div>
-        <p id="round-message" class="round-message" role="status" aria-live="polite"></p>
       </form>
       <details class="parameter-group fitness-section top-section" open>
       <summary>Fitness</summary>

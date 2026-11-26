@@ -260,6 +260,7 @@ def verify_integrity_reviews(job, result, receipts, settings, context=None, lear
                 raise ValueError('Candidate review task, receipt and fresh report must identify the same assigned candidate')
         if (report.get('reviewer_id') != receipt['reviewer_id'] or report.get('context_sha256') != context['context_sha256']
                 or len(reports) != len(assigned)
+                or any(not isinstance(item, dict) or not isinstance(item.get('candidate'), dict) for item in reports)
                 or {item.get('candidate', {}).get('name') for item in reports} != assigned):
             raise ValueError('Each candidate-scoped reviewer must review only its assigned challenger' if per_candidate
                              else 'Each final reviewer must review every challenger, including pruned proposals')

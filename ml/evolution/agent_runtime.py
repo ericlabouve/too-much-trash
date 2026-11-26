@@ -8,6 +8,7 @@ availability is a separate capability, not a substitute for these controls.
 import argparse
 from copy import deepcopy
 from datetime import datetime, timezone
+from hashlib import sha256
 import json
 from math import isfinite
 import os
@@ -19,7 +20,8 @@ import sys
 from threading import Event, RLock, Thread
 from time import monotonic
 from uuid import uuid4
-from .review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL, preflight_bundle
+from .review_bundles import (PROTOCOL as REVIEW_BUNDLE_PROTOCOL, preflight_bundle,
+                             preflight_report, ReviewReportError, review_decision_digest)
 from .agent_budgets import budget_policy
 
 PROTOCOL = 'supervised-v1'
@@ -168,7 +170,7 @@ class Supervisor:
                                   'started_utc': datetime.now(timezone.utc).isoformat()})
             task['_queued_cycle'] = None
         cycle = task['cycles'][-1]
-        if now >= cycle['deadline_monotonic'] and not (phase == 'export' and self._finish_export(task)):
+        if now >= cycle['deadline_monotonic'] and not (phase == 'export' and self._finish_export(task, phase)):
             self._terminal(task, 'timed_out', 'Agent allocation exhausted before another turn')
             return
         number = len(task['turns']) + 1
@@ -245,11 +247,17 @@ class Supervisor:
             'Use blocked only for a concrete operational blocker and explain attempted remedies. '
             'Do not invent scores or force pointless trials just to consume time.\n')
         if phase == 'export':
-            if self._finish_export(task):
+            if self._finish_export(task, phase):
                 common += ('The scheduled deadline above does NOT cut off this export turn. '
                            'Finish packaging the completed work and return your final receipt promptly; '
                            'this is no extension of research or fitting.\n')
-            common += ('EXPORT ONLY: Stop new research, training and parameter search. Restore '
+            if task['kind'] == 'integrity_review':
+                common += ('EXPORT ONLY: Your source review and probes are complete. Correct only '
+                           'report packaging using the exact frozen candidate object/context/hashes. '
+                           'Preserve the original report, verdict, findings and probe evidence. Do not '
+                           'restart review, change verdict, alter candidates or run new experiments.\n')
+            else:
+                common += ('EXPORT ONLY: Stop new research, training and parameter search. Restore '
                        'your best validated checkpoint, verify/export its implementation, weights, '
                        'configuration and evidence, and provide the final artifact. Preserve failed '
                        'trials. Mark any interrupted unfinished fit failed in its journal; never '
@@ -268,6 +276,10 @@ class Supervisor:
                 bundle = task['review_bundle']
                 common += (f'Authoritative frozen review package: {bundle["path"]}; SHA256 '
                            f'{bundle["sha256"]}. Verify this package and review its assigned graph only.\n')
+                common += ('Before returning ready, call ml.evolution.review_bundles.preflight_report '
+                           'with the job, your report path, the pinned package from preflight_bundle, '
+                           'and your actual thread ID. candidates[0].candidate must be the FULL '
+                           'candidate object from the frozen package, never just its name.\n')
         return common + '\n' + prompt
 
     def _events(self, task):
@@ -319,6 +331,11 @@ class Supervisor:
             raise ValueError('Reviewer reported a different assigned candidate')
         if not task['thread_id']:
             raise ValueError('Cannot continue a child without its actual thread identity')
+        if report['status'] == 'ready' and task['kind'] == 'integrity_review' and task.get('review_bundle'):
+            packaged = preflight_report(self.job, artifact, task['review_bundle'], task['thread_id'])
+            correction = task.get('report_export_correction')
+            if correction and review_decision_digest(packaged) != correction['decision_sha256']:
+                raise ReviewReportError('Report export cannot change verdict, findings, inspected paths or probes')
         task.update(artifact=artifact, summary=report['summary'], candidate_name=report['candidate_name'])
         return report
 
@@ -393,8 +410,9 @@ class Supervisor:
         if task['cycles']:
             task['cycles'][-1]['ended_monotonic'] = self.clock()
 
-    def _finish_export(self, task):
-        return self.policy['finish_export'] and task['kind'] in ('parent', 'research')
+    def _finish_export(self, task, phase=None):
+        return self.policy['finish_export'] and (task['kind'] in ('parent', 'research')
+            or (task['kind'] == 'integrity_review' and (phase or task['phase']) == 'export'))
 
     def tick(self):
         with self.lock:
@@ -453,6 +471,23 @@ class Supervisor:
                     continue
                 try:
                     report = self._read_final(task)
+                except ReviewReportError as error:
+                    if self.policy['finish_export'] and task['phase'] != 'export':
+                        structured = json.loads(Path(task['turns'][-1]['final_path']).read_text())
+                        original = self._artifact(structured['artifact'])
+                        saved = task['_folder'] / 'review-report-before-export.json'
+                        shutil.copyfile(original, saved)
+                        task['report_export_correction'] = {'error': str(error), 'original': str(saved),
+                            'original_sha256': sha256(saved.read_bytes()).hexdigest(),
+                            'decision_sha256': review_decision_digest(json.loads(saved.read_text()))}
+                        self._launch(task, 'export',
+                            f'Correct only this completed review report packaging: {error}. '
+                            f'Report path: {original}. Original preserved at {saved}. '
+                            'Keep the same verdict/findings/probes and frozen graph. '
+                            'Return the corrected report as your final artifact.')
+                    else:
+                        self._terminal(task, 'failed', f'Invalid finalized review report: {error}')
+                    continue
                 except Exception as error:
                     self._terminal(task, 'failed', f'Invalid child result: {error}')
                     continue

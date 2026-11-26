@@ -9,7 +9,7 @@ import unittest
 
 from .agent_runtime import Supervisor
 from .agent_budgets import verify_agent_budgets
-from .review_bundles import PROTOCOL, preflight_bundle
+from .review_bundles import PROTOCOL, preflight_bundle, preflight_report, ReviewReportError
 from .test_agent_runtime import Clock, ProcessFactory
 from . import test_agent_budgets as budget_fixtures
 
@@ -34,13 +34,15 @@ class ReviewBundleTests(unittest.TestCase):
     def save(self):
         self.package.write_text(json.dumps(self.envelope))
 
-    def supervisor(self):
+    def supervisor(self, finish=False):
         factory = ProcessFactory()
         config = {'protocol': 'supervised-v1', 'job': str(self.job), 'repository': str(self.root),
                   'ledger_path': str(self.root / 'ledger.json'), 'binary': 'codex',
                   'settings': {'agent_minutes': 1, 'agent_concurrency': 1, 'family': 'all',
                                'review_agents': 1, 'review_bundle_protocol': PROTOCOL},
                   'expected': {'parent': [], 'research': 0, 'review': 0, 'integrity_review': 1}}
+        if finish:
+            config['settings']['agent_export_completion'] = 'finish-v1'
         runtime = Supervisor(config, clock=Clock(), popen=factory, killpg=factory.killpg,
                              snapshot=lambda: {})
         self.addCleanup(runtime.shutdown)
@@ -65,6 +67,67 @@ class ReviewBundleTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             runtime.start_agent('integrity_review', 'Review child', candidate_name='child')
         self.assertEqual(factory.processes, [])
+
+    def report(self, candidate=None, verdict='approved'):
+        return {'reviewer_id': 'thread-1', 'candidate_name': 'child', 'fresh_context': True,
+                'context_sha256': 'a' * 64, 'candidates': [{
+                    'candidate': self.bundle['candidate'] if candidate is None else candidate,
+                    'verdict': verdict, 'artifact_hashes': {r['path']: r['sha256'] for r in self.bundle['files']}}]}
+
+    def test_report_requires_exact_candidate_object_and_preserves_rejected_verdict(self):
+        path = self.job / 'report.json'
+        pinned = preflight_bundle(self.job, str(self.package), 'child')
+        path.write_text(json.dumps(self.report(candidate='child')))
+        with self.assertRaisesRegex(ReviewReportError, 'FULL exact candidate object'):
+            preflight_report(self.job, path.name, pinned, 'thread-1')
+        path.write_text(json.dumps(self.report(verdict='rejected')))
+        self.assertEqual(preflight_report(self.job, path.name, pinned, 'thread-1')['candidates'][0]['verdict'], 'rejected')
+
+    def test_malformed_review_export_resumes_same_context_and_can_finish_past_timer(self):
+        runtime, factory = self.supervisor(finish=True)
+        path = self.job / 'report.json'
+        path.write_text(json.dumps(self.report(candidate='child')))
+        task = runtime.start_agent('integrity_review', 'Review child', candidate_name='child', review_bundle=str(self.package))
+        factory.processes[-1].finish(path, candidate='child')
+        runtime.clock.value = 10
+        runtime.tick()
+        current = runtime.get_agents()['agents'][0]
+        self.assertEqual((current['status'], current['phase']), ('running', 'export'))
+        self.assertTrue(Path(current['report_export_correction']['original']).exists())
+        runtime.clock.value = 80
+        runtime.tick()
+        self.assertEqual(runtime.get_agents()['agents'][0]['status'], 'running')
+        path.write_text(json.dumps(self.report()))
+        factory.processes[-1].finish(path, candidate='child')
+        runtime.tick()
+        current = runtime.get_agents()['agents'][0]
+        self.assertEqual(current['status'], 'ready')
+        self.assertEqual(current['agent_id'], 'thread-1')
+        self.assertEqual(current['cycles'][0]['deadline_monotonic'], 60)
+        self.assertEqual(len(current['turns']), 2)
+
+    def test_unfinished_review_analysis_still_times_out(self):
+        runtime, factory = self.supervisor(finish=True)
+        runtime.start_agent('integrity_review', 'Review child', candidate_name='child', review_bundle=str(self.package))
+        runtime.clock.value = 60
+        runtime.tick()
+        runtime.clock.value = 61
+        runtime.tick()
+        self.assertEqual(runtime.get_agents()['agents'][0]['status'], 'timed_out')
+
+    def test_report_correction_cannot_flip_rejection_into_approval(self):
+        runtime, factory = self.supervisor(finish=True)
+        path = self.job / 'report.json'
+        path.write_text(json.dumps(self.report(candidate='child', verdict='rejected')))
+        runtime.start_agent('integrity_review', 'Review child', candidate_name='child', review_bundle=str(self.package))
+        factory.processes[-1].finish(path, candidate='child')
+        runtime.tick()
+        path.write_text(json.dumps(self.report(verdict='approved')))
+        factory.processes[-1].finish(path, candidate='child')
+        runtime.tick()
+        task = runtime.get_agents()['agents'][0]
+        self.assertEqual(task['status'], 'failed')
+        self.assertIn('cannot change verdict', task['summary'])
 
     def test_scope_hash_roles_and_context_are_checked(self):
         original = deepcopy(self.envelope)

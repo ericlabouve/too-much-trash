@@ -249,6 +249,15 @@ dispatch. The supervisor pins the package and graph, and completion rejects
 later changes or disagreement with the published graph. This preflight does
 not replace independent source inspection or streaming probes.
 
+Before marking a final reviewer ready, the supervisor calls `preflight_report`
+to require the full exact candidate object, actual reviewer identity, frozen
+context and artifact hashes. A malformed completed report gets one same-context
+export-only correction under finish-v1, which may finish past the timer. Original
+report bytes are preserved; verdict, findings, inspected paths and probe evidence
+are hash-bound and cannot change during correction. Review analysis still has
+its hard deadline. The outer timeout includes report-export pauses too. This
+structural check never approves a rejection or replaces the final integrity audit.
+
 If training loss improves while validation worsens, investigate capacity,
 weight decay, dropout, label-preserving augmentation and simpler baselines.
 Increasing validation loss alone is not a rejection if task F1 improves.

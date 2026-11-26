@@ -117,7 +117,7 @@ def completed_export_wall_seconds(ledger_path, now):
         return 0.
     spans = []
     for task in ledger.get('tasks', []):
-        if task.get('kind') not in ('parent', 'research'):
+        if task.get('kind') not in ('parent', 'research', 'integrity_review'):
             continue
         for turn in task.get('turns', []):
             start, end = turn.get('started_monotonic'), turn.get('ended_monotonic', now)

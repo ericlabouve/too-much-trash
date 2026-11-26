@@ -2,8 +2,9 @@
 
 from math import isclose, isfinite
 from pathlib import Path
+from hashlib import sha256
 import json
-from .review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL, preflight_bundle, artifact_graph
+from .review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL, preflight_bundle, artifact_graph, review_decision_digest
 
 PROTOCOL = 'supervised-v1'
 SHUTDOWN_GRACE_SECONDS = 2.0
@@ -108,6 +109,14 @@ def verify_agent_budgets(job, receipts, settings, challengers=(), candidate_arti
                 raise ValueError('Published candidate graph differs from the reviewer-dispatched package')
         if _artifact(job, record.get('artifact')) != _artifact(job, task.get('artifact')):
             raise ValueError('Task artifact must be the supervisor-observed final artifact')
+        if record.get('report_export_correction'):
+            correction = record['report_export_correction']
+            original = _artifact(job, correction['original'])
+            final_report = json.loads(_artifact(job, record['artifact']).read_text())
+            if (sha256(original.read_bytes()).hexdigest() != correction['original_sha256']
+                    or review_decision_digest(json.loads(original.read_text())) != correction['decision_sha256']
+                    or review_decision_digest(final_report) != correction['decision_sha256']):
+                raise ValueError('Report export correction changed the independent review decision or evidence')
         if _artifact(job, record.get('prompt_path')) != _artifact(job, task.get('prompt_path')):
             raise ValueError('Task prompt must be the supervisor-dispatched initial prompt')
         cycles = record.get('cycles', [])
@@ -115,7 +124,8 @@ def verify_agent_budgets(job, receipts, settings, challengers=(), candidate_arti
         if not 1 <= len(cycles) <= allowed:
             raise ValueError('Agent budget may only renew for bounded New Family architecture cycles')
         previous_end = -1.
-        author_finishing = policy['finish_export'] and kind in ('parent', 'research')
+        author_finishing = policy['finish_export'] and (kind in ('parent', 'research')
+            or (kind == 'integrity_review' and record.get('turns', [{}])[-1].get('phase') == 'export'))
         for index, cycle in enumerate(cycles, 1):
             start, deadline, end = (cycle.get(key) for key in
                                     ('started_monotonic', 'deadline_monotonic', 'ended_monotonic'))
@@ -142,6 +152,11 @@ def verify_agent_budgets(job, receipts, settings, challengers=(), candidate_arti
             previous_turn_end = end
         if kind in ('parent', 'research') and turns[-1].get('phase') != 'export':
             raise ValueError('Candidate agents must finalize in an export-only turn')
+        if kind == 'integrity_review' and author_finishing:
+            for turn in turns:
+                if (turn.get('phase') != 'export'
+                        and turn['ended_monotonic'] > cycles[turn.get('cycle', 1) - 1]['deadline_monotonic'] + SHUTDOWN_GRACE_SECONDS):
+                    raise ValueError('Reviewer analysis cannot continue past its deadline; only report export may finish')
         if kind in ('parent', 'research'):
             for turn in turns:
                 cycle = next(cycle for cycle in cycles if cycle['started_monotonic'] <= turn['started_monotonic']

@@ -268,6 +268,11 @@ subagent dispatch. The outer worker copies its private supervisor ledger into
 `agent-runtime.json`, pins its hash and independently verifies every task's
 identity, assignments, prompt, artifact, deadline and export window before
 publication. A failed, timed-out or unfinished child blocks successful publication.
+Final report packaging is validated before a reviewer is marked finished. Its
+`candidates[0].candidate` must be the exact frozen candidate object, not a name.
+One same-context export-only correction may finish past the timer, preserving
+the original report and hash-bound verdict/findings/probe evidence. Analysis
+does not restart, and a rejection cannot become approval through format repair.
 Legacy jobs remain readable without retroactive deadline certification. See
 `ml/evolution/README.md` for the shared lifecycle contract and Goal diagnostics.
 On installed Codex 0.160.0, native Goals continued automatically in persistent
