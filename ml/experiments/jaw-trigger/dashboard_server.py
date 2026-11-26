@@ -31,7 +31,7 @@ from ml.evolution.review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL
 
 DEFAULTS = BOUNDED_DEFAULTS | {
     "mode": "agent_guided", "target_basis": "validation",
-    "pool_size": 8, "research_slots": 2, "agent_minutes": 20, "agent_concurrency": 3,
+    "pool_size": 8, "research_slots": 2, "agent_minutes": 2, "agent_concurrency": 3,
     "agent_prompt": "", "review_agents": 1, "review_protocol": REVIEW_PROTOCOL,
     "evaluation_protocol": "clip_replay-v1",
     "benchmark_protocol": "deployment-v1",
