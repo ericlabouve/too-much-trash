@@ -1,17 +1,18 @@
-const trend = document.querySelector("#leader-trend");
-const plot = document.querySelector("#trend-plot");
-const scrubber = document.querySelector("#trend-round");
-const trendScores = document.querySelector("#trend-scores");
+const trend = document.querySelector('#leader-trend');
+const plot = document.querySelector('#trend-plot');
+const scrubber = document.querySelector('#trend-round');
+const trendScores = document.querySelector('#trend-scores');
+const contextSelector = document.querySelector('#trend-context');
 const series = [
-  { key: "fitness", label: "Fitness" },
-  { key: "jaw", label: "Development jaw F1" },
+  { key: 'fitness', label: 'Fitness' },
+  { key: 'jaw', label: 'Validation jaw F1' },
 ];
-const trendStorageKey = "jaw-dashboard:leader-trend";
 let leaderRounds = [];
-let lastTrend;
+let leaderContexts = [];
+let lastContexts;
 
 function plotElement(tag, attributes, label) {
-  const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
   for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);
   if (label !== undefined) element.textContent = label;
   return element;
@@ -24,67 +25,61 @@ function drawLeaderTrend() {
   const left = 32;
   const right = width - 18;
   const bottom = height - 26;
-  const first = leaderRounds[0].round;
-  const last = leaderRounds.at(-1).round;
-  const x = (round) => first === last ? (left + right) / 2 : left + (right - left) * (round - first) / (last - first);
-  const y = (score) => bottom - score * (bottom - 12);
-  const selected = leaderRounds[Number(scrubber.value)];
-  plot.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  const grid = [0, .25, .5, .75, 1].flatMap((score) => [
-    plotElement("line", { x1: left, x2: right, y1: y(score), y2: y(score), class: "trend-grid" }),
-    plotElement("text", { x: left - 6, y: y(score) + 4, "text-anchor": "end" }, String(score)),
+  const x = index => leaderRounds.length === 1 ? (left + right) / 2
+    : left + (right - left) * index / (leaderRounds.length - 1);
+  const y = score => bottom - score * (bottom - 12);
+  const selectedIndex = Math.min(Number(scrubber.value), leaderRounds.length - 1);
+  const selected = leaderRounds[selectedIndex];
+  plot.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  const grid = [0, .25, .5, .75, 1].flatMap(score => [
+    plotElement('line', { x1: left, x2: right, y1: y(score), y2: y(score), class: 'trend-grid' }),
+    plotElement('text', { x: left - 6, y: y(score) + 4, 'text-anchor': 'end' }, String(score)),
   ]);
-  const step = Math.max(1, Math.ceil((last - first + 1) / Math.floor(width / 55)));
-  const ticks = leaderRounds.filter(({ round }) => round === first || round === last ||
-    ((round - first) % step === 0 && last - round >= step));
+  const stride = Math.max(1, Math.ceil(leaderRounds.length / Math.max(1, Math.floor(width / 55))));
+  const ticks = leaderRounds.flatMap((entry, index) => index % stride === 0 || index === leaderRounds.length - 1
+    ? [plotElement('text', { x: x(index), y: height - 6, 'text-anchor': 'middle' }, `R${entry.round}`)] : []);
   const traces = series.flatMap(({ key }) => [
-    plotElement("polyline", {
-      points: leaderRounds.map((entry) => `${x(entry.round)},${y(entry[key])}`).join(" "),
+    plotElement('polyline', {
+      points: leaderRounds.map((entry, index) => `${x(index)},${y(entry[key])}`).join(' '),
       class: `trend-${key}`,
     }),
-    plotElement("circle", { cx: x(selected.round), cy: y(selected[key]), r: 4, class: `trend-${key}` }),
+    plotElement('circle', { cx: x(selectedIndex), cy: y(selected[key]), r: 4, class: `trend-${key}` }),
   ]);
-  plot.replaceChildren(...grid,
-    ...ticks.map(({ round }) => plotElement("text", { x: x(round), y: height - 6, "text-anchor": "middle" }, `R${round}`)),
-    plotElement("line", { x1: x(selected.round), x2: x(selected.round), y1: y(1), y2: y(0), class: "trend-cursor" }),
+  plot.replaceChildren(...grid, ...ticks,
+    plotElement('line', { x1: x(selectedIndex), x2: x(selectedIndex), y1: y(1), y2: y(0), class: 'trend-cursor' }),
     ...traces);
-  scrubber.setAttribute("aria-valuetext", `Round ${selected.round}`);
-  trendScores.textContent = [`Round ${selected.round} · ${selected.name}`,
-    ...series.map(({ key, label }) => `${label} ${selected[key].toFixed(3)}`)].join(" · ");
+  scrubber.setAttribute('aria-valuetext', `Round ${selected.round}${selected.isolated ? ', isolated check' : ''}`);
+  trendScores.textContent = [`Round ${selected.round}${selected.isolated ? ' · isolated check' : ''} · ${candidateLabel(selected.name)}`,
+    ...series.map(({ key, label }) => `${label} ${selected[key].toFixed(3)}`),
+    selected.integrity === 'approved' ? 'Final integrity review passed' : 'Continuous-stream integrity unverified'].join(' · ');
 }
 
-function showLeaderTrend(points) {
-  if (!points.length) return;
-  const followLatest = !leaderRounds.length || Number(scrubber.value) === leaderRounds.length - 1;
-  leaderRounds = points;
-  lastTrend = JSON.stringify(points);
-  trend.hidden = false;
-  document.querySelector("#trend-empty").hidden = true;
-  scrubber.max = points.length - 1;
+function showTrendContext(followLatest = true) {
+  const context = leaderContexts.find(item => item.id === contextSelector.value);
+  leaderRounds = context?.points ?? [];
+  trend.hidden = !leaderRounds.length;
+  document.querySelector('#trend-empty').hidden = !!leaderRounds.length;
+  document.querySelector('#trend-context-summary').textContent = context?.summary ?? '';
+  if (!leaderRounds.length) return;
+  scrubber.max = leaderRounds.length - 1;
   if (followLatest) scrubber.value = scrubber.max;
   drawLeaderTrend();
 }
 
-function updateLeaderTrend(snapshot) {
-  const history = snapshot.result?.history;
-  const points = snapshot.leader_trend ?? history?.flatMap(({ round, ranked }) => {
-    const top = ranked[0];
-    if (!top?.deposit) return [];
-    return [{ round, name: top.candidate.name, fitness: top.fitness, jaw: top.development.f1 }];
-  });
-  if (!points?.length || JSON.stringify(points) === lastTrend) return;
-  showLeaderTrend(points);
-  try {
-    sessionStorage.setItem(trendStorageKey, JSON.stringify(points));
-  } catch {
-    // Keep the chart available in the current page.
-  }
+function updateLeaderContexts(contexts) {
+  const serialized = JSON.stringify(contexts);
+  if (serialized === lastContexts) return;
+  const selected = contextSelector.value;
+  const wasLatest = !leaderContexts.length || selected === leaderContexts.at(-1).id;
+  const followLatest = !leaderRounds.length || Number(scrubber.value) === leaderRounds.length - 1;
+  leaderContexts = contexts;
+  lastContexts = serialized;
+  contextSelector.replaceChildren(...contexts.map(context => new Option(context.label, context.id)));
+  contextSelector.value = wasLatest ? contexts.at(-1)?.id ?? '' : selected;
+  showTrendContext(followLatest);
 }
 
-scrubber.addEventListener("input", drawLeaderTrend);
+contextSelector.addEventListener('change', () => showTrendContext());
+scrubber.addEventListener('input', drawLeaderTrend);
+document.addEventListener('candidate-labels-updated', drawLeaderTrend);
 new ResizeObserver(drawLeaderTrend).observe(plot);
-try {
-  showLeaderTrend(JSON.parse(sessionStorage.getItem(trendStorageKey)) ?? []);
-} catch {
-  // The next dashboard snapshot can populate the chart.
-}

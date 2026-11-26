@@ -56,10 +56,184 @@ fitness rules in the experiment.
   coverage. An exploration leader can also be the overall champion.
   Persist `protected` and pass it back on resume. Use `--portfolio` when
   generating the agent briefs for this mode.
+  Fresh ideas also enter ordinary competition when protected slots are full;
+  protection grants extra mutation opportunities rather than gating admission.
+
+The jaw dashboard now passes its protected-slot limit, actual mutation-attempt
+limit and soft architecture-family cap explicitly into a domain selection
+adapter. It trims inherited lanes when limits shrink and independently checks
+selection against per-case metrics recalculated from validation detections.
+Use reviewed architecture identities rather than method-string heuristics for
+this domain. Legacy CLI defaults remain available for reproducing old runs.
+
+The current jaw dashboard uses **portfolio** selection, not the older plain
+parent/child-replacement rule. Its defaults retain eight incumbents, produce
+one child per current incumbent, and add two fresh researcher proposals.
+Survivors need not be the eight highest fitness scores: the global champion,
+protected leads, a useful task specialist and complementary per-clip coverage
+share the pool. Parent and child can both survive; no automatic neural-weight
+crossover occurs. The architecture-family cap of two is soft when diversity
+is scarce. At most one new protected lane is opened per round, within two
+total lanes. Protection expires after two actual child attempts, not two
+elapsed rounds. The former top-seven cutoff was removed: every current member
+gets a child in ordinary All families rounds, including weak protected members.
+New Family runs research only; family-filtered checks reproduce every candidate
+in their selected scope. Pool size sets the next survivor capacity, so shrinking
+it takes effect after the current full-pool reproduction/selection transition.
+Research count controls fresh proposals and agent concurrency controls parallel
+execution. Neither is a hidden parent cutoff. New completion audits require
+exactly one mutated child and one parent-agent receipt per expected parent;
+old top-X runs retain their historical rules under their saved settings.
 
 From the repository root, generate domain-specific briefs with
 `python -m ml.evolution.agent_briefs RESULTS_JSON --context "Evaluation and constraints"`.
 Pass `--pool-size` and `--research-slots` for a custom policy. The orchestrating
-Codex session dispatches one researcher and one task per parent, collects
+Codex session dispatches the configured research tasks and one task per parent, collects
 proposals, and passes the plan to the runner. The library emits briefs
 and executes search. Agent dispatch belongs to the session.
+
+## Supervised agent lifetimes
+
+New jaw dashboard jobs bind `agent_budget_protocol=supervised-v1`. The
+coordinator delegates through the local `evolution_agents` MCP server in
+`agent_runtime.py`; built-in multi-agent dispatch is disabled for that invocation.
+Each task runs an independent `codex exec` process group. Concurrency queues
+work; a task's monotonic clock starts when it actually launches, not when queued.
+`start_agent`, `get_agents`, `wait_agents`, `send_message` and `close_agent` expose
+the controlled lifecycle. Other domains can reuse this stdlib supervisor by
+providing repository/job paths, fixed budget settings and expected task counts.
+
+**Minutes per agent is a wall-time ceiling, not a suggested prompt duration.**
+Candidate authors use the search window to inspect failures, try credible
+hypotheses, journal failures and preserve their best validated checkpoint.
+When an author returns early, the supervisor explicitly resumes the same thread
+with its original remaining allocation. Patience-stopping one model fit does not
+finish the author assignment. Export one final child/fresh proposal, rather than
+growing the round population with every internal trial. Concrete operational
+blockers stop honestly; reviewers can finish once their evidence is complete.
+
+The last 10% of an author's allocation, capped at 120 seconds, is reserved for
+finalization (at least 5 seconds for ordinary dashboard settings). At that cutoff,
+active search is interrupted and the same thread gets an export-only turn: no new
+fitting or parameter search, restore/package the best checkpoint and evidence.
+Shared deployment export and serial final benchmarking remain separate phases
+outside the author's research window. At the original hard deadline, the
+supervisor terminates the process group and escalates to kill after 1 second;
+the audit allows at most 2 seconds of shutdown bookkeeping, not extra research.
+Ordinary feedback never resets time. Only the existing bounded New Family
+architecture feedback cycles 2/3 renew research/architecture-review allocations
+on the same identities. Cancellation, EOF and supervisor signals clean up owned
+process groups and observed command descendants, including helpers in separate
+sessions. PID/start identities are rechecked before signaling. This is process
+supervision, not an OS security container: deliberately double-forking out of
+the tree before its first observation can escape tracking, and detached work
+is forbidden. A timed-out/failed/unfinished task cannot publish success.
+
+The supervisor writes its lifecycle ledger outside the agent-writable job root.
+The outer worker copies and hash-pins `agent-runtime.json` after the coordinator
+exits. `agent_budgets.py` binds actual thread IDs, assignments, exact prompts and
+final artifacts to coordinator receipts, verifies deadlines/export windows and
+rejects extra/uncontrolled work. Legacy jobs without this protocol retain their
+original audit semantics; new API jobs cannot disable it.
+
+Goal capability was checked on Codex CLI 0.160.0 on November 26:
+persistent app-server Goals automatically continued into a second turn, but
+`codex --no-daemon exec` created a Goal and exited after its first turn while the
+Goal remained active. Ephemeral threads rejected Goal operations. Therefore
+CLI children use explicit supervised resume, without native Goals. The bounded
+diagnostic `python -m ml.evolution.goal_probe --output /tmp/tmt-goal-probe`
+rechecks the CLI lifecycle and clears/archives its own probe thread; it starts
+no evolutionary round or training. Goal support can change with CLI versions.
+
+## Validation checkpoints and experiment records
+
+The workflow adapts the fixed evaluator, bounded experiments, baseline and
+failure-log principles of [autoresearch](https://github.com/karpathy/autoresearch/blob/master/program.md).
+Our existing multi-family portfolio, requested round limits and deployment
+benchmarks remain in place. Do not import its CUDA language-model trainer,
+infinite loop, dependency ban or Git reset workflow into this shared checkout.
+
+The shared `training.py` monitor is independent of PyTorch/Core ML/framework
+choice. Before fitting, declare a hypothesis, objective, capacity/parameter count,
+regularization (including a reason if none), seed and resource allocation. Reuse
+prepared inputs with pinned train/validation manifests and establish an unchanged
+measured baseline. The trial journal retains failures and rejected alternatives;
+learning only from winners hides useful evidence and exaggerates search success.
+
+For each iterative fit, evaluate **both losses in inference mode after every
+epoch**, using the same objective/reduction/weighting, with no gradients,
+dropout or augmentation on validation. Do not advance training RNG state while
+measuring. The domain's validation task score selects a checkpoint; lower
+validation loss then earlier epoch break exact score ties. The jaw domain uses
+event F1 with a predeclared decoder held fixed within a fit. Training loss,
+validation loss, event F1 and composite fitness are different quantities.
+
+Default policy: 10 evaluations without at least 0.001 task-score improvement,
+at least five epochs before patience stopping, and a 300-second per-trial wall
+cap including optimization/validation after preparation (or the owning agent's
+shorter allocation). Agents declare their epoch ceiling before fitting; 100
+epochs is not mandatory. Stop on patience, the ceiling or the time cap, and
+export the **saved best checkpoint**, not the last optimizer state. Call
+`can_start_epoch()` and check the budget inside long epochs; disclose boundary
+overruns. Parallel research/fitting may share resources, so record contention
+and do not claim equal effective hardware compute from wall time alone. Final
+deployment latency remains serial and isolated from training.
+
+```python
+from ml.evolution.training import TrainingMonitor, policy_for
+
+# plan: candidate_name, hypothesis, objective, capacity, regularization, seed,
+# resources={device, threads}, kind='iterative', max_epochs, selection_decoder.
+# context: SHA256 of the pinned train and validation manifest files.
+with TrainingMonitor(job, trial_id, plan, context,
+                     policy=policy_for(settings)) as trial:
+    while trial.can_start_epoch():
+        train_one_epoch()
+        # Run your model in eval/inference mode here; do not fit on validation.
+        if trial.observe(train_loss=train_loss, validation_loss=validation_loss,
+                         validation_score=validation_task_score,
+                         validation_predictions=validation_predictions,
+                         parameters=frozen_parameters, artifacts=opaque_weight_paths):
+            break
+    receipt = trial.finish()
+    checkpoint = trial.selected_checkpoint()
+    export_model(checkpoint['parameters'])
+```
+
+JSON-safe parameters can reference hashed opaque framework checkpoints; keep
+referenced weight filenames immutable for each checkpoint. The
+monitor does not require tensor weights to be serialized as JSON. Genuinely
+noniterative fits use an explicit noniterative plan and `finish(parameters=...)`,
+with a fitting justification, not invented losses. Failed context-manager
+trials are journaled as crashes. Journal all other attempted fits as well,
+including candidates not finally proposed. Preserve small gains when they
+simplify the mechanism; no hidden simplicity bonus changes official fitness.
+
+The jaw completion gate verifies `evaluation.training_receipts` for every
+fitted candidate, exact split/checkpoint/history hashes, per-epoch F1 against
+saved validation detections, best-epoch selection and stopping/budget evidence.
+Independent final reviewers inspect the actual training code and declared
+noniterative exemptions. Receipts reduce accidental errors and dishonest
+reporting; they do not mathematically prove arbitrary agent code is honest.
+
+The jaw dashboard uses `review_protocol=per-candidate-v1`: **Reviewers per
+candidate** defaults to 1 (range 1–5). After freezing and serially evaluating
+challengers, dispatch fresh independent review contexts for every
+candidate/reviewer slot. Each reviews exactly one candidate using the same
+rubric, without another reviewer's verdict. Never reuse an author, early
+architecture reviewer or another candidate's reviewer identity/context. With
+8 parents and 2 researchers, defaults produce 10 challengers and 10 review tasks,
+plus 10 author tasks. All assigned reviews must approve before publication;
+the next pool competes approved challengers against current parents. Concurrency
+limits batching, not the number of assignments. Historical jobs without this
+protocol retain their saved shared-review interpretation. The domain README
+documents the exact frozen-artifact and streaming-probe receipts.
+
+If training loss improves while validation worsens, investigate capacity,
+weight decay, dropout, label-preserving augmentation and simpler baselines.
+Increasing validation loss alone is not a rejection if task F1 improves.
+One logged decoder-tuning stage may follow checkpoint selection. Repeated
+validation selection can itself overfit a small validation set: keep test
+reserved and qualify random/overlapping-session generalization. More varied
+data may still be required. Monitoring reduces overtraining; it cannot repair
+dataset leakage or create missing independent evidence.

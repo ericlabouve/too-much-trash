@@ -24,6 +24,8 @@ class Portfolio:
         champion = min(all_scores, key=key)
         competition = dict(by_name)
         competition.update({name(entry): entry for entry in children})
+        # Protection grants extra mutation opportunities; it must not be an admission gate.
+        competition.update({name(entry): entry for entry in ideas})
         protected_next = []
         selected = {name(champion): champion}
 

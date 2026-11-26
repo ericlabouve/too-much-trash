@@ -341,10 +341,9 @@ def write_progress(path, step, ranked, *, pool, round_number=1, active_candidate
         history = []
         for item in result["history"]:
             leader = (result if item["round"] == round_number else item)["ranked"][0]
-            if "deposit" in leader:
-                history.append({"round": item["round"], "name": leader["candidate"]["name"],
-                                "fitness": fitness_for(leader), "jaw": leader["development"]["f1"],
-                                "deposit": leader["deposit"]["f1"]})
+            point = {"round": item["round"], "name": leader["candidate"]["name"],
+                     "fitness": leader["fitness"], "jaw": leader["development"]["f1"]}
+            history.append(point)
         if history:
             snapshot["leader_trend"] = history
     with NamedTemporaryFile(mode="w", dir=path.parent, prefix=".progress-", suffix=".json", delete=False) as pending:

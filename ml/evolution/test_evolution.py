@@ -69,6 +69,8 @@ class EvolutionTests(unittest.TestCase):
         self.assertTrue(briefs["parents"][0]["ambitious"])
         self.assertIn("Minimize distance to five", briefs["research"])
         self.assertIn("exactly 1 new candidates", briefs["research"])
+        self.assertEqual(len(briefs['research_tasks']), POLICY.research_slots)
+        self.assertTrue(all('exactly ONE distinct fresh candidate' in task for task in briefs['research_tasks']))
 
     def test_failed_child_can_be_retried(self):
         def failing(candidate):
@@ -79,6 +81,18 @@ class EvolutionTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             run_round(self.pool, 2, self.seen, failing, SPACE, policy=POLICY, plan=self.plan)
         self.assertNotIn((10,), self.seen)
+
+    def test_fresh_proposals_compete_when_protection_is_full_or_disabled(self):
+        parents = [dict(evaluate(Number(name, value)), fitness=fitness) for name, value, fitness in
+                   [('champion', 5, 1.), ('protected', 1, .1), ('weak', 2, .2), ('filler', 3, .3)]]
+        proposal = dict(evaluate(Number('fresh competitor', 4)), fitness=.8)
+        for protected_slots, lanes in [(1, [{'name': 'protected', 'root': 'protected', 'attempts': 0}]), (0, [])]:
+            with self.subTest(protected_slots=protected_slots):
+                selector = Portfolio(lambda e: (), lambda e: [0.], protected_slots=protected_slots)
+                retained, _, info = selector.select(parents, [], [proposal], SPACE, POLICY, lanes)
+                self.assertIn(proposal, retained)
+                self.assertEqual(len(retained), POLICY.pool_size)
+                self.assertEqual(info['protected'], lanes)
 
     def test_portfolio_preserves_specialist_and_counts_real_mutations(self):
         champion, jaw_parent, filler, seed = [

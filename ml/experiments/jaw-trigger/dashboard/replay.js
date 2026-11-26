@@ -90,7 +90,8 @@ async function loadReplay() {
     const response = await fetch("replay/events.json", { cache: "no-store" });
     if (!response.ok) throw new Error(response.status);
     replay = await response.json();
-    candidateSelect.replaceChildren(...replay.candidates.map((name) => new Option(name, name)));
+    candidateSelect.replaceChildren(...replay.candidates.map((name) => new Option(candidateLabel(name), name)));
+    candidateSelect.value = replay.default_candidate ?? replay.candidates[0];
     clipSelect.replaceChildren(...replay.clips.map((clip, index) => new Option(clip.split + " · " + clip.name, index)));
     const comparisonIndex = replay.clips.findIndex((clip) => clip.split === "Comparison");
     clipSelect.selectedIndex = Math.max(0, comparisonIndex);
@@ -113,13 +114,20 @@ video.addEventListener("error", () => {
   if (video.hasAttribute("src")) replayStatus.textContent = "This video could not be played.";
 });
 candidateSelect.addEventListener("change", updateReplay);
+document.addEventListener('candidate-labels-updated', () => {
+  for (const option of candidateSelect.options) option.textContent = candidateLabel(option.value);
+});
 clipSelect.addEventListener("change", updateReplay);
 document.addEventListener("jaw-replay-candidate", ({ detail }) => {
+  document.querySelector('#video-replay-panel').open = true;
   if (!replay?.candidates.includes(detail)) {
     replayStatus.textContent = "Replay is unavailable for this candidate.";
     return;
   }
   candidateSelect.value = detail;
   updateReplay();
+});
+document.querySelector('#video-replay-panel').addEventListener('toggle', event => {
+  if (!event.currentTarget.open) video.pause();
 });
 loadReplay();

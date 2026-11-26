@@ -6,6 +6,51 @@ from pathlib import Path
 
 from . import Policy
 
+EXPERIMENT_GUIDELINES = '''
+Establish a measured unchanged baseline before claiming improvement. Treat the
+domain's split, labels, evaluator, event tolerance, fitness and benchmark harness
+as fixed: propose changes to them separately, never alter them to improve a score.
+Declare each trial's hypothesis, objective, capacity/parameter count, regularization,
+seed and resource allocation before fitting. Keep a complete trial journal including
+crashes, rejected ideas and negative results. Favor simpler mechanisms when gains
+are indistinguishable, without inventing a simplicity bonus in the fitness formula.
+Use ml.evolution.training.TrainingMonitor for iterative fits. Evaluate training and
+validation loss under the same objective in inference mode after each epoch; no
+validation gradients, dropout or augmentation. Save the best validation-task-score
+checkpoint, with lower validation loss then earlier epoch as tie-breaks. Freeze the
+checkpoint-selection decoder within a fit. Monitor patience and a common wall-time
+cap; do not blindly export the last epoch or prescribe 100 epochs for every model.
+Keep loss separate from task F1 and composite fitness. Rising validation loss is an
+overfitting warning, not automatic rejection of a model with better task F1. Review
+capacity, weight decay, dropout, label-preserving augmentation and simpler baselines
+when the train/validation gap grows. Genuine closed-form/tree fits get an explicit
+noniterative record, not invented epoch curves. Large tensors may remain framework
+checkpoints referenced by hash; Python, NumPy, PyTorch and other suitable prototypes
+are allowed. Final task accuracy and latency must use the same deployment artifact
+and the domain's serial benchmark protocol. Reserve test for a separately authorized
+final evaluation. Repeated validation selection and overlapping recording sessions
+limit generalization claims. Retain protected exploration/diversity under the domain
+selector; this is not an instruction to greedily discard every novel lower score.
+For jaw dashboard rounds, each frozen challenger receives its own freshly initialized
+integrity reviewer(s), one per candidate by default. Reviewers are independent of all
+authors, early architecture review and other candidate reviews. Expect inspection
+of the actual deployed code, checkpoint and native streaming probes; do not exploit
+episode offsets, labels, clip identity, future inputs or hidden labeled resets.
+Answer findings with evidence; changed artifacts require a fresh review of their hashes.
+Candidate authors should use their remaining allocated search time: inspect validation
+failures, compare previous attempts, and try another credible hypothesis while retaining
+the best validated checkpoint. A first valid proposal or patience-stopped fit does not
+complete the research assignment. Export exactly one best child/fresh proposal. Respect
+the supervisor's finalization-only window: stop new fitting and package the best model,
+implementation, configuration and trial evidence. Only a concrete operational blocker
+justifies ending early; record attempted remedies. Reviewers may finish once checks are
+complete. Follow-ups share the original deadline; never start another identity to evade
+it. Use the runner's supervised lifecycle tools; a Goal or instruction alone is not a
+wall-time enforcement mechanism. Do not manufacture meaningless trials to fill time.
+Stay within the requested round/agent budget. Preserve unrelated changes; never
+copy another project's infinite-loop or git-reset workflow into a shared checkout.
+'''.strip()
+
 
 def proposal_mode(history, minimum_gain):
     recent = history[-4:]
@@ -31,6 +76,7 @@ def build_briefs(result, source, *, context="", policy=Policy(), portfolio=False
         common += (f"The planned round keeps the {survivors} best parent–child lineages and gives "
                    f"{policy.research_slots} slots to new research proposals. ")
     common += "Use the domain's evaluation protocol and keep evaluation-only inputs out of inference."
+    common += '\n' + EXPERIMENT_GUIDELINES
     if context:
         common += f" Domain guidance: {context}"
     parents = []
@@ -60,6 +106,8 @@ def build_briefs(result, source, *, context="", policy=Policy(), portfolio=False
     return {
         "round": round_number,
         "research": research,
+        "research_tasks": [f'{common} Researcher {index + 1}: browse primary sources and implement exactly ONE distinct fresh candidate; coordinate to avoid duplicate proposals.'
+                           for index in range(policy.research_slots)],
         "parents": parents,
     }
 

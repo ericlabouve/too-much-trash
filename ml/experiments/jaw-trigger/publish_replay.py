@@ -11,6 +11,46 @@ import cv2
 from round_one import Candidate, motion_samples, events, features, load_frames
 
 
+def publish_joint(manifest_path, result, output):
+    from round_one import POSE_METHODS, pose_samples
+    from run_joint_round import JointCandidate
+
+    manifest = json.loads(manifest_path.read_text())
+    candidates = [JointCandidate(**entry["candidate"]) for entry in result["ranked"]]
+    parameters = result["feature_parameters"]
+    clips = []
+    for row in manifest["clips"]:
+        source = (manifest_path.parent / row["video"]).resolve(strict=True)
+        frames = load_frames(source)
+        capture = json.loads((manifest_path.parent / row["capture_manifest"]).read_text())
+        start = capture["timing"]["start"]
+        with (manifest_path.parent / row["imu"]).open() as file:
+            imu = motion_samples({"start": start, "samples": [json.loads(line) for line in file]})
+        poses = pose_samples(manifest_path.parent / row["poses"] if row.get("poses") else None, start)
+        measured, predictions = {}, {}
+        for candidate in candidates:
+            key = candidate.method, candidate.signal
+            if key not in measured:
+                sensors = {"imu": imu, "poses": poses} if candidate.method in POSE_METHODS else imu
+                measured[key] = features(candidate.method, frames, candidate.signal, sensors, parameters)[0]
+            predictions[candidate.name] = events(candidate, measured[key], confirmation_time=True)
+        video_name = row["clip"] + ".mp4"
+        link = output / video_name
+        if link.is_symlink():
+            link.unlink()
+        link.symlink_to(source)
+        with av.open(str(source)) as container:
+            duration = container.duration / av.time_base
+        clips.append({"name": row["clip"], "split": "Development", "video": video_name,
+                      "duration": duration, "references": [
+                          ["close", row["jaw_reference"]["squeeze"]["button_cue_seconds"]],
+                          ["open", row["jaw_reference"]["release"]["button_cue_seconds"]]],
+                      "predictions": predictions})
+        print(f"Published {row['clip']}", flush=True)
+    return {"round": result["round"], "default_candidate": candidates[0].name,
+            "candidates": [candidate.name for candidate in candidates], "clips": clips}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("clips", type=Path)
@@ -21,6 +61,12 @@ def main():
     args = parser.parse_args()
     result = json.loads(args.results.read_text())
     labels = json.loads(args.labels.read_text())
+    cv2.setNumThreads(1)
+    args.output.mkdir(parents=True, exist_ok=True)
+    if "clips" in labels:
+        replay = publish_joint(args.labels, result, args.output)
+        write_replay(args.output, replay)
+        return
     candidates = {}
     for group in ("ranked", "challengers", "pruned_scores", "incumbents"):
         for entry in result.get(group, []):
@@ -64,10 +110,15 @@ def main():
                       "video": video_name, "duration": duration,
                       "references": list(labels[name].items()), "predictions": predictions})
 
-    replay = {"round": result["round"], "candidates": list(candidates), "clips": clips}
-    with NamedTemporaryFile(mode="w", dir=args.output, prefix=".replay-", suffix=".json", delete=False) as pending:
+    replay = {"round": result["round"], "default_candidate": result["ranked"][0]["candidate"]["name"],
+              "candidates": list(candidates), "clips": clips}
+    write_replay(args.output, replay)
+
+
+def write_replay(output, replay):
+    with NamedTemporaryFile(mode="w", dir=output, prefix=".replay-", suffix=".json", delete=False) as pending:
         json.dump(replay, pending)
-    Path(pending.name).replace(args.output / "events.json")
+    Path(pending.name).replace(output / "events.json")
 
 
 if __name__ == "__main__":
