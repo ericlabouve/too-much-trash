@@ -1010,7 +1010,10 @@ def verify_publication(job, require_review=False):
     for record in receipt.get('files', {}).values():
         if sha256(artifact(job, record['path']).read_bytes()).hexdigest() != record['sha256']:
             raise ValueError('Published integrity evidence changed after outer-worker verification')
-    if set(receipt.get('files', {})) != {'results_path', 'agent_manifest_path', 'evaluation_path', 'config', 'final'}:
+    expected_files = {'results_path', 'agent_manifest_path', 'evaluation_path', 'config', 'final'}
+    if 'agent_budget_protocol' in config.get('settings', {}):
+        expected_files.add('agent_runtime')
+    if set(receipt.get('files', {})) != expected_files:
         raise ValueError('Outer-worker publication receipt is incomplete')
     final = json.loads(artifact(job, receipt['files']['final']['path']).read_text())
     config['_trusted_input_hashes'] = receipt.get('trusted_input_hashes', {})

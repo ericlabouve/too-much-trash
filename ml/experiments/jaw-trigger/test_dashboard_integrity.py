@@ -315,6 +315,34 @@ class FinalIntegrityTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'changed'): verify_publication(job)
                 verify.assert_called_once()
 
+    def test_supervised_publication_requires_and_accepts_pinned_runtime_receipt(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory).resolve() / 'dashboard-supervised'; job.mkdir()
+            (job / 'config.json').write_text(json.dumps({'settings': {'review_agents': 1, 'agent_budget_protocol': 'supervised-v1'}}))
+            (job / 'status.json').write_text(json.dumps({'state': 'completed'}))
+            final = {key: str(job / name) for key, name in (
+                ('results_path', 'results.json'), ('agent_manifest_path', 'agents.json'), ('evaluation_path', 'evaluation.json'))}
+            for path in final.values(): Path(path).write_text('{}')
+            (job / 'agent-final.json').write_text(json.dumps(final))
+            (job / 'agent-runtime.json').write_text('{"supervisor":"synthetic"}')
+            write_publication_receipt(job, final, {})
+            receipt_path = job.parent / '.verified-completions' / f'{job.name}.json'
+            with patch('dashboard_agents.os.kill', side_effect=ProcessLookupError), \
+                 patch('dashboard_agents.verify_completion', return_value=(job / 'results.json', {'approved': True})):
+                self.assertTrue(verify_publication(job)[1]['approved'])
+                receipt = json.loads(receipt_path.read_text())
+                del receipt['files']['agent_runtime']
+                receipt_path.write_text(json.dumps(receipt))
+                with self.assertRaisesRegex(ValueError, 'incomplete'):
+                    verify_publication(job)
+            write_publication_receipt(job, final, {})
+            (job / 'agent-runtime.json').write_text('{"changed":true}')
+            with patch('dashboard_agents.os.kill', side_effect=ProcessLookupError), \
+                 patch('dashboard_agents.verify_completion') as verify:
+                with self.assertRaisesRegex(ValueError, 'changed'):
+                    verify_publication(job)
+                verify.assert_not_called()
+
     def test_context_changes_invalidate_saved_reviews(self):
         with TemporaryDirectory() as directory:
             job = Path(directory).resolve()
