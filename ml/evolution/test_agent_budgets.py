@@ -88,6 +88,21 @@ class AgentBudgetTests(unittest.TestCase):
             ledger['settings']['agent_export_min_seconds'] = 60
             self.assertEqual(self.audit(job, settings, ledger, receipts, challengers)['export_seconds'], 120.)
 
+    def test_finish_policy_allows_only_export_to_exceed_nominal_deadline(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory).resolve()
+            settings, ledger, receipts, challengers = self.fixture(job)
+            settings['agent_export_completion'] = 'finish-v1'
+            ledger['settings']['agent_export_completion'] = 'finish-v1'
+            author = ledger['tasks'][0]
+            author['cycles'][0]['ended_monotonic'] = author['cycles'][0]['deadline_monotonic'] + 45
+            author['turns'][-1]['ended_monotonic'] = author['cycles'][0]['ended_monotonic']
+            self.assertEqual(self.audit(job, settings, ledger, receipts, challengers)['tasks'], 4)
+            author['turns'][1]['ended_monotonic'] = author['cycles'][0]['deadline_monotonic'] + 1
+            author['turns'][-1]['started_monotonic'] = author['cycles'][0]['deadline_monotonic'] + 1
+            with self.assertRaisesRegex(ValueError, 'research cannot consume'):
+                self.audit(job, settings, ledger, receipts, challengers)
+
     def test_ready_authors_and_independent_reviewers_are_bound_to_actual_artifacts(self):
         with TemporaryDirectory() as directory:
             job = Path(directory).resolve()

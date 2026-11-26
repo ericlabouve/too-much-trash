@@ -45,7 +45,10 @@ failures, compare previous attempts, and try another credible hypothesis while r
 the best validated checkpoint. A first valid proposal or patience-stopped fit does not
 complete the research assignment. Export exactly one best child/fresh proposal. Respect
 the supervisor's finalization-only window: stop new fitting and package the best model,
-implementation, configuration and trial evidence. Only a concrete operational blocker
+implementation, configuration and trial evidence. New finish-v1 jobs let an export
+already in progress finish past the nominal timer, without new fitting, research or
+parameter search. The research cutoff stays enforced; reviewer deadlines remain hard.
+Only a concrete operational blocker
 justifies ending early; record attempted remedies. Reviewers may finish once checks are
 complete. Follow-ups share the original deadline; never start another identity to evade
 it. Use the runner's supervised lifecycle tools; a Goal or instruction alone is not a

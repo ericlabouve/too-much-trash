@@ -17,8 +17,12 @@ def budget_policy(settings):
     export_minimum = settings.get('agent_export_min_seconds', 5.)
     if type(export_minimum) not in (int, float) or not isfinite(export_minimum) or not 5 <= export_minimum <= 120:
         raise ValueError('Agent export minimum must be between 5 and 120 seconds')
+    completion = settings.get('agent_export_completion')
+    if 'agent_export_completion' in settings and completion != 'finish-v1':
+        raise ValueError('Unknown agent export-completion policy')
     return {'protocol': PROTOCOL, 'seconds': seconds,
             'export_seconds': min(seconds / 2, 120., max(export_minimum, seconds * .1)),
+            'finish_export': completion == 'finish-v1',
             'shutdown_grace_seconds': SHUTDOWN_GRACE_SECONDS}
 
 
@@ -62,6 +66,8 @@ def verify_agent_budgets(job, receipts, settings, challengers=(), candidate_arti
         raise ValueError('Supervisor cannot disable frozen review-package preflight')
     if 'agent_export_min_seconds' in settings and knobs.get('agent_export_min_seconds') != settings['agent_export_min_seconds']:
         raise ValueError('Supervisor export minimum differs from the frozen job')
+    if 'agent_export_completion' in settings and knobs.get('agent_export_completion') != settings['agent_export_completion']:
+        raise ValueError('Supervisor export completion differs from the frozen job')
     runtime = ledger.get('tasks', [])
     tasks = receipts.get('tasks', [])
     if not runtime or len(runtime) != len(tasks):
@@ -109,13 +115,14 @@ def verify_agent_budgets(job, receipts, settings, challengers=(), candidate_arti
         if not 1 <= len(cycles) <= allowed:
             raise ValueError('Agent budget may only renew for bounded New Family architecture cycles')
         previous_end = -1.
+        author_finishing = policy['finish_export'] and kind in ('parent', 'research')
         for index, cycle in enumerate(cycles, 1):
             start, deadline, end = (cycle.get(key) for key in
                                     ('started_monotonic', 'deadline_monotonic', 'ended_monotonic'))
             if (cycle.get('cycle') != index or not all(_number(value) for value in (start, deadline, end))
                     or start < previous_end or end < start
                     or not isclose(deadline - start, policy['seconds'], abs_tol=.01)
-                    or end > deadline + SHUTDOWN_GRACE_SECONDS):
+                    or (not author_finishing and end > deadline + SHUTDOWN_GRACE_SECONDS)):
                 raise ValueError('Invalid or overrun supervised agent deadline')
             if kind in ('parent', 'research'):
                 export = cycle.get('export_monotonic')

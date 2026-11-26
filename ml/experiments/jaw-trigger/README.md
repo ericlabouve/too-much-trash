@@ -251,11 +251,14 @@ original remaining budget. Authors inspect failures, try further hypotheses
 and retain the best validated checkpoint. Their final 10% (up to 120 seconds)
 is reserved for finalization only. New jobs freeze `agent_export_min_seconds=60`
 as a CLI-startup allowance, capped at half the total agent allocation. At two
-minutes this gives 60 seconds search and 60 seconds export; the hard deadline
-does not grow. Older jobs without the field keep their recorded policy.
+minutes this gives 60 seconds search and a nominal 60 seconds export.
+New jobs require `agent_export_completion=finish-v1`: once an author starts
+export, let packaging finish beyond the timer, with no new research or fitting.
+The outer coordinator timer excludes actual author export time (parallel exports
+count once); reviewers still have hard deadlines. Explicit cancellation and
+process failures remain effective. Older jobs keep their recorded policy.
 Shared deployment export and isolated final
-benchmarks still happen afterward. At the hard deadline, the supervisor stops
-the process group, allowing only a short cleanup grace. Ordinary feedback
+benchmarks still happen afterward. Ordinary feedback
 cannot reset clocks; only bounded New Family architecture cycles 2/3 renew
 the same research/reviewer identities. A documented operational blocker stops
 early; completed reviewers need not consume their whole allowance.

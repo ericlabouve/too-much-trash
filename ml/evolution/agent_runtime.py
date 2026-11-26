@@ -20,6 +20,7 @@ from threading import Event, RLock, Thread
 from time import monotonic
 from uuid import uuid4
 from .review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL, preflight_bundle
+from .agent_budgets import budget_policy
 
 PROTOCOL = 'supervised-v1'
 KINDS = ('parent', 'research', 'review', 'integrity_review')
@@ -62,6 +63,7 @@ class Supervisor:
             raise ValueError('Unsupported agent supervisor protocol')
         self.config = deepcopy(config)
         self.settings = config['settings']
+        self.policy = budget_policy(self.settings)
         if ('review_bundle_protocol' in self.settings
                 and self.settings['review_bundle_protocol'] != REVIEW_BUNDLE_PROTOCOL):
             raise ValueError('Unknown frozen review-bundle protocol')
@@ -93,7 +95,7 @@ class Supervisor:
         atomic_json(self.ledger, {'protocol': PROTOCOL, 'job': str(self.job),
                     'supervisor_pid': os.getpid(),
                     'settings': {key: self.settings.get(key) for key in
-                                 ('agent_minutes', 'agent_concurrency', 'family', 'review_bundle_protocol', 'agent_export_min_seconds')},
+                                 ('agent_minutes', 'agent_concurrency', 'family', 'review_bundle_protocol', 'agent_export_min_seconds', 'agent_export_completion')},
                     'tasks': [self._public(task) for task in self.tasks.values()]})
 
     def start_agent(self, kind, prompt, parent=None, candidate_name=None, review_bundle=None):
@@ -157,8 +159,8 @@ class Supervisor:
     def _launch(self, task, phase, prompt):
         now = self.clock()
         if task['_queued_cycle']:
-            duration = self.minutes * 60
-            reserve = min(duration / 2, max(5., min(120., duration * .1)))
+            duration = self.policy['seconds']
+            reserve = self.policy['export_seconds']
             task['cycles'].append({'cycle': task['_queued_cycle'],
                                   'started_monotonic': now,
                                   'deadline_monotonic': now + duration,
@@ -166,7 +168,7 @@ class Supervisor:
                                   'started_utc': datetime.now(timezone.utc).isoformat()})
             task['_queued_cycle'] = None
         cycle = task['cycles'][-1]
-        if now >= cycle['deadline_monotonic']:
+        if now >= cycle['deadline_monotonic'] and not (phase == 'export' and self._finish_export(task)):
             self._terminal(task, 'timed_out', 'Agent allocation exhausted before another turn')
             return
         number = len(task['turns']) + 1
@@ -243,6 +245,10 @@ class Supervisor:
             'Use blocked only for a concrete operational blocker and explain attempted remedies. '
             'Do not invent scores or force pointless trials just to consume time.\n')
         if phase == 'export':
+            if self._finish_export(task):
+                common += ('The scheduled deadline above does NOT cut off this export turn. '
+                           'Finish packaging the completed work and return your final receipt promptly; '
+                           'this is no extension of research or fitting.\n')
             common += ('EXPORT ONLY: Stop new research, training and parameter search. Restore '
                        'your best validated checkpoint, verify/export its implementation, weights, '
                        'configuration and evidence, and provide the final artifact. Preserve failed '
@@ -387,6 +393,9 @@ class Supervisor:
         if task['cycles']:
             task['cycles'][-1]['ended_monotonic'] = self.clock()
 
+    def _finish_export(self, task):
+        return self.policy['finish_export'] and task['kind'] in ('parent', 'research')
+
     def tick(self):
         with self.lock:
             if self.stopping.is_set():
@@ -405,7 +414,7 @@ class Supervisor:
                 except Exception as error:
                     self._stop(task, f'Unverifiable child identity/event stream: {error}', 'failed')
                 cycle = task['cycles'][-1]
-                if now >= cycle['deadline_monotonic']:
+                if now >= cycle['deadline_monotonic'] and not self._finish_export(task):
                     self._stop(task, 'Hard per-agent deadline reached', 'timed_out')
                 elif (task['kind'] in ('parent', 'research') and task['phase'] == 'research'
                       and now >= cycle['export_monotonic']):
@@ -424,7 +433,7 @@ class Supervisor:
                     task['turns'][-1].update(ended_monotonic=now, reason=stopping['reason'])
                     self._close_handles(task)
                     task['_process'], task['_stopping'] = None, None
-                    if stopping['terminal'] or now >= cycle['deadline_monotonic']:
+                    if stopping['terminal'] or (now >= cycle['deadline_monotonic'] and not self._finish_export(task)):
                         self._terminal(task, stopping['terminal'] or 'timed_out', stopping['reason'])
                     elif not task['thread_id']:
                         self._terminal(task, 'failed', 'Cannot enter export: no resumable child identity')

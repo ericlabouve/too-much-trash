@@ -103,6 +103,34 @@ def round_allocation_seconds(prior, settings):
     return (batches + 2) * settings['agent_minutes'] * 60
 
 
+def completed_export_wall_seconds(ledger_path, now):
+    """Pause coordinator timeout for the union of actual author export turns.
+
+    Read only the supervisor-owned ledger, including a currently running export.
+    Parallel exports count once. This prevents the outer timeout undoing finish-v1.
+    """
+    try:
+        ledger = json.loads(Path(ledger_path).read_text())
+    except (OSError, ValueError):
+        return 0.
+    if ledger.get('settings', {}).get('agent_export_completion') != 'finish-v1':
+        return 0.
+    spans = []
+    for task in ledger.get('tasks', []):
+        if task.get('kind') not in ('parent', 'research'):
+            continue
+        for turn in task.get('turns', []):
+            start, end = turn.get('started_monotonic'), turn.get('ended_monotonic', now)
+            if (turn.get('phase') == 'export' and type(start) in (int, float)
+                    and type(end) in (int, float) and 0 <= start <= end <= now):
+                spans.append((start, end))
+    total, last = 0., 0.
+    for start, end in sorted(spans):
+        total += max(0., end - max(start, last))
+        last = max(last, end)
+    return total
+
+
 def supervisor_configuration(prior, settings, job, binary):
     """Keep the lifecycle journal outside agent-writable job/repository roots."""
     counts = agent_counts(prior, settings)
@@ -156,8 +184,12 @@ in the journal. Retain the best independently validated version; never replace i
 last attempt. Early stopping one fit is not permission to stop the whole candidate search.
 The finalization-only turn must finish the best checkpoint, proposal and evidence, not start a
 new fit. Shared deployment export and isolated final benchmarks still happen afterward, outside
-each author's research allocation. The supervisor interrupts at finalization cutoff, then kills
-overdue child process groups at the original deadline. No ordinary follow-up resets the clock.
+each author's research allocation. The supervisor interrupts at finalization cutoff.
+New jobs use agent_export_completion=finish-v1: an author already exporting must finish promptly
+without a timer kill, even beyond the nominal allocation. No new research, fits or parameter
+search is permitted during export. Reviewer deadlines remain hard. The outer coordinator clock
+pauses for actual author export time, counted once across concurrent exports. Explicit user
+cancellation and real process failures still stop work. No ordinary follow-up resets search time.
 Only a concrete documented blocker can end author search early. Report attempted paths and
 what is needed to unblock; a missing final artifact/failed task cannot publish a successful round.
 
@@ -1025,6 +1057,8 @@ def execute(config_path):
             raise ValueError('New jobs require frozen-bundle-v1 review-package preflight')
         if settings.get('agent_export_min_seconds') != 60:
             raise ValueError('New jobs require the 60-second short-budget export minimum')
+        if settings.get('agent_export_completion') != 'finish-v1':
+            raise ValueError('New jobs must allow an in-progress export to finish')
         selection_parameters(settings)
         status('running', .01, 'Preparing the pinned train and validation inputs', phase='prepare')
         ready = readiness()
@@ -1080,7 +1114,9 @@ def execute(config_path):
             phases = {'preparation': 0, 'research': 1, 'evolution': 2, 'evaluation': 3,
                       'integrity_review': 4, 'audit': 5}
             while process.poll() is None:
-                if monotonic() >= deadline:
+                now = monotonic()
+                export_time = completed_export_wall_seconds(runtime_config['ledger_path'], now)
+                if now >= deadline + export_time:
                     stop_coordinator(process)
                     raise TimeoutError('The coordinator exceeded its round allocation')
                 progress_file = job / 'agent-progress.json'

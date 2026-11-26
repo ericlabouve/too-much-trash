@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 from dashboard_agents import (coordinator_command, coordinator_prompt, execute,
-                              supervisor_configuration, verify_completion)
+                              supervisor_configuration, verify_completion, completed_export_wall_seconds)
 from dashboard_server import validate_settings
 from ml.evolution.agent_budgets import PROTOCOL
 import test_dashboard_agents as receipt_fixtures
@@ -38,6 +38,24 @@ class DashboardAgentBudgetTests(unittest.TestCase):
         for value in (None, 5, 0, 120):
             with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'export minimum'):
                 self.settings({'agent_export_min_seconds': value})
+        self.assertEqual(self.settings()['agent_export_completion'], 'finish-v1')
+        with self.assertRaisesRegex(ValueError, 'export to finish'):
+            self.settings({'agent_export_completion': None})
+
+    def test_outer_timeout_pauses_for_actual_export_union_not_parallel_sum(self):
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / 'ledger.json'
+            ledger = {'settings': {'agent_export_completion': 'finish-v1'}, 'tasks': [
+                {'kind': 'parent', 'turns': [{'phase': 'research', 'started_monotonic': 0, 'ended_monotonic': 5},
+                                           {'phase': 'export', 'started_monotonic': 10, 'ended_monotonic': 20}]},
+                {'kind': 'research', 'turns': [{'phase': 'export', 'started_monotonic': 15}]},
+                {'kind': 'integrity_review', 'turns': [{'phase': 'review', 'started_monotonic': 0}]}]}
+            path.write_text(json.dumps(ledger))
+            self.assertEqual(completed_export_wall_seconds(path, 30), 20)
+            self.assertEqual(completed_export_wall_seconds(path, 50), 40)
+            ledger['settings'] = {}
+            path.write_text(json.dumps(ledger))
+            self.assertEqual(completed_export_wall_seconds(path, 50), 0)
 
     def test_coordinator_has_only_the_required_supervised_dispatch_mcp(self):
         with TemporaryDirectory() as directory:

@@ -51,13 +51,17 @@ packages consume no reviewer task slot. Correct and retry before dispatch;
 after dispatch the package and published artifact graph must remain identical.
 New dashboard jobs also require agent_budget_protocol=supervised-v1. Dispatch
 through the runner-owned evolution_agents MCP supervisor, never unsupervised
-spawn/shell delegation. Every started task has its own hard wall deadline;
+spawn/shell delegation. Every started task has its own enforced search schedule;
 queued time is excluded. Early author finishes resume the same context and
 original deadline to improve validation fitness and retain the best checkpoint.
 Reserve the last 10% (at most 120 seconds) for finalization only, with no new fit.
 New dashboard jobs freeze agent_export_min_seconds=60 to allow CLI resume startup
 on short budgets, capped at half the total allocation. A two-minute smoke has
-60 seconds search and 60 seconds export; its hard deadline remains two minutes.
+60 seconds search and a nominal 60 seconds export. New jobs freeze
+agent_export_completion=finish-v1: once export starts, let it finish past the
+timer without new research/fitting. Reviewer deadlines remain hard. The outer
+round timeout pauses for actual author export time, counting parallel exports
+once. Explicit cancellation or process failure still stops work.
 Legacy jobs without the setting retain their earlier five-second minimum.
 Export one best child/fresh proposal, preserving failed trials. A concrete
 documented blocker can stop work early; reviewers may finish after their checks.

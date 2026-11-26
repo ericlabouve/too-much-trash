@@ -138,6 +138,32 @@ class SupervisorTests(unittest.TestCase):
         self.assertEqual(current['cycles'][0]['deadline_monotonic'], 120)
         self.assertLess(current['cycles'][0]['ended_monotonic'], 120)
 
+    def test_in_progress_export_can_finish_past_nominal_deadline(self):
+        self.runtime.shutdown()
+        self.config['settings'].update(agent_minutes=2, agent_export_min_seconds=60,
+                                       agent_export_completion='finish-v1')
+        self.runtime = Supervisor(self.config, clock=self.clock, popen=self.factory,
+                                  killpg=self.factory.killpg, snapshot=lambda: {})
+        self.addCleanup(self.runtime.shutdown)
+        task = self.start()
+        self.clock.value = 60
+        self.runtime.tick()
+        self.clock.value = 61
+        self.runtime.tick()
+        self.clock.value = 150
+        self.runtime.tick()
+        current = self.runtime.get_agents()['agents'][0]
+        self.assertEqual((current['status'], current['phase']), ('running', 'export'))
+        self.assertEqual(self.factory.processes[-1].poll(), None)
+        self.factory.processes[-1].finish(self.artifact)
+        self.clock.value = 155
+        self.runtime.tick()
+        current = self.runtime.get_agents()['agents'][0]
+        self.assertEqual(current['status'], 'ready')
+        self.assertEqual(current['agent_id'], 'thread-1')
+        self.assertEqual(current['cycles'][0]['deadline_monotonic'], 120)
+        self.assertEqual(current['cycles'][0]['ended_monotonic'], 155)
+
     def test_queued_agent_clock_starts_when_slot_becomes_available(self):
         self.start('review')
         second = self.start('research')

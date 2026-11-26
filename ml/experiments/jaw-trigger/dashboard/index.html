@@ -49,7 +49,7 @@
           <label id="review-agent-setting" hidden data-help="New Family uses one early architecture reviewer, separate from the final integrity reviewers. Rejected architectures receive at least three feedback cycles before giving up.">Architecture review
             <output id="review-agent-count">0</output>
           </label>
-          <label data-help="Hard wall-time limit per started agent. Authors continue improving until the final 10% (up to two minutes), reserved for export. Queued time is excluded.">Minutes per agent
+          <label data-help="Research schedule per started agent; queued time is excluded. Authors switch to export in the final 10% (60-second startup minimum, capped at half the allocation and two minutes). Once export begins it can finish past the timer, with no new research. Reviewers have a hard limit.">Minutes per agent
             <input name="agent_minutes" type="number" min="1" max="120" value="2" required>
           </label>
           <label data-help="Maximum candidate agents working at once. Additional parent tasks run in later batches.">Parallel agents

@@ -103,7 +103,7 @@ work; a task's monotonic clock starts when it actually launches, not when queued
 the controlled lifecycle. Other domains can reuse this stdlib supervisor by
 providing repository/job paths, fixed budget settings and expected task counts.
 
-**Minutes per agent is a wall-time ceiling, not a suggested prompt duration.**
+**Minutes per agent sets an enforced research schedule, not a suggested prompt duration.**
 Candidate authors use the search window to inspect failures, try credible
 hypotheses, journal failures and preserve their best validated checkpoint.
 When an author returns early, the supervisor explicitly resumes the same thread
@@ -116,14 +116,19 @@ The last 10% of an author's allocation, capped at 120 seconds, is reserved for
 finalization. New dashboard jobs freeze `agent_export_min_seconds=60` to leave
 room for CLI resume startup on short allocations; the export window cannot
 exceed half the total allocation. Thus a two-minute smoke has 60 seconds of
-search and 60 seconds of export, within the same two-minute hard deadline.
+search and a nominal 60 seconds of export.
 Legacy jobs without this field retain the five-second floor. At that cutoff,
 active search is interrupted and the same thread gets an export-only turn: no new
 fitting or parameter search, restore/package the best checkpoint and evidence.
 Shared deployment export and serial final benchmarking remain separate phases
-outside the author's research window. At the original hard deadline, the
-supervisor terminates the process group and escalates to kill after 1 second;
-the audit allows at most 2 seconds of shutdown bookkeeping, not extra research.
+outside the author's research window. New jobs freeze
+`agent_export_completion=finish-v1`: an export turn may finish beyond the nominal
+deadline; no new research, fitting or parameter search is allowed. The coordinator
+timeout excludes the union of actual author export intervals, including active
+exports, so the outer timer cannot undo this rule. Reviews retain their hard
+deadlines. Explicit cancellation and real process failures still stop work.
+Legacy jobs without this flag retain hard author deadlines and the two-second
+shutdown bookkeeping allowance.
 Ordinary feedback never resets time. Only the existing bounded New Family
 architecture feedback cycles 2/3 renew research/architecture-review allocations
 on the same identities. Cancellation, EOF and supervisor signals clean up owned
