@@ -22,7 +22,7 @@ class RoundServiceTests(unittest.TestCase):
         self.assertEqual([settings[key] for key in
                           ('pool_size', 'research_slots', 'protected_slots', 'mutation_attempts', 'family_limit')],
                          [8, 2, 2, 2, 2])
-        self.assertEqual(settings['agent_minutes'], 2)
+        self.assertEqual(settings['agent_minutes'], 20)
         pool = [asdict(JointCandidate(f'parent-{index}', 'imu', .1)) for index in range(10)]
         transition = agent_counts({'next_pool': pool}, settings)
         steady = agent_counts({'next_pool': pool[:8]}, settings)

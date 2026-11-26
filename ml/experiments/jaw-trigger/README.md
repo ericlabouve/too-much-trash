@@ -207,7 +207,7 @@ JSON has `metric`, `points` (`epoch`, `train_loss`, `validation_loss`) and optio
 models or candidate configurations invalidate the displayed history. These are
 objective-loss diagnostics, separate from deployment F1 and fitness.
 Hover or focus a parameter for its definition. The default
-agent allocation is 2 minutes per candidate for the supervised smoke check, with up to three child agents
+agent allocation is 20 minutes per candidate, with up to three child agents
 working concurrently. The controls show actual evolution, research and review
 counts before launch; the coordinator is fixed at one and hidden from parameters.
 The parallel-agent control supports up to five (default three). Agents may
@@ -241,8 +241,7 @@ datasets, split seed or scoring settings clears mismatched table values instead
 of reusing historical fitting scores.
 
 New jobs require `agent_budget_protocol=supervised-v1`. A local MCP supervisor
-uses a default 2-minute allocation per started agent for the supervised smoke check.
-Increase this before substantial model research. There is currently no
+uses a default 20-minute allocation per started agent. There is currently no
 per-agent token budget (deferred by user choice).
 The supervisor owns independent CLI child process groups, queue/concurrency limits, monotonic
 deadlines, same-thread continuation and cancellation. Minutes per agent starts

@@ -55,7 +55,7 @@
             <output id="review-agent-count">0</output>
           </label>
           <label data-help="Research schedule per started agent; queued time is excluded. Authors switch to export in the final 10% (60-second startup minimum, capped at half the allocation and two minutes). Once export begins it can finish past the timer, with no new research. Reviewers have a hard limit.">Minutes per agent
-            <input name="agent_minutes" type="number" min="1" max="120" value="2" required>
+            <input name="agent_minutes" type="number" min="1" max="120" value="20" required>
           </label>
           <label data-help="Maximum candidate agents working at once. Additional parent tasks run in later batches.">Parallel agents
             <input name="agent_concurrency" type="number" min="1" max="5" value="3" required>
