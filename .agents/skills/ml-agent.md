@@ -294,3 +294,32 @@ regression verifies a conflicting prompt cannot omit that authoritative object.
 Retry the light smoke with the exact Scanlines parent and its parent03 source
 explicitly pinned, then proceed to the user-authorized full round only after
 canonical publication succeeds. No change to split, scoring or agent budgets.
+
+
+Audit smoke follow-up: dashboard-20261127T004250Z-81fc480e preserved a blocked
+parent: the two-minute/60-second-search budget ended before fitting. Increased
+ONLY smoke allocation to5minutes; full remains20. Scanlines baseline is genuinely
+closed-form ridge and must stay noniterative; the child tests real epoch curves.
+
+Smoke dashboard-20261127T004841Z-d66e533e completed4independent tasks,3serial native
+evaluations and10native probes. Canonical training/fit/deployment/budget/review/
+portfolio gates pass, with selected-checkpoint loss recomputation exact. Original
+outer audit rejected only an overlong differentiator. Trusted presentation-only
+recovery backed up original results/status/final in display-recovery-originals,
+changed ONLY that one string to 'Trimmed bilateral row consensus', independently
+reconstructed frozen dataset/source/config/private-ledger bindings, reran every
+unchanged verify_completion gate and wrote a real terminal-worker receipt.
+All models/scores/reviews/fit receipts/candidates/families/architecture unchanged.
+The independent audit verified recursive scientific equality, original final
+bytes, backup hash, private ledger and verify_publication success. Disclose this
+as documented manual display repair, not a clean unattended first-attempt smoke.
+Full original61test IDs remain excluded, test_evaluatedfalse. Exact evaluated
+child's259-character objective renders22paired epochs, selectedepoch22.
+
+Extracted the unchanged display-metadata contract into validate_display_metadata
+and added it to pre-review canonical --round preflight for novel methods only,
+preventing this formatting failure after review. Focused14training tests pass,
+and the actual smoke passes the new CLI gate. Official eight-parent pool remains
+unpromoted; successful scoped R52 consumes the round number, so next full isR53.
+User authorization covers that ONE full round with8parents/2researchers,6slots,
+2fits,20minutes,182/61/61seed0,80/20jaw/speed and reserved test.

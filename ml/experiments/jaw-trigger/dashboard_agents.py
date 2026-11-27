@@ -748,6 +748,17 @@ def requires_training_record(result, name, entry):
     return family.casefold() not in {'threshold', 'geometry', 'template', 'optical flow', 'hog'}
 
 
+def validate_display_metadata(metadata):
+    """The same presentation contract before review and at final publication."""
+    graph = metadata.get('architecture')
+    if (not isinstance(metadata.get('family'), str) or not 1 <= len(metadata['family'].split()) <= 2
+            or not isinstance(metadata.get('differentiator'), str) or not 3 <= len(metadata['differentiator'].split()) <= 4
+            or not isinstance(graph, list) or not graph
+            or any(not isinstance(stage, list) or len(stage) != 2
+                   or any(not isinstance(text, str) or not text.strip() for text in stage) for stage in graph)):
+        raise ValueError('Novel methods require reviewed display and architecture metadata')
+
+
 def verify_completion(job, final, config, manifests):
     from round_one import accuracy
     from run_joint_round import JointCandidate, joint_genotype, read_genotype
@@ -859,13 +870,7 @@ def verify_completion(job, final, config, manifests):
         observed[name] = entry
         if entry['candidate']['method'] not in prior_methods:
             metadata = result.get('candidate_metadata', {}).get(name, {})
-            graph = metadata.get('architecture')
-            if (not isinstance(metadata.get('family'), str) or not 1 <= len(metadata['family'].split()) <= 2
-                    or not isinstance(metadata.get('differentiator'), str) or not 3 <= len(metadata['differentiator'].split()) <= 4
-                    or not isinstance(graph, list) or not graph
-                    or any(not isinstance(stage, list) or len(stage) != 2
-                           or any(not isinstance(text, str) or not text.strip() for text in stage) for stage in graph)):
-                raise ValueError('Novel methods require reviewed display and architecture metadata')
+            validate_display_metadata(metadata)
     parent_tasks = [task for task in completed if task.get('kind') == 'parent']
     if (len(parent_tasks) != len(parents_to_evolve)
             or {task.get('parent') for task in parent_tasks} != {candidate['name'] for candidate in parents_to_evolve}):

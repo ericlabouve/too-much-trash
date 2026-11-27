@@ -12,6 +12,15 @@ from dashboard_training import verify_training_records, preflight_training_trial
 
 
 class TrainingAuditTests(unittest.TestCase):
+    def test_early_display_contract_is_identical_to_final_contract(self):
+        from dashboard_agents import validate_display_metadata
+        good = {'family': 'Contrast', 'differentiator': 'Trimmed bilateral row consensus',
+                'architecture': [['Data', 'Measured image appearance'], ['State', 'Causal hysteresis']]}
+        validate_display_metadata(good)
+        bad = dict(good, differentiator='Robust sorted-row bilateral appearance contrast with fixed ten-row tail removal and persistent visual hysteresis')
+        with self.assertRaisesRegex(ValueError, 'display and architecture metadata'):
+            validate_display_metadata(bad)
+
     def fixture(self, job, *, kind='iterative', epochs=3):
         settings = {'training_protocol': PROTOCOL, 'agent_minutes': 30, 'match_seconds': .5}
         train = job / 'train.json'

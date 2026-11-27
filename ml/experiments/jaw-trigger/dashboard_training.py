@@ -321,6 +321,12 @@ if __name__ == '__main__':
         config = json.loads(local_artifact(job, job / 'config.json').read_text())
         result = json.loads(local_artifact(job, job / 'results.json').read_text())
         evaluation = json.loads(local_artifact(job, job / 'evaluation.json').read_text())
+        from dashboard_agents import validate_display_metadata, candidate_catalog
+        prior = json.loads(Path(config['prior']).read_text())
+        prior_methods = {row['method'] for row in candidate_catalog(prior)} | set(prior.get('feature_parameters', {}))
+        for entry in result['challengers']:
+            if entry['candidate']['method'] not in prior_methods:
+                validate_display_metadata(result.get('candidate_metadata', {}).get(entry['candidate']['name'], {}))
         eligible = {row['candidate']['name']: row['candidate']
                     for row in result['incumbents'] + result['challengers']}
         report = verify_training_records(job, result, evaluation, config['settings'],
