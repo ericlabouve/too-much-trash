@@ -138,6 +138,8 @@ def supervisor_configuration(prior, settings, job, binary):
     return {'protocol': BUDGET_PROTOCOL, 'job': str(job.resolve()),
             'repository': str(REPOSITORY), 'binary': binary, 'settings': settings,
             'review_report_probe_kinds': list(PROBE_KINDS),
+            'review_preflight_command': [sys.executable, str(HERE / 'dashboard_training.py'),
+                                         '--job', str(job.resolve()), '--round'],
             'expected': {'parent': [parent['name'] for parent in evolution_parents(prior, settings)],
                          **{kind: counts[key] for kind, key in
                             (('research', 'research'), ('review', 'review'), ('integrity_review', 'integrity_review'))}},
@@ -503,6 +505,24 @@ same named objective/reduction. Validation runs without gradients, dropout or au
 it never supplies fitting examples, and the test split remains untouched. Save a JSON
 history {{"metric":"objective name", "points":[{{"epoch":1,"train_loss":number,
 "validation_loss":number}}],"note":"measurement/weighting details"}} inside this job.
+Use dashboard_training.make_training_monitor(job, trial_id, plan) for new jaw fits;
+it binds exact frozen validation IDs, finite close/open events and recomputed F1
+BEFORE saving an epoch/checkpoint. After every completed fit, call the canonical
+preflight_training_trial(job, trial_id), not a custom permissive checker.
+Run verify_training_records successfully for the ENTIRE journal before final native
+evaluation and reviewer dispatch. The supervisor additionally runs this canonical
+round gate before allocating any final reviewer; failed evidence consumes no slot.
+Every reviewer must independently run this canonical check and inspect source in
+addition to it. A structural streaming-probe pass cannot override training errors.
+Disclose weighting/reduction, masks/offsets, data-loss vs regularization and evaluation
+mode in plan.measurement_note. Prefer normalized data loss sum(weight*loss)/sum(weight)
+for comparable curves; optional ml.evolution.losses.binary_data_loss supplies an
+auditable NumPy reference. Keep optimizer penalties separate from data-loss diagrams.
+Alternative scientifically justified objectives remain allowed when honestly labeled.
+Do not force a decreasing validation curve, compare unrelated objectives by raw height,
+or silently replace event-F1 checkpoint selection with minimum-loss selection.
+Plot ONLY the history referenced by evaluation.training_receipts[candidate], verifying
+model/checkpoint equality. Exploratory trials must be labeled as exploratory.
 Audited training receipts are the canonical source for new dashboard loss curves; no
 duplicate chart metadata/model serialization is required. Legacy optional curves may
 link from candidate_metadata[name].training_history as {{"path":job-relative path,
@@ -1103,7 +1123,7 @@ def execute(config_path):
                                           for path in manifests.values()}
         # Freeze trusted source before agents run. Publication later checks these
         # copies, so future legitimate repository edits do not erase old history.
-        protected = ['ml/evolution/training.py', 'ml/evolution/resources.py', 'ml/evolution/agent_briefs.py',
+        protected = ['ml/evolution/training.py', 'ml/evolution/losses.py', 'ml/evolution/resources.py', 'ml/evolution/agent_briefs.py',
                      'ml/evolution/agent_runtime.py', 'ml/evolution/agent_budgets.py', 'ml/evolution/review_bundles.py',
                      'ml/evolution/portfolio.py', 'ml/evolution/__init__.py',
                      *[f'ml/experiments/jaw-trigger/{name}' for name in

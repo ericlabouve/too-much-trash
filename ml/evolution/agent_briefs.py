@@ -55,6 +55,20 @@ it. Use the runner's supervised lifecycle tools; a Goal or instruction alone is 
 wall-time enforcement mechanism. Do not manufacture meaningless trials to fill time.
 Stay within the requested round/agent budget. Preserve unrelated changes; never
 copy another project's infinite-loop or git-reset workflow into a shared checkout.
+For the jaw domain use dashboard_training.make_training_monitor, which binds frozen
+validation IDs, event schema and recomputed F1 before saving each epoch. Run
+preflight_training_trial after each completed fit; do not replace the canonical
+checker with a handwritten approximation. The full training gate must pass before
+serial deployment scoring and again before reviewer dispatch. Reviewers must run
+the canonical check themselves as well as inspecting source and native probes.
+Describe measurement details in plan.measurement_note: fixed examples, weighting,
+reduction, masks/offsets, inference mode and whether a penalty is included. Prefer
+normalized data loss sum(weight*loss)/sum(weight) and report optimizer penalties
+separately; ml.evolution.losses.binary_data_loss is an optional NumPy reference.
+Other legitimate objectives remain allowed with the same evaluation definition
+on both splits. Do not demand decreasing curves or invent a desired shape. Plot
+the exact evaluated candidate's selected receipt/checkpoint, not a similarly named
+exploratory trial. Keep raw epochs, selected marker and full measurement definition.
 '''.strip()
 
 

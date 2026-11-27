@@ -231,6 +231,28 @@ format within its original allocation. The domain audit still verifies exact
 validation membership and recomputes F1 from every saved epoch; this early
 check does not relax that audit or repair previously frozen receipts.
 
+Jaw authors should use `dashboard_training.make_training_monitor(job, trial_id,
+plan)`: its domain callback checks the exact frozen validation IDs, serialized
+close/open events and recomputed F1 **before** saving an epoch/checkpoint. The
+generic monitor accepts an optional `validation_validator` callback for other
+domains. Validation sees the same canonical JSON object that will be persisted,
+so ordinary tuple events remain compatible. Run
+`preflight_training_trial(job, trial_id)` after each completed fit while peers
+may still be running. It uses the same canonical checker as final admission,
+not a weaker author/reviewer approximation. The jaw supervisor runs the full
+canonical training gate before allocating each final reviewer; failure consumes
+no task slot. Final source review and the full completion audit remain mandatory.
+
+Keep loss diagrams bound to `evaluation.training_receipts[candidate]` and its
+exact selected checkpoint. Earlier exploratory trials need explicit labels.
+Use `plan.measurement_note` for weighting/reduction, masks or label offsets,
+fixed evaluation samples and penalty treatment; the monitor preserves it in
+the history. Prefer comparable normalized **data loss**, with regularization
+reported separately. The optional NumPy helper
+`ml.evolution.losses.binary_data_loss` reports `sum(w * BCE) / sum(w)`, weight
+mass and sample count. Other justified objectives remain allowed. Never infer
+generalization from the shape alone or force validation loss to decrease.
+
 JSON-safe parameters can reference hashed opaque framework checkpoints; keep
 referenced weight filenames immutable for each checkpoint. The
 monitor does not require tensor weights to be serialized as JSON. Genuinely

@@ -81,7 +81,8 @@ def _verify_evidence(root, record):
 
 
 class TrainingMonitor:
-    def __init__(self, job, trial_id, plan, context, *, policy=None, clock=monotonic):
+    def __init__(self, job, trial_id, plan, context, *, policy=None, clock=monotonic,
+                 validation_validator=None):
         if not isinstance(trial_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,80}', trial_id):
             raise ValueError('Use a unique simple trial ID')
         if not isinstance(plan, dict) or not isinstance(context, dict):
@@ -89,6 +90,13 @@ class TrainingMonitor:
         required = ('candidate_name', 'hypothesis', 'objective', 'capacity', 'regularization')
         if any(not isinstance(plan.get(key), str) or not plan[key].strip() for key in required):
             raise ValueError('Declare the hypothesis, objective, capacity and regularization before fitting')
+        if len(plan['objective']) > 2048:
+            raise ValueError('Keep the objective label within 2048 characters')
+        if ('measurement_note' in plan and (not isinstance(plan['measurement_note'], str)
+                or len(plan['measurement_note']) > 2000)):
+            raise ValueError('Measurement details must be text within 2000 characters')
+        if validation_validator is not None and not callable(validation_validator):
+            raise ValueError('The domain validation checker must be callable')
         if plan.get('kind') not in ('iterative', 'noniterative'):
             raise ValueError('Declare iterative or genuinely noniterative training')
         seed = plan.get('seed')
@@ -119,6 +127,7 @@ class TrainingMonitor:
         if not self.directory.resolve().is_relative_to(self.job):
             raise ValueError('Training trial directory must stay inside its job')
         self.plan = json.loads(canonical(plan))
+        self.validation_validator = validation_validator
         self.context = dict(context)
         self.policy = TrainingPolicy(**(asdict(TrainingPolicy()) if policy is None else policy))
         self.clock, self.started = clock, clock()
@@ -186,12 +195,14 @@ class TrainingMonitor:
             raise ValueError('Declared epoch ceiling exceeded')
         point = {'epoch': epoch, 'train_loss': train_loss, 'validation_loss': validation_loss,
                  'validation_score': validation_score, 'elapsed_seconds': self._elapsed()}
-        canonical(validation_predictions)
+        frozen_predictions = json.loads(canonical(validation_predictions))
         canonical(parameters)
+        if self.validation_validator is not None:
+            self.validation_validator(frozen_predictions, validation_score)
         if parameters is None:
             raise ValueError('A validation checkpoint needs frozen parameters')
         predictions_path = self.directory / f'validation-{epoch:04d}.json'
-        write(predictions_path, validation_predictions)
+        write(predictions_path, frozen_predictions)
         point['predictions'] = evidence(self.job, predictions_path)
         self.points.append(point)
         if self.best is None or checkpoint_key(point) > checkpoint_key(self.best):
@@ -205,8 +216,11 @@ class TrainingMonitor:
             self.stop_reason = 'patience'
         elif epoch == self.plan['max_epochs']:
             self.stop_reason = 'max_epochs'
+        note = 'Post-epoch inference-mode losses; checkpoint selected by validation task score, then lower validation loss, then earlier epoch. Test excluded.'
+        if self.plan.get('measurement_note'):
+            note += ' ' + self.plan['measurement_note']
         write(self.directory / 'history.json', {'metric': self.plan['objective'], 'points': self.points,
-              'note': 'Post-epoch inference-mode losses; checkpoint selected by validation task score, then lower validation loss, then earlier epoch. Test excluded.'})
+                                               'note': note})
         self._history_record = evidence(self.job, self.directory / 'history.json')
         return self.stop_reason is not None
 

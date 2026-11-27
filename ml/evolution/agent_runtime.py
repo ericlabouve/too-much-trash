@@ -118,6 +118,7 @@ class Supervisor:
                 if len(same) >= expected.get(kind, 0):
                     raise ValueError('The configured agent count for this kind is exhausted')
             frozen_review = None
+            training_preflight = None
             if kind == 'integrity_review':
                 if not isinstance(candidate_name, str) or not candidate_name.strip():
                     raise ValueError('Final reviewer needs its one assigned candidate')
@@ -126,6 +127,22 @@ class Supervisor:
                     raise ValueError('This candidate already has its configured reviewers')
                 if self.settings.get('review_bundle_protocol') == REVIEW_BUNDLE_PROTOCOL:
                     frozen_review = preflight_bundle(self.job, review_bundle, candidate_name)
+                command = self.config.get('review_preflight_command')
+                if command is not None:
+                    if not isinstance(command, list) or not command or any(not isinstance(x, str) or not x for x in command):
+                        raise ValueError('The trusted review preflight command is invalid')
+                    environment = dict(os.environ, PYTHONDONTWRITEBYTECODE='1')
+                    environment['PYTHONPATH'] = str(self.repository) + os.pathsep + environment.get('PYTHONPATH', '')
+                    try:
+                        checked = subprocess.run(command, cwd=self.repository, env=environment,
+                                                 capture_output=True, text=True, timeout=60)
+                    except (OSError, subprocess.TimeoutExpired) as error:
+                        raise ValueError(f'Canonical training preflight blocked reviewer dispatch: {error}') from error
+                    if checked.returncode:
+                        raise ValueError('Canonical training preflight blocked reviewer dispatch: '
+                                         + (checked.stderr or checked.stdout)[-2000:])
+                    training_preflight = {'status': 'passed', 'command': command,
+                                          'stdout_sha256': sha256(checked.stdout.encode()).hexdigest()}
             elif review_bundle is not None:
                 raise ValueError('Only final review tasks accept a frozen review bundle')
             identifier = str(uuid4())
@@ -145,6 +162,8 @@ class Supervisor:
             task['owned_processes'] = []
             if frozen_review is not None:
                 task['review_bundle'] = frozen_review
+            if training_preflight is not None:
+                task['training_preflight'] = training_preflight
             self.tasks[identifier] = task
             self.tick()
             return self._public(task)

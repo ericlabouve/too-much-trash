@@ -10,6 +10,7 @@ from tempfile import TemporaryDirectory
 import time
 from types import MethodType
 import unittest
+from unittest.mock import patch
 
 from ml.evolution.agent_runtime import PROTOCOL, Supervisor, serve
 
@@ -98,6 +99,19 @@ class SupervisorTests(unittest.TestCase):
         self.assertEqual(current['cycles'][0]['deadline_monotonic'], 60)
         self.assertIn('resume', self.factory.processes[-1].argv)
         self.assertEqual(self.factory.processes[-1].argv[self.factory.processes[-1].argv.index('resume') + 1], 'thread-1')
+
+    def test_failed_canonical_training_gate_consumes_no_reviewer_slot(self):
+        self.runtime.config['review_preflight_command'] = ['/trusted/python', 'canonical-training-check']
+        with patch('ml.evolution.agent_runtime.subprocess.run') as run:
+            run.return_value = subprocess.CompletedProcess([], 1, '', 'Invalid epoch predictions')
+            with self.assertRaisesRegex(ValueError, 'blocked reviewer dispatch'):
+                self.start('integrity_review', candidate_name='candidate')
+            self.assertEqual(self.runtime.tasks, {})
+            self.assertEqual(self.factory.processes, [])
+            run.return_value = subprocess.CompletedProcess([], 0, '{"status":"passed"}', '')
+            task = self.start('integrity_review', candidate_name='candidate')
+            self.assertEqual(task['training_preflight']['status'], 'passed')
+            self.assertEqual(len(self.runtime.tasks), 1)
 
     def test_export_interrupts_research_then_finishes_before_original_deadline(self):
         task = self.start()

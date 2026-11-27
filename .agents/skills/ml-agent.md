@@ -244,3 +244,39 @@ fits, preserves existing immutable evidence, and does not waive domain
 membership/F1 checks. A regression test verifies same-allocation correction
 without saving a malformed epoch. Do not start another round without user
 authorization.
+
+
+## Independent R52 audit and retry preparation — 2026-11-26
+
+An independent audit reproduced89valid/12invalid training receipts, checked all18
+exports equal their selected parameters and found no test IDs in saved predictions.
+P04 reviewer used a weaker custom checker, so its approval missed the schema error.
+All73iterative histories/1906epochs have real paired losses;72patience stops and
+1epoch-cap stop. Gaps mostly reflect genuine overfitting. P07's weight-mass scaling
+changes validation data loss by2.3–2.7%, insufficient to explain the large gaps;
+class-balanced evaluation is legitimate when explicit. Separate data loss from
+regularization and do not change event-F1 checkpoint selection to make curves pretty.
+The example plot previously used exploratory p02-absolute; exported P02 child is
+p02-compact8, selectedepoch13. Corrected plot resolves evaluation.training_receipts
+and verifies exact model hashes. Dashboard long objective labels (>150characters)
+silently hid three selected histories; expanded bounded label support to2048.
+
+New trusted jaw make_training_monitor wrapper checks exact canonical-JSON IDs,
+close/open schema and recomputed F1 before immutable epoch/checkpoint writes.
+Tuple events/JSON-compatible NumPy timestamps serialize consistently. Public
+preflight_training_trial reuses the canonical checker while peer fits are open.
+Supervisor review_preflight_command requires the FULL canonical training gate to
+pass before allocating a final-review task (no slot spent on failure). Final
+publication gates remain unchanged. Optional shared NumPy binary_data_loss helper
+reports sum(weight*BCE)/sum(weight), sample count and weight mass. Measurement
+notes preserve weighting/masks/offsets and penalty treatment; other objectives
+remain allowed. Independent follow-up review found no remaining must-fix issue.
+73shared and96dashboard regression tests passed (169total).
+
+User now authorizes a light smoke and then ONE full retry after fixes/smoke pass.
+Keep eight parents/two researchers/six agent slots/two fitting slots/twenty minutes
+for the full run, original182/61/61seed0 split,80%validation jawF1/20%speed,
+0.95validation target and reserved test. Smoke is scoped and cannot promote the
+official eight-parent pool. No extra full round beyond that authorization.
+Detailed independent report, per-receipt audit and corrected plot/provenance are
+under working/runs/audits/round52-20261126/, outside Git.

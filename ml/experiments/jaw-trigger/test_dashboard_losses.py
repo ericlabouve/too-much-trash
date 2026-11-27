@@ -31,6 +31,15 @@ class LossHistoryTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 normalize_history({'metric': 'BCE', 'points': points})
 
+    def test_detailed_realistic_objectives_do_not_silently_drop_loss_curves(self):
+        for length in (154, 186, 2048):
+            prefix = 'Weighted binary cross-entropy; '
+            objective = prefix + 'x' * (length - len(prefix))
+            history = normalize_history({'metric': objective,
+                                         'points': [{'epoch': 1, 'train_loss': .1, 'validation_loss': .3}]})
+            self.assertEqual(history['metric'], objective)
+            self.assertEqual(history['points'][0]['validation_loss'], .3)
+
     def test_explicit_history_requires_matching_hashes_and_model(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)

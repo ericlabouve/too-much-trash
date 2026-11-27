@@ -153,6 +153,20 @@ policies need a new protocol version and a compatible historical validator.
 Audited histories directly populate candidate loss charts, without duplicate
 legacy `candidate_metadata.training_history` artifacts.
 
+Use `dashboard_training.make_training_monitor` for new jaw fits. Its canonical
+ID/event/F1 checks run before saving an epoch, allowing correction within the
+same allocation without rewriting completed receipts. Use
+`preflight_training_trial(job, trial_id)` after each fit; other agents may still
+have open trials. The CLI supports `--job JOB --trial TRIAL_ID`, or `--round`
+to run the full training gate. The supervisor requires that full gate to pass
+before allocating any final reviewer. Reviewers run the same checker in
+addition to independent code/probe inspection; a custom check is insufficient.
+Record weighting/reduction, masks, offsets, inference mode and penalty treatment
+in `plan.measurement_note`. Prefer normalized data-loss curves, report penalties
+separately, and plot the exact evaluated receipt rather than an exploratory fit.
+Detailed objective names up to 2048 characters remain renderable; no chart is
+silently omitted merely because its measurement definition exceeds 150 characters.
+
 The dataset checklist discovers beach, park and home from the frozen local
 reference snapshot. Selected episodes are shuffled by the seed and assigned to
 the configured training/validation/test percentages. Random clip splitting can

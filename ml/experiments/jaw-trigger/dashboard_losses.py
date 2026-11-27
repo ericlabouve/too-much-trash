@@ -12,7 +12,7 @@ def normalize_history(record):
         raise ValueError('Loss history must describe its metric and points')
     metric = record.get('metric')
     points = record.get('points')
-    if not isinstance(metric, str) or not metric.strip() or len(metric) > 150:
+    if not isinstance(metric, str) or not metric.strip() or len(metric) > 2048:
         raise ValueError('A loss metric label is required')
     if not isinstance(points, list) or not 1 <= len(points) <= 5000:
         raise ValueError('Record 1–5000 loss measurements')
@@ -33,7 +33,7 @@ def normalize_history(record):
         clean.append(row)
     note = record.get('note', '')
     return {'metric': metric.strip(), 'points': clean,
-            'note': note[:500] if isinstance(note, str) else ''}
+            'note': note[:2500] if isinstance(note, str) else ''}
 
 
 def _read(job, reference):

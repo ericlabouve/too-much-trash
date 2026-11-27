@@ -112,3 +112,15 @@ Use the domain's native inputs for inference. Evaluation labels and clip
 identity may guide fitting when authorized, but should not silently enter
 runtime logic. Keep private examples, generated reports, learned weights
 and build artifacts out of Git under the project's existing policy.
+
+
+Independent R52 audit follow-up: new jaw authors use
+`dashboard_training.make_training_monitor` to validate exact serialized validation
+IDs/events/F1 before saving an epoch. Run public `preflight_training_trial` after
+each fit; the supervisor requires the full canonical training gate before any
+final reviewer gets a task slot. Reviewers use the canonical checker plus source
+inspection, never a permissive handwritten substitute. Use measurement_note for
+weighting/reduction, masks/offsets and penalty treatment; prefer normalized data
+loss with optimizer penalties separate. Real overfit gaps stay visible. Exported
+plots must resolve the candidate's exact evaluation.training_receipts checkpoint,
+not an exploratory trial chosen by name.

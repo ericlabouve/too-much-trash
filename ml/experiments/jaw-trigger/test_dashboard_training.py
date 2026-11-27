@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from ml.evolution.training import TrainingMonitor, PROTOCOL, evidence, policy_for, write
-from dashboard_training import verify_training_records
+from dashboard_training import verify_training_records, preflight_training_trial, make_training_monitor
 
 
 class TrainingAuditTests(unittest.TestCase):
@@ -51,6 +51,92 @@ class TrainingAuditTests(unittest.TestCase):
     def audit(self, job, fixture):
         settings, manifests, result, evaluation, eligible = fixture
         return verify_training_records(job, result, evaluation, settings, manifests, eligible)
+
+    def test_early_preflight_uses_canonical_checks_with_other_open_trials(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory)
+            fixture = self.fixture(job)
+            write(job / 'config.json', {'settings': fixture[0]})
+            # Another agent is actively fitting; that must not block this check.
+            with (job / 'trials.jsonl').open('a') as stream:
+                stream.write(json.dumps({'trial_id': 'another-fit', 'status': 'started'}) + '\n')
+            before = {str(p): sha256(p.read_bytes()).hexdigest() for p in job.rglob('*') if p.is_file()}
+            result = preflight_training_trial(job, 'trial-one')
+            self.assertEqual(result['status'], 'passed')
+            self.assertEqual(result['selected_epoch'], 2)
+            self.assertEqual(result['candidate_names'], ['Model'])
+            self.assertEqual(before, {str(p): sha256(p.read_bytes()).hexdigest()
+                                      for p in job.rglob('*') if p.is_file()})
+            with self.assertRaisesRegex(ValueError, 'started/completed'):
+                preflight_training_trial(job, 'another-fit')
+
+    def test_early_preflight_does_not_accept_handwritten_list_or_false_f1(self):
+        for corruption in ('list', 'f1'):
+            with self.subTest(corruption=corruption), TemporaryDirectory() as directory:
+                job = Path(directory)
+                fixture = self.fixture(job)
+                write(job / 'config.json', {'settings': fixture[0]})
+                def mutate(receipt):
+                    history_path = job / receipt['history']['path']
+                    history = json.loads(history_path.read_text())
+                    first = history['points'][0]
+                    if corruption == 'list':
+                        path = job / first['predictions']['path']
+                        predictions = json.loads(path.read_text())
+                        write(path, list(predictions.values()))
+                        first['predictions'] = evidence(job, path)
+                    else:
+                        first['validation_score'] = 1.
+                    write(history_path, history)
+                    receipt['history'] = evidence(job, history_path)
+                self.republish(job, fixture, mutate)
+                with self.assertRaisesRegex(ValueError, 'JSON object|must match'):
+                    preflight_training_trial(job, 'trial-one')
+
+    def test_domain_monitor_rejects_bad_ids_event_shapes_and_scores_before_saving(self):
+        for predictions, score in (({'test': []}, 0.),
+                                   ({'validation': [['close', float('inf')]]}, 0.),
+                                   ({'validation': [['squeeze', 3.]]}, 0.),
+                                   ({'validation': [['close', 3.]]}, 1.)):
+            with self.subTest(predictions=predictions), TemporaryDirectory() as directory:
+                job = Path(directory)
+                fixture = self.fixture(job)
+                write(job / 'config.json', {'settings': fixture[0]})
+                plan = json.loads((job / 'training/trial-one/plan.json').read_text())['plan']
+                plan['max_epochs'] = 1
+                plan['measurement_note'] = 'Data BCE; equal fixed evaluation rules, penalty excluded.'
+                with make_training_monitor(job, 'validated-trial', plan) as monitor:
+                    with self.assertRaises(ValueError):
+                        monitor.observe(train_loss=.1, validation_loss=.2, validation_score=score,
+                                        validation_predictions=predictions, parameters={'value': 1})
+                    self.assertEqual(monitor.points, [])
+                    self.assertFalse((monitor.directory / 'selected-checkpoint.json').exists())
+                    monitor.observe(train_loss=.1, validation_loss=.2, validation_score=1.,
+                                    validation_predictions={'validation': [['close', 3.], ['open', 5.]]},
+                                    parameters={'value': 1})
+                    monitor.finish()
+                checked = preflight_training_trial(job, 'validated-trial')
+                self.assertEqual(checked['selected_validation_f1'], 1.)
+                history = json.loads((job / checked['history']['path']).read_text())
+                self.assertIn('penalty excluded', history['note'])
+
+    def test_domain_monitor_checks_the_stored_json_representation(self):
+        import numpy as np
+        with TemporaryDirectory() as directory:
+            job = Path(directory)
+            fixture = self.fixture(job)
+            write(job / 'config.json', {'settings': fixture[0]})
+            plan = json.loads((job / 'training/trial-one/plan.json').read_text())['plan']
+            plan['max_epochs'] = 1
+            with make_training_monitor(job, 'tuple-events', plan) as monitor:
+                monitor.observe(train_loss=.1, validation_loss=.2, validation_score=1.,
+                                validation_predictions={'validation': [('close', np.float64(3.)), ('open', 5.)]},
+                                parameters={'value': 1})
+                monitor.finish()
+            report = preflight_training_trial(job, 'tuple-events')
+            self.assertEqual(report['selected_validation_f1'], 1.)
+            prediction = json.loads((job / 'training/tuple-events/validation-0001.json').read_text())
+            self.assertEqual(prediction['validation'], [['close', 3.], ['open', 5.]])
 
     def republish(self, job, fixture, mutate):
         """Refresh hashes after an adversarial edit so semantic checks must catch it."""

@@ -5,12 +5,14 @@ not prove that arbitrary candidate code computed its reported losses honestly.
 """
 
 from hashlib import sha256
+import fcntl
 import json
 from math import isclose, isfinite
 from pathlib import Path
 import re
+from time import monotonic
 
-from ml.evolution.training import PROTOCOL, checkpoint_key, policy_for
+from ml.evolution.training import PROTOCOL, TrainingMonitor, checkpoint_key, policy_for
 from dashboard_integrity import hashed_artifact, local_artifact
 
 
@@ -61,7 +63,10 @@ def _plan(job, record, context, policy):
 
 
 def _predictions(job, record, ids):
-    predictions = _read(job, record)
+    return _prediction_values(_read(job, record), ids)
+
+
+def _prediction_values(predictions, ids):
     if not isinstance(predictions, dict) or set(predictions) != set(ids):
         raise ValueError('Epoch predictions must cover exactly validation clips, excluding test')
     for events in predictions.values():
@@ -233,3 +238,91 @@ def verify_training_records(job, result, evaluation, settings, manifests, eligib
     return {'protocol': PROTOCOL, 'policy': policy, 'candidates': candidates,
             'trials': len(started), 'crashes': len(crashes),
             'unselected_completed_trials': len(completed) - len(used)}
+
+
+def _training_inputs(job):
+    job = Path(job).resolve(strict=True)
+    config = json.loads(local_artifact(job, job / 'config.json').read_text())
+    settings = config['settings']
+    if settings.get('training_protocol') != PROTOCOL:
+        raise ValueError('Training preflight requires validation-checkpoints-v1')
+    manifests = {split: local_artifact(job, job / f'{split}.json')
+                 for split in ('train', 'validation')}
+    context = {f'{split}_manifest_sha256': sha256(path.read_bytes()).hexdigest()
+               for split, path in manifests.items()}
+    train = json.loads(manifests['train'].read_text())['clips']
+    validation = json.loads(manifests['validation'].read_text())['clips']
+    ids = [row['clip'] for row in validation]
+    if not ids or len(ids) != len(set(ids)) or set(ids) & {row['clip'] for row in train}:
+        raise ValueError('Training preflight requires unique disjoint validation clips')
+    return settings, context, ids, [row['jaw_reference'] for row in validation]
+
+
+def make_training_monitor(job, trial_id, plan, *, clock=monotonic):
+    """Bind the canonical jaw validator BEFORE an epoch can become immutable."""
+    settings, context, ids, labels = _training_inputs(job)
+
+    def validate(predictions, score):
+        values = _prediction_values(predictions, ids)
+        import round_one
+        old_tolerance = round_one.MATCH_SECONDS
+        round_one.MATCH_SECONDS = settings['match_seconds']
+        try:
+            actual = round_one.accuracy(values, labels)['f1']
+        finally:
+            round_one.MATCH_SECONDS = old_tolerance
+        if not _number(score) or not isclose(score, actual, abs_tol=1e-12, rel_tol=0):
+            raise ValueError('Epoch validation F1 must match its saved event predictions')
+
+    return TrainingMonitor(job, trial_id, plan, context, policy=policy_for(settings),
+                           clock=clock, validation_validator=validate)
+
+
+def preflight_training_trial(job, trial_id):
+    """Check one closed fit without requiring other agents' fits to be closed.
+
+    This never modifies evidence or replaces the complete round-end audit.
+    """
+    job = Path(job).resolve(strict=True)
+    if not isinstance(trial_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,80}', trial_id):
+        raise ValueError('Select one simple trial ID')
+    settings, context, ids, labels = _training_inputs(job)
+    with local_artifact(job, job / 'trials.jsonl').open() as stream:
+        fcntl.flock(stream, fcntl.LOCK_SH)
+        rows = [json.loads(line) for line in stream]
+    rows = [row for row in rows if row.get('trial_id') == trial_id]
+    if len(rows) != 2 or [row.get('status') for row in rows] != ['started', 'completed']:
+        raise ValueError('Training preflight needs exactly one started/completed trial')
+    import round_one
+    old_tolerance = round_one.MATCH_SECONDS
+    round_one.MATCH_SECONDS = settings['match_seconds']
+    try:
+        names, summary, _ = _receipt(job, rows[1]['receipt'], trial_id, rows[0]['plan'],
+                                     context, policy_for(settings), ids,
+                                     labels, round_one.accuracy)
+    finally:
+        round_one.MATCH_SECONDS = old_tolerance
+    return {'status': 'passed', 'scope': 'one-completed-trial',
+            'candidate_names': names, 'receipt': rows[1]['receipt'], **summary}
+
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Read-only canonical training-receipt preflight.')
+    parser.add_argument('--job', type=Path, required=True)
+    scope = parser.add_mutually_exclusive_group(required=True)
+    scope.add_argument('--trial')
+    scope.add_argument('--round', action='store_true')
+    args = parser.parse_args()
+    if args.trial:
+        report = preflight_training_trial(args.job, args.trial)
+    else:
+        job = args.job.resolve(strict=True)
+        config = json.loads(local_artifact(job, job / 'config.json').read_text())
+        result = json.loads(local_artifact(job, job / 'results.json').read_text())
+        evaluation = json.loads(local_artifact(job, job / 'evaluation.json').read_text())
+        eligible = {row['candidate']['name']: row['candidate']
+                    for row in result['incumbents'] + result['challengers']}
+        report = verify_training_records(job, result, evaluation, config['settings'],
+                                         {split: job / f'{split}.json' for split in ('train', 'validation')}, eligible)
+    print(json.dumps(report, indent=2, allow_nan=False))
