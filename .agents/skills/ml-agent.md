@@ -851,3 +851,58 @@ Goal remains PAUSED by explicit user cancellation. user_final_request launches_u
   Live dashboard API confirms completedR60, currentviewR60 and next_round61.
   No additional round started; PR remains draft while target/field/test work is
   pending. Later CLI helper/history fixes preserve already published evidence.
+
+
+## Pinned jaw alpha handoff — 2026-11-27
+
+- User authorizes preparing PR/code for the iPhone+backend agent to integrate
+  the current leader for alpha live SQUEEZE/RELEASE flashes. RSI chat owns model
+  selection/export/evaluation; no iOS/backend implementation, installation or
+  cross-chat message was performed here. Alpha testing is authorized despite
+  currentvalF1 .93927 falling below the .95 research target.
+- Authoritative handoff: ml/experiments/jaw-trigger/alpha/README.md and
+  alpha/selection.json. Model ID jaw-r59-independent-motion-alpha1, candidate
+  R59 independent motion delta-bce / independent_motion_correction59, display
+  Event Confidence: Independent motion adds recall. Pin the full candidate,
+  recovered R60 publication result/spec hashes,6 exact source files and all3
+  component weight hashes. Do not substitute tied R60 child or select by method.
+- Runtime consumes15Hz selected frames, tightly packed320x240 uint8 grayscale
+  derived from4:3 media; source960x720 and camera~60FPS are different rates/sizes.
+  Preserve exact reference preprocessing/orientation, common monotonic time,
+  raw device-axis accel including gravity(g) and gyro(rad/s), latest33 causal
+  native~100Hzsamples/stream. No ARKit pose/attitude/audio model inputs.
+- Full composite: visual state head +parent event head +correction decoder
+  +independent delta event head +parent_add decoder. Final signed native event,
+  not returned visual score, drives flashes. Maintain all5 handles across
+  episode boundaries; no app-added debounce/alternation/auto-recording changes.
+- Exact generic C++/Python runtime sources are checked in under alpha/runtime;
+  weights/data remain private. Original CPP components have overlapping C
+  symbols and global CPP types. Exporter generates symbol-prefixed namespace
+  wrappers and alpha_c_api.h; compile only the2wrappers for iOS, not rawCPP as
+  additional target sources. Host dylib is NOT an iOS binary. Flattening/model
+  flag/orchestration references are in the adapters and alphaREADME.
+- Actual private capsule exported to /Users/ericlabouve/Datasets/too-much-trash/working/alpha/jaw-r59-independent-motion-alpha1.
+  Contains3metadata-cleaned JSON weight files, complete runtime, independent
+  pin/checksum manifest and6validation-only conformance clips. check_parity.py
+  compiled-host results:705frames, maxabsolutevisualscoreerror0.0, identical
+  native events acrossall6 versus auditedartifact. No fitting/test/phone run.
+  Source pin independently anchors runtimeweights, sourcecode, decoderconfig
+  and fixturepixels/expected outputs rather than trusting editable manifests.
+- iPhone+backend agent must replay private rawgrayfixtures+IMU on actualphone,
+  check numeric/event parity and then livecamera preprocessing and sustained
+  inference alongsidecapture. Expected outputs remain test-harness inputs,
+  never model inputs. Phone port and natural continuous data remain unvalidated.
+- Continuous-data recommendation is documented in alpha/continuous-data.md:
+  first new labeled recording stays intact as streaming DEVELOPMENT validation;
+  future training/validation/test prefer separatecapture sessions. Splitting one
+  recording into thirds is correlated same-session evidence. If needed, use
+  disjoint chronological blocks with guards and reset/warmup using same-split
+  data only, reserving future independenttest. Current61testepisodes unchanged.
+  Existingadapter still assumes1close/openpair perclip; arbitrary continuous
+  eventlists/statefulscoring need a new versioned adapter, not invented3second
+  cues. Preserve noeventspans, verifiedlabelcoverage, multipleevents and clocks;
+  chunkstorage/data loading must not reset the live detector. No continuous
+  ingestion/training implementation was claimed or started by this handoff.
+- Local tests:151domain testsPASS;92shared testsunchanged from verified round.
+  Added meaningful synthetic linkage and independently pinned asset-tampering
+  regressions. Rawprivate fixtures/compiled artifacts stay outsideGit.

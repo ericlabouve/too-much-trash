@@ -1,5 +1,14 @@
 # Marker-free jaw trigger
 
+For the current user-approved iPhone alpha, start with the
+[alpha integration handoff](alpha/README.md) and its pinned
+[model selection](alpha/selection.json). The alpha export includes the complete
+three-component native model and conformance fixtures; app integration and
+deployment belong to the iPhone+backend agent. The
+[continuous-data plan](alpha/continuous-data.md) describes future labeled-stream
+evaluation and the remaining adapter work. The initial CLI example below
+documents the original five-clip experiment.
+
 `round_one.py` evolves lightweight detectors on the same five clips. Use
 a Python environment with PyAV, NumPy, and OpenCV. Keep clips, labels, and
 results in private storage outside Git.
