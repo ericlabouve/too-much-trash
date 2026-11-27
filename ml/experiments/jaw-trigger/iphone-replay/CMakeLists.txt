@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.28)
+project(JawPoolMac LANGUAGES CXX OBJCXX)
+find_package(OpenCV 5.0 EXACT REQUIRED COMPONENTS core imgproc)
+add_executable(jaw-pool-mac mac_main.mm)
+target_compile_features(jaw-pool-mac PRIVATE cxx_std_17)
+target_compile_options(jaw-pool-mac PRIVATE -O3 -fobjc-arc -fblocks)
+target_include_directories(jaw-pool-mac PRIVATE ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(jaw-pool-mac PRIVATE ${OpenCV_LIBS} "-framework Foundation" "-framework Accelerate")

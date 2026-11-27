@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evolutionary Phone Model</title>
+  <link rel="stylesheet" href="style.css?v=family-catalog">
+  <link rel="stylesheet" href="round-controls.css?v=jaw-matching-layout">
+  <link rel="stylesheet" href="architecture.css?v=loss-curves">
+  <script src="round-controls.js?v=jaw-matching-graphic" defer></script>
+  <script src="architecture.js?v=architecture-diagrams" defer></script>
+  <script src="candidate-names.js?v=architectural-names" defer></script>
+  <script src="loss-curves.js?v=event-f1-curves" defer></script>
+  <script src="table-resize.js?v=columns" defer></script>
+  <script src="trend.js?v=integrity-gate" defer></script>
+  <script src="app.js?v=concise-candidate-context" defer></script>
+  <script src="replay.js?v=candidate-cards" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">TOO MUCH TRASH / RESEARCH</p>
+      <h1>Evolutionary Phone Model</h1>
+      <p id="status" hidden>Waiting for experiment data</p>
+      <form id="round-form" class="round-form">
+        <div class="round-toolbar">
+          <button id="start-round" class="start-round" type="submit" disabled>Start Round …</button>
+          <label>Family
+            <select name="family" id="round-family"><option value="all">All families</option></select>
+          </label>
+          <label class="round-prompt" data-help="Additional research direction passed unchanged to every subagent in this round. The harness still applies the selected split, fitness and workspace constraints.">Round prompt
+            <textarea name="agent_prompt" id="agent-prompt" rows="1" maxlength="8000" placeholder="Optional direction for this round"></textarea>
+          </label>
+        </div>
+        <div id="round-progress-wrap" class="round-progress-wrap" hidden>
+          <progress id="round-progress" max="1" value="0" aria-label="Round progress"></progress>
+          <output id="round-progress-label">0%</output>
+        </div>
+        <p id="round-message" class="round-message" role="status" aria-live="polite"></p>
+        <details class="parameter-group round-configuration top-section" open>
+          <summary>Population &amp; agents</summary>
+        <div class="population-layout">
+        <div class="population-controls">
+        <div class="round-agent-settings">
+          <label>Pool size
+            <input name="pool_size" type="number" min="1" max="10" step="1" value="8" required>
+          </label>
+          <label data-help="Each independent research agent implements and evaluates exactly one fresh proposal. Ordinary proposals can explore any family; New Family requires a distinct new architecture from every researcher.">Research agents
+            <input name="research_slots" type="number" min="1" max="10" value="2" required>
+          </label>
+          <label data-help="Fresh, independently initialized reviewers assigned to each new candidate after evaluation. Each reviewer sees just one candidate, follows the same integrity checks, and must approve it before admission. Reviewers are separate from authors and from each other.">Reviewers per candidate
+            <input name="review_agents" type="number" min="1" max="5" value="1" required>
+          </label>
+          <label id="review-agent-setting" hidden data-help="New Family uses one early architecture reviewer, separate from the final integrity reviewers. Rejected architectures receive at least three feedback cycles before giving up.">Architecture review
+            <output id="review-agent-count">0</output>
+          </label>
+          <label data-help="Research schedule per started agent; queued time is excluded. Authors switch to export in the final 10% (60-second startup minimum, capped at half the allocation and two minutes). Once export begins it can finish past the timer, with no new research. Reviewers have a hard limit.">Minutes per agent
+            <input name="agent_minutes" type="number" min="1" max="120" value="20" required>
+          </label>
+          <label data-help="Maximum candidate agents working at once. Additional parent tasks run in later batches.">Parallel agents
+            <input name="agent_concurrency" type="number" min="1" max="6" value="6" required>
+          </label>
+          <label data-help="Maximum concurrent fitting jobs, enforced by process-shared training slots. Research and coding can continue in other agents. Slot waiting stays inside each agent's allocation; final performance benchmarks remain serial.">Parallel fits
+            <input name="fit_concurrency" type="number" min="1" max="6" value="2" required>
+          </label>
+        </div>
+        <details class="breeding-settings" open>
+          <summary>Breeding &amp; diversity</summary>
+          <div class="parameter-fields">
+            <label>Protected slots
+              <input name="protected_slots" type="number" min="0" max="9" step="1" value="2" required>
+            </label>
+            <label>Protected mutation attempts
+              <input name="mutation_attempts" type="number" min="1" max="20" step="1" value="2" required>
+            </label>
+            <label>Soft family cap
+              <input name="family_limit" type="number" min="1" max="10" step="1" value="2" required>
+            </label>
+          </div>
+        </details>
+        </div>
+        <figure class="agent-flow" aria-labelledby="agent-flow-title">
+          <figcaption id="agent-flow-title">Agent flow</figcaption>
+          <div class="agent-flow-branches">
+            <div class="agent-flow-node"><strong id="flow-parents">… parents</strong><span>Selected scope</span></div>
+            <div class="agent-flow-node"><strong id="flow-research">2 research agents</strong><span id="flow-architecture">Independent proposals</span></div>
+            <span class="agent-flow-arrow" aria-hidden="true">↓</span><span class="agent-flow-arrow" aria-hidden="true">↓</span>
+            <div class="agent-flow-node"><strong id="flow-children">… children</strong><span>One evolution agent each</span></div>
+            <div class="agent-flow-node"><strong id="flow-fresh">2 fresh candidates</strong><span>One per researcher</span></div>
+          </div>
+          <svg class="agent-flow-merge" viewBox="0 0 320 24" preserveAspectRatio="none" aria-hidden="true"><path d="M80 0 V10 H240 V0 M160 10 V24"/></svg>
+          <div class="agent-flow-node agent-flow-gate"><strong id="flow-reviewers">… fresh reviewers</strong><span id="flow-review-detail">1 per candidate · each reviews only one</span></div>
+          <div class="agent-flow-arrow" aria-hidden="true">↓</div>
+          <div class="agent-flow-node"><strong id="flow-selection">Select up to 8 survivors</strong><span>Current parents + approved candidates</span></div>
+        </figure>
+        </div>
+        </details>
+
+        <details class="dataset-selector top-section" open>
+          <summary>Datasets</summary>
+          <div id="round-datasets" class="dataset-options">Loading datasets…</div>
+          <div id="dataset-totals" class="dataset-totals" aria-live="polite"></div>
+          <p class="dataset-label-note">Counts use the effective outcome labels in the frozen snapshot, including human-reviewed and AI-only annotations.</p>
+          <div class="split-settings">
+            <label>Clips <span class="field-hint">0 = all</span>
+              <input name="clip_limit" type="number" min="0" step="1" value="0" required>
+            </label>
+            <label>Seed
+              <input name="seed" type="number" min="0" step="1" value="0" required>
+            </label>
+            <label data-help="The percentage of selected clips used to fit model weights. The random split is recorded with the run seed.">Training %
+              <input name="train_percent" type="number" min="1" max="98" value="60" step="1" required>
+            </label>
+            <label data-help="Used to compare and select candidates during evolution. These clips are excluded from model fitting.">Validation %
+              <input name="validation_percent" type="number" min="1" max="98" value="20" step="1" required>
+            </label>
+            <label data-help="Reserved for the final selected detector. Test clips are excluded from fitting, candidate proposals and round selection.">Test %
+              <input name="test_percent" type="number" min="1" max="98" value="20" step="1" required>
+            </label>
+            <output id="split-summary" aria-live="polite"></output>
+          </div>
+        </details>
+      </form>
+      <details class="parameter-group fitness-section top-section" open>
+      <summary>Fitness</summary>
+      <div class="round-form fitness-settings" aria-label="Fitness parameters">
+        <div class="event-parameter-groups">
+          <fieldset class="parameter-group jaw-parameter-group" data-event-group="jaw">
+            <legend>Jaw events · squeeze &amp; release</legend>
+            <div class="parameter-fields">
+              <label>Event tolerance, seconds
+                <input form="round-form" name="match_seconds" type="number" min="0.01" max="10" step="0.01" value="0.5" required>
+              </label>
+              <label>Target validation F1
+                <input form="round-form" name="target_f1" type="number" min="0.01" max="1" step="0.01" value="0.95" required>
+              </label>
+            </div>
+            <figure class="jaw-graphic">
+              <svg viewBox="0 0 520 120" role="img" aria-labelledby="jaw-graphic-title">
+                <title id="jaw-graphic-title">Illustrative squeeze and release matching within ±0.5 seconds of each button cue.</title>
+                <text x="150" y="18" text-anchor="middle">Squeeze</text>
+                <text x="390" y="18" text-anchor="middle">Release</text>
+                <rect class="jaw-match-window" x="108" y="35" width="84" height="44" rx="5"/>
+                <rect class="jaw-match-window" x="348" y="35" width="84" height="44" rx="5"/>
+                <path class="jaw-time-axis" d="M25 57 H495 M489 53 L495 57 L489 61"/>
+                <path class="jaw-reference" d="M150 28 V85 M390 28 V85"/>
+                <circle class="jaw-prediction" cx="165" cy="57" r="6"/>
+                <circle class="jaw-prediction" cx="378" cy="57" r="6"/>
+                <text id="jaw-squeeze-window" x="150" y="108" text-anchor="middle">±0.5 s</text>
+                <text id="jaw-release-window" x="390" y="108" text-anchor="middle">±0.5 s</text>
+              </svg>
+              <figcaption><span class="jaw-cue-key">Button cue</span><span class="jaw-prediction-key">Prediction</span><strong id="jaw-target-label">Target F1 ≥ 0.95</strong></figcaption>
+            </figure>
+          </fieldset>
+        </div>
+        <fieldset class="parameter-group speed-parameter-group">
+          <legend>Speed score · connected bounds</legend>
+          <div class="parameter-fields speed-bound-fields">
+            <label id="target-fps-setting">Scoring frame rate, fps
+              <input form="round-form" name="target_fps" type="number" min="1" max="240" step="any" value="60" required aria-describedby="speed-frame-rate">
+            </label>
+            <p id="dataset-fps-note" class="field-derived">Checking dataset frame rates…</p>
+            <span id="speed-frame-rate" class="field-derived">1 frame = 16.67 ms</span>
+          </div>
+          <input form="round-form" name="full_speed_ms" type="hidden" value="4.166666666666667">
+          <input form="round-form" name="frame_budget_ms" type="hidden" value="16.666666666666668">
+          <figure class="speed-curve">
+            <div class="speed-range-labels">
+              <label for="full-speed-frame-fraction">Full credit
+                <strong><output id="speed-full-fraction-value">0.25</output> frame</strong>
+                <span id="speed-full-credit-time">4.17 ms</span>
+              </label>
+              <label for="zero-speed-frame-fraction">Zero credit
+                <strong><output id="speed-zero-fraction-value">1.00</output> frame</strong>
+                <span id="speed-zero-credit-time">16.67 ms</span>
+              </label>
+            </div>
+            <svg class="speed-range-curve" viewBox="0 0 600 80" role="img" aria-labelledby="speed-range-curve-title">
+              <title id="speed-range-curve-title">Full speed credit through 0.25 frame, decreasing to zero at 1.00 frame.</title>
+              <text x="0" y="10">Speed credit</text>
+              <path id="speed-range-curve-fill" d="M0 72 V22 H75 L300 72 H600 Z"/>
+              <path id="speed-range-curve-line" d="M0 22 H75 L300 72 H600"/>
+            </svg>
+            <div id="speed-range" class="speed-range" role="group" aria-label="Speed credit bounds in frame fractions">
+              <div class="speed-range-track"></div>
+              <input form="round-form" id="full-speed-frame-fraction" name="full_speed_frame_fraction" type="range" min="0" max="2" step="0.01" value="0.25" aria-label="Full-credit frame fraction" aria-describedby="speed-bound-summary">
+              <input form="round-form" id="zero-speed-frame-fraction" name="zero_speed_frame_fraction" type="range" min="0" max="2" step="0.01" value="1" aria-label="Zero-credit frame fraction" aria-describedby="speed-bound-summary">
+            </div>
+            <div class="speed-range-ticks" aria-hidden="true"><span>0</span><span>0.5</span><span>1</span><span>1.5</span><span>2 frames</span></div>
+            <figcaption id="speed-bound-summary" aria-live="polite">Full credit ≤4.17 ms → decreasing credit → zero credit ≥16.67 ms</figcaption>
+          </figure>
+        </fieldset>
+      </div>
+      <div class="fitness-card">
+      <div class="round-form fitness-weight-settings" aria-label="Fitness weights">
+        <label>Jaw weight %
+          <input form="round-form" id="jaw-weight" name="jaw_weight" type="number" min="0" max="100" step="1" value="80" required>
+        </label>
+        <label>Speed weight %
+          <output form="round-form" id="speed-weight" for="jaw-weight">20</output>
+        </label>
+      </div>
+      <details class="fitness-disclosure">
+        <summary aria-label="Expand fitness definitions">
+          <math aria-label="Fitness equals jaw weight times F1 plus speed weight times Speed">
+            <mi mathvariant="normal">Fitness</mi><mo>=</mo><mo>(</mo><mn id="compact-jaw-weight">0.80</mn><mo>)</mo><msub><mi>F</mi><mn>1</mn></msub>
+            <mo>+</mo><mo>(</mo><mn id="compact-speed-weight">0.20</mn><mo>)</mo><mi mathvariant="normal">Speed</mi>
+          </math>
+        </summary>
+      <div class="fitness-equations" aria-label="Fitness function">
+        <div class="fitness-math">
+          <p class="fitness-symbols"><span><i>F</i> = Fitness</span><span><i>F</i><sub>1</sub> = Precision–recall balance</span><span><i>S</i> = Speed score</span></p>
+        <math display="block" aria-label="Fitness equals jaw weight times jaw F1 plus speed weight times speed score">
+          <mi>F</mi><mo>=</mo><mn id="formula-jaw-weight">0.80</mn><msub><mi>F</mi><mn>1</mn></msub>
+          <mo>+</mo><mn id="formula-speed-weight">0.20</mn><mi>S</mi>
+        </math>
+        <math display="block" aria-label="Jaw F1 equals twice true positives divided by twice true positives plus false positives plus false negatives">
+          <msub><mi>F</mi><mn>1</mn></msub><mo>=</mo>
+          <mfrac><mrow><mn>2</mn><mi>TP</mi></mrow><mrow><mn>2</mn><mi>TP</mi><mo>+</mo><mi>FP</mi><mo>+</mo><mi>FN</mi></mrow></mfrac>
+          <mo>,</mo><mspace width="1em"/><mi>S</mi><mo>=</mo><mi mathvariant="normal">clip</mi><mo>(</mo>
+          <mfrac><mrow><mn id="formula-budget">16.667</mn><mo>−</mo><msub><mi>t</mi><mn>95</mn></msub></mrow>
+            <mrow><mn id="formula-budget-denominator">16.667</mn><mo>−</mo><mn id="formula-full-credit">4.167</mn></mrow></mfrac>
+          <mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>)</mo>
+        </math>
+        </div>
+        <p class="fitness-definitions">TP = matched events, FP = false triggers, FN = missed events. Each squeeze or release can match one button cue within ±<span id="formula-tolerance">0.5</span> seconds. <i>t</i><sub>95</sub> is laptop detector p95 in milliseconds.</p>
+      </div>
+      </details>
+      </div>
+      </details>
+    </header>
+
+    <section aria-labelledby="pool-title">
+      <details class="section-disclosure top-section" open>
+      <summary class="section-head"><h2 id="pool-title">Candidates</h2><span id="pool-count"></span></summary>
+      <p id="candidate-score-context" class="note" hidden></p>
+      <div class="candidate-panel">
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable candidate scores">
+        <table class="candidate-table">
+          <colgroup><col style="width:36%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:14%"><col style="width:14%"></colgroup>
+          <thead><tr><th scope="col">Candidate</th><th scope="col">Train F1</th><th scope="col">Validation F1</th><th scope="col">Test F1</th><th scope="col">Laptop p95 ms</th><th scope="col">iPhone p95 ms</th></tr></thead>
+          <tbody id="candidates"><tr><td colspan="6">Scores appear when a round starts.</td></tr></tbody>
+        </table>
+      </div>
+      <button class="resize-handle" data-corner="left" aria-label="Resize candidates from bottom left" title="Drag to resize. Arrow keys also resize."></button>
+      <button class="resize-handle" data-corner="right" aria-label="Resize candidates from bottom right" title="Drag to resize. Arrow keys also resize."></button>
+      </div>
+      </details>
+    </section>
+
+    <section aria-labelledby="trend-title">
+      <details class="section-disclosure top-section" open>
+      <summary><h2 id="trend-title">Leader scores by round</h2></summary>
+      <p class="note" id="score-context">Scores are grouped by dataset, split and evaluation protocol. Clip replay is not proof of nonstop-stream accuracy; legacy candidates have not passed the new final integrity gate.</p>
+      <div id="leader-trend" class="trend" hidden>
+        <label class="trend-context-label">Evaluation context <select id="trend-context"></select></label>
+        <p id="trend-context-summary" class="note"></p>
+        <ul class="trend-legend" aria-label="Chart legend">
+          <li class="trend-fitness">Fitness</li>
+          <li class="trend-jaw">Validation jaw F1</li>
+        </ul>
+        <svg id="trend-plot" role="img" aria-label="Fitness and validation jaw F1 for the leading evaluated candidate in each comparable completed round"></svg>
+        <label class="trend-scrubber">Round <input id="trend-round" type="range" min="0" value="0"></label>
+        <output id="trend-scores" for="trend-round"></output>
+      </div>
+      <p id="trend-empty" class="note">Validation scores appear after an audited agent round finishes.</p>
+      </details>
+    </section>
+
+    <section id="video-replay" aria-labelledby="replay-title">
+      <details class="section-disclosure top-section" id="video-replay-panel">
+      <summary><h2 id="replay-title">Video replay</h2><span id="replay-round"></span></summary>
+      <p id="replay-status" class="note" role="status">Loading the latest scored round…</p>
+      <div id="replay-controls" hidden>
+        <div class="replay-selectors">
+          <label>Candidate <select id="replay-candidate"></select></label>
+          <label>Clip <select id="replay-clip"></select></label>
+        </div>
+        <video id="replay-video" controls playsinline preload="metadata" aria-label="Test clip"></video>
+        <div id="replay-events"></div>
+        <p class="note">Select a marker or timestamp to jump to it. Button timestamps approximate when the jaws squeezed and released.</p>
+      </div>
+      </details>
+    </section>
+
+    <section aria-labelledby="research-agent-title" id="research-agent">
+      <details class="section-disclosure top-section">
+      <summary><h2 id="research-agent-title">Research Agent</h2></summary>
+      <p id="research-status" class="note" role="status">Loading the round harness…</p>
+      <dl class="research-harness" id="research-harness"></dl>
+      <details class="research-prompt-details">
+        <summary>Coordinator prompt for the next round</summary>
+        <pre id="research-prompt"></pre>
+      </details>
+      </details>
+    </section>
+
+    <section aria-labelledby="loop-title">
+      <details class="section-disclosure top-section" open>
+      <summary><h2 id="loop-title">Experiment loop</h2></summary>
+      <div class="flow">
+        <details class="step" name="experiment-step" data-step="prepare">
+          <summary>Pin data and split</summary>
+          <p>Select datasets and freeze the seeded random train, validation and test partition for this run.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="research">
+          <summary>Research fresh candidates</summary>
+          <p>Researchers propose the configured number of fresh ideas. New Family requests one new architecture and an independent review.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="evolution">
+          <summary>Evolve and train children</summary>
+          <p>Dispatch a task per selected parent, compare previous failures, implement children and fit learned models on training clips only.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="evaluation">
+          <summary>Measure candidate performance</summary>
+          <p>Measure event F1 and runtime under the pinned protocol. Run latency measurements sequentially after fitting stops; keep test clips reserved.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="integrity_review">
+          <summary>Review streaming integrity</summary>
+          <p>Independent final reviewers inspect frozen code and weights, challenge timing shortcuts, future access and clip resets, and test continuous-state behavior. Unapproved candidates cannot enter the pool.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="audit">
+          <summary>Audit the evidence</summary>
+          <p>Verify reviewer approvals and artifact hashes, actual subagent receipts, training provenance, saved predictions, timings and fitness before publishing the selected pool.</p>
+        </details>
+        <details class="step" name="experiment-step" data-step="selected">
+          <summary>Save and repeat</summary>
+          <p>Save the scored pool, lineage and run artifacts. Start the next round when ready. Research and evolution repeat each round.</p>
+        </details>
+      </div>
+      <p class="note loop-followup">Final test evaluation and iPhone benchmarking are separate milestones after candidate selection. The test split stays reserved during evolution.</p>
+      </details>
+    </section>
+
+  </main>
+</body>
+</html>

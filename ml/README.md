@@ -4,4 +4,5 @@ This workspace will hold datasets, experiments, training code, and evaluation fo
 
 The first research questions are whether egocentric video improves object localization and grasp prediction, and how reliably bucket deposition can provide outcome labels.
 
+[Shared evolutionary search and agent briefs](evolution/README.md) are available for experiments that compare and evolve candidates.
 [Training label review](label_review/README.md) provides a local viewer for validating image and video predictions.

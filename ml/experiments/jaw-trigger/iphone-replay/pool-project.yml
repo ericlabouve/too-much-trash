@@ -1,0 +1,31 @@
+name: JawPoolReplay
+targets:
+  JawPoolReplay:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.2"
+    sources:
+      - pool_main.mm
+      - pool_runtime.hpp
+      - path: Fixtures
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - framework: opencv2.framework
+        embed: false
+      - sdk: UIKit.framework
+      - sdk: Accelerate.framework
+      - sdk: AVFoundation.framework
+      - sdk: CoreMedia.framework
+      - sdk: CoreVideo.framework
+      - sdk: CoreGraphics.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.toomuchtrash.jawflowreplay
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        CLANG_CXX_LANGUAGE_STANDARD: c++17
+        GCC_OPTIMIZATION_LEVEL: "3"
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: "1"

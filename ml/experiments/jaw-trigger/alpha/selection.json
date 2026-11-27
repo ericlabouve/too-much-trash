@@ -1,0 +1,148 @@
+{
+  "schema": "jaw-alpha-selection-v1",
+  "model_id": "jaw-r59-independent-motion-alpha1",
+  "display_name": "Event Confidence: Independent motion adds recall",
+  "candidate": {
+    "name": "R59 independent motion delta-bce",
+    "method": "independent_motion_correction59",
+    "threshold": 0.75,
+    "confirm": 1,
+    "smoothing": 1,
+    "cooldown": 0,
+    "signal": "state8-event16-delta-bce-history4",
+    "created_round": 59,
+    "parent": "R58 confidence correction additive-control",
+    "deposit_method": "motion",
+    "deposit_threshold": 0.07,
+    "release_ratio": 0.3333333333333333,
+    "release_cooldown": 0,
+    "release_confirm": 1
+  },
+  "source_job": "dashboard-recovery-20261127-r60-6e54376f",
+  "source_result_sha256": "75e101932e51a2b417eb15133900ae9415aa79468ecf0c409f6db9644e9517c4",
+  "source_spec_slug": "parent-01-baseline",
+  "source_spec_sha256": "652c3a0d5f01ff9dc789ae024d738266ee681a6d6c9717a934b3909e6df0070c",
+  "runtime_config": {
+    "independent": true,
+    "independent_high": 0.8,
+    "refractory": 0.8,
+    "independent_gate": 0
+  },
+  "input_contract": {
+    "sample_hz": 15,
+    "frame": {
+      "width": 320,
+      "height": 240,
+      "dtype": "uint8",
+      "channels": 1,
+      "layout": "row-major tightly packed",
+      "input_mode": "legacy-gray-v1",
+      "reference_preprocessor": "round_one.load_frames"
+    },
+    "source_resolution": [
+      960,
+      720
+    ],
+    "sensors": {
+      "accelerometer": {
+        "units": "g including gravity",
+        "axes": "native Core Motion device axes"
+      },
+      "gyroscope": {
+        "units": "rad/s",
+        "axes": "native Core Motion device axes"
+      },
+      "native_sample_hz": 100,
+      "max_samples_per_stream_per_step": 33,
+      "future_samples_allowed": false
+    },
+    "time": "common monotonic seconds; preserve native sensor timestamps",
+    "unsupported_model_inputs": [
+      "ARKit pose",
+      "attitude",
+      "audio"
+    ]
+  },
+  "output_contract": {
+    "0": null,
+    "1": "squeeze",
+    "-1": "release",
+    "visual_score_is_final_event_confidence": false,
+    "caller_adds_debounce": false
+  },
+  "sources": {
+    "exact_parent_native_adapter.py": {
+      "source_path": "parent-01/exact_parent_native_adapter.py",
+      "sha256": "55b0025c8d0dff406ed6054938c7133b12f712ab456303d8f09d788a43c23dfc"
+    },
+    "assigned_baseline_adapter.py": {
+      "source_path": "parent-01/assigned_baseline_adapter.py",
+      "sha256": "6811fd6c33b752f2ceb458f1abbe9c5864b222d10f64885b516c95dcd77e0a85"
+    },
+    "baseline_native_adapter.py": {
+      "source_path": "parent-01/baseline_native_adapter.py",
+      "sha256": "76e83ad221e439c88542eec07f8ec95146f61a29bb76836c1f2c07046c1fa301"
+    },
+    "event_native_adapter.py": {
+      "source_path": "parent-01/event_native_adapter.py",
+      "sha256": "a0c459b7ccc0c12c47e54f11d0c126775e5587aaeab05654360e4b677e5df7c7"
+    },
+    "baseline_native.cpp": {
+      "source_path": "parent-01/baseline_native.cpp",
+      "sha256": "7bff42571410d9be8108dc97b2e7373104eb9d2511d07f79054edc3f9e34f787"
+    },
+    "event_native.cpp": {
+      "source_path": "parent-01/event_native.cpp",
+      "sha256": "bf7b717a387c1a3b59c7e69b61324e0134567e72c25489ec641971ce3bc22816"
+    }
+  },
+  "weights": {
+    "independent_event": {
+      "filename": "exact-parent-model.json",
+      "source_path": "parent-01/exact-parent-model.json",
+      "sha256": "a22048506f937228cec599601bf6b6111d7c09956569b7bf0a49b1499b7e815c",
+      "runtime_sha256": "52e3e85de54708d25688c5741cf8ff3738e5b6ed3068cd7ae0ee4c5febd49f9a"
+    },
+    "parent_event": {
+      "filename": "baseline-model.json",
+      "source_path": "parent-01/baseline-model.json",
+      "sha256": "35f01a6f371ba675df884c34ad129d6819a221a24506caee8727a6c256926d37",
+      "runtime_sha256": "10150eff0b5e0c40b020556eff2843377bae2c170376a6406ff3877ad4a7bd80"
+    },
+    "visual_state": {
+      "filename": "visual-component.json",
+      "source_path": "parent-01/visual-component.json",
+      "sha256": "0fcd69d50647f004dee10c8116bb0fa1046a49a250c567046a3396bb67f46642",
+      "runtime_sha256": "95d339b08af826f8770a79829e9f497000c1f3b4c8f202ff6761a056b7f44903"
+    }
+  },
+  "metrics": {
+    "validation_jaw_f1": 0.9392712550607287,
+    "validation_squeeze_f1": 0.9206349206349206,
+    "validation_release_f1": 0.9586776859504132,
+    "laptop_native_p95_ms": 0.527442,
+    "train_jaw_f1": 0.9327956989247311,
+    "target_jaw_f1": 0.95
+  },
+  "validation_status": {
+    "alpha_only": true,
+    "natural_continuous_video_validated": false,
+    "iphone_port_validated": false,
+    "test_set_evaluated": false,
+    "source_leader_integrity": "previously admitted R59; unchanged native event parity in recovered R60"
+  },
+  "integration_owner": "iPhone+backend agent; RSI chat owns model selection and evaluation",
+  "conformance": {
+    "policy": "First two validation clips per dataset in frozen fixture order; never test",
+    "fixture_count": 6,
+    "index_sha256": "6addc066e67b1b30e44861ad660e868335c47f6dbba2f5d18797ef122c70d771",
+    "pixels": {
+      "validation-000.bin": "883eee8ca577030170dd54f4b54b9e553e4d41be0b63f16bc1c7f5b6efed31a4",
+      "validation-001.bin": "665ef0bb50890a07015acd31ec5a81b8b17026c4db95d672ebbc9a386f69c501",
+      "validation-002.bin": "649ae47347a0a4948822c604dd0f2b22e14b9664d3739c8acb716eaf63a08e9a",
+      "validation-003.bin": "cc95bed5e7c18191ed689a84fa47ffa0568d3b3e9d3ac8d02b21620feff94051",
+      "validation-004.bin": "5b7e91fb86ea18922d2ce0ed546b632b0cbcfdf111e83a61cd9a86ddc4e44a0d",
+      "validation-005.bin": "9d034f17ab1b2e47cdc88e3006115cf4042b27e026bda5cdf12baa5f9df7b165"
+    }
+  }
+}
