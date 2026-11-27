@@ -791,3 +791,63 @@ Goal remains PAUSED by explicit user cancellation. user_final_request launches_u
   do not reopen completed authors, retrain or silently edit original receipts.
 - Prior admitted R59 independent motion delta-bce still passes full publication
   gate: validation F1 0.9392712550607287, fitness 0.951417004048583. Test reserved.
+
+
+## Recovered R60 completed; chat ownership — 2026-11-27
+
+- User explicitly authorized finishing saved-candidate evaluation/reviews. Keep
+  this chat focused on the RSI loop and PR readiness/merge when the leader is
+  ready. The separate iPhone+backend agent owns model integration and phone
+  deployment. Do not start app builds/deployment or message that chat without
+  authorization to send the handoff.
+- User has no natural long continuous video yet; collecting it is a future
+  field task and storing an hour is expensive. Synthetic static/repeated-event
+  probes below are integrity checks, not evidence of natural uninterrupted use.
+- Successful continuation: working/runs/dashboard-recovery-20261127-r60-6e54376f.
+  Original failed source and archive remain unchanged. All18 saved models were
+  replayed serially on frozen182TRAIN/61VALIDATION;61TEST stayed reserved. No
+  fitting, new breeding round or original author allocation was started.
+- Rechecked every actual paired RGB/grayscale hash:243clips/28,329frames pass,
+  RGB index c68c8b26aa2acf9957ab090bbbd19a3c32374cdbbcc78c76e9acb829b0b171b4.
+  Cache inputs are sampled15Hz; distinguish that from capture/source60FPS and
+  speed-credit budget. Phone integration must preserve evaluated cadence and
+  preprocessing or independently verify parity; it has not happened here.
+- Ten freshly initialized review-only supervised CLI contexts,20min each and
+  six concurrent, all finalized approved. Each inspected its own frozen graph
+  and ran all5 actual native probes;50probes total. Separate source author and
+  new reviewer ledgers are audited, never fabricated into a joined lifetime
+  ledger. Original10author IDs remain distinct/closed.
+- New recovery_completion.py pins immutable source/archive, original author
+  budgets/whole journal/selected weights, same native artifacts for F1+p95,
+  fresh review budgets and exact portfolio selection. finalize_recovery writes
+  local results only; an independent outer owner certifies publication after
+  the review supervisor exits. Ordinary scientific/review gates remain intact.
+- The first outer audit caught root coordinator metadata omissions in agents.json
+  (task.fresh_context and integrity_reviews report index), not reviewer failures.
+  Root reconstructed only that index from sealed distinct initial thread.started
+  events and original reports, preserved agents-supervisor-unindexed.json plus
+  coordinator-manifest-packaging.json, then reran the unchanged gates successfully.
+  No verdict, evidence, candidate, checkpoint or allocation changed. Preserve
+  these records. recovery_reviews.index_completed_reviews / --index-reports now
+  derives metadata from expected private/job ledger equality, distinct actual
+  initial CLI events and unchanged reports/final exports; it archives the old
+  index, preserves rejections and refuses already published jobs.
+- Final outer publication and a separate verify_publication(require_review=True)
+  both PASS. Round60 is complete, next pool8. Leader remains R59 independent
+  motion delta-bce (Event Confidence: Independent motion adds recall): valF1
+  0.9392712550607287, trainF1 0.9327956989247311, current laptop p95 .527442ms,
+  fitness .951417004048583. All18 get full speed credit under4.167ms. New child
+  recall-weight8 ties validationF1; no new accuracy leader. Best fresh research
+  geometryF1 .9032258064516129; RGBTCN .808. TargetjawF1 .95 NOT reached.
+- Fourteen exact checkpoint-bound loss histories load from the published job.
+  New model weights/reports/private videos/build artifacts stay outside Git.
+  Test and actual continuous field validation remain pending; do not declare
+  production readiness or start more rounds automatically.
+- Dashboard history ordering must use numeric round before filename: recovery
+  directory names otherwise sort after later timestamp-named jobs. Regression
+  added to ensure a laterR61 remains the newest view after recoveredR60.
+
+- Final regression suites:146 jaw/domain +92 shared runner tests PASS (238total).
+  Live dashboard API confirms completedR60, currentviewR60 and next_round61.
+  No additional round started; PR remains draft while target/field/test work is
+  pending. Later CLI helper/history fixes preserve already published evidence.

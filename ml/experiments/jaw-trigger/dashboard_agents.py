@@ -788,6 +788,14 @@ def verify_completion(job, final, config, manifests):
     result = json.loads(result_path.read_text())
     receipts = json.loads(artifact(job, final['agent_manifest_path']).read_text())
     evaluation = json.loads(artifact(job, final['evaluation_path']).read_text())
+    recovery = None
+    if 'recovery' in config:
+        from recovery_completion import recovery_context
+        recovery = recovery_context(job, config, result, receipts, final=True)
+        # Original authors retain their actual source ledger. Only a virtual
+        # manifest is joined for the unchanged reproduction/independence checks;
+        # no task is restarted and no combined lifetime ledger is fabricated.
+        receipts = recovery['receipts']
     prior = json.loads(Path(config['prior']).read_text())
     settings = config['settings']
     if result.get('round') != config.get('round_number', prior['round'] + 1) or result.get('mode') != 'agent_guided' or result.get('reporting') != 'validation':
@@ -897,8 +905,8 @@ def verify_completion(job, final, config, manifests):
         if settings.get('agent_prompt') and settings['agent_prompt'] not in artifact(job, task.get('prompt_path', '')).read_text():
             raise ValueError('Each child prompt must include the dashboard research direction')
     if 'agent_budget_protocol' in settings:
-        result['agent_budget_audit'] = verify_agent_budgets(job, receipts, settings, challengers,
-                                                         result.get('candidate_artifacts'))
+        result['agent_budget_audit'] = (recovery['agent_budget_audit'] if recovery else
+            verify_agent_budgets(job, receipts, settings, challengers, result.get('candidate_artifacts')))
     if settings['family'] == 'new_family':
         verify_architecture_reviews(job, receipts, settings,
                                     {entry['candidate']['name']: entry['candidate'] for entry in research},
@@ -947,9 +955,10 @@ def verify_completion(job, final, config, manifests):
                 raise ValueError('New jobs require candidate-scoped model parameter bindings')
             for candidate in eligible.values():
                 parameters_for(result, candidate, required=True)
-        result['training_audit'] = verify_training_records(job, result, evaluation, settings, manifests, eligible)
+        training_job = recovery['source'] if recovery else job
+        result['training_audit'] = verify_training_records(training_job, result, evaluation, settings, manifests, eligible)
         if 'fit_slot_protocol' in settings:
-            result['fit_resource_audit'] = verify_fitting_slots(job)
+            result['fit_resource_audit'] = verify_fitting_slots(training_job)
     for name, entry in observed.items():
         training_predictions = evaluation.get('training_predictions', {}).get(name, {})
         if set(training_predictions) != set(training_ids):

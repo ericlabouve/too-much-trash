@@ -149,6 +149,25 @@ class LeaderMetricTests(unittest.TestCase):
             self.assertEqual(history.snapshot(), [])
             self.assertEqual(history.views, [])
 
+    def test_recovery_directory_cannot_hide_a_later_round(self):
+        result, inputs, protocol = self.fixture()
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            snapshot = root / 'SNAPSHOT.json'; snapshot.write_bytes(b'fixture')
+            for name, number in (('dashboard-recovery-r60', 60), ('dashboard-20261128-r61', 61)):
+                job = root / name; (job / 'evaluator-source').mkdir(parents=True)
+                current = {**result, 'round': number}
+                for filename, value in {'status.json': {'state': 'completed', 'mode': 'agent_guided'},
+                                        'config.json': {'settings': current['settings']},
+                                        'results.json': current, 'inputs.json': inputs,
+                                        'evaluator-source/sha256.json': protocol}.items():
+                    (job / filename).write_text(json.dumps(value))
+            history = LeaderHistory(root, snapshot)
+            contexts = history.snapshot()
+            self.assertEqual([point['round'] for point in contexts[0]['points']], [60, 61])
+            self.assertEqual(history.views[0]['round'], 61)
+            self.assertEqual(history.views[0]['job'], 'dashboard-20261128-r61')
+
 
 if __name__ == '__main__':
     unittest.main()

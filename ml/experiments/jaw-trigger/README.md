@@ -222,6 +222,33 @@ JSON has `metric`, `points` (`epoch`, `train_loss`, `validation_loss`) and optio
 `feature_parameters[method]` format. Changed hashes,
 models or candidate configurations invalidate the displayed history. These are
 objective-loss diagnostics, separate from deployment F1 and fitness.
+
+Saved-round completion is a separate job, never a rewrite of a failed job.
+`recovery_completion.make_recovery_proof(source, archive)` pins the verified
+recovery archive and original supervisor-owned author ledger. A continuation
+keeps the original round/settings/splits, exact candidates, selected weights,
+training journal and implementation bytes. The sole deployment-spec cleanup is
+omitting zero-byte build logs from executable dependency bundles. New native
+benchmarks run serially after the original author/fit lifetimes. Only fresh
+candidate-scoped integrity reviewers receive new supervised allocations;
+original authors are not reopened. `recovery_completion.py --job CONTINUATION
+--preflight` checks original author budgets, full training evidence and all
+current native deployment reports before any reviewer allocation is spent.
+Publication repeats ordinary scientific, review and portfolio gates, plus
+separate original-author and fresh-reviewer lifecycle audits. Archived receipt
+bytes and source genotypes are never edited to repair a bookkeeping failure.
+After the outer owner copies the finished review supervisor's actual private
+ledger into the continuation job, run `recovery_reviews.py --job CONTINUATION
+--index-reports`. This derives fresh-context task fields and report references
+from the sealed initial CLI identities and original completed reports, archives
+the earlier index and preserves every reviewer decision. It refuses published
+jobs or inconsistent supervision evidence. Then `recovery_completion.py --job CONTINUATION
+--finalize` checks all assigned reviews before portfolio selection and writes
+audited local results plus `agent-final.json`. Any later canonical failure
+restores the original pending result bytes. This helper never writes the private
+publication receipt or completed status; independent outer certification remains
+mandatory. It does not mark field-stream validation or reserved testing complete.
+
 Hover or focus a parameter for its definition. The default
 agent allocation is 20 minutes per candidate, with up to six child agents
 working concurrently. The controls show actual evolution, research and review

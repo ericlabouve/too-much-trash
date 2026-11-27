@@ -114,7 +114,10 @@ class LeaderHistory:
                 if context:
                     group = groups.setdefault(context['id'], {**context, 'points': []})
                     group['points'].extend(context['points'])
-                    views[context['id']] = self.cache[job][2]
+                    view = self.cache[job][2]
+                    previous = views.get(context['id'])
+                    if previous is None or (view['round'], view['job']) > (previous['round'], previous['job']):
+                        views[context['id']] = view
             except (OSError, ValueError, KeyError, TypeError):
                 # Partial jobs and legacy results without comparable provenance aren't chart points.
                 continue
@@ -126,6 +129,8 @@ class LeaderHistory:
                 self.reference_stamp = reference_stamp
         except OSError:
             self.reference_hash = None
+        for group in groups.values():
+            group['points'].sort(key=lambda point: (point['round'], point['job']))
         self.views = sorted((view for view in views.values() if view['snapshot'] == self.reference_hash),
-                            key=lambda view: view['job'])
-        return sorted(groups.values(), key=lambda group: group['points'][-1]['job'])
+                            key=lambda view: (view['round'], view['job']))
+        return sorted(groups.values(), key=lambda group: (group['points'][-1]['round'], group['points'][-1]['job']))
