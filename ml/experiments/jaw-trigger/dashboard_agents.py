@@ -140,6 +140,8 @@ def supervisor_configuration(prior, settings, job, binary):
             'review_report_probe_kinds': list(PROBE_KINDS),
             'review_preflight_command': [sys.executable, str(HERE / 'dashboard_training.py'),
                                          '--job', str(job.resolve()), '--round'],
+            'parent_candidates': {parent['name']: parent
+                                  for parent in evolution_parents(prior, settings)},
             'expected': {'parent': [parent['name'] for parent in evolution_parents(prior, settings)],
                          **{kind: counts[key] for kind, key in
                             (('research', 'research'), ('review', 'review'), ('integrity_review', 'integrity_review'))}},

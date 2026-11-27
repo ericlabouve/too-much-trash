@@ -113,6 +113,15 @@ class SupervisorTests(unittest.TestCase):
             self.assertEqual(task['training_preflight']['status'], 'passed')
             self.assertEqual(len(self.runtime.tasks), 1)
 
+    def test_parent_gets_the_trusted_full_candidate_despite_a_wrong_prompt_scaffold(self):
+        candidate = {'name': 'parent-A', 'method': 'correct-model', 'threshold': .5}
+        self.runtime.config['parent_candidates'] = {'parent-A': candidate}
+        task = self.runtime.start_agent('parent', 'Wrong scaffold says use parent-B.', parent='parent-A')
+        dispatched = Path(task['prompt_path']).read_text()
+        self.assertIn(json.dumps(candidate, sort_keys=True), dispatched)
+        self.assertIn('authoritative assignment', dispatched)
+        self.assertEqual(task['parent_candidate'], candidate)
+
     def test_export_interrupts_research_then_finishes_before_original_deadline(self):
         task = self.start()
         self.export_finish(task)

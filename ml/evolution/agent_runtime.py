@@ -149,6 +149,15 @@ class Supervisor:
             folder = self.root / identifier
             folder.mkdir()
             prompt_path = folder / 'initial-prompt.txt'
+            if kind == 'parent' and 'parent_candidates' in self.config:
+                assigned = self.config['parent_candidates'].get(parent)
+                if not isinstance(assigned, dict) or assigned.get('name') != parent:
+                    raise ValueError('Trusted parent candidate does not match the assignment')
+                prompt += ('\nSupervisor-pinned parent candidate (authoritative assignment):\n'
+                           + json.dumps(assigned, sort_keys=True)
+                           + '\nRefit this exact baseline and derive one child from it. '
+                             'Verify name, method and genotype against this object before fitting. '
+                             'A different scaffold is not permission to substitute a different parent.')
             direction = self.settings.get('agent_prompt', '')
             if direction and direction not in prompt:
                 prompt += '\nRound direction (verbatim):\n' + direction
@@ -160,6 +169,8 @@ class Supervisor:
                     '_folder': folder, '_prompt': prompt, '_process': None,
                     '_output_handles': [], '_queued_cycle': 1, '_phase_requested': None}
             task['owned_processes'] = []
+            if kind == 'parent' and 'parent_candidates' in self.config:
+                task['parent_candidate'] = deepcopy(assigned)
             if frozen_review is not None:
                 task['review_bundle'] = frozen_review
             if training_preflight is not None:

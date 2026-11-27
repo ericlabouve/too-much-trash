@@ -280,3 +280,17 @@ for the full run, original182/61/61seed0 split,80%validation jawF1/20%speed,
 official eight-parent pool. No extra full round beyond that authorization.
 Detailed independent report, per-receipt audit and corrected plot/provenance are
 under working/runs/audits/round52-20261126/, outside Git.
+
+
+Audit smoke dashboard-20261127T003502Z-7ce6ed0e failed honestly before native
+scoring/reviews: coordinator supplied a temporal-model scaffold to the Scanlines
+parent author. Two completed iterative fits passed canonical receipts, wrong-ID/
+wrong-F1 prewrite tests and selected-loss recomputation, but they are the wrong
+lineage and cannot be relabeled/promoted. Preserve evidence. Supervisor now
+automatically appends the full frozen parent candidate to every parent assignment
+and records it in its private ledger; authors must check exact name/method/
+genotype before fitting, rather than trust a borrowed scaffold. A focused
+regression verifies a conflicting prompt cannot omit that authoritative object.
+Retry the light smoke with the exact Scanlines parent and its parent03 source
+explicitly pinned, then proceed to the user-authorized full round only after
+canonical publication succeeds. No change to split, scoring or agent budgets.
