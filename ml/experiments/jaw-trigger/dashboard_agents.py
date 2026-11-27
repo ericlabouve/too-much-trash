@@ -21,6 +21,7 @@ from ml.evolution.training import PROTOCOL as TRAINING_PROTOCOL, policy_for
 from ml.evolution.agent_budgets import PROTOCOL as BUDGET_PROTOCOL, budget_policy, verify_agent_budgets
 from ml.evolution.review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL
 from ml.evolution.resources import PROTOCOL as FIT_SLOT_PROTOCOL, verify_fitting_slots
+from ml.evolution.model_parameters import PROTOCOL as MODEL_BINDING_PROTOCOL, parameters_for
 from dashboard_selection import PROTOCOL as SELECTION_PROTOCOL, selection_parameters, verify_selection
 
 HERE = Path(__file__).resolve().parent
@@ -306,6 +307,7 @@ Iterative plans also declare
 max_epochs and selection_decoder before fitting. Context pins train_manifest_sha256 and
 validation_manifest_sha256. Use can_start_epoch() before every epoch, observe() after every
 epoch with measured train_loss/validation_loss/validation_score, validation_predictions,
+training_predictions (full training split, same fixed selection_decoder in inference mode),
 JSON-safe frozen parameters and optional opaque artifact paths, then finish(). Use its
 selected_checkpoint() to export the best model, not the current final optimizer state.
 Keep inference-mode observation from advancing training RNG state. Referenced opaque
@@ -494,9 +496,14 @@ evolution, evaluation, integrity_review, and audit. Do not claim tasks have comp
 Keep exact prompts, Codex child IDs, proposal artifacts, trained parameters, scores and logs.
 
 Write results.json with round={round_number}, incumbents (all evaluated baselines), ranked, challengers, next_pool, seen, seed,
-feature_parameters, history, candidate_metadata, mode='agent_guided', reporting='validation', actual fitness_weights,
+model_binding_protocol='candidate-scoped-v1', candidate_parameters, history, candidate_metadata, mode='agent_guided', reporting='validation', actual fitness_weights,
 settings, benchmark_protocol matching settings, input_manifest paths and evidence. Candidate records must remain compatible with
-JointCandidate. Every ranked entry contains candidate, development (the validation jaw-event
+JointCandidate. Store bare parameters at candidate_parameters[candidate.name], using
+ml.evolution.model_parameters.bind_parameters to reject duplicate names. A method is
+an architecture dispatch key, NOT a trained model identity: parent and child may have
+the SAME method and DIFFERENT weights. Preserve both bindings. Never store or retrieve
+new weights by method. Use parameters_for(result, candidate) for exports, gates and
+plots. Every ranked entry contains candidate, development (the validation jaw-event
 counts, retained field name for UI compatibility), jaw_by_event, p95_ms, speed_score, fitness,
 clip_f1, worst_clip_accuracy, zero_jaw_clips. Use validation-only per-clip predictions.
 Also record split_scores for every evaluated candidate as an object with train and validation
@@ -530,7 +537,7 @@ duplicate chart metadata/model serialization is required. Legacy optional curves
 link from candidate_metadata[name].training_history as {{"path":job-relative path,
 "sha256":file digest,"model_path":job-relative frozen model JSON path,
 "model_sha256":model file digest}}. This legacy model JSON is bare parameters matching
-feature_parameters[method], not the monitor's selected-checkpoint.json wrapper.
+candidate_parameters[name], not the monitor's selected-checkpoint.json wrapper.
 Copy retained histories and model evidence into the new job when carrying unchanged
 models forward; refits need new history tied to the new model. Do not invent old losses or treat tree counts, decoder
 sweeps, final F1, or closed-form fits as epoch loss curves. For noniterative candidates,
@@ -935,6 +942,11 @@ def verify_completion(job, final, config, manifests):
         if settings['training_protocol'] != TRAINING_PROTOCOL:
             raise ValueError('Unknown training checkpoint protocol')
         from dashboard_training import verify_training_records
+        if (job / 'protected-source/ml/evolution/model_parameters.py').is_file():
+            if result.get('model_binding_protocol') != MODEL_BINDING_PROTOCOL:
+                raise ValueError('New jobs require candidate-scoped model parameter bindings')
+            for candidate in eligible.values():
+                parameters_for(result, candidate, required=True)
         result['training_audit'] = verify_training_records(job, result, evaluation, settings, manifests, eligible)
         if 'fit_slot_protocol' in settings:
             result['fit_resource_audit'] = verify_fitting_slots(job)
@@ -1130,7 +1142,8 @@ def execute(config_path):
                                           for path in manifests.values()}
         # Freeze trusted source before agents run. Publication later checks these
         # copies, so future legitimate repository edits do not erase old history.
-        protected = ['ml/evolution/training.py', 'ml/evolution/losses.py', 'ml/evolution/resources.py', 'ml/evolution/agent_briefs.py',
+        protected = ['ml/evolution/training.py', 'ml/evolution/epoch_admission.py', 'ml/evolution/model_parameters.py',
+                     'ml/evolution/losses.py', 'ml/evolution/resources.py', 'ml/evolution/agent_briefs.py',
                      'ml/evolution/agent_runtime.py', 'ml/evolution/agent_budgets.py', 'ml/evolution/review_bundles.py',
                      'ml/evolution/portfolio.py', 'ml/evolution/__init__.py',
                      *[f'ml/experiments/jaw-trigger/{name}' for name in

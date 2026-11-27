@@ -13,6 +13,8 @@ import re
 from time import monotonic
 
 from ml.evolution.training import PROTOCOL, TrainingMonitor, checkpoint_key, policy_for
+from ml.evolution.epoch_admission import PROTOCOL as EPOCH_ADMISSION_PROTOCOL, budget_stop
+from ml.evolution.model_parameters import PROTOCOL as MODEL_BINDING_PROTOCOL, parameters_for
 from dashboard_integrity import hashed_artifact, local_artifact
 
 
@@ -79,7 +81,7 @@ def _prediction_values(predictions, ids):
     return [predictions[clip] for clip in ids]
 
 
-def _receipt(job, record, trial_id, started_plan, context, policy, ids, labels, accuracy):
+def _receipt(job, record, trial_id, started_plan, context, policy, ids, labels, accuracy, train_ids=None):
     receipt = _read(job, record)
     if receipt.get('protocol') != PROTOCOL or receipt.get('trial_id') != trial_id:
         raise ValueError('Training receipt must identify its trial and protocol')
@@ -129,6 +131,12 @@ def _receipt(job, record, trial_id, started_plan, context, policy, ids, labels, 
             raise ValueError('Training epoch timing is inconsistent with its receipt')
         previous_elapsed = measured_elapsed
         actual = accuracy(_predictions(job, point['predictions'], ids), labels)['f1']
+        if plan.get('record_training_predictions') and 'training_predictions' not in point:
+            raise ValueError('Every epoch must retain training predictions for its F1 curves')
+        if 'training_predictions' in point:
+            if train_ids is None:
+                raise ValueError('Training prediction audit requires the frozen training split')
+            _predictions(job, point['training_predictions'], train_ids)
         score = point.get('validation_score')
         if not _number(score) or not 0 <= score <= 1 or not isclose(score, actual, abs_tol=1e-12, rel_tol=0):
             raise ValueError('Epoch validation F1 must match its saved event predictions')
@@ -144,6 +152,14 @@ def _receipt(job, record, trial_id, started_plan, context, policy, ids, labels, 
         # can_start_epoch() may observe expiry between the last measurement and
         # the next optimization step. It need not add a fake terminal epoch.
         stop = 'time_budget'
+    if receipt.get('stop_reason') == 'epoch_budget' and stop is None:
+        guard = receipt.get('epoch_admission_stop')
+        if (plan.get('epoch_admission') != EPOCH_ADMISSION_PROTOCOL or not isinstance(guard, dict)
+                or not _number(guard.get('elapsed_seconds'), nonnegative=True)
+                or not previous_elapsed <= guard['elapsed_seconds'] <= elapsed
+                or budget_stop(points, guard['elapsed_seconds'], policy['max_seconds']) != guard):
+            raise ValueError('Epoch budget stop needs reproducible lookahead evidence')
+        stop = 'epoch_budget'
     if stop is None or receipt.get('stop_reason') != stop:
         raise ValueError('Training receipt must explain its actual stopping rule')
     best = max(points, key=checkpoint_key)
@@ -161,6 +177,9 @@ def verify_training_records(job, result, evaluation, settings, manifests, eligib
     if settings.get('training_protocol') != PROTOCOL:
         raise ValueError('New learned fits require validation-checkpoints-v1 training evidence')
     job = Path(job).resolve()
+    if ((job / 'protected-source/ml/evolution/model_parameters.py').is_file()
+            and result.get('model_binding_protocol') != MODEL_BINDING_PROTOCOL):
+        raise ValueError('New jobs require candidate-scoped model parameter bindings')
     policy = policy_for(settings)
     context = {f'{split}_manifest_sha256': sha256(Path(manifests[split]).read_bytes()).hexdigest()
                for split in ('train', 'validation')}
@@ -216,7 +235,7 @@ def verify_training_records(job, result, evaluation, settings, manifests, eligib
     round_one.MATCH_SECONDS = settings['match_seconds']
     try:
         audited = {trial_id: _receipt(job, record, trial_id, started[trial_id], context, policy,
-                                      ids, labels, round_one.accuracy)
+                                      ids, labels, round_one.accuracy, [row['clip'] for row in training])
                    for trial_id, record in completed.items()}
     finally:
         round_one.MATCH_SECONDS = old_tolerance
@@ -230,8 +249,7 @@ def verify_training_records(job, result, evaluation, settings, manifests, eligib
         recorded_names, summary, parameters = audited[trial_id]
         if name not in recorded_names:
             raise ValueError('Published fit names must match their training plans')
-        models = result.get('feature_parameters', {})
-        if eligible[name]['method'] not in models or parameters != models[eligible[name]['method']]:
+        if parameters != parameters_for(result, eligible[name], required=True):
             raise ValueError('Published model must equal the selected validation checkpoint, not the final epoch')
         used.add(trial_id)
         candidates[name] = summary
@@ -261,6 +279,13 @@ def _training_inputs(job):
 def make_training_monitor(job, trial_id, plan, *, clock=monotonic):
     """Bind the canonical jaw validator BEFORE an epoch can become immutable."""
     settings, context, ids, labels = _training_inputs(job)
+    training = json.loads(local_artifact(job, Path(job) / 'train.json').read_text())['clips']
+    train_ids = [row['clip'] for row in training]
+    if not train_ids or len(set(train_ids)) != len(train_ids):
+        raise ValueError('Training F1 requires unique nonempty training clips')
+    plan = dict(plan)
+    if plan['kind'] == 'iterative':
+        plan['record_training_predictions'] = True
 
     def validate(predictions, score):
         values = _prediction_values(predictions, ids)
@@ -275,7 +300,8 @@ def make_training_monitor(job, trial_id, plan, *, clock=monotonic):
             raise ValueError('Epoch validation F1 must match its saved event predictions')
 
     return TrainingMonitor(job, trial_id, plan, context, policy=policy_for(settings),
-                           clock=clock, validation_validator=validate)
+                           clock=clock, validation_validator=validate,
+                           training_validator=lambda predictions: _prediction_values(predictions, train_ids))
 
 
 def preflight_training_trial(job, trial_id):
@@ -299,7 +325,8 @@ def preflight_training_trial(job, trial_id):
     try:
         names, summary, _ = _receipt(job, rows[1]['receipt'], trial_id, rows[0]['plan'],
                                      context, policy_for(settings), ids,
-                                     labels, round_one.accuracy)
+                                     labels, round_one.accuracy,
+                                     [row['clip'] for row in json.loads((job / 'train.json').read_text())['clips']])
     finally:
         round_one.MATCH_SECONDS = old_tolerance
     return {'status': 'passed', 'scope': 'one-completed-trial',

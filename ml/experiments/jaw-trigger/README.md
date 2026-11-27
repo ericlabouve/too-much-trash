@@ -217,7 +217,9 @@ Future agent rounds save both series under the same objective with inference-mod
 validation and no test access. Their `candidate_metadata[name].training_history`
 contains job-relative `path`, `sha256`, `model_path` and `model_sha256`. The history
 JSON has `metric`, `points` (`epoch`, `train_loss`, `validation_loss`) and optional
-`note`. The model JSON must equal `feature_parameters[method]`. Changed hashes,
+`note`. New model JSON must equal `candidate_parameters[candidate.name]` under
+`model_binding_protocol=candidate-scoped-v1`; historical jobs retain their original
+`feature_parameters[method]` format. Changed hashes,
 models or candidate configurations invalidate the displayed history. These are
 objective-loss diagnostics, separate from deployment F1 and fitness.
 Hover or focus a parameter for its definition. The default
@@ -519,6 +521,29 @@ Labels, source identities and Python parity outputs remain outside the phone's
 `Fixtures` folder. `iphone-replay/pool_runtime.hpp` ports the ten R50 candidates
 to native C++/Accelerate/OpenCV CPU inference; unsupported future methods fail
 explicitly. It is separate from the recording app and the older replay below.
+
+### Paired color inputs for later experiments
+
+`prepare_rgb_inputs.py --job FROZEN_JOB --output PRIVATE_CACHE` prepares raw
+RGB 960×720 arrays from only the videos already in that job's train/validation
+fixtures. It preserves display orientation and aspect ratio with letterboxing,
+reproduces every legacy 320×240 gray pixel and timestamp exactly, and refuses
+changed sources or mismatches. `--limit 1` is a preparation pilot; its partial
+index cannot enter an experiment. Completed entries resume by their original
+hashes. Cache pixels, source paths and indexes remain private working data.
+
+Before author dispatch, pin the completed index SHA and call
+`paired_rgb_inputs.load_paired_inputs(job, index, sha, verify_pixels=True)` to
+verify every paired input. Reuse read-only memory maps across rounds. A new
+job's benchmark and independent probes must explicitly support the RGB input
+contract; preparing a cache alone does not change or validate a detector.
+Inference receives current pixels, timestamps and causal sensor samples, never
+the fixture's clip identity, labels, source paths or split metadata. Preserve
+the legacy gray path for exact comparisons. Count all model-specific cropping,
+resizing, color conversion, features, inference and decoding in native timing;
+cached learned features cannot stand in for raw-frame processing. Record the
+input mode, cache hash and timing scope, and exercise the actual RGB deployment
+artifact in every required streaming probe. Test footage remains reserved.
 
 Stage `pool_main.mm`, `pool_runtime.hpp` and `pool-project.yml` (as `project.yml`)
 beside `Fixtures` in the private run/build directory, supply the official OpenCV

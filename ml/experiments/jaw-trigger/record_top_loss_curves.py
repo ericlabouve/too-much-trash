@@ -15,6 +15,7 @@ import time
 import cv2
 import numpy as np
 import torch
+from ml.evolution.model_parameters import parameters_for
 
 
 def write(path, value):
@@ -198,7 +199,7 @@ def main():
                     yield path
             base = fit(checked_paths(), [None] * len(rows['train']),
                        [row['jaw_reference'] for row in rows['train']], seed=result['seed'], epochs=100)
-            original = result['feature_parameters'][method]
+            original = parameters_for(result, candidate, required=True)
             regenerated = {**original, 'base': base}
         else:
             namespace['_feature_rows'] = native_rows
@@ -208,7 +209,7 @@ def main():
                              load=load, temporal47=SimpleNamespace(_feature_rows=native_rows))
             fit = instrument(multiscale_source, namespace, own / 'observed-fit.py')
             regenerated = fit(index)
-            original = result['feature_parameters'][method]
+            original = parameters_for(result, candidate, required=True)
         write(own / 'model.json', regenerated)
         exact = regenerated == original
         summary['candidates'][name] = {'candidate': candidate, 'exact_model_match': exact,

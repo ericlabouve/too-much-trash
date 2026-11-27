@@ -30,10 +30,28 @@ from ml.evolution.agent_budgets import PROTOCOL as BUDGET_PROTOCOL
 from ml.evolution.review_bundles import PROTOCOL as REVIEW_BUNDLE_PROTOCOL
 from ml.evolution.resources import PROTOCOL as FIT_SLOT_PROTOCOL
 
+NEXT_ROUND_PROMPT = """Explore causal temporal Transformer architectures for squeeze/release detection.
+Give the two fresh researchers distinct Transformer hypotheses (for example cached temporal
+self-attention over visual features, and causal video/IMU/ARKit fusion); existing parents
+may adopt attention when justified, but preserve an unchanged MLP comparison. Start with
+compact models and compare capacity/context lengths rather than assuming larger is better.
+Use only present/past inputs with bounded persistent state, causal masks and stream-relative
+positions; never use future frames, episode length, clip identity, button cues or elapsed
+episode time at inference. Native sensor timestamp deltas for alignment remain allowed.
+Compare regularization/label-preserving training-only augmentation against a documented
+control within the existing fit/agent budgets. Use identical inference-mode loss measurement
+on train and validation, and log both splits' squeeze/release predictions each epoch.
+Optimize validation event F1 toward 0.95; diagnose validation loss without replacing F1
+selection or changing the objective/decoder to beautify curves. Current speed credit is
+full through 0.25 frame (~4.17 ms at 60 fps), falling to zero at 1 frame (~16.67 ms).
+Budget time for deployment export and serial native accuracy/latency verification; prototype
+speed does not count. Keep the current split, 80/20 fitness, independent reviews and test
+reservation unchanged. Record failures and ablations as well as successes."""
+
 DEFAULTS = BOUNDED_DEFAULTS | {
     "mode": "agent_guided", "target_basis": "validation",
     "pool_size": 8, "research_slots": 2, "agent_minutes": 20, "agent_concurrency": 6,
-    "agent_prompt": "", "review_agents": 1, "review_protocol": REVIEW_PROTOCOL,
+    "agent_prompt": NEXT_ROUND_PROMPT, "review_agents": 1, "review_protocol": REVIEW_PROTOCOL,
     "evaluation_protocol": "clip_replay-v1",
     "benchmark_protocol": "deployment-v1",
     "training_protocol": TRAINING_PROTOCOL,

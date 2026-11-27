@@ -12,6 +12,7 @@ import pickle
 import numpy as np
 
 from prepare_pool_replay import runtime_model
+from ml.evolution.model_parameters import parameters_for
 
 
 def export(result_path, output):
@@ -23,8 +24,8 @@ def export(result_path, output):
     spec={'suite':'jaw-pool-native-v1','round':result['round'],'repeats':3,
           'result_sha256':sha256(result_path.read_bytes()).hexdigest(),
           'pool_sha256':sha256(canonical(result['next_pool']).encode()).hexdigest(),
-          'candidates':[{'candidate':c,'parameters':runtime_model(result['feature_parameters'].get(c['method'],{})),
-                         'model_sha256':sha256(canonical(result['feature_parameters'].get(c['method'],{})).encode()).hexdigest()}
+          'candidates':[{'candidate':c,'parameters':runtime_model(parameters_for(result,c)),
+                         'model_sha256':sha256(canonical(parameters_for(result,c)).encode()).hexdigest()}
                         for c in result['next_pool']]}
     clips=[];splits={};hashes={}
     for split in ('train','validation'):

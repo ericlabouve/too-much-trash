@@ -9,6 +9,7 @@ import unittest
 
 from ml.evolution.training import TrainingMonitor, PROTOCOL, evidence, policy_for, write
 from dashboard_training import verify_training_records, preflight_training_trial, make_training_monitor
+from ml.evolution.model_parameters import bind_parameters
 
 
 class TrainingAuditTests(unittest.TestCase):
@@ -117,11 +118,13 @@ class TrainingAuditTests(unittest.TestCase):
                 with make_training_monitor(job, 'validated-trial', plan) as monitor:
                     with self.assertRaises(ValueError):
                         monitor.observe(train_loss=.1, validation_loss=.2, validation_score=score,
-                                        validation_predictions=predictions, parameters={'value': 1})
+                                        validation_predictions=predictions, parameters={'value': 1},
+                                        training_predictions={'train': []})
                     self.assertEqual(monitor.points, [])
                     self.assertFalse((monitor.directory / 'selected-checkpoint.json').exists())
                     monitor.observe(train_loss=.1, validation_loss=.2, validation_score=1.,
                                     validation_predictions={'validation': [['close', 3.], ['open', 5.]]},
+                                    training_predictions={'train': [['close', 3.], ['open', 5.]]},
                                     parameters={'value': 1})
                     monitor.finish()
                 checked = preflight_training_trial(job, 'validated-trial')
@@ -140,12 +143,39 @@ class TrainingAuditTests(unittest.TestCase):
             with make_training_monitor(job, 'tuple-events', plan) as monitor:
                 monitor.observe(train_loss=.1, validation_loss=.2, validation_score=1.,
                                 validation_predictions={'validation': [('close', np.float64(3.)), ('open', 5.)]},
+                                training_predictions={'train': [('close', 3.), ('open', 5.)]},
                                 parameters={'value': 1})
                 monitor.finish()
             report = preflight_training_trial(job, 'tuple-events')
             self.assertEqual(report['selected_validation_f1'], 1.)
             prediction = json.loads((job / 'training/tuple-events/validation-0001.json').read_text())
             self.assertEqual(prediction['validation'], [['close', 3.], ['open', 5.]])
+
+    def test_training_curves_require_full_training_ids_before_writing(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory)
+            fixture = self.fixture(job)
+            write(job / 'config.json', {'settings': fixture[0]})
+            plan = json.loads((job / 'training/trial-one/plan.json').read_text())['plan']
+            plan['max_epochs'] = 1
+            with make_training_monitor(job, 'train-curves', plan) as monitor:
+                for predictions in (None, {'validation': []}, {'train': [['bad', 1.]]}):
+                    with self.subTest(predictions=predictions), self.assertRaises(ValueError):
+                        monitor.observe(train_loss=.1, validation_loss=.2, validation_score=1.,
+                                        validation_predictions={'validation': [['close', 3.], ['open', 5.]]},
+                                        training_predictions=predictions, parameters={'value': 1})
+                    self.assertEqual(monitor.points, [])
+                monitor.observe(train_loss=.1, validation_loss=.2, validation_score=1.,
+                                validation_predictions={'validation': [['close', 3.], ['open', 5.]]},
+                                training_predictions={'train': []}, parameters={'value': 1})
+                monitor.finish()
+            report = preflight_training_trial(job, 'train-curves')
+            history = json.loads((job / report['history']['path']).read_text())
+            path = job / history['points'][0]['training_predictions']['path']
+            self.assertEqual(json.loads(path.read_text()), {'train': []})
+            path.write_text('{}')
+            with self.assertRaises(ValueError):
+                preflight_training_trial(job, 'train-curves')
 
     def republish(self, job, fixture, mutate):
         """Refresh hashes after an adversarial edit so semantic checks must catch it."""
@@ -172,6 +202,48 @@ class TrainingAuditTests(unittest.TestCase):
             fixture[2]['feature_parameters']['state_model'] = {'value': 3}
             with self.assertRaisesRegex(ValueError, 'selected validation checkpoint'):
                 self.audit(job, fixture)
+
+    def test_parent_and_child_same_method_keep_their_selected_checkpoints(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory)
+            settings, manifests, result, evaluation, eligible = self.fixture(job)
+            parent = eligible['Model']
+            child = {'name': 'Child', 'method': parent['method']}
+            plan = json.loads((job / 'training/trial-one/plan.json').read_text())['plan']
+            plan.update(candidate_name='Child', max_epochs=1)
+            context = {f'{split}_manifest_sha256': sha256(path.read_bytes()).hexdigest()
+                       for split, path in manifests.items()}
+            with TrainingMonitor(job, 'child-fit', plan, context, policy=policy_for(settings)) as monitor:
+                monitor.observe(train_loss=.1, validation_loss=.2, validation_score=1.,
+                                validation_predictions={'validation': [['close', 3.], ['open', 5.]]},
+                                parameters={'value': 9})
+                receipt = monitor.finish()
+            evaluation['fitted_candidates'].append('Child')
+            evaluation['training_receipts']['Child'] = receipt
+            eligible['Child'] = child
+            result.update(bind_parameters([(parent, {'value': 2}), (child, {'value': 9})]))
+            # A conflicting legacy table cannot override either scoped binding.
+            summary = verify_training_records(job, result, evaluation, settings, manifests, eligible)
+            self.assertEqual(set(summary['candidates']), {'Model', 'Child'})
+            self.assertEqual(summary['candidates']['Model']['selected_epoch'], 2)
+            result['candidate_parameters']['Model'] = {'value': 9}
+            with self.assertRaisesRegex(ValueError, 'Published model must equal'):
+                verify_training_records(job, result, evaluation, settings, manifests, eligible)
+            del result['candidate_parameters']['Model']
+            with self.assertRaisesRegex(ValueError, 'Missing candidate-scoped'):
+                verify_training_records(job, result, evaluation, settings, manifests, eligible)
+
+    def test_new_frozen_jobs_require_scoped_bindings_before_native_evaluation(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory)
+            fixture = self.fixture(job)
+            marker = job / 'protected-source/ml/evolution/model_parameters.py'
+            marker.parent.mkdir(parents=True)
+            marker.write_text('# Frozen binding protocol marker\n')
+            with self.assertRaisesRegex(ValueError, 'New jobs require candidate-scoped'):
+                self.audit(job, fixture)
+            fixture[2].update(bind_parameters([(fixture[4]['Model'], {'value': 2})]))
+            self.assertEqual(self.audit(job, fixture)['candidates']['Model']['selected_epoch'], 2)
 
     def test_noniterative_fit_has_no_fake_curve(self):
         with TemporaryDirectory() as directory:
@@ -322,6 +394,52 @@ class TrainingAuditTests(unittest.TestCase):
             evaluation['training_receipts']['Model'] = monitor.finish()
             result['feature_parameters']['state_model'] = {'value': 9}
             self.assertEqual(self.audit(job, fixture)['candidates']['Model']['stop_reason'], 'time_budget')
+
+    def guarded_fixture(self, job):
+        fixture = self.fixture(job)
+        write(job / 'config.json', {'settings': fixture[0]})
+        plan = json.loads((job / 'training/trial-one/plan.json').read_text())['plan']
+        plan['max_epochs'] = 100
+        clock = [0.]
+        monitor = make_training_monitor(job, 'guarded', plan, clock=lambda: clock[0])
+        for epoch, elapsed in enumerate((217.878, 233.851, 250.129, 266.635, 283.215), 1):
+            self.assertTrue(monitor.can_start_epoch())
+            clock[0] = elapsed
+            monitor.observe(train_loss=1 / epoch, validation_loss=1 / epoch,
+                            validation_score=1., parameters={'value': epoch},
+                            validation_predictions={'validation': [['close', 3.], ['open', 5.]]},
+                            training_predictions={'train': [['close', 3.], ['open', 5.]]})
+        self.assertFalse(monitor.can_start_epoch())
+        fixture[3]['training_receipts']['Model'] = monitor.finish()
+        fixture[2]['feature_parameters']['state_model'] = {'value': 5}
+        return fixture
+
+    def test_canonical_gate_accepts_reproducible_early_epoch_budget_stop(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory)
+            fixture = self.guarded_fixture(job)
+            checked = preflight_training_trial(job, 'guarded')
+            self.assertEqual(checked['stop_reason'], 'epoch_budget')
+            self.assertEqual(checked['trained_epochs'], 5)
+            self.assertEqual(self.audit(job, fixture)['candidates']['Model']['selected_epoch'], 5)
+
+    def test_epoch_guard_cannot_be_self_stamped_or_expand_the_time_bound(self):
+        for corruption in ('missing', 'prediction', 'early_clock', 'actual_overrun'):
+            with self.subTest(corruption=corruption), TemporaryDirectory() as directory:
+                job = Path(directory)
+                fixture = self.guarded_fixture(job)
+                def mutate(receipt):
+                    if corruption == 'missing':
+                        receipt.pop('epoch_admission_stop')
+                    elif corruption == 'prediction':
+                        receipt['epoch_admission_stop']['predicted_epoch_seconds'] *= 2
+                    elif corruption == 'early_clock':
+                        receipt['epoch_admission_stop']['elapsed_seconds'] = 100.
+                    else:
+                        receipt['elapsed_seconds'] = 315.21874891698826
+                self.republish(job, fixture, mutate)
+                with self.assertRaisesRegex(ValueError, 'lookahead|bounded time'):
+                    preflight_training_trial(job, 'guarded')
 
 
 if __name__ == '__main__':

@@ -57,6 +57,8 @@ def verify_agent_budgets(job, receipts, settings, challengers=(), candidate_arti
     if 'review_bundle_protocol' in settings and package_protocol != REVIEW_BUNDLE_PROTOCOL:
         raise ValueError('Unknown frozen review-bundle protocol')
     ledger = json.loads(_artifact(job, 'agent-runtime.json').read_text())
+    if ledger.get('watchdog_failure') is not None:
+        raise ValueError('Supervisor watchdog failed; incomplete supervision cannot publish')
     if ledger.get('protocol') != PROTOCOL or Path(ledger.get('job', '')).resolve() != job.resolve():
         raise ValueError('Agent runtime ledger must identify this job and protocol')
     knobs = ledger.get('settings', {})
@@ -150,6 +152,26 @@ def verify_agent_budgets(job, receipts, settings, challengers=(), candidate_arti
                                <= cycle['ended_monotonic'] for cycle in cycles)):
                 raise ValueError('Supervised turn must fit its original agent allocation')
             previous_turn_end = end
+        retries = record.get('capacity_retries', [])
+        if not isinstance(retries, list) or len(retries) > 2:
+            raise ValueError('Capacity resumes must remain bounded to two retries per identity')
+        for index, retry in enumerate(retries):
+            number = retry.get('turn') if isinstance(retry, dict) else None
+            if type(number) is not int or not 1 <= number < len(turns):
+                raise ValueError('Capacity retry must retain its failed turn and resumed turn')
+            failed, resumed = turns[number - 1:number + 1]
+            retry_at = retry.get('retry_at_monotonic')
+            raw = _artifact(job, failed.get('events_path')).read_bytes()
+            reason = 'Selected model is at capacity. Please try a different model.'
+            events = [json.loads(line) for line in raw.splitlines() if line.strip()]
+            if (failed.get('returncode') in (None, 0) or retry.get('reason') != reason
+                    or sha256(raw).hexdigest() != retry.get('events_sha256')
+                    or not any(event.get('type') == 'error' and event.get('message') == reason for event in events)
+                    or not _number(retry_at)
+                    or not isclose(retry_at, failed['ended_monotonic'] + 5. * (index + 1), abs_tol=1e-6)
+                    or resumed['started_monotonic'] < retry_at
+                    or retry_at >= cycles[failed.get('cycle', 1) - 1]['deadline_monotonic']):
+                raise ValueError('Capacity retry evidence or original-allocation backoff is invalid')
         if kind in ('parent', 'research') and turns[-1].get('phase') != 'export':
             raise ValueError('Candidate agents must finalize in an export-only turn')
         if kind == 'integrity_review' and author_finishing:

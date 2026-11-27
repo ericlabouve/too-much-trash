@@ -20,10 +20,26 @@ validation gradients, dropout or augmentation. Save the best validation-task-sco
 checkpoint, with lower validation loss then earlier epoch as tie-breaks. Freeze the
 checkpoint-selection decoder within a fit. Monitor patience and a common wall-time
 cap; do not blindly export the last epoch or prescribe 100 epochs for every model.
+Call can_start_epoch() before every epoch. New monitors reserve room for the next
+epoch using recent measured epoch intervals plus finalization time; an auditable
+epoch_budget stop keeps the existing best checkpoint without inventing epochs.
+The actual trial limit is unchanged. Check time inside long minibatch/evaluation
+loops too: lookahead cannot predict a sudden stall. Do not begin a last full epoch
+with less than its measured cost remaining or discard a failed trial to evade the
+whole-journal gate. Large input preparation can dominate the first measurement;
+cache deterministic label-free crops before the next fit when feasible, retain
+the memory lease, and keep all model-specific preprocessing in final native timing.
 Keep loss separate from task F1 and composite fitness. Rising validation loss is an
 overfitting warning, not automatic rejection of a model with better task F1. Review
 capacity, weight decay, dropout, label-preserving augmentation and simpler baselines
-when the train/validation gap grows. Genuine closed-form/tree fits get an explicit
+when the train/validation gap grows. Compare at least one justified generalization
+change against a documented control within the existing allocation, or record a
+concrete budget/blocker reason. Augment fitting examples only; transform corresponding
+sensor/pose channels consistently where geometry or timing changes. Fit normalization,
+weights and preprocessing statistics on training alone. Bigger models are hypotheses,
+not evidence of improvement; causal attention must exclude future inputs and use
+bounded streaming state. Do not tune an objective's scale to reduce displayed loss.
+Genuine closed-form/tree fits get an explicit
 noniterative record, not invented epoch curves. Large tensors may remain framework
 checkpoints referenced by hash; Python, NumPy, PyTorch and other suitable prototypes
 are allowed. Final task accuracy and latency must use the same deployment artifact
@@ -57,6 +73,12 @@ Stay within the requested round/agent budget. Preserve unrelated changes; never
 copy another project's infinite-loop or git-reset workflow into a shared checkout.
 For the jaw domain use dashboard_training.make_training_monitor, which binds frozen
 validation IDs, event schema and recomputed F1 before saving each epoch. Run
+observe(..., training_predictions={clip_id: events, ...}) on every epoch too, using
+the same fixed selection decoder and inference-mode full training split. These
+hashed predictions supply train/validation squeeze/release F1 on one chart; the
+monitor rejects missing training predictions and wrong-split IDs for new fits.
+Historical missing epochs must remain missing; never reconstruct a curve from
+the final F1 or claim prototype epoch diagnostics are final deployment scores. Run
 preflight_training_trial after each completed fit; do not replace the canonical
 checker with a handwritten approximation. The full training gate must pass before
 serial deployment scoring and again before reviewer dispatch. Reviewers must run
@@ -69,6 +91,14 @@ Other legitimate objectives remain allowed with the same evaluation definition
 on both splits. Do not demand decreasing curves or invent a desired shape. Plot
 the exact evaluated candidate's selected receipt/checkpoint, not a similarly named
 exploratory trial. Keep raw epochs, selected marker and full measurement definition.
+Keep trained weights keyed by exact candidate identity, not algorithm method.
+Several parents/children may use the same architecture with different weights.
+For jaw results use model_binding_protocol='candidate-scoped-v1',
+candidate_parameters[candidate.name] and ml.evolution.model_parameters helpers.
+Never overwrite one candidate's weights with another's or relabel a finished
+author's method to repair a storage collision. Bind each export, score and curve
+to that candidate's actual selected checkpoint. Legacy method tables remain
+read-only compatibility inputs; new publication requires scoped bindings.
 '''.strip()
 
 

@@ -7,9 +7,57 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from dashboard_losses import load_training_histories, load_loss_diagnostics, normalize_history
+from dashboard_event_curves import event_f1
+from ml.evolution.model_parameters import bind_parameters
 
 
 class LossHistoryTests(unittest.TestCase):
+    def test_per_event_f1_counts_duplicate_predictions_and_wrong_event_kinds(self):
+        rows = [{'clip': 'a', 'jaw_reference': {'close': 3., 'open': 5.}},
+                {'clip': 'b', 'jaw_reference': {'close': 3., 'open': 5.}}]
+        predictions = {'a': [['close', 3.], ['close', 3.1], ['open', 5.]], 'b': [['open', 3.]]}
+        actual = event_f1(predictions, rows, .5)
+        self.assertEqual(actual, {'squeeze': .5, 'release': .5})
+        for bad in ({'test': []}, {'a': [], 'b': [['close', float('nan')]]}):
+            with self.assertRaises(ValueError):
+                event_f1(bad, rows, .5)
+
+    def test_event_curves_are_bound_to_split_prediction_and_checkpoint_hashes(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            candidate, model, result = self.fixture(root)
+            def save(name, value):
+                path = root / name
+                path.write_text(json.dumps(value))
+                return {'path': name, 'sha256': sha256(path.read_bytes()).hexdigest()}
+            manifests = {split: save(f'{split}.json', {'clips': [
+                {'clip': split, 'jaw_reference': {'close': 3., 'open': 5.}}]})
+                for split in ('train', 'validation')}
+            save('plan.json', {'context': {f'{split}_manifest_sha256': ref['sha256']
+                                          for split, ref in manifests.items()}})
+            save('config.json', {'settings': {'match_seconds': .5}})
+            val = save('validation-predictions.json', {'validation': [['close', 3.], ['open', 5.]]})
+            train = save('train-predictions.json', {'train': [['close', 3.]]})
+            history = save('history.json', {'metric': 'BCE', 'points': [
+                {'epoch': 1, 'train_loss': .3, 'validation_loss': .4,
+                 'predictions': val, 'training_predictions': train},
+                {'epoch': 2, 'train_loss': .2, 'validation_loss': .5, 'predictions': val}]})
+            checkpoint = save('selected-checkpoint.json', {'parameters': model})
+            result['training_audit'] = {'candidates': {'Model': {
+                'kind': 'iterative', 'history': history, 'checkpoint': checkpoint, 'selected_epoch': 1}}}
+            loaded = load_training_histories(root, result)['Model']
+            first, second = loaded['points']
+            self.assertEqual(first['train_squeeze_f1'], 1.)
+            self.assertEqual(first['train_release_f1'], 0.)
+            self.assertEqual(second['validation_release_f1'], 1.)
+            self.assertIsNone(second['train_squeeze_f1'])
+            self.assertEqual(loaded['selected_epoch'], 1)
+            # Tampered predictions must disappear rather than fabricate curves.
+            save('train-predictions.json', {'test': []})
+            loaded = load_training_histories(root, result)['Model']
+            self.assertIsNone(loaded['points'][0]['validation_release_f1'])
+            self.assertEqual(loaded['points'][0]['train_loss'], .3)
+
     def fixture(self, root):
         candidate = {'name': 'Model', 'method': 'mlp', 'threshold': .5}
         model = {'layers': [1, 2]}
@@ -58,6 +106,28 @@ class LossHistoryTests(unittest.TestCase):
             result['feature_parameters']['mlp'] = model
             history.write_text('{}')
             self.assertEqual(load_training_histories(root, result), {})
+
+    def test_same_method_loss_curves_bind_to_each_candidate(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            parent, model, result = self.fixture(root)
+            child = {**parent, 'name': 'Child'}
+            result['ranked'].append({'candidate': child})
+            result.update(bind_parameters([(parent, model), (child, {'layers': [9]})]))
+            for candidate, weights, loss in ((parent, model, .3), (child, {'layers': [9]}, .7)):
+                name = candidate['name']
+                history, checkpoint = root / f'{name}-history.json', root / f'{name}-checkpoint.json'
+                history.write_text(json.dumps({'metric': 'BCE', 'points': [
+                    {'epoch': 1, 'train_loss': loss, 'validation_loss': loss + .1}]}))
+                checkpoint.write_text(json.dumps({'parameters': weights}))
+                ref = lambda p: {'path': p.name, 'sha256': sha256(p.read_bytes()).hexdigest()}
+                result.setdefault('training_audit', {}).setdefault('candidates', {})[name] = {
+                    'kind': 'iterative', 'history': ref(history), 'checkpoint': ref(checkpoint), 'selected_epoch': 1}
+            histories = load_training_histories(root, result)
+            self.assertEqual(histories['Model']['points'][0]['train_loss'], .3)
+            self.assertEqual(histories['Child']['points'][0]['train_loss'], .7)
+            result['candidate_parameters']['Model'] = {'layers': [9]}
+            self.assertEqual(set(load_training_histories(root, result)), {'Child'})
 
     def test_legacy_training_only_history_bound_by_evaluation_and_model(self):
         with TemporaryDirectory() as directory:

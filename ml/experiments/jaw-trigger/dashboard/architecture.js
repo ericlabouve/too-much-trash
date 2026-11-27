@@ -1,12 +1,12 @@
 // These stages describe the runtime implementations, not their training graphs.
-function candidateArchitecture(candidate, parameters = {}) {
+function candidateArchitecture(candidate, parameters = {}, candidateParameters) {
   const declared = candidate.presentation?.architecture;
   if (Array.isArray(declared) && declared.length && declared.every(stage =>
     Array.isArray(stage) && stage.length === 2 && stage.every(value => typeof value === 'string'))) {
     return declared;
   }
   const method = candidate.method;
-  const model = parameters[method] ?? {};
+  const model = candidateParameters === undefined ? (parameters?.[method] ?? {}) : (candidateParameters?.[candidate.name] ?? {});
   const denseWidth = (index, fallback) => model.layers?.[index]?.bias?.length ?? fallback;
   let stages;
   if (method === 'unknown') {
@@ -113,7 +113,7 @@ function candidateArchitecture(candidate, parameters = {}) {
   return stages;
 }
 
-function makeCandidateArchitecture(candidate, parameters) {
+function makeCandidateArchitecture(candidate, parameters, candidateParameters) {
   const figure = document.createElement('figure');
   figure.className = 'candidate-architecture';
   const caption = document.createElement('figcaption');
@@ -121,7 +121,7 @@ function makeCandidateArchitecture(candidate, parameters) {
   const flow = document.createElement('ol');
   flow.className = 'architecture-flow';
   flow.setAttribute('aria-label', `${candidateLabel(candidate.name)} runtime stages`);
-  for (const [title, description] of candidateArchitecture(candidate, parameters)) {
+  for (const [title, description] of candidateArchitecture(candidate, parameters, candidateParameters)) {
     const node = document.createElement('li');
     const heading = document.createElement('strong');
     heading.textContent = title;

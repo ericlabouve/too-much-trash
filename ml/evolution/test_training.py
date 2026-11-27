@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 from .training import TrainingMonitor, TrainingPolicy, evidence, policy_for
 
@@ -117,6 +118,40 @@ class TrainingMonitorTests(unittest.TestCase):
                 receipt = json.loads((Path(directory) / monitor.finish()['path']).read_text())
                 self.assertEqual(receipt['stop_reason'], 'time_budget')
 
+    def test_long_epoch_lookahead_reserves_finalization_without_inventing_epochs(self):
+        with TemporaryDirectory() as directory:
+            clock = Clock()
+            monitor = self.monitor(directory, plan=self.plan(epochs=100), clock=clock)
+            # The first measurement includes substantial input preparation;
+            # later epochs actually cost about sixteen seconds each.
+            times = [217.878, 233.851, 250.129, 266.635, 283.215]
+            for elapsed in times:
+                self.assertTrue(monitor.can_start_epoch())
+                clock.now = monitor.started + elapsed
+                self.record(monitor, .5)
+            self.assertFalse(monitor.can_start_epoch())
+            self.assertEqual(monitor.stop_reason, 'epoch_budget')
+            clock.now += .1
+            receipt = json.loads((Path(directory) / monitor.finish()['path']).read_text())
+            self.assertEqual(receipt['trained_epochs'], 5)
+            self.assertLess(receipt['elapsed_seconds'], 300.)
+            guard = receipt['epoch_admission_stop']
+            self.assertEqual(len(guard['observed_epoch_intervals_seconds']), 3)
+            self.assertLess(guard['predicted_epoch_seconds'], 22.)
+            self.assertEqual(len(monitor.points), 5)
+            with self.assertRaises(ValueError):
+                self.record(monitor, .9)
+
+    def test_lookahead_accounts_for_a_recent_slow_epoch(self):
+        from .epoch_admission import budget_stop
+        points = [{'elapsed_seconds': t} for t in (100., 110., 120., 180.)]
+        guard = budget_stop(points, 230., 300.)
+        self.assertEqual(guard['predicted_epoch_seconds'], 75.)
+        self.assertIsNone(budget_stop(points, 200., 300.))
+        self.assertIsNone(budget_stop(points[:1], 200., 300.))
+        with self.assertRaises(ValueError):
+            budget_stop(points, 170., 300.)
+
     def test_context_failure_and_unfinished_trial_preserve_failure_journal(self):
         for fail_explicitly in (True, False):
             with self.subTest(fail_explicitly=fail_explicitly), TemporaryDirectory() as directory:
@@ -141,6 +176,30 @@ class TrainingMonitorTests(unittest.TestCase):
             self.assertIsNone(receipt['selected_epoch'])
             self.assertEqual(receipt['trained_epochs'], 0)
             self.assertEqual(receipt['stop_reason'], 'noniterative_complete')
+
+    def test_empty_exception_messages_preserve_failure_type_and_partial_evidence(self):
+        for error in (KeyboardInterrupt(), RuntimeError(), ValueError('  ')):
+            with self.subTest(error=type(error).__name__), TemporaryDirectory() as directory:
+                with self.assertRaises(type(error)):
+                    with self.monitor(directory) as monitor:
+                        self.record(monitor, .5)
+                        raise error
+                rows = [json.loads(line) for line in (Path(directory) / 'trials.jsonl').read_text().splitlines()]
+                self.assertEqual([row['status'] for row in rows], ['started', 'crash'])
+                self.assertIn(type(error).__name__, rows[-1]['reason'])
+                self.assertTrue(rows[-1]['reason'].strip())
+                self.assertTrue((monitor.directory / 'history.json').exists())
+                self.assertTrue((monitor.directory / 'selected-checkpoint.json').exists())
+
+    def test_keyboard_interrupt_while_waiting_for_fit_slot_is_not_a_blank_failure(self):
+        with TemporaryDirectory() as directory:
+            with patch('ml.evolution.training.fitting_settings', return_value=2), patch(
+                    'ml.evolution.training.FittingLease.acquire', side_effect=KeyboardInterrupt()):
+                with self.assertRaises(KeyboardInterrupt):
+                    self.monitor(directory)
+            row = json.loads((Path(directory) / 'trials.jsonl').read_text().splitlines()[-1])
+            self.assertEqual(row['status'], 'crash')
+            self.assertEqual(row['reason'], 'KeyboardInterrupt (no exception message)')
 
     def test_opaque_weights_preserved_and_mutation_or_escape_is_rejected(self):
         with TemporaryDirectory() as directory:

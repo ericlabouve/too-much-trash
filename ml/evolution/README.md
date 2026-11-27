@@ -156,6 +156,24 @@ no evolutionary round or training. Goal support can change with CLI versions.
 
 ## Validation checkpoints and experiment records
 
+Algorithm dispatch and trained model identity are separate. New jaw results use
+`model_binding_protocol=candidate-scoped-v1` with bare weights in
+`candidate_parameters[candidate.name]`. Build the table with
+`model_parameters.bind_parameters([(candidate, parameters), ...])` and read it
+with `parameters_for(result, candidate)`. Duplicate names fail before overwrite;
+parent and child may share a method while preserving different selected weights.
+Missing scoped entries fail closed, even when a legacy method table is present.
+Historical method-keyed results remain readable without retroactive rewriting.
+
+`ml/experiments/jaw-trigger/recover_saved_candidates.py --job FAILED_JOB --output
+NEW_RECOVERY_DIRECTORY` can archive intact selected models after an operational
+failure. It verifies the entire original trial journal, preserves candidate
+identities and original receipt bytes, and archives the source evidence with
+hashes. `--verify --output RECOVERY_DIRECTORY` rechecks the source and archive.
+Recovery performs no fitting, test evaluation, scoring or admission. It does not
+reopen author allocations or mark the failed round complete: resumed evaluation
+and fresh independent candidate reviews are still required before promotion.
+
 New jaw jobs use `fit_slot_protocol=flock-v1`, with `fit_concurrency=2` and up to
 six independently scheduled agents. TrainingMonitor acquires a process-shared
 kernel fitting slot before optimization and releases it on finish/failure;
@@ -192,14 +210,43 @@ validation loss, event F1 and composite fitness are different quantities.
 
 Default policy: 10 evaluations without at least 0.001 task-score improvement,
 at least five epochs before patience stopping, and a 300-second per-trial wall
-cap including optimization/validation after preparation (or the owning agent's
-shorter allocation). Agents declare their epoch ceiling before fitting; 100
+cap measured after acquiring the fit lease, including any preparation inside
+that trial (or the owning agent's shorter allocation). Agents declare their epoch ceiling before fitting; 100
 epochs is not mandatory. Stop on patience, the ceiling or the time cap, and
 export the **saved best checkpoint**, not the last optimizer state. Call
 `can_start_epoch()` and check the budget inside long epochs; disclose boundary
 overruns. Parallel research/fitting may share resources, so record contention
 and do not claim equal effective hardware compute from wall time alone. Final
 deployment latency remains serial and isolated from training.
+
+New iterative plans pin `epoch-lookahead-v1`. After two measured epochs,
+`can_start_epoch()` estimates the next epoch from the longest of the last three
+measurement intervals, adds a 25% margin and reserves finalization time. It may
+stop with `epoch_budget` before the cap, exporting the existing best checkpoint.
+The receipt retains the exact lookahead evidence; the canonical audit recomputes
+it from the unchanged history. The first interval is excluded because it may
+contain input preparation. This guard does not expand the time limit or its
+audit grace, invent a terminal epoch, excuse an actual overrun, or guarantee
+against a sudden stall. Keep checking time inside long training/evaluation
+loops. Reuse verified deterministic pixel caches across fits when appropriate;
+all model-specific processing still executes in final deployment measurements.
+
+The supervisor permits at most two retries of the exact provider error
+`Selected model is at capacity. Please try a different model.`. It resumes the
+same established CLI identity after 5/10 seconds, reserves its concurrency slot
+and keeps the original deadline; backoff consumes the original allocation.
+Failed turns and hashed provider error streams remain in the private ledger and
+completion audit. There is no retry after the deadline, without a known thread,
+or for authentication, arbitrary execution, or review failures. This is a
+transient transport recovery, not a new author or renewed research budget.
+
+Process-topology sampling retries one bounded2-second `ps` timeout with a new
+observation; it never substitutes stale process data. A tick reuses that same
+fresh observation for its own stop/cleanup decisions instead of spawning a
+separate `ps` per child. Persistent failures remain fatal. Watchdog exceptions
+are now written to the supervisor-owned ledger and private `watchdog-failure.json`
+before shutdown; completion auditing rejects a fatal-watchdog record even if
+task receipts otherwise claim ready. Deadlines and shutdown grace are unchanged.
 
 ```python
 from ml.evolution.training import TrainingMonitor, policy_for
@@ -232,7 +279,15 @@ validation membership and recomputes F1 from every saved epoch; this early
 check does not relax that audit or repair previously frozen receipts.
 
 Jaw authors should use `dashboard_training.make_training_monitor(job, trial_id,
-plan)`: its domain callback checks the exact frozen validation IDs, serialized
+plan)`. New iterative jaw fits must pass `training_predictions={clip_id: events}`
+to `observe` each epoch, covering every training clip in inference mode with the
+same fixed checkpoint-selection decoder as validation. These predictions are
+hash-bound and audited separately from validation; they supply four curves on
+one chart: train/validation squeeze F1 and train/validation release F1. Missing
+historical training epochs stay missing. Epoch diagnostics are prototype results,
+not the final deployment benchmark. The generic monitor makes this optional for
+other domains through `record_training_predictions` and `training_validator`.
+Its domain callback checks the exact frozen validation IDs, serialized
 close/open events and recomputed F1 **before** saving an epoch/checkpoint. The
 generic monitor accepts an optional `validation_validator` callback for other
 domains. Validation sees the same canonical JSON object that will be persisted,

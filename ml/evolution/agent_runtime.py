@@ -17,6 +17,7 @@ import signal
 import shutil
 import subprocess
 import sys
+import traceback
 from threading import Event, RLock, Thread
 from time import monotonic
 from uuid import uuid4
@@ -27,6 +28,7 @@ from .agent_budgets import budget_policy
 PROTOCOL = 'supervised-v1'
 KINDS = ('parent', 'research', 'review', 'integrity_review')
 TERMINAL = {'ready', 'blocked', 'failed', 'timed_out', 'closed'}
+PROCESS_SNAPSHOT_TIMEOUT_SECONDS = 2.0
 FINAL_SCHEMA = {
     'type': 'object', 'additionalProperties': False,
     'required': ['status', 'summary', 'artifact', 'candidate_name'],
@@ -46,8 +48,17 @@ def atomic_json(path, value):
 
 def process_snapshot():
     """Bounded process topology/start metadata only; never collect command lines."""
-    result = subprocess.run(['ps', '-axo', 'pid=,ppid=,lstart='], capture_output=True,
-                            text=True, timeout=.5, check=True)
+    for attempt in range(2):
+        try:
+            # A loaded Mac exceeded both old 0.5 s observations. Allow a bounded
+            # fresh read; tick samples the clock AFTER this call, so observation
+            # time never renews an allocation or bypasses the overrun audit.
+            result = subprocess.run(['ps', '-axo', 'pid=,ppid=,lstart='], capture_output=True,
+                                    text=True, timeout=PROCESS_SNAPSHOT_TIMEOUT_SECONDS, check=True)
+            break
+        except subprocess.TimeoutExpired:
+            if attempt:
+                raise
     records = {}
     for line in result.stdout.splitlines():
         fields = line.split(None, 2)
@@ -81,6 +92,7 @@ class Supervisor:
         self.clock, self.popen, self.killpg = clock, popen, killpg
         self.kill, self.snapshot = kill, snapshot
         self.tasks, self.lock, self.stopping = {}, RLock(), Event()
+        self.watchdog_failure = None
         self.root = self.job / 'agent-runtime'
         self.root.mkdir(exist_ok=True)
         self.private_io = self.ledger.parent / f'.{self.ledger.stem}-io'
@@ -94,11 +106,22 @@ class Supervisor:
                          if not key.startswith('_')})
 
     def _persist(self):
-        atomic_json(self.ledger, {'protocol': PROTOCOL, 'job': str(self.job),
+        record = {'protocol': PROTOCOL, 'job': str(self.job),
                     'supervisor_pid': os.getpid(),
                     'settings': {key: self.settings.get(key) for key in
                                  ('agent_minutes', 'agent_concurrency', 'family', 'review_bundle_protocol', 'agent_export_min_seconds', 'agent_export_completion')},
-                    'tasks': [self._public(task) for task in self.tasks.values()]})
+                    'tasks': [self._public(task) for task in self.tasks.values()]}
+        if self.watchdog_failure is not None:
+            record['watchdog_failure'] = self.watchdog_failure
+        atomic_json(self.ledger, record)
+
+    def record_watchdog_failure(self, error):
+        """Preserve the actual failure outside agent-writable paths before cleanup."""
+        with self.lock:
+            self.watchdog_failure = {'type': type(error).__name__, 'message': str(error)[:2000],
+                'at_monotonic': self.clock(), 'traceback': ''.join(traceback.format_exception(error))[-16000:]}
+            atomic_json(self.private_io / 'watchdog-failure.json', self.watchdog_failure)
+            self._persist()
 
     def start_agent(self, kind, prompt, parent=None, candidate_name=None, review_bundle=None):
         with self.lock:
@@ -435,10 +458,10 @@ class Supervisor:
                 pass
         self._signal(task, sig)
 
-    def _stop(self, task, reason, terminal=None):
+    def _stop(self, task, reason, terminal=None, records=None):
         if task.get('_stopping'):
             return
-        self._signal_tree(task, signal.SIGTERM)
+        self._signal_tree(task, signal.SIGTERM, records)
         task['_stopping'] = {'at': self.clock(), 'reason': reason, 'terminal': terminal}
 
     def _terminal(self, task, status, summary):
@@ -449,6 +472,36 @@ class Supervisor:
     def _finish_export(self, task, phase=None):
         return self.policy['finish_export'] and (task['kind'] in ('parent', 'research')
             or (task['kind'] == 'integrity_review' and (phase or task['phase']) == 'export'))
+
+    def _retry_capacity(self, task, now):
+        """Resume a transient provider failure without replacing identity or clocks."""
+        retries = task.get('capacity_retries', [])
+        retry_at = now + 5. * (len(retries) + 1)
+        if (not task['thread_id'] or len(retries) >= 2
+                or retry_at >= task['cycles'][-1]['deadline_monotonic']):
+            return False
+        # Read the supervisor-owned stream, never the agent-writable mirror.
+        path = task['_actual_events_path']
+        with path.open('rb') as stream:
+            stream.seek(max(0, path.stat().st_size - 65536))
+            tail = stream.read().decode('utf-8', errors='replace')
+        message = 'Selected model is at capacity. Please try a different model.'
+        found = False
+        for line in tail.splitlines():
+            try:
+                event = json.loads(line)
+            except ValueError:
+                continue
+            if event.get('type') == 'error' and event.get('message') == message:
+                found = True
+        if not found:
+            return False
+        task.setdefault('capacity_retries', []).append({
+            'turn': task['turns'][-1]['number'], 'reason': message,
+            'events_sha256': sha256(path.read_bytes()).hexdigest(),
+            'retry_at_monotonic': retry_at})
+        task.update(status='retry_wait', summary='Temporary model capacity failure; resuming the same identity within its original allocation')
+        return True
 
     def tick(self):
         with self.lock:
@@ -466,20 +519,20 @@ class Supervisor:
                 try:
                     self._events(task)
                 except Exception as error:
-                    self._stop(task, f'Unverifiable child identity/event stream: {error}', 'failed')
+                    self._stop(task, f'Unverifiable child identity/event stream: {error}', 'failed', records)
                 cycle = task['cycles'][-1]
                 if now >= cycle['deadline_monotonic'] and not self._finish_export(task):
-                    self._stop(task, 'Hard per-agent deadline reached', 'timed_out')
+                    self._stop(task, 'Hard per-agent deadline reached', 'timed_out', records)
                 elif (task['kind'] in ('parent', 'research') and task['phase'] == 'research'
                       and now >= cycle['export_monotonic']):
-                    self._stop(task, 'Reserved export phase reached')
+                    self._stop(task, 'Reserved export phase reached', records=records)
                 stopping = task.get('_stopping')
                 if stopping:
                     # Kill the process GROUP even if the CLI parent already exited,
                     # so its long-running commands cannot keep modifying checkpoints.
                     if now - stopping['at'] < 1.:
                         continue
-                    self._signal_tree(task, signal.SIGKILL)
+                    self._signal_tree(task, signal.SIGKILL, records)
                     try:
                         process.wait(timeout=.1)
                     except subprocess.TimeoutExpired:
@@ -498,12 +551,13 @@ class Supervisor:
                     continue
                 # A normal exit is also followed by group cleanup: child commands
                 # must not outlive their owning turn.
-                self._signal_tree(task, signal.SIGKILL)
+                self._signal_tree(task, signal.SIGKILL, records)
                 task['turns'][-1].update(ended_monotonic=now, returncode=process.returncode)
                 self._close_handles(task)
                 task['_process'] = None
                 if process.returncode != 0:
-                    self._terminal(task, 'failed', 'Child process failed; no automatic identity replacement')
+                    if not self._retry_capacity(task, now):
+                        self._terminal(task, 'failed', 'Child process failed; no automatic identity replacement')
                     continue
                 try:
                     report = self._read_final(task)
@@ -541,9 +595,27 @@ class Supervisor:
                     self._terminal(task, 'ready', report['summary'])
             active = sum(task['_process'] is not None for task in self.tasks.values())
             for task in self.tasks.values():
+                if task['status'] == 'retry_wait':
+                    cycle = task['cycles'][-1]
+                    if now >= cycle['deadline_monotonic']:
+                        self._terminal(task, 'timed_out', 'Original allocation expired during capacity backoff')
+                        continue
+                    if active < self.concurrency and now >= task['capacity_retries'][-1]['retry_at_monotonic']:
+                        phase = task['phase']
+                        if phase == 'research' and now >= cycle['export_monotonic']:
+                            phase = 'export'
+                        self._launch(task, phase, task['_prompt'] +
+                            '\nResume after the provider capacity error. Keep your SAME identity, '
+                            'original deadline and saved evidence. Inspect interrupted trials before '
+                            'continuing; no replacement agent or renewed allocation is allowed.')
+                        active += task['_process'] is not None
                 if active >= self.concurrency:
                     break
                 if task['status'] == 'queued':
+                    # Reserve a slot during backoff so fresh queued work cannot
+                    # consume the failed task's remaining original allocation.
+                    if active + sum(t['status'] == 'retry_wait' for t in self.tasks.values()) >= self.concurrency:
+                        continue
                     phase = 'research' if task['kind'] in ('parent', 'research') else 'review'
                     self._launch(task, phase, task['_prompt'])
                     active += task['_process'] is not None
@@ -655,6 +727,7 @@ def serve(supervisor, stdin=sys.stdin, stdout=sys.stdout):
             while not supervisor.stopping.wait(.2):
                 supervisor.tick()
         except Exception as error:
+            supervisor.record_watchdog_failure(error)
             print(f'Supervisor watchdog failed: {error}', file=sys.stderr, flush=True)
             supervisor.shutdown()
     watcher = Thread(target=watchdog, daemon=True)

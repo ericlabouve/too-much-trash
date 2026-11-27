@@ -60,6 +60,7 @@ class LeaderMetricTests(unittest.TestCase):
 
     def test_only_completed_jobs_and_current_snapshot_can_supply_table_scores(self):
         result, inputs, protocol = self.fixture()
+        result['benchmark_protocol'] = 'deployment-v1'
         with TemporaryDirectory() as directory:
             root = Path(directory)
             snapshot = root / 'SNAPSHOT.json'
@@ -78,6 +79,7 @@ class LeaderMetricTests(unittest.TestCase):
             self.assertEqual(len(history.snapshot()), 1)
             self.assertEqual(len(history.views), 1)
             self.assertEqual(len(history.views[0]['entries']), 2)
+            self.assertEqual(history.views[0]['benchmark_protocol'], 'deployment-v1')
             self.assertEqual(len(history.snapshot()[0]['points']), 1)  # cache doesn't duplicate points
             snapshot.write_bytes(b'new-frozen-snapshot')
             self.assertEqual(len(history.snapshot()), 1)  # historical chart remains available

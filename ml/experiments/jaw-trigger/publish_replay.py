@@ -9,6 +9,7 @@ import av
 import cv2
 
 from round_one import Candidate, motion_samples, events, features, load_frames
+from model_inputs import feature_table
 
 
 def publish_joint(manifest_path, result, output):
@@ -17,7 +18,6 @@ def publish_joint(manifest_path, result, output):
 
     manifest = json.loads(manifest_path.read_text())
     candidates = [JointCandidate(**entry["candidate"]) for entry in result["ranked"]]
-    parameters = result["feature_parameters"]
     clips = []
     for row in manifest["clips"]:
         source = (manifest_path.parent / row["video"]).resolve(strict=True)
@@ -29,10 +29,11 @@ def publish_joint(manifest_path, result, output):
         poses = pose_samples(manifest_path.parent / row["poses"] if row.get("poses") else None, start)
         measured, predictions = {}, {}
         for candidate in candidates:
-            key = candidate.method, candidate.signal
+            key = candidate.name
             if key not in measured:
                 sensors = {"imu": imu, "poses": poses} if candidate.method in POSE_METHODS else imu
-                measured[key] = features(candidate.method, frames, candidate.signal, sensors, parameters)[0]
+                measured[key] = features(candidate.method, frames, candidate.signal, sensors,
+                                         feature_table(result, candidate))[0]
             predictions[candidate.name] = events(candidate, measured[key], confirmation_time=True)
         video_name = row["clip"] + ".mp4"
         link = output / video_name
@@ -91,10 +92,11 @@ def main():
             duration = container.duration / av.time_base
         measurements, predictions = {}, {}
         for candidate in candidates.values():
-            key = candidate.method, candidate.signal
+            key = candidate.name
             if key not in measurements:
                 measurements[key] = features(
-                    candidate.method, frames, candidate.signal, imu.get(name), result.get("feature_parameters")
+                    candidate.method, frames, candidate.signal, imu.get(name),
+                    feature_table(result, candidate)
                 )[0]
             predictions[candidate.name] = events(candidate, measurements[key], result.get("confirmation_time", False))
         video_name = f"clip-{index}.mp4"

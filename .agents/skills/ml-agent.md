@@ -323,3 +323,471 @@ and the actual smoke passes the new CLI gate. Official eight-parent pool remains
 unpromoted; successful scoped R52 consumes the round number, so next full isR53.
 User authorization covers that ONE full round with8parents/2researchers,6slots,
 2fits,20minutes,182/61/61seed0,80/20jaw/speed and reserved test.
+
+
+## Full Round 53 passed — 2026-11-26
+
+The full run working/runs/dashboard-20261127T010810Z-470e0ef7 completed normally
+with no scientific/metadata recovery. Independent verify_publication passed.
+All20supervised tasks (8parent authors,2researchers,10fresh reviewers),18serial
+native evaluations,50native probes and103canonical fitting trials passed, with
+zero crashes. Root matched all103fit starts to original supervised allocations:
+none after the export cutoff. All native timing follows completed authors/fits
+and intervals do not overlap. Original182/61/61seed0 partitions are identical;
+no reserved test IDs in evaluation, test_evaluatedfalse. Root report:
+independent-monitor-audit.json in that run. A stale coordinator phrase saying
+outer audit pending was cleared from the DISPLAY status only after receipt
+verification, preserving original status in status-before-monitor-message.json.
+
+New admitted champion: R53 causal appearance fusion; display Appearance Fusion:
+Causal pooled geometry state. Train eventF1=0.910761, validationF1=0.880000
+(110matched,18false,12missed;44clean validation clips), fitness0.904000,
+laptop deployment CPU p95=0.025917ms. Prior admitted R50 validationF1=0.823529.
+The0.95validation goal remains unmet; no physical-phone benchmark or test replay.
+Winner uses current intensity/absolute spatial-gradient pooling,250ms causal EMA
+appearance memory and8-unitReLU readout with train-only normalization; IMU was
+ablated after comparison, so this checkpoint is video-only. It remains clip-
+replay evidence plus structural probes, not proof of nonstop field accuracy.
+
+All72iterative histories/1560epochs preserved;12exact evaluated-model histories
+load through the dashboard. Winner curve is training/research01-finevisual-
+collection/history.json:19epochs,selectedepoch9; checkpoint selection still
+validation eventF1. Memory watcher126samples, peak tracked agentRSS3596MiB
+(shared pages can overlap), kernel pressure at most2/warning, never critical;
+max system swap15482.31MiB includes other workloads/preexisting swap. Fit peak2.
+Official pool promoted to8members in this run's results.json; dashboard next54.
+User authorized monitoring only after launch: no Round54 was started.
+
+## Next-round Transformer direction and event learning curves — 2026-11-26
+
+User requests exploring Transformer architectures in the next round's prompt,
+and train/validation squeeze/release F1 on one plot. Dashboard's editable default
+prompt now prepares distinct causal visual-attention and optional video/IMU/pose
+fusion hypotheses, a compact MLP control, bounded persistent streaming state,
+capacity/context comparisons, regularization/augmentation controls and unchanged
+80/20 validation-F1/native-speed scoring. No Round54 launched or automatic new
+round/stopping-policy change authorized by this request.
+
+New jaw make_training_monitor plans require full inference-mode
+training_predictions each epoch with the SAME fixed selection decoder as validation.
+Shared TrainingMonitor saves hashed train predictions; canonical per-fit and
+round audits validate training IDs/schema/hashes. Existing frozen trials remain
+compatible. Exact-model dashboard charts derive four per-event F1 series from
+saved predictions and hash-bound train/validation manifests, keep raw losses
+and selected epoch, and never read test. R53 has only validation epoch predictions,
+so historical training lines explicitly remain unrecorded. No refit or invented
+train curve. The prototype epoch decoder differs from the separately tuned final
+deployment decoder; do not label their scores as identical.
+
+Guidelines now request a documented generalization control/ablation or concrete
+budget/blocker reason; normalize only on train, preserve sensor consistency for
+augmentations, and do not game objective scale or demand prettier curves.
+Stopping recommendation (not a new enforced setting): pause when validation F1
+reaches0.95 or when meaningful improvements plateau across several comparable
+rounds; then freeze and validate on phone/fresh sessions, keeping test reserved
+until separately authorized. Shared74 and dashboard100 tests pass (174total),
+JS syntax/diff checks and real R53 history loading passed. Browser verified the
+loaded Transformer prompt, selected-epoch marker, squeeze/release validation
+lines and explicitly absent training lines; Start Round54 remains unclicked.
+
+## Active continuation goal — 2026-11-26
+
+User now authorizes consecutive audited rounds until validation jaw-eventF1>=0.95,
+with adaptive round prompts, then the leading model's updated loss/event-F1 plots
+and concise architecture. This supersedes earlier one-round-only authorization
+and the proposed plateau pause (which was never an enforced policy). Do not
+change fitness/splits/tolerance or use reserved test to reach this goal. Keep
+8parents/2researchers/6agent slots/2fitting slots/20minutes and independent final
+reviews. Full Round54 started at working/runs/dashboard-20261127T044502Z-887aba33
+from the actual admitted R53 pool, with the prepared causal Transformer prompt.
+Resource monitor and worker-bound idle-sleep prevention are attached. Verify live
+worker/ledger state and actual final outer-worker publication before any promotion
+or next round; coordinator output alone is insufficient. No commit/push implied.
+
+Round54 attempt dashboard-20261127T044502Z-887aba33 failed after the provider
+returned an exact temporary model-capacity error for parent04. Other tasks were
+closed and evidence preserved (28partial epoch histories/485epochs at monitoring);
+no scoring/publication/test access. Worker terminal state verified as defunct.
+Future supervisor versions allow two bounded5/10second capacity retries using the
+same established identity and original deadline, with slot reservation and hashed
+failed error evidence checked by the outer budget audit. No model substitution,
+quota/auth retry, new identity or clock renewal. Retry the authorized round from
+the unchanged admitted R53 pool after synthetic regression checks pass.
+
+Actual retry Round54 is now live at working/runs/dashboard-20261127T045652Z-7c515bc7
+(worker28410). Six authors are running and four queued; current completed trial
+histories retain full training prediction evidence. All three manifest file
+hashes equal R53's original partitions; test untouched. Same-identity capacity
+retries reserve their slot so queued authors cannot starve a pending retry;
+outer audit validates the exact provider-error stream hash and5/10second backoff.
+39targeted runtime/budget regressions pass; previous shared77tests passed before
+the added audit-only guard. Runtime handles/health scripts are recorded in
+/tmp/tmt-goal-state.json for continuation, but verify actual live state. Last
+accepted validationF1 remains0.880 pending a full audited native round result.
+
+## Round54 accepted; autonomous0.95goal continues — 2026-11-26
+
+Retry dashboard-20261127T045652Z-7c515bc7 passed the actual outer-worker gate
+and independent verify_publication. Twenty supervised tasks, ten approvals,
+fifty native probes and eighteen serial native replays completed; root verified
+ALL native intervals are nonoverlapping and begin after all author allocations
+and fitting leases ended. All train/validation/test manifest hashes equal R53.
+138fits:136completed/two honestly logged experimental crashes;101iterative
+histories/1988epochs. No capacity retry was needed in this successful attempt.
+
+Admitted leader R54 attended appearance fusion: validationF1=0.9149797571,
+113matched/12false/9missed;trainF1=0.9264305177,fitness0.9319838057,
+laptop native p95=0.0430832ms. Squeeze55matched/8false/6missed;release58/4/3.
+Beach11false/6missed,park1/1,home0/2. Runtime cannot use collection/clip identity.
+Wide current grayscale/absolute gradients and250ms causal memory feed an8-channel,
+8-token causal attention cache with relative-lag bias and residual feed-forward
+readout, then persistent hysteresis. Exact selected history has12epochs and
+all FOUR train/validation squeeze/release F1 traces; no test replay/phone run.
+Root audit saved /tmp/tmt-last-goal-round-audit.json and scripts preserve details.
+
+Resource monitor120samples:maximum trackedRSS5416MiB,pressure at most2/warning,
+no observed critical4;system swap peak20717.56MiB includes other/preexisting
+workloads. Keep current2fit/6agent controls. Fixed presentation-only missing
+benchmark_protocol in dashboard evaluation views, which incorrectly called
+native scores Historical prototype;6metric-reader regressions pass. No model,
+evaluation result or scientific context changed.
+
+Prepare Round55 with adaptive prompt /tmp/tmt-round55-prompt.txt: prioritize
+squeeze errors, matched-input ablation of wider ROI versus attention, meaningfully
+wider/deeper causal Transformers, and complementary learned spatial/patch/CNN
+features with optional evidence-backed sensor fusion. Native compute has headroom;
+retain exact80/20 scoring,182/61/61seed0 split,8pool/2researchers/6agents/2fits,
+20minutes and reserved test. Root is authorized by the ACTIVE continuous goal,
+not a new one-round approval. Dashboard reload uses the adaptive prompt as its
+in-memory default so visible controls match the next actual job configuration.
+
+Round55 now started at working/runs/dashboard-20261127T055956Z-1725b017,
+worker63120, from the accepted R54 pool with the complete adaptive prompt saved
+in config.settings.agent_prompt. Live monitor/awake/server handles are updated in
+/tmp/tmt-goal-state.json. Root goal verification script checks actual publication,
+unchanged manifest hashes, serial native measurements after all authors/fits,
+and exact selected model's four F1 curves. The0.95goal is an accuracy target:
+inspect the best audited F1 among ALL evaluated models as well as the composite-
+fitness pool leader; do not impose a new requirement that a0.95model must also
+win composite fitness. Disclose a speed/fitness tradeoff if these differ.
+
+## Round55 accepted; finer inputs/raw sensors next — 2026-11-27
+
+dashboard-20261127T055956Z-1725b017 passed outer publication and root's independent
+verify-goal-round script.20supervised tasks/10approvals/50probes/18serial native
+evaluations;122fits,102iterative histories/1644epochs. Native intervals are
+nonoverlapping and begin after ALL authors/fits. All three manifest hashes
+remain identical. Leader R55 wide-attention8-k8-boundary:valF1=0.918699187,
+trainF1=0.9322493225,113matched/11false/9missed,p95=0.042708ms,
+fitness0.9349593496;16raw epochs with all four train/validation event-F1 series.
+Only one false trigger improvement over R54;0.95not yet achieved. No test/phone run.
+
+Raw-training inspection /tmp/tmt-training-roi-inspection.png covers one training
+example from beach/park/home, three timepoints each. Current x144..223,y80..191
+crop generally includes the gripper, but small feet/jaw details can be coarsened
+by4px pooling; this is a hypothesis, NOT proof of the error cause. Prepared images
+are full320x240grayscale, so more detailed pixels are available without changing
+the frozen fixture/evaluator. R55 fresh spatial model used a convolution over
+the existing six-channel pooled descriptors and reached0.89764; dual-scale
+Transformer with an8-dimensional input bottleneck reached0.90837. Merely widening
+attention did not yield a step increase.
+
+Adaptive Round56 prompt /tmp/tmt-round56-prompt.txt prioritizes an actual fine-
+pixel learned CNN with causal temporal state and a complementary raw-IMU
+convolution/recurrent encoder plus visual fusion. Primary research starting
+points (not jaw-task validation):DeepSense arxiv1611.01942 and DeepConvLSTM
+PMC4732148. Keep current split/settings/gates and root continuous goal. Resource
+115samples:trackedRSSmax4783MiB,pressure<=2,system swapmax10236.25MiB. Four-line
+plot renderer /tmp/tmt-plot-goal-candidate.py verifies exact selected checkpoint
+and separates fixed-decoder epoch curves from tuned native final metrics; audited
+R54 baseline rendered at /tmp/tmt-round54-curves.png. Goal deliverable still pending.
+
+Round56 actually started at working/runs/dashboard-20261127T070057Z-77866e65,
+worker97026, using accepted R55 as prior and the complete finer-pixel/raw-IMU
+prompt in frozen config. Current monitor/awake/server handles and helper paths
+are in /tmp/tmt-goal-state.json; verify live state before continuing. The
+continuous0.95goal remains active; no next round is preauthorized beyond its
+actual stopping condition. Do not consume test or claim target completion at0.919.
+
+Round56 attempt dashboard-20261127T070057Z-77866e65 failed after its watchdog
+shut the supervisor down, closing six live authors/four queued tasks. MCP still
+answered afterwards, so this was the watchdog failure path, not a disappeared
+MCP process. The OLD runtime only printed its exception to stderr and the
+coordinator log did not retain it; exact original cause remains unknown. Do NOT
+claim a proved timeout. Preserve24partial histories/365epochs and unchanged R55;
+no final native scoring/reviews/publication/test access occurred.
+
+Investigated a related reliability hazard: a single0.5second process-snapshot
+timeout was fatal, and stop/cleanup repeatedly sampled all processes per task.
+Future runtime retries ONE such timeout with fresh data, reuses the current
+tick's snapshot for stop/cleanup, and durably records original watchdog type/
+message/traceback in its private ledger and watchdog-failure.json before shutdown.
+Other/persistent failures still stop; publication rejects any fatal watchdog
+record. No clock, identity, reviewer gate or shutdown grace relaxed. Synthetic
+fault injection verifies the real watchdog logging path and cleanup/deadlines;
+83shared and100dashboard checks pass (183total). Retry the same Round56 direction
+from admitted R55. If it recurs, inspect the NEW private failure evidence first.
+
+Actual Round56 retry is live at working/runs/dashboard-20261127T071747Z-ad90e8c7,
+worker4300, same research direction/admitted R55 prior. Monitor/awake handles
+are updated in /tmp/tmt-goal-state.json. Durable fatal diagnostics would appear
+in working/runs/.agent-runtime/<job>.json.watchdog_failure and its private-io
+watchdog-failure.json; read the actual ledger field, not a guessed error reason.
+Continue the authorized goal while unmet, verifying live process/receipts before
+any restart/promotion. Latest accepted validationF1 is still0.918699187.
+
+
+## Round56 interrupted-fit logger retry — 2026-11-27
+
+Second attempt dashboard-20261127T071747Z-ad90e8c7 failed before native scoring:
+KeyboardInterrupt has an empty string, and TrainingMonitor.fail serialized that
+as a blank reason, correctly rejected by canonical full-journal audit. The
+supervisor stayed healthy (watchdog_failure null). Preserve failed journals and
+partial fits; do not supplement original evidence or waive publication. Future
+fail() logs exception class even when its message is empty, including interruption
+while acquiring a fit slot.85shared+100dashboard checks passed. Candidate expanded
+cards retain exact-checkpoint loss and four train/validation squeeze/release F1
+series; historical missing predictions are disclosed, never reconstructed falsely.
+Root browser verification observed both graphs in the accepted R55 leader card.
+
+Third Round56 attempt dashboard-20261127T074334Z-7909f33f,worker17097, now uses
+accepted R55 and the same fine-pixel/raw-IMU direction, plus canonical logger and
+current-round scaffold notes. Actual config preserves8pool/2researchers/6agents/
+2fits/20minutes,1reviewer per candidate,80/20fitness and reserved test. Verify
+live state via /tmp/tmt-goal-state.json. No accepted F1 above0.918699187 yet.
+
+
+Round56 third attempt dashboard-20261127T074334Z-7909f33f stopped operationally:
+NEW durable watchdog evidence proves both0.5s process snapshots timed out while
+six authors were active.29completed fits/27partial-or-complete histories477epochs,
+no native evaluation/reviews/promotion; test untouched. Unlike the first failed
+attempt, this exact cause is known. Logger fix worked: KeyboardInterrupt failures
+now have nonempty typed reasons. Resource41samples:trackedRSSmax5875MiB,pressure
+at most2,system swapmax21613MiB (includes unrelated/preexisting workloads).
+
+Future process snapshots now allow2seconds per fresh attempt,still at mostONE
+retry; persistent failures remain fatal and fatal ledger records prevent publish.
+No stale process metadata, identity changes, deadline reset or shutdown-grace
+increase. Tick reads actual clock after sampling; a synthetic delayed observation
+crossing the hard deadline correctly stops the task. Existing2second overrun
+audit remains strict, so excessive observation delays near cutoff can still
+reject a run rather than grant extra research time. No source changes in failed
+job and no reuse of closed tasks. Retry from accepted R55 after regression checks.
+
+Round56 fourth attempt started at working/runs/dashboard-20261127T080601Z-32025a41,
+worker26773. Frozen source includes PROCESS_SNAPSHOT_TIMEOUT_SECONDS=2.0;
+86shared regressions passed, previous100dashboard regressions unchanged/passed.
+Actual config is8pool/2research/6concurrent/2fits/20minutes/1reviewer and prior
+accepted R55. Root verified exact config prompt and frozen runtime source.
+Current live monitor/awake/server handles are in /tmp/tmt-goal-state.json.
+Goal remains actual audited validationF1>=0.95 plus exact model curves/architecture;
+latest accepted F1 is0.918699187. Test remains reserved. No failed job was admitted.
+
+
+## Round56 admitted; explicit event supervision next — 2026-11-27
+
+Fourth attempt dashboard-20261127T080601Z-32025a41 completed and passed actual
+outer publication plus root /tmp/tmt-verify-goal-round.py.20supervised tasks,
+10independent approvals,50native integrity probes,18serialnative evaluations,
+61fits,49iterative histories942epochs. Native intervals do not overlap and
+start after ALL authors and fits. All182/61/61seed0 manifest hashes unchanged;
+test never evaluated. Leader unchanged:R55 wide-attention8-k8-boundary,
+validationF1=.918699187,trainF1=.9322493225,p95=.043458ms,fitness=.9349593496.
+Its exact16epoch history has all four train/validation squeeze/release curves.
+Fresh finepixel CNN+48D attention=.87603,raw-IMU confidence residual=.914286.
+Both passed integrity; neither improves leader. Runtime2second snapshot fix
+completed the full run; no fatal watchdog. Resource127samples,RSSmax4746MiB,
+pressure always1,system swapmax10270.12MiB includes other/preexisting workloads.
+
+Researcher2 discovered sampled-state supervision holes. Root independently
+recomputed them from actual Fixtures/clips.json timestamps and unchanged TRAIN/
+VALIDATION button references:3TRAIN clips and1VALIDATION clip have zero closed
+video frames;4TRAIN intervals<100ms. Some durations~0.25ms,validation~3.67ms.
+This is NOT a label-error conclusion. Preserve labels/evaluator; state-only BCE
+supplies no positive target for intervals entirely between sampled frames.
+Root evidence:/tmp/tmt-root-state-supervision-audit.json;author report:
+research-02/state-supervision-coverage.json and research-report.md. No test read.
+
+Next adaptive prompt:/tmp/tmt-round57-prompt.txt. Researcher1 prioritizes explicit
+causal close/open heads with matched state-only control,optionally raw-IMU and
+auxiliary state loss; keep one-event-per-step adapter contract and no quota/time
+shortcut. Researcher2 tests transfer learning compact pretrained visual features
+with honest native export/full runtime costs,not cached embeddings masquerading
+as inference. Official sources:docs.pytorch.org/vision/stable/models/generated/
+torchvision.models.mobilenet_v3_small.html;github.com/pytorch/vision/blob/main/
+torchvision/models/mobilenetv3.py;github.com/facebookresearch/dinov2;arxiv2304.07193.
+These motivate hypotheses,not jaw performance claims. No required model download
+or dependency changes yet. Keep all current split/scoring/resource/review settings.
+Accepted current pointer now R56 results.json. Goal remains unmet at.919<.95.
+
+
+Round57 actually started:working/runs/dashboard-20261127T091522Z-5f03b985,
+worker60680,accepted prior R56. Root confirmed complete adaptive prompt in frozen
+settings and unchanged8pool/2research/6parallel/2fits/20minutes/1reviewer. Dashboard
+server refreshed from current code with that prompt as visible default; newserver
+PID60550. Live monitor/awake/server handles:/tmp/tmt-goal-state.json. Continue
+actual0.95goal; target still unmet, test reserved. No source changes needed to
+current evaluators, supervisor or scoring for this new research direction.
+
+
+## Round57 admitted:0.930; recover complementary misses next — 2026-11-27
+
+working/runs/dashboard-20261127T091522Z-5f03b985 passed actual outer publication
+and root independent goal audit.20supervised tasks,10approvals,50causal probes,
+18serial native evaluations AFTER all authors/fits;92fits,80iterative histories/
+1426epochs. All182/61/61seed0 manifests unchanged,test not evaluated. Leader:
+R57 explicit events event-regularized,method explicit_event_heads57,validationF1
+.9300411523,trainF1.9386084584,113TP/8FP/9FN,p95.1312172ms,fitness.9440329218.
+83932parameters:separate TRAIN-refitted8D visual-state attention and16D visual/
+raw-IMU event attention graphs;4frame event-confidence buffer VETOES state
+transitions unsupported at.1. It cannot recover absent state transitions.
+Exact18epoch selected history has all four train/validation event-F1 curves.
+R55 baseline.918699 was113TP/11FP/9FN,so improvement is3fewerfalse events.
+
+Actual transfer proposal.895161 uses frozen ImageNet MobileNetV3Small first4
+stages with spatial cells plus visual branch/8Dattention. Native artifact is
+PyTorch Mobile Lite interpreter2.14.1 CPU via torch._C._load_for_lite_interpreter,
+one libtorch intra-op thread,not handwritten C++. Coordinator deployment_runtime
+metadata accurately overrides engine; full graph/preprocessing/decoder timed.
+No physical-phone benchmark. Its final reviewer recovered one exact capacity
+error via same-identity/original-clock bounded retry; full audit accepted it.
+Monitor126samples,RSSmax4812MiB,pressure always1,system swapmax9702.12MiB.
+
+Root generated /tmp/tmt-r57-complementarity.json by checking hash-bound native
+outputs and actual one-to-one matches against TRAIN/VALIDATION refs. Every one
+of leader9validation misses was matched by another model. Motion eventheads
+covers5but28FP;geometry covers4but27FP;ExtraTrees covers4but29FP;spatial model
+covers3but18FP. This is ORACLE DIAGNOSTIC ONLY,not an ensemble result. Never use
+its clip IDs,reference times or routing labels at inference. The current misses
+are NOT the earlier zero-closed-frame validation example; do not overfocus on
+that edge case. Native source/report and scientific context unchanged.
+
+Next prompt:/tmp/tmt-round58-prompt.txt(7511chars). Prioritize recall-capable
+causal state/event correction and complementary learned expert fusion with
+TRAIN-only fitting/cross-fitting where feasible. Official stacking guidance:
+https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.StackingClassifier.html
+warns about in-sample meta-learning overfit; no validation labels tofitfuser.
+Keep all8parents reproducing and all resource/scoring/review/test settings.
+Latest accepted current pointerR57. Goal remains actual.95validationF1+graphs/
+architecture; unmet at.930. Current exact handles:/tmp/tmt-goal-state.json.
+
+
+Round58 actually started at working/runs/dashboard-20261127T102409Z-488de607,
+worker93559,accepted prior R57. Frozen prompt equals /tmp/tmt-round58-prompt.txt
+(7511chars),settings remain8pool/2research/6parallel/2fits/20minutes/1reviewer.
+Dashboard refreshed with this prompt as visible default,serverPID93495. Live
+monitor/awake/server handles and specific fusion/engine audit notes are in
+/tmp/tmt-goal-state.json. Continue the same0.95goal; current acceptedF1.930041
+and target unmet. No source/evaluator/scoring change or physical-phone run.
+
+
+## Round58 admitted:.939; hard negatives/event objective next — 2026-11-27
+
+working/runs/dashboard-20261127T102409Z-488de607 passed actual outer publication
+and root independent verify-goal-round audit.20supervised tasks,10approvals,
+50causal probes,18serialnative evaluations after ALL authors/fits;89fits,
+70iterative histories1226epochs. All182/61/61seed0 manifest hashes unchanged;
+test never evaluated. Leader R58 recall correction additive-delta(method
+causal_event_correction58):validationF1=.9387755102,trainF1=.9322493225,
+115TP/8FP/7FN,p95=.2311662ms,fitness=.9510204082. FITNESS>.95is NOT goal completion;
+actual validationF1 remains below.95. Exact15epoch selected history has all four
+train/validation squeeze/release F1 traces. R57 prior113TP/8FP/9FN;recovers2park
+CLOSEs,loses0validation matches,unchanged8false. TRAIN recovers1/loses1match and
+adds5netFP,so accuracy is not uniformly improved. New independent additive16D
+signed-motion event correction sits beside unchanged visual/veto branches.
+Published checkpoint/curves use fixed fit decoder; final post-decoder selected
+.8confidence/.8s same-kind refractory after checkpoints frozen. Rapid same-kind
+repeats can be suppressed; no nonstop/iPhone generalization claim. Full real
+branches and sensor alignment are measured. Global logistic geometry fusion
+failed to improve(.918699);all negative trials remain recorded. Resource135samples,
+RSSmax4629MiB,pressure<=2,system swapmax9580.12MiB includes other/preexisting work.
+
+Next adaptive prompt:/tmp/tmt-round59-prompt.txt(7603chars). Researcher1 tests
+matched BCE versus focal/TRAIN-only hard-negative mining;primary source
+https://arxiv.org/abs/1708.02002 motivates sparse hard examples,not jaw accuracy.
+Researcher2 tests event-window/bag or timing-aligned objectives with actual causal
+online heads;inspirations arxiv1703.03329(UntrimmedNets) and arxiv2006.03732(WOAD).
+Offline proposal/whole-clip aggregation must never be deployed. Keep original
+button cues,.5s matching and splits;no validation-label fitting or runtime oracle.
+With115TP/7FN,FP8->5 suffices for F1>.95,or recover3misses with8FP;do not impose
+extra individual precision/recall targets. Require explicit structured parameters,
+not trial-name substring dispatch(confounded prior wide trial disclosed). All
+resource/reviewer/scoring settings remain as accepted. Goal remains unmet at.939.
+Current exact state/handles:/tmp/tmt-goal-state.json. No extra source-code change
+or model fitting by root; all training stays in supervised round tasks.
+
+
+Round59 actually started:working/runs/dashboard-20261127T113641Z-7a33ad2c,
+worker27235,accepted prior R58. Root confirmed complete7603character adaptive
+prompt and exact8pool/2research/6parallel/2fits/20minutes/1reviewer settings in
+frozen config. Dashboard refreshed with same visible default prompt,PID27130.
+Live monitor/awake/server handles and loss/mining/causality audit notes are in
+/tmp/tmt-goal-state.json. Target remains actual validationF1>=.95,not composite
+fitness; accepted F1=.93877551,test reserved. No scoring/evaluator/source edits
+or physical-phone performance claim. Continue same active goal.
+
+
+### Audited R59 and paired RGB preparation — 2026-11-27
+
+R59 `dashboard-20261127T113641Z-7a33ad2c` passed actual outer publication and independent root audit: all20 supervised tasks ready,10 independent final approvals,18 final native comparisons strictly serial after all authors/fits,50 probes,99 fit leases,84 histories/1396 epochs. Strongest `R59 independent motion delta-bce` validationF1=.9392712550607287(116TP/9FP/6FN),trainF1=.9327956989247311,p95=.2266746ms,fitness=.9514170040. Exact15epoch history contains all4 train/validation squeeze/release series. Frozen train/validation/test manifests unchanged; test not evaluated. Goal.95F1 UNMET. R59 focal/proposal-validity/event-bag approaches mostly tied/regressed; preserve parent08 original wrong-objective attempt and explicit quarantine (variable shadowing disabled focal); its separate corrected focal attempt regressed. Do not confuse structural training preflight with scientific objective correctness.
+
+Next hypothesis: remove artificial320x240gray-only input bottleneck without changing frozen evaluation. `prepare_rgb_inputs.py` deterministically prepares rawRGB960x720 with orientation/aspect-preserving letterbox from only the existing243 TRAIN/VAL videos, reproducing EVERY oldgray pixel and timestamp exactly. First real104frame pilot passed; full cache preparation in progress under working/input-cache/rgb960x720-v1-r59 (private, not Git). `paired_rgb_inputs.py` maps read-only paired inputs, pins full index SHA and current manifest/fixture context; coordinator must verify all pixel hashes before dispatch.12 focused real-video tests passed. These are label-free preparation checks, not model accuracy or native benchmarks. Before R60 authors start, job-local native benchmark AND independent probes need genuine RGB opt-in dispatch with exact same model input contract; keep legacy gray baseline unchanged. All algorithm-specific resize/crop/color/features/inference/decoder cost counts. No cached embeddings replacing runtime. Read-only mmap cache shared across rounds, no full corpus duplication. No test input. Input metadata/clip IDs never reach inference. Adaptive R60 prompt is /tmp/tmt-round60-prompt.txt; not yet launched at this note.
+
+
+### Failed first R60 and conservative epoch admission — 2026-11-27
+
+First R60 `dashboard-20261127T125501Z-130133c9` FAILED, not admitted. Six authors ready/four explicitly cancelled, no final native evaluation/review; priorR59 .939271255 retained, test untouched. Researcher01 legitimate23745parameter RGB-CNN/TCN MobileLite export feasibility passed but first gray-control trial `r60r01-gray-retry` took315.21874891698826s versus unchanged300s policy+15s canonical grace. Original7epochs,receipt,plan,checkpoint and full journal remain unchanged and rejected. Raw first epoch217.878s included expensive label-free crop prep; later epochs~16s. No candidate accuracy claim from this failed job. Monitor/resource owner exited,zero active fits.
+
+Future shared TrainingMonitor now pins epoch-lookahead-v1 for new iterative plans. can_start_epoch() uses the longest of up to3recent adjacent epoch measurement intervals (excluding initial interval with prep),25%margin and bounded finalization reserve; stops early as epoch_budget with hash-bound receipt evidence. Canonical dashboard audit recomputes exact decision from original raw history. Actual300s bound/315s audit max unchanged; old overrun remains rejected. Cannot predict sudden stalls; authors still check long loops. No fake terminal epochs or rewritten histories. New helper ml/evolution/epoch_admission.py is protected-source. Actual trace replay would stop after epoch5 at283.2145s; this is counterfactual guard validation,not training or improved accuracy.83 shared and102 dashboard regressions passed (process/loopback tests require normal elevated permissions); acceptedR59 independently re-audited successfully. Shared agent briefs/README updated.
+
+Raw pairedRGBcache now COMPLETE and independently hash-verified:243train/validation clips(182/61),28329frames,58743045504bytes,indexSHA c68c8b26aa2acf9957ab090bbbd19a3c32374cdbbcc78c76e9acb829b0b171b4. All original sampled sources960x720. No test footage read; every oldgraypixel/timestamp exact. Failed R60 job has source-only input_dispatch.py/benchmark/probe recipe scaffolds and genuine no-fit RGB/gray dispatch checks; future jobs may inspect/copy/test source,but no invalid learned artifacts or task revival. Optional researcher01 gray-*pixels.npy caches are deterministic uint8 raw pixel crops only; can be reused with independently verified order,split,input,preprocessor andhash provenance,never learned scores/embeddings or invalid weights. Final native processing always recomputes model-specific transforms inside timedstep.
+
+Fresh R60 retry prompt /tmp/tmt-round60-retry-prompt.txt(7356chars) and detail /tmp/tmt-round60-retry-guidance.txt preserve same8parents/2researchers/6parallel/2fits/20minutes/1reviewer and admittedR59. Not yet launched at this note; reload idle server for new monitor/auditor source before launch. Keep failed attempt immutable.
+
+
+### User cancelled open-ended goal; one final round only — 2026-11-27
+
+Latest user instruction supersedes all previous.95 continuation directives: finish interrupted round if valid; otherwise run JUST ONE replacement round,then present latest audited leader. Goal tool is PAUSED (no cancelled status available),no automatic continuation/resume/new Goal. Interrupted R60 dashboard-20261127T133811Z-886f1ca6 FAILED on Codex quota/automatic approval failure,6authors ready/4closed,no final native scoring/reviews; closed allocations cannot reopen. Same-account read-only quota check subsequently showed available capacity(no account/model/approval bypass or credit purchase). The user's ONE replacement job is dashboard-20261127T144126Z-6e54376f,worker10818. Finite prompt /tmp/tmt-user-final-round-prompt.txt(7100chars); technical /tmp/tmt-final-round-technical-contract.txt. Same8/2/6/2/20/1,admittedR59 prior,test reserved. After this job,STOP regardless of F1 or outcome. Do not start another job even if.95 unmet. Latest accepted leader before this job remains R59 independent motion delta-bce,F1 .939271255. Current controls in /tmp/tmt-goal-state.json user_final_request maximum_additional_rounds1,launches_used1. Final report needs actual audited latest leader,recorded loss/four-F1 curves and real architecture; disclose any failed final run instead of promoting provisional output.
+
+
+### Final authorized round stopped; R59 retained — 2026-11-27
+
+The user's ONE replacement job dashboard-20261127T144126Z-6e54376f is terminal FAILED before native scoring/reviews. All10authors ready;81attempts(78completed,3typedcrashes),60histories/1035epochs,zeroactivefits/tasks. Full combined training gate correctly rejected parent02 baseline and child sharing method `causal_event_correction58` with different selected weights; feature_parameters[method] overwrote the baseline despite each per-fit checkpoint being individually valid. No original author allocation reopened or scientific gate waived; failed evidence retained. Future runner work should catch unique model-ID/storage-key collisions while authors can still correct export metadata,or design explicit per-candidate parameter storage under a newly tested protocol; do NOT change this frozen failed run. No new round is authorized.
+
+Goal remains PAUSED by explicit user cancellation. user_final_request launches_used1,max1,finishedtrue in /tmp/tmt-goal-state.json. Resource monitor30585completed,worker10818ended; no further work/round/Goalcontinuation. Latest admitted R59 independent motion delta-bce reverified via actual publication and independent full audit: validation .939271255(116TP9FP6FN),train .932795699,p95 .2266746ms laptop native,fitness .9514170040;testreserved. Exact15epoch primary-history curves(all4F1series),epoch5selected,140647totalparameters across visual/IMUevent/motion correction graphs. Final evidence /tmp/tmt-final-user-round-audit.json,graph /tmp/tmt-round59-leader-curves.png. Do not describe final R60 as completed or admit provisional children.
+
+
+## R60 candidate-binding recovery — 2026-11-27
+
+- User requested fixing the failed round and recovering saved candidates, not a
+  new breeding round or restarting the cancelled goal. No new fitting, test
+  evaluation, reviewer dispatch or model admission happened during recovery.
+- Last source job: working/runs/dashboard-20261127T144126Z-6e54376f, terminal
+  failed. Its 10 authors finished; 81 attempts comprise 78 completed fits and
+  3 recorded crashes. Preserve that job and its original author allocations.
+- Cause: parent R58 recall correction additive-delta and child R60 recall
+  correction short target share method causal_event_correction58 but have
+  different correct selected weights. The combined method-keyed table overwrote
+  one binding. Individual checkpoints were intact; do not rename authored
+  genotypes or weaken selected-checkpoint equality to hide this collision.
+- New shared ml/evolution/model_parameters.py uses candidate-scoped-v1 and
+  candidate_parameters[exact candidate.name]. bind_parameters rejects duplicate
+  identities. parameters_for fails closed on missing/bad scoped bindings and
+  reads historical method-keyed tables only when scoped format is absent.
+  Gates, curves, runtime architecture display and replay/export readers use
+  candidate identity. New jobs freeze the helper and require scoped binding
+  before native evaluation. Shared evolution/research briefs carry this rule.
+- Recovery package: /Users/ericlabouve/Datasets/too-much-trash/working/runs/recovery-r60-candidate-bindings-v1.
+  All 10 challengers plus 8 baselines recovered with exact candidate objects,
+  selected bare weights, histories/checkpoints/receipts, implementation files
+  and full journal. Canonical whole-journal audit passes all 18 selected models.
+  3,783 hash-bound source files archived (558,249,115 bytes); source unmodified.
+  recover_saved_candidates.py --verify --output PACKAGE rechecks both original
+  source and archive. A recovery archive may preserve empty build logs, but
+  canonical training/deployment artifact gates remain strict and unchanged.
+- Status recovered_pending_evaluation_and_review, published=false. This is NOT a
+  completed round and must not enter leader history or next_pool as admitted.
+  Resume serial native evaluation and new independent reviews before promotion;
+  do not reopen completed authors, retrain or silently edit original receipts.
+- Prior admitted R59 independent motion delta-bce still passes full publication
+  gate: validation F1 0.9392712550607287, fitness 0.951417004048583. Test reserved.

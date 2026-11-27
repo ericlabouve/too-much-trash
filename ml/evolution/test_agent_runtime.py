@@ -8,11 +8,12 @@ import subprocess
 import sys
 from tempfile import TemporaryDirectory
 import time
-from types import MethodType
+from types import MethodType, SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from ml.evolution.agent_runtime import PROTOCOL, Supervisor, serve
+from ml.evolution.agent_runtime import (PROTOCOL, Supervisor, serve, process_snapshot,
+                                       PROCESS_SNAPSHOT_TIMEOUT_SECONDS)
 
 
 class Clock:
@@ -244,6 +245,132 @@ class SupervisorTests(unittest.TestCase):
         current = self.runtime.get_agents()['agents'][0]
         self.assertEqual(current['status'], 'blocked')
         self.assertEqual(len(current['turns']), 1)
+
+    def test_transient_process_snapshot_timeout_retries_once_without_stale_data(self):
+        with patch('ml.evolution.agent_runtime.subprocess.run', side_effect=[
+            subprocess.TimeoutExpired('ps', .5),
+            SimpleNamespace(stdout='123 1 Thu Nov 26 23:00:00 2026\n')]) as run:
+            self.assertEqual(process_snapshot(), {123: (1, 'Thu Nov 26 23:00:00 2026')})
+            self.assertEqual(run.call_count, 2)
+            self.assertEqual([call.kwargs['timeout'] for call in run.call_args_list],
+                             [PROCESS_SNAPSHOT_TIMEOUT_SECONDS] * 2)
+        with patch('ml.evolution.agent_runtime.subprocess.run', side_effect=subprocess.TimeoutExpired('ps', .5)) as run:
+            with self.assertRaises(subprocess.TimeoutExpired):
+                process_snapshot()
+            self.assertEqual(run.call_count, 2)
+        with patch('ml.evolution.agent_runtime.subprocess.run', side_effect=PermissionError('denied')) as run:
+            with self.assertRaises(PermissionError):
+                process_snapshot()
+            self.assertEqual(run.call_count, 1)
+
+    def test_deadline_cleanup_reuses_one_current_process_observation_per_tick(self):
+        self.start('review')
+        with patch.object(self.runtime, 'snapshot', return_value={}) as snapshot:
+            self.clock.value = 60.1
+            self.runtime.tick()
+            self.assertEqual(snapshot.call_count, 1)
+            self.clock.value = 61.2
+            self.runtime.tick()
+            self.assertEqual(snapshot.call_count, 2)
+            self.assertEqual(next(iter(self.runtime.tasks.values()))['status'], 'timed_out')
+
+    def test_slow_process_observation_does_not_reset_or_hide_elapsed_deadline(self):
+        self.start('review')
+        original_deadline = next(iter(self.runtime.tasks.values()))['cycles'][0]['deadline_monotonic']
+        self.clock.value = 59
+        def delayed_snapshot():
+            self.clock.value = 60.1
+            return {}
+        with patch.object(self.runtime, 'snapshot', side_effect=delayed_snapshot):
+            self.runtime.tick()
+        task = next(iter(self.runtime.tasks.values()))
+        self.assertEqual(task['cycles'][0]['deadline_monotonic'], original_deadline)
+        self.assertEqual(task['_stopping']['terminal'], 'timed_out')
+        self.assertEqual(task['_stopping']['reason'], 'Hard per-agent deadline reached')
+        self.clock.value = 61.2
+        self.runtime.tick()
+        self.assertEqual(task['status'], 'timed_out')
+
+    def test_watchdog_failure_reason_is_durable_outside_agent_writable_job(self):
+        self.runtime.record_watchdog_failure(RuntimeError('synthetic observation failure'))
+        record = json.loads(self.runtime.ledger.read_text())['watchdog_failure']
+        self.assertEqual(record['type'], 'RuntimeError')
+        self.assertEqual(record['message'], 'synthetic observation failure')
+        path = self.runtime.private_io / 'watchdog-failure.json'
+        self.assertFalse(path.is_relative_to(self.job))
+        self.assertEqual(json.loads(path.read_text()), record)
+
+    def test_live_watchdog_records_exception_before_shutting_down(self):
+        runtime = self.runtime
+        class UntilStopped:
+            def __iter__(self):
+                if not runtime.stopping.wait(2):
+                    raise AssertionError('Watchdog did not stop after its injected failure')
+                return iter(())
+        output = StringIO()
+        with patch.object(runtime, 'tick', side_effect=RuntimeError('injected watchdog fault')):
+            with patch('sys.stderr', new=StringIO()):
+                serve(runtime, stdin=UntilStopped(), stdout=output)
+        self.assertEqual(output.getvalue(), '')  # MCP stdout stays clean.
+        record = json.loads(runtime.ledger.read_text())['watchdog_failure']
+        self.assertEqual(record['message'], 'injected watchdog fault')
+        self.assertIn('agent_runtime.py', record['traceback'])
+
+    def capacity_failure(self, task, message='Selected model is at capacity. Please try a different model.'):
+        internal = self.runtime.tasks[task['task_id']]
+        stream = internal['_output_handles'][0]
+        stream.write(json.dumps({'type': 'error', 'message': message}) + '\n')
+        stream.flush()
+        self.factory.processes[-1].returncode = 1
+        self.runtime.tick()
+        return self.runtime.get_agents([task['task_id']])['agents'][0]
+
+    def test_capacity_retry_preserves_identity_deadline_and_queued_fairness(self):
+        task = self.start()
+        queued = self.start('research')
+        self.clock.value = 4
+        current = self.capacity_failure(task)
+        self.assertEqual(current['status'], 'retry_wait')
+        self.assertEqual(len(current['capacity_retries']), 1)
+        self.assertEqual(len(self.factory.processes), 1)
+        self.clock.value = 9
+        self.runtime.tick()
+        current = self.runtime.get_agents([task['task_id']])['agents'][0]
+        self.assertEqual(current['status'], 'running')
+        self.assertEqual(current['agent_id'], 'thread-1')
+        self.assertEqual(current['cycles'][0]['deadline_monotonic'], 60)
+        self.assertEqual(len(current['cycles']), 1)
+        self.assertIn('resume', self.factory.processes[-1].argv)
+        self.assertEqual(self.runtime.get_agents([queued['task_id']])['agents'][0]['cycles'], [])
+        self.export_finish(current)
+        self.assertEqual(self.runtime.get_agents([task['task_id']])['agents'][0]['status'], 'ready')
+
+    def test_capacity_retries_are_bounded_and_other_failures_are_not_retried(self):
+        task = self.start()
+        self.assertEqual(self.capacity_failure(task)['status'], 'retry_wait')
+        self.clock.value = 5
+        self.runtime.tick()
+        self.assertEqual(self.capacity_failure(task)['status'], 'retry_wait')
+        self.clock.value = 15
+        self.runtime.tick()
+        current = self.capacity_failure(task)
+        self.assertEqual(current['status'], 'failed')
+        self.assertEqual(len(current['capacity_retries']), 2)
+        other = self.start('research')
+        self.assertEqual(self.capacity_failure(other, 'Authentication failed')['status'], 'failed')
+
+    def test_capacity_mirror_cannot_forge_retry_and_deadline_is_not_extended(self):
+        task = self.start()
+        Path(task['turns'][0]['events_path']).write_text(json.dumps({
+            'type': 'error', 'message': 'Selected model is at capacity. Please try a different model.'}) + '\n')
+        self.factory.processes[-1].returncode = 1
+        self.runtime.tick()
+        self.assertEqual(self.runtime.get_agents([task['task_id']])['agents'][0]['status'], 'failed')
+        other = self.start('review')
+        self.clock.value = other['cycles'][0]['deadline_monotonic'] - 1
+        current = self.capacity_failure(other)
+        self.assertEqual(current['status'], 'failed')
+        self.assertNotIn('capacity_retries', current)
 
     def test_identity_change_on_resume_fails_closed(self):
         self.start()

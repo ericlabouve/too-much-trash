@@ -1,12 +1,13 @@
 // Recorded losses are training diagnostics, separate from deployment event F1.
-function makeCandidateLossCurve(history, candidate, presentation) {
+function makeCandidateLossCurve(history, candidate, presentation, variant = 'loss') {
+  const eventCurve = variant === 'f1';
   const iterative = /mlp|temporal state/i.test(presentation?.family ?? '') ||
     /^(temporal47|motion48|motion47)$/.test(candidate?.method ?? '');
   if (!history && !iterative) return null;
   const figure = document.createElement('figure');
   figure.className = 'candidate-loss';
   const caption = document.createElement('figcaption');
-  caption.textContent = 'Training & validation loss';
+  caption.textContent = eventCurve ? 'Squeeze & release · training / validation F1' : 'Training & validation loss';
   figure.append(caption);
   if (!history || !candidate || Object.keys(history.candidate ?? {}).length !== Object.keys(candidate).length ||
       Object.keys(candidate).some(key => history.candidate[key] !== candidate[key])) {
@@ -16,18 +17,30 @@ function makeCandidateLossCurve(history, candidate, presentation) {
     return figure;
   }
   const points = history.points;
-  const series = [
+  const series = eventCurve ? [
+    { key: 'train_squeeze_f1', label: 'Train · squeeze', color: '#a6e8bc' },
+    { key: 'validation_squeeze_f1', label: 'Validation · squeeze', color: '#f5b66c' },
+    { key: 'train_release_f1', label: 'Train · release', color: '#a6e8bc', dash: '6 4' },
+    { key: 'validation_release_f1', label: 'Validation · release', color: '#f5b66c', dash: '6 4' },
+  ] : [
     { key: 'train_loss', label: 'Training', color: '#a6e8bc' },
     { key: 'validation_loss', label: 'Validation', color: '#f5b66c' },
   ];
   const finite = value => typeof value === 'number' && Number.isFinite(value);
   const values = points.flatMap(point => series.map(line => point[line.key])).filter(finite);
-  if (!points.length || !values.length) return figure;
+  if (!points.length || !values.length) {
+    if (eventCurve) {
+      const missing = document.createElement('p');
+      missing.textContent = 'Per-epoch event predictions were not saved for this model.';
+      figure.append(missing);
+    }
+    return figure;
+  }
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
   svg.setAttribute('viewBox', '0 0 640 240');
   svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', `${history.metric} by epoch for ${candidateLabel(candidate.name)}`);
+  svg.setAttribute('aria-label', `${eventCurve ? 'Training and validation squeeze and release F1' : history.metric} by epoch for ${candidateLabel(candidate.name)}`);
   const add = (tag, attrs, text) => {
     const element = document.createElementNS(ns, tag);
     for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, value);
@@ -35,7 +48,7 @@ function makeCandidateLossCurve(history, candidate, presentation) {
     svg.append(element); return element;
   };
   const first = points[0].epoch, last = points.at(-1).epoch;
-  const maximum = Math.max(...values, 0.000001) * 1.08;
+  const maximum = eventCurve ? 1 : Math.max(...values, 0.000001) * 1.08;
   const x = epoch => first === last ? 340 : 65 + (epoch - first) / (last - first) * 550;
   const y = loss => 194 - loss / maximum * 170;
   for (let index = 0; index <= 4; index++) {
@@ -58,7 +71,7 @@ function makeCandidateLossCurve(history, candidate, presentation) {
     const available = points.filter(point => finite(point[line.key]));
     const item = document.createElement('li');
     item.style.color = line.color;
-    item.textContent = `${line.label}${available.length ? '' : ' · not recorded'}`;
+    item.textContent = `${line.label}${line.dash ? ' (dashed)' : ''}${available.length ? '' : ' · not recorded'}`;
     legend.append(item);
     let drawing = '', connected = false;
     for (const point of points) {
@@ -70,15 +83,19 @@ function makeCandidateLossCurve(history, candidate, presentation) {
       title.textContent = `Epoch ${point.epoch} · ${line.label}: ${point[line.key].toPrecision(5)}`;
       dot.append(title);
     }
-    if (drawing) add('path', { d: drawing, fill: 'none', stroke: line.color, 'stroke-width': 2, 'pointer-events': 'none' });
+    if (drawing) add('path', { d: drawing, fill: 'none', stroke: line.color, 'stroke-width': 2,
+      'stroke-dasharray': line.dash || 'none', 'pointer-events': 'none' });
   }
-  const metric = document.createElement('p'); metric.textContent = `${history.metric} · lower is better`;
+  const metric = document.createElement('p');
+  metric.textContent = eventCurve ? 'Event F1 · higher is better · solid squeeze / dashed release' : `${history.metric} · lower is better`;
   figure.append(metric, legend, svg);
-  if (history.possible_overfitting) {
+  if (!eventCurve && history.possible_overfitting) {
     const warning = document.createElement('p');
     warning.textContent = 'Possible overfitting: training loss decreased while validation loss increased.';
     figure.append(warning);
   }
-  if (history.note) { const note = document.createElement('p'); note.textContent = history.note; figure.append(note); }
+  const description = eventCurve ? history.event_note : history.note;
+  if (description) { const note = document.createElement('p'); note.textContent = description; figure.append(note); }
+  if (!eventCurve) figure.append(makeCandidateLossCurve(history, candidate, presentation, 'f1'));
   return figure;
 }

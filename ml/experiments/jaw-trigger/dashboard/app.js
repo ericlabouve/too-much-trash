@@ -225,7 +225,7 @@ function render(snapshot) {
     }
     const diagramCandidate = { ...(candidate ?? { name, method: "unknown", confirm: 1 }),
       presentation: result?.candidate_metadata?.[name] };
-    cardLayout.append(metadata, makeCandidateArchitecture(diagramCandidate, result?.feature_parameters));
+    cardLayout.append(metadata, makeCandidateArchitecture(diagramCandidate, result?.feature_parameters, result?.candidate_parameters));
     details.append(cardLayout);
     const lossCurve = makeCandidateLossCurve(result?.training_histories?.[name], candidate, diagramCandidate.presentation);
     if (lossCurve) details.append(lossCurve);

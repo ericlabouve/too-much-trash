@@ -105,6 +105,7 @@ class LeaderHistory:
                                     'round': result['round'], 'job': job.name, 'summary': context['summary'],
                                     'settings': result['settings'], 'entries': list(entries.values()),
                                     'integrity_review': result.get('integrity_review'),
+                                    'benchmark_protocol': result.get('benchmark_protocol', result['settings'].get('benchmark_protocol')),
                                     'evaluation_protocol': result.get('evaluation_protocol', 'clip_replay-v1'),
                                     'candidate_metadata': result.get('candidate_metadata', {}),
                                     'training_histories': load_training_histories(job, result)}

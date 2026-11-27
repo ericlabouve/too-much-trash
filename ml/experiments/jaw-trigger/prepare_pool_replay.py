@@ -18,6 +18,8 @@ import numpy as np
 
 from round_one import events, features as old_features
 from run_joint_round import JointCandidate
+from ml.evolution.model_parameters import parameters_for
+from model_inputs import feature_table
 
 
 def digest(path):
@@ -68,7 +70,6 @@ def prepare(result_path, output, per_collection=2):
     if not selected:
         raise ValueError('No validation inputs available')
     pool = [JointCandidate(**candidate) for candidate in result['next_pool']]
-    models = result['feature_parameters']
     manifest, reference = [], {}
     for number, (source, data) in enumerate(selected):
         key = f'clip-{number:02d}'
@@ -82,7 +83,7 @@ def prepare(result_path, output, per_collection=2):
                                      for name, (t, v) in sensors.items() if name in ('accelerometer', 'gyroscope')}})
         reference[key] = {'source_sha256': digest(Path(source)), 'source': source, 'candidates': {}}
         for candidate in pool:
-            model = models.get(candidate.method)
+            model = parameters_for(result, candidate)
             if candidate.method == 'geometry50_multiscale':
                 measured = modules[candidate.method].features(frames, model)
             elif candidate.method == 'radial50':
@@ -92,7 +93,7 @@ def prepare(result_path, output, per_collection=2):
             elif candidate.method in modules:
                 measured = modules[candidate.method].features(frames, sensors, model)
             else:
-                measured = old_features(candidate.method, frames, candidate.signal, sensors, models)
+                measured = old_features(candidate.method, frames, candidate.signal, sensors, feature_table(result, candidate))
             values, _ = measured
             reference[key]['candidates'][candidate.name] = {
                 'scores': [float(value) for _, value in values],
@@ -101,8 +102,8 @@ def prepare(result_path, output, per_collection=2):
     canonical = lambda value: json.dumps(value, sort_keys=True, separators=(',', ':'))
     spec = {'suite': 'jaw-pool-native-v1', 'round': result['round'], 'repeats': 3,
             'result_sha256': digest(result_path), 'pool_sha256': sha256(canonical(result['next_pool']).encode()).hexdigest(),
-            'candidates': [{'candidate': asdict(c), 'parameters': runtime_model(models.get(c.method, {})),
-                            'model_sha256': sha256(canonical(models.get(c.method, {})).encode()).hexdigest()}
+            'candidates': [{'candidate': asdict(c), 'parameters': runtime_model(parameters_for(result,c)),
+                            'model_sha256': sha256(canonical(parameters_for(result,c)).encode()).hexdigest()}
                            for c in pool]}
     (fixtures / 'pool.json').write_text(json.dumps(spec))
     (fixtures / 'clips.json').write_text(json.dumps(manifest))

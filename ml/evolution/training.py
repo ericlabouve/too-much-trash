@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 from time import monotonic
 from .resources import FittingLease, fitting_settings
+from .epoch_admission import PROTOCOL as EPOCH_ADMISSION_PROTOCOL, budget_stop
 
 PROTOCOL = 'validation-checkpoints-v1'
 
@@ -82,7 +83,7 @@ def _verify_evidence(root, record):
 
 class TrainingMonitor:
     def __init__(self, job, trial_id, plan, context, *, policy=None, clock=monotonic,
-                 validation_validator=None):
+                 validation_validator=None, training_validator=None):
         if not isinstance(trial_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,80}', trial_id):
             raise ValueError('Use a unique simple trial ID')
         if not isinstance(plan, dict) or not isinstance(context, dict):
@@ -97,6 +98,8 @@ class TrainingMonitor:
             raise ValueError('Measurement details must be text within 2000 characters')
         if validation_validator is not None and not callable(validation_validator):
             raise ValueError('The domain validation checker must be callable')
+        if training_validator is not None and not callable(training_validator):
+            raise ValueError('The domain training checker must be callable')
         if plan.get('kind') not in ('iterative', 'noniterative'):
             raise ValueError('Declare iterative or genuinely noniterative training')
         seed = plan.get('seed')
@@ -127,7 +130,12 @@ class TrainingMonitor:
         if not self.directory.resolve().is_relative_to(self.job):
             raise ValueError('Training trial directory must stay inside its job')
         self.plan = json.loads(canonical(plan))
+        if self.plan['kind'] == 'iterative':
+            if self.plan.get('epoch_admission', EPOCH_ADMISSION_PROTOCOL) != EPOCH_ADMISSION_PROTOCOL:
+                raise ValueError('New iterative trials require the epoch admission guard')
+            self.plan['epoch_admission'] = EPOCH_ADMISSION_PROTOCOL
         self.validation_validator = validation_validator
+        self.training_validator = training_validator
         self.context = dict(context)
         self.policy = TrainingPolicy(**(asdict(TrainingPolicy()) if policy is None else policy))
         self.clock, self.started = clock, clock()
@@ -135,6 +143,7 @@ class TrainingMonitor:
             raise ValueError('Training clock must produce finite timestamps')
         self.points, self.best, self.gain_score, self.gain_epoch = [], None, None, 0
         self.stop_reason, self.closed = None, False
+        self.epoch_admission_stop = None
         self.fitting_lease = None
         self._checkpoint_record = None
         self._history_record = None
@@ -174,13 +183,18 @@ class TrainingMonitor:
     def can_start_epoch(self):
         if self.closed or self.stop_reason:
             return False
-        if self._elapsed() >= self.policy.max_seconds:
+        elapsed = self._elapsed()
+        if elapsed >= self.policy.max_seconds:
             self.stop_reason = 'time_budget'
+            return False
+        self.epoch_admission_stop = budget_stop(self.points, elapsed, self.policy.max_seconds)
+        if self.epoch_admission_stop is not None:
+            self.stop_reason = 'epoch_budget'
             return False
         return True
 
     def observe(self, *, train_loss, validation_loss, validation_score,
-                validation_predictions, parameters, artifacts=()):
+                validation_predictions, parameters, artifacts=(), training_predictions=None):
         if self.closed or self.stop_reason or self.plan['kind'] != 'iterative':
             raise ValueError('Cannot append another epoch to this trial')
         if any(type(value) not in (int, float) or not isfinite(value) for value in
@@ -196,6 +210,16 @@ class TrainingMonitor:
         point = {'epoch': epoch, 'train_loss': train_loss, 'validation_loss': validation_loss,
                  'validation_score': validation_score, 'elapsed_seconds': self._elapsed()}
         frozen_predictions = json.loads(canonical(validation_predictions))
+        frozen_training = None
+        if training_predictions is not None:
+            if (not isinstance(training_predictions, dict) or not training_predictions
+                    or any(not isinstance(key, str) or not key.strip() for key in training_predictions)):
+                raise ValueError('Training predictions must be a nonempty JSON object keyed by example/clip ID')
+            frozen_training = json.loads(canonical(training_predictions))
+            if self.training_validator is not None:
+                self.training_validator(frozen_training)
+        elif self.plan.get('record_training_predictions'):
+            raise ValueError('This trial requires inference-mode training_predictions after every epoch')
         canonical(parameters)
         if self.validation_validator is not None:
             self.validation_validator(frozen_predictions, validation_score)
@@ -204,6 +228,10 @@ class TrainingMonitor:
         predictions_path = self.directory / f'validation-{epoch:04d}.json'
         write(predictions_path, frozen_predictions)
         point['predictions'] = evidence(self.job, predictions_path)
+        if frozen_training is not None:
+            training_path = self.directory / f'train-{epoch:04d}.json'
+            write(training_path, frozen_training)
+            point['training_predictions'] = evidence(self.job, training_path)
         self.points.append(point)
         if self.best is None or checkpoint_key(point) > checkpoint_key(self.best):
             self.best = point
@@ -257,6 +285,8 @@ class TrainingMonitor:
         self.selected_checkpoint()
         for point in self.points:
             _verify_evidence(self.job, point['predictions'])
+            if 'training_predictions' in point:
+                _verify_evidence(self.job, point['training_predictions'])
         if self._history_record:
             _verify_evidence(self.job, self._history_record)
         receipt = {'protocol': PROTOCOL, 'trial_id': self.trial_id,
@@ -266,6 +296,8 @@ class TrainingMonitor:
                    'trained_epochs': len(self.points), 'stop_reason': self.stop_reason,
                    'elapsed_seconds': self._elapsed(),
                    'history': self._history_record}
+        if self.epoch_admission_stop is not None:
+            receipt['epoch_admission_stop'] = self.epoch_admission_stop
         if self.fitting_lease is not None:
             receipt['fit_lease'] = evidence(self.job, self.fitting_lease.release())
         write(self.directory / 'receipt.json', receipt)
@@ -278,5 +310,10 @@ class TrainingMonitor:
         if not self.closed:
             if self.fitting_lease is not None:
                 self.fitting_lease.release()
-            journal(self.job, {'trial_id': self.trial_id, 'status': 'crash', 'reason': str(reason)[:1000]})
+            message = str(reason).strip()
+            if isinstance(reason, BaseException):
+                message = f'{type(reason).__name__}: {message}' if message else f'{type(reason).__name__} (no exception message)'
+            elif not message:
+                message = 'Unspecified trial failure (empty reason supplied)'
+            journal(self.job, {'trial_id': self.trial_id, 'status': 'crash', 'reason': message[:1000]})
             self.closed = True

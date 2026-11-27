@@ -1,6 +1,7 @@
 """Audit supervisor evidence without launching models or an evolution round."""
 
 from copy import deepcopy
+from hashlib import sha256
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -112,6 +113,14 @@ class AgentBudgetTests(unittest.TestCase):
             self.assertEqual(summary['followups'], 2)
             self.assertEqual(summary['minutes_per_agent'], 30)
             self.assertEqual(summary['export_seconds'], 120.)
+
+    def test_fatal_watchdog_failure_blocks_even_otherwise_ready_receipts(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory).resolve()
+            settings, ledger, receipts, challengers = self.fixture(job)
+            ledger['watchdog_failure'] = {'type': 'RuntimeError', 'message': 'synthetic fault'}
+            with self.assertRaisesRegex(ValueError, 'watchdog failed'):
+                self.audit(job, settings, ledger, receipts, challengers)
 
     def test_missing_extra_duplicate_or_mismatched_identities_are_rejected(self):
         with TemporaryDirectory() as directory:
@@ -240,6 +249,34 @@ class AgentBudgetTests(unittest.TestCase):
                     changed['tasks'][0]['followups'] = value
                     with self.assertRaises(ValueError):
                         self.audit(job, settings, changed, receipts, challengers)
+
+    def test_capacity_retry_requires_original_error_hash_backoff_and_deadline(self):
+        with TemporaryDirectory() as directory:
+            job = Path(directory).resolve()
+            settings, ledger, receipts, challengers = self.fixture(job)
+            record = ledger['tasks'][0]
+            event_path = job / 'capacity-events.jsonl'
+            reason = 'Selected model is at capacity. Please try a different model.'
+            event_path.write_text(json.dumps({'type': 'error', 'message': reason}) + '\n')
+            failed, resumed = record['turns'][:2]
+            failed.update(events_path='capacity-events.jsonl', returncode=1)
+            resumed['started_monotonic'] = failed['ended_monotonic'] + 5.
+            record['capacity_retries'] = [{'turn': 1, 'reason': reason,
+                'events_sha256': sha256(event_path.read_bytes()).hexdigest(),
+                'retry_at_monotonic': resumed['started_monotonic']}]
+            self.assertEqual(self.audit(job, settings, ledger, receipts, challengers)['tasks'], 4)
+            for case in ('hash', 'backoff', 'turn', 'limit', 'successful_exit', 'reason'):
+                changed = deepcopy(ledger)
+                task = changed['tasks'][0]
+                retry = task['capacity_retries'][0]
+                if case == 'hash': retry['events_sha256'] = '0' * 64
+                if case == 'backoff': retry['retry_at_monotonic'] -= 1
+                if case == 'turn': retry['turn'] = 3
+                if case == 'limit': task['capacity_retries'] *= 3
+                if case == 'successful_exit': task['turns'][0]['returncode'] = 0
+                if case == 'reason': retry['reason'] = 'Authentication failed'
+                with self.subTest(case=case), self.assertRaises(ValueError):
+                    self.audit(job, settings, changed, receipts, challengers)
 
 
 if __name__ == '__main__':

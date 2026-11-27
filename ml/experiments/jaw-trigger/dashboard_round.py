@@ -13,6 +13,8 @@ import round_one
 from round_one import accuracy, features, load_frames, measure_events, motion_samples, pose_samples
 from run_joint_round import JointCandidate, SPACE, joint_genotype, read_genotype
 from ml.evolution import Policy, run_round
+from ml.evolution.model_parameters import bind_parameters
+from model_inputs import feature_model, feature_table
 from dashboard_datasets import REFERENCE_ROOT, SPLIT_DEFAULTS, build_split_manifest
 
 
@@ -92,7 +94,8 @@ def execute(config_path):
         pool = pool[:settings['pool_size']]
         if not pool:
             raise ValueError('The selected family has no retained candidates')
-        parameters = prior['feature_parameters']
+        pool_by_name = {candidate.name: candidate for candidate in pool}
+        model_bindings = []
         frames, sensors, labels = [], [], []
         cv2.setNumThreads(1)
         round_one.MATCH_SECONDS = settings['match_seconds']
@@ -107,10 +110,14 @@ def execute(config_path):
         evaluated = []
 
         def evaluate(candidate):
-            key = candidate.method, candidate.signal
+            source = pool_by_name.get(candidate.name) or pool_by_name[candidate.parent]
+            model = feature_model(prior, source)
+            model_bindings.append((candidate, model))
+            key = source.name, candidate.signal
             if key not in cache:
                 cache[key] = [features(candidate.method, video, candidate.signal,
-                             sensor if candidate.method in round_one.POSE_METHODS else sensor['imu'], parameters)
+                             sensor if candidate.method in round_one.POSE_METHODS else sensor['imu'],
+                             feature_table(prior, source))
                               for video, sensor in zip(frames, sensors, strict=True)]
             predictions, timings = measure_events(candidate, cache[key])
             metrics = accuracy(predictions, labels)
@@ -135,7 +142,7 @@ def execute(config_path):
         result = run_round(pool, round_number, seen, evaluate, SPACE, policy=policy, seed=settings['seed'])
         result.update(settings=settings, mode='bounded_mutations', reporting='frozen_prior_training_diagnostic', subset=subset,
                       split_counts=split_manifest['counts'], test_evaluated=False, validation_evaluated=False,
-                      feature_parameters=parameters, seed=settings['seed'], seen=sorted(seen, key=repr),
+                      **bind_parameters(model_bindings), seed=settings['seed'], seen=sorted(seen, key=repr),
                       target_basis='development', clip_count=len(records),
                       fitness_weights={'jaw_f1': settings['jaw_weight'], 'speed_score': 1 - settings['jaw_weight']},
                       input_manifest=str(output / 'inputs.json'))
