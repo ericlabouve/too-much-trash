@@ -160,14 +160,21 @@ final class HoldRecordingStateTests: XCTestCase {
         for stream in [MotionSample.Stream.accelerometer, .gyroscope, .attitude] {
             try journal.append(MotionSample(stream: stream, timestamp: 8, values: [1, 2, 3]), commonTime: 8, through: 15)
         }
-        let pose = CameraPoseSample(timestamp: 8, callbackUptime: 8.01, cameraToWorldColumns: Array(repeating: 0, count: 16), cameraOrientationQuaternion: [0, 0, 0, 1], intrinsicsColumns: Array(repeating: 0, count: 9), imageWidth: 64, imageHeight: 64, tracking: "limited", trackingReason: "initializing")
+        let pose = CameraPoseSample(timestamp: 8, callbackUptime: 8.01, cameraToWorldColumns: Array(repeating: 0, count: 16), cameraOrientationQuaternion: [0, 0, 0, 1], intrinsicsColumns: Array(repeating: 0, count: 9), imageWidth: 1920, imageHeight: 1080, tracking: "limited", trackingReason: "initializing")
         try journal.append(pose, commonTime: 8, through: 15)
         let video = root.appendingPathComponent("temporary.mp4")
         try Data("video".utf8).write(to: video)
-        try journal.finalize(video: video, release: 12, end: 15, validatedCoverageAndClock: false)
+        let geometry = EncodedFrameGeometry(sourceWidth: 1920, sourceHeight: 1080)
+        try journal.finalize(video: video, release: 12, end: 15,
+                             validatedCoverageAndClock: false, videoFrameGeometry: [geometry])
         let manifest = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: journal.directory.appendingPathComponent("manifest.json"))) as? [String: Any])
         XCTAssertEqual(manifest["complete"] as? Bool, false)
         XCTAssertEqual(manifest["episode_id"] as? String, window.id.uuidString)
+        let metadata = try XCTUnwrap(manifest["sensor_metadata"] as? [String: Any])
+        XCTAssertEqual(metadata["videoFrameCoordinates"] as? String, "top_left_pixel_edges_scale_to_content_then_translate")
+        let mapping = try XCTUnwrap((metadata["videoFrameGeometry"] as? [[String: Int]])?.first)
+        XCTAssertEqual(mapping, ["sourceWidth": 1920, "sourceHeight": 1080, "encodedWidth": 960, "encodedHeight": 720,
+                                 "contentX": 0, "contentY": 90, "contentWidth": 960, "contentHeight": 540])
         XCTAssertEqual(String(decoding: try Data(contentsOf: journal.directory.appendingPathComponent("imu.jsonl")), as: UTF8.self).split(separator: "\n").count, 3)
         XCTAssertTrue(FileManager.default.fileExists(atPath: journal.directory.appendingPathComponent("video.mp4").path))
     }
@@ -213,11 +220,20 @@ final class HoldRecordingStateTests: XCTestCase {
         var completed: ARVideoSegmentWriter.Segment?
         writer.onSegment = { segment in completed = segment; done.fulfill() }
         var source: CVPixelBuffer?
-        let result = CVPixelBufferCreate(nil, 64, 64, kCVPixelFormatType_32BGRA,
+        let result = CVPixelBufferCreate(nil, 1920, 1440, kCVPixelFormatType_420YpCbCr8BiPlanarFullRange,
                                          [kCVPixelBufferIOSurfacePropertiesKey: [:]] as CFDictionary, &source)
         XCTAssertEqual(result, kCVReturnSuccess)
         let frame = try XCTUnwrap(source)
-        for i in 0..<10 { try writer.append(frame, timestamp: 10 + Double(i) / 30) }
+        XCTAssertEqual(CVPixelBufferLockBaseAddress(frame, []), kCVReturnSuccess)
+        for plane in 0..<2 {
+            let base = try XCTUnwrap(CVPixelBufferGetBaseAddressOfPlane(frame, plane))
+            memset(base, 128, CVPixelBufferGetBytesPerRowOfPlane(frame, plane) * CVPixelBufferGetHeightOfPlane(frame, plane))
+        }
+        CVPixelBufferUnlockBaseAddress(frame, [])
+        for i in 0..<10 {
+            try writer.append(frame, timestamp: 10 + Double(i) / 60)
+            try await Task.sleep(for: .milliseconds(3))
+        }
         writer.finishCurrent()
         await fulfillment(of: [done], timeout: 20)
         let segment = try XCTUnwrap(completed)
@@ -229,12 +245,21 @@ final class HoldRecordingStateTests: XCTestCase {
         let video = try await asset.loadTracks(withMediaType: .video)
         let audio = try await asset.loadTracks(withMediaType: .audio)
         XCTAssertEqual(video.count, 1)
+        let size = try await XCTUnwrap(video.first).load(.naturalSize)
+        XCTAssertEqual(size, CGSize(width: 960, height: 720))
         XCTAssertTrue(audio.isEmpty)
         let assembledResult = try await EpisodeVideoAssembler.assemble(segments: [segment], start: 9.5, end: 10.3,
                                                                output: directory.appendingPathComponent("assembled.mp4"))
         let assembled = AVURLAsset(url: assembledResult.url)
         let assembledPlayable = try await assembled.load(.isPlayable)
         let assembledAudio = try await assembled.loadTracks(withMediaType: .audio)
+        let mapping = try XCTUnwrap(assembledResult.geometry.first)
+        XCTAssertEqual(mapping.sourceWidth, 1920)
+        XCTAssertEqual(mapping.sourceHeight, 1440)
+        XCTAssertEqual(mapping.contentX, 0)
+        XCTAssertEqual(mapping.contentY, 0)
+        XCTAssertEqual(mapping.contentWidth, 960)
+        XCTAssertEqual(mapping.contentHeight, 720)
         XCTAssertTrue(assembledPlayable)
         XCTAssertTrue(assembledAudio.isEmpty)
         var rejectedTinyBudget = false
@@ -272,7 +297,8 @@ final class HoldRecordingStateTests: XCTestCase {
     func testMultiSegmentPassthroughKeepsSourceCadenceAndNoAudio() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let writer = try ARVideoSegmentWriter(directory: directory, segmentDuration: 0.5)
+        let writer = try ARVideoSegmentWriter(directory: directory, segmentDuration: 0.5,
+                                              encodedWidth: 64, encodedHeight: 64)
         let done = expectation(description: "all segments")
         done.expectedFulfillmentCount = 3
         var segments: [ARVideoSegmentWriter.Segment] = []

@@ -1,0 +1,188 @@
+{
+  "revision": "v4-continuous-tail-anchor",
+  "status": "Print completed; user reports PETG plate success",
+  "source_slice": "build/20261110-continuous-tail-anchor-ramp/slice",
+  "viewer_path": "versions/v4/print/jobs/2026-11-10-actuator-fit-reprint-petg/",
+  "pieces": [
+    {
+      "name": "bracket",
+      "quantity": 1,
+      "source": "build/20261110-continuous-tail-anchor-ramp/source/bracket.stl",
+      "input_sha256": "0cef5d8771781083960f0ee9445b99a7c94b66f432dd1a4c9a4d26fc90fb2e6c",
+      "center_xy_mm": [
+        60,
+        80
+      ],
+      "bounds_mm": [
+        49.07509231567383,
+        37.19999980926514,
+        16.799999237060547
+      ],
+      "orientation": "Bracket base down",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        6.5624542236328125,
+        -27.40000009536743,
+        3.700743608425998e-18
+      ]
+    },
+    {
+      "name": "plunger",
+      "quantity": 1,
+      "source": "build/20261110-continuous-tail-anchor-ramp/source/plunger.stl",
+      "input_sha256": "254b5a828d995dab4a90913af2af84e38a43ae57f5e4cc19cac81b916ba312cc",
+      "center_xy_mm": [
+        120,
+        80
+      ],
+      "bounds_mm": [
+        16.0,
+        40.15000009536743,
+        12.899999141693115
+      ],
+      "orientation": "Plunger base down",
+      "rotation_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "centering_translation_mm": [
+        -0.0,
+        -22.924999952316284,
+        -3.4000000953674316
+      ]
+    }
+  ],
+  "slicer": "BambuStudio-02.07.01.62",
+  "total_g": 6.317492485046387,
+  "total_minutes": 58.364925130208334,
+  "support_g": 0,
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "hashes": {
+    "cuff-fit-input.3mf": "1b803e1350f8f0c7fb0a0ed70854d8e9ffff83ae55c2ca92ba78929215bdeb94",
+    "cuff-fit.gcode.3mf": "cf1a30ee79e16fbc83aca1c64105f9bbd8d5f68e7389e2496a2fc495fdd14981",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "gcode_md5": "c1c30abf76915c2723c6af70974f3539",
+  "limits": [
+    "Support removal, fit, layer strength, retention and part function need physical checks.",
+    "Per-role masses sum positive moving extrusion within labeled objects; startup purge is excluded.",
+    "Preview shows extrusion centerlines, not simulated bead width or validated support removability.",
+    "Automatic supports ON; bridge suppression OFF.",
+    "Current V4 geometry; no print sent.",
+    "Full projected footprints separated by at least 3 mm; inspect actual paths."
+  ],
+  "start": {
+    "observed_at": "2026-11-11T04:52:29.442043+00:00",
+    "printer": "tmt-a1-mini",
+    "remote_file": "/v4-actuator-fit-20261110-c1c30abf.gcode.3mf",
+    "gcode_md5": "c1c30abf76915c2723c6af70974f3539",
+    "plate": 1,
+    "bed_type": "textured_plate",
+    "use_ams": false,
+    "filament_reported": "PETG",
+    "nozzle_mm": 0.4,
+    "state": "RUNNING",
+    "stage": "heatbed_preheating",
+    "print_error": 0,
+    "remaining_minutes": 58,
+    "user_confirmed_bed_clear_and_petg_loaded": true
+  },
+  "completion": {
+    "recorded_at": "2026-11-11T17:13:17.542713+00:00",
+    "printer_state": "FINISH",
+    "progress_percent": 100,
+    "print_error": 0,
+    "user_report": "PETG plate success",
+    "fit_validation": "Not separately reported"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "version": "v4",
+  "revision": "v4-continuous-tail-anchor",
+  "source": "cad/versions/v4/review/bare-near/manifest.json",
+  "views": [
+    "readme-v4-front.png",
+    "readme-v4-back.png"
+  ],
+  "intent": "Full tool and phone mount detail; stock and phone geometry illustrative.",
+  "renderer": "readme-v4-render.html",
+  "physical_status": "PETG actuator printed; assembly fit and liner retention require verification."
+}

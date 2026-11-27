@@ -101,6 +101,7 @@ def build_site(cad: Path, dest: Path, versions: list[str], definitions: dict) ->
         registry['versions'] = [entry for entry in registry['versions'] if entry['id'] in versions]
         if registry['default'] not in versions:
             registry['default'] = versions[0]
+        concepts = {entry['id'] for entry in registry['versions'] if entry.get('concept_only') or entry.get('build_mode') == 'preview'}
         (dest / 'versions.json').write_text(json.dumps(registry, indent=2) + '\n')
         copy_retained_review_assets(cad, dest, versions)
         for version in versions:
@@ -111,6 +112,39 @@ def build_site(cad: Path, dest: Path, versions: list[str], definitions: dict) ->
                 for path in source.iterdir():
                     if path.is_file() and path.suffix.lower() in ('.html', '.js', '.css', '.md'):
                         shutil.copy2(path, target / path.name)
+            if version == 'v3':
+                review_tools = Path('versions/v3/review/concepts/braced-tail-b')
+                (dest / review_tools).mkdir(parents=True, exist_ok=True)
+                for name in ('frame-pen.js', 'surface-pen.js'):
+                    shutil.copy2(cad / review_tools / name, dest / review_tools / name)
+            if version in concepts:
+                if version == 'v4':
+                    # V4 is a data adapter for the same V3 application, including
+                    # when building a V4-only site. Never fork its viewer/BOM UI.
+                    app_target = dest / 'versions/v3'
+                    app_target.mkdir(parents=True, exist_ok=True)
+                    for app in (cad / 'versions/v3').iterdir():
+                        if app.is_file() and app.suffix in ('.html', '.js', '.css'):
+                            shutil.copy2(app, app_target / app.name)
+                    subprocess.run([sys.executable, str(source / 'source/build_viewer.py'),
+                                    str(target / 'review')], check=True)
+                    review_tools = Path('versions/v3/review/concepts/braced-tail-b')
+                    (dest / review_tools).mkdir(parents=True, exist_ok=True)
+                    for name in ('frame-pen.js', 'surface-pen.js'):
+                        shutil.copy2(cad / review_tools / name, dest / review_tools / name)
+                preview = source / 'source' / 'build_preview.py'
+                if preview.is_file():
+                    subprocess.run([sys.executable, str(preview), str(target / 'preview')], check=True)
+                if version == 'v4':
+                    travel = target / 'review/concepts/tail-handle'
+                    shutil.copytree(source / 'review/concepts/tail-handle', travel, dirs_exist_ok=True)
+                    subprocess.run([sys.executable, str(source / 'source/build_tail_handle.py'),
+                                    str(travel / 'models')], check=True)
+                if version == 'v4':
+                    study = target / 'review/concepts/steep-stop'
+                    shutil.copytree(source / 'review/concepts/steep-stop', study, dirs_exist_ok=True)
+                    subprocess.run([sys.executable, str(source / 'source/build_steep_stop.py'), str(study / 'models')], check=True)
+                continue  # Design preview has no manufacturing snapshot.
             run = runs / version
             result = subprocess.run([sys.executable, str(cad / 'cad.py'), 'build', version,
                                      '--output', str(run)], check=False)

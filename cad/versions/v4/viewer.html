@@ -1,0 +1,4 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>V4 · Shared CAD viewer</title></head><body><p>Opening the <a id="viewer" href="../v3/viewer.html?design=v4">V4 CAD viewer</a>…</p><script>
+// V3 and V4 intentionally run the same application. Only the manifest root differs.
+const target=new URL('../v3/viewer.html',location.href);target.search=location.search;target.searchParams.set('design','v4');document.querySelector('#viewer').href=target.href;location.replace(target.href);
+</script></body></html>

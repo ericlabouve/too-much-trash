@@ -1,5 +1,5 @@
 // Each frame is an assembly state, not a validated continuous insertion path.
-export function assemblySteps(){
+export function assemblySteps(design='v3'){
  const steps=[],jaw=[],actuator=[],installed=[];
  const add=(title,text,names,{bench=false,group=installed}={})=>{group.push(...names);steps.push({title,text,visible:[...group],added:names,bench});};
  add('Fixed jaw — off the grabber','Start with the fixed jaw/carrier on your work surface.',['carrier'],{bench:true,group:jaw});
@@ -29,5 +29,19 @@ export function assemblySteps(){
  add('Route the twine','Wrap around the pulley and run through the single TPU guide, then toward the inline band and trigger. The two lower guides are removed. Check the longer free span for rubbing and snagging; do not assume routing is qualified.',['twine','stock_neck','stock_blue_brace']);
  add('Attach at the trigger','Join the upper and lower twine sections with an inline band along the neck; tie the lower section to the moving trigger. Adjust slack and preload with the actual bands.',['stock_blue_handle','stock_blue_grip','stock_black_trigger','stock_trigger_pivot','band_overtravel','twine_trigger']);
  add('Check the complete assembly','Check jaw grip, parallel collar closure, button release, safe force, twine travel and camera framing before loaded use. Assembly states are illustrative; fit and forces need physical testing.',['stock_claws','stock_black_foot_-1','stock_black_foot_1']);
+ if(design==='v4'){
+  // Liner is part of all later jaw/installed states; omit the superseded clip.
+  for(const step of steps){
+   step.visible=step.visible.filter(n=>!n.startsWith('guide_'));
+   step.added=step.added.filter(n=>!n.startsWith('guide_'));
+   if(step.visible.includes('carrier'))step.visible.push('jaw_liner');
+   if(step.visible.includes('shaft_cap'))step.visible.push('cap_liner');
+   if(step.title==='Fixed jaw — off the grabber')step.text='Fit the full-face TPU jaw liner first; its continuous lips register through the existing windows. The liner replaces rigid contact skin, preserving the nominal neck opening.';
+   if(step.title==='Close with the shaft cap')step.text='Seat the cap liner and close the compact 97 mm clamp from the side. Its two screw-bearing ends move inward 5 mm each. Tighten opposing pairs evenly; liner grip remains physically unverified.';
+   if(step.title==='Position the actuator')step.text='Install the open-wrap bracket from the end of the shortened rail before tightening the single screw. Check service access physically; this is an assembly state, not an insertion simulation.';
+   if(step.title==='Route the twine')step.text='Route through the selected integral 3 × 2 mm shaft-cap passage toward the pulley. The path shown is schematic; tension and full-stroke clearance need physical checks.';
+  }
+  return steps.filter(s=>s.title!=='Clip on the TPU guide');
+ }
  return steps;
 }

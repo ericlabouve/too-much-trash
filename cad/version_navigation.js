@@ -8,9 +8,9 @@ try{
  function show(id){
   const v=versions.get(id)||versions.get(registry.default);
   select.value=v.id;const viewerUrl=new URL(v.viewer,location.href);
-  if(v.id==='v3'){
+  if(v.id==='v3'||v.id==='v4'){
    const requested=new URLSearchParams(location.search);
-   for(const key of ['sample','side','revision','focus'])if(requested.has(key))viewerUrl.searchParams.set(key,requested.get(key));
+   for(const key of ['sample','side','revision','focus','view'])if(requested.has(key))viewerUrl.searchParams.set(key,requested.get(key));
   }
   viewerUrl.searchParams.set("load",Date.now());frame.src=viewerUrl.href;frame.title=v.label;note.textContent=v.note;
   const url=new URL(location.href);url.searchParams.set('version',v.id);history.replaceState(null,'',url);

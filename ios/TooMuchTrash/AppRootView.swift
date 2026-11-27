@@ -1,8 +1,10 @@
 import SwiftUI
+import UIKit
 
 struct AppRootView: View {
     @StateObject private var account = AccountSession(configuration: APIConfiguration.initial(),
         automaticUploads: true, discoverAdminServers: true)
+    @State private var watchBridge = WatchBridge()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -14,12 +16,16 @@ struct AppRootView: View {
             }
         }
         .task {
+            watchBridge.start(account: account)
             await account.bootstrap()
             while !Task.isCancelled {
                 await account.probeAdmin()
                 account.syncTick()
                 do { try await Task.sleep(for: .seconds(3)) } catch { break }
             }
+        }
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            UIApplication.shared.isIdleTimerDisabled = phase == .active
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {

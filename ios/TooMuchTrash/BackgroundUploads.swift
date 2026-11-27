@@ -6,6 +6,8 @@ import UIKit
 final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     static let shared = BackgroundUploads()
     static let identifier = "org.toomuchtrash.video-uploads.v1"
+    static let largerChunkSize = 4 * 1024 * 1024
+    static let maximumConcurrentChunks = 4
     private let lock = NSLock()
     private struct Handler {
         let continuation: CheckedContinuation<(Data, HTTPURLResponse), Error>
@@ -65,8 +67,10 @@ final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Send
                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> (Data, HTTPURLResponse) {
         let tasks = await session.allTasks
         let key = request.value(forHTTPHeaderField: "Idempotency-Key")
+        let chunkSize = request.value(forHTTPHeaderField: "X-TMT-Chunk-Size")
         let existing = tasks.first { $0.originalRequest?.url == request.url &&
-            $0.originalRequest?.value(forHTTPHeaderField: "Idempotency-Key") == key }
+            $0.originalRequest?.value(forHTTPHeaderField: "Idempotency-Key") == key &&
+            $0.originalRequest?.value(forHTTPHeaderField: "X-TMT-Chunk-Size") == chunkSize }
         let box = CancellationBox()
         return try await withTaskCancellationHandler(operation: {
             try await withCheckedThrowingContinuation { continuation in
@@ -111,7 +115,14 @@ final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Send
               UUID(uuidString: parts[parts.count - 4]) == UUID(uuidString: key),
               ["video", "imu", "poses", "manifest"].contains(parts[parts.count - 2]),
               let index = Int(parts.last ?? ""), index >= 0 else { return nil }
-        return "\(key).\(parts[parts.count - 2]).\(index).chunk"
+        return Self.chunkFileName(episodeID: key, name: parts[parts.count - 2], index: index,
+                                  chunkSize: request.value(forHTTPHeaderField: "X-TMT-Chunk-Size"))
+    }
+
+    static func chunkFileName(episodeID: String, name: String, index: Int, chunkSize: String?) -> String {
+        let largerSize = String(largerChunkSize)
+        let suffix = chunkSize == largerSize ? "." + largerSize : ""
+        return "\(episodeID).\(name).\(index)\(suffix).chunk"
     }
 
     func cleanOrphanedChunks(captureID: UUID) async throws {

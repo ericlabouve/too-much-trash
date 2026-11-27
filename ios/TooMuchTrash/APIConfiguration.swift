@@ -142,6 +142,7 @@ enum ClientError: Error, Equatable {
     case rateLimited(TimeInterval)
     case quotaExceeded, missingMedia, validation, unsupportedMedia, uploadEmpty
     case idempotencyConflict
+    case captureProcessing, developmentRequired
 
     var message: String {
         switch self {
@@ -161,6 +162,8 @@ enum ClientError: Error, Equatable {
         case .unsupportedMedia: return "This video format is not supported. The local video is retained."
         case .uploadEmpty: return "This video is empty. The local file is retained for review."
         case .idempotencyConflict: return "This video conflicts with a previously accepted upload. Contact your administrator."
+        case .captureProcessing: return "Wait for backend processing to finish, then try again."
+        case .developmentRequired: return "A development login is required."
         }
     }
 }
@@ -176,6 +179,7 @@ struct Installation: Codable, Equatable {
     var episodeContractVersion: Int?
     var resumableEpisodeContractVersion: Int?
     var developmentSession: Bool?
+    var developmentVideoDeleteVersion: Int?
     enum CodingKeys: String, CodingKey {
         case installationID = "installation_id", installationName = "installation_name"
         case quotaBytes = "quota_bytes", quotaUploads = "quota_uploads"
@@ -184,6 +188,7 @@ struct Installation: Codable, Equatable {
         case episodeContractVersion = "episode_contract_version"
         case resumableEpisodeContractVersion = "resumable_episode_contract_version"
         case developmentSession = "development_session"
+        case developmentVideoDeleteVersion = "development_video_delete_version"
     }
 }
 

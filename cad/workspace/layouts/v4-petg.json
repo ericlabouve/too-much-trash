@@ -1,0 +1,65 @@
+{
+  "shaft_cap": [
+    [
+      53,
+      51
+    ],
+    "Z",
+    0,
+    "Approved bed face preserved; full projected footprints separated by >=3 mm"
+  ],
+  "carrier": [
+    [
+      119,
+      53
+    ],
+    "Z",
+    90,
+    "Approved bed face preserved; full projected footprints separated by >=3 mm"
+  ],
+  "sliding_jaw": [
+    [
+      156,
+      65
+    ],
+    "Z",
+    0,
+    "Approved bed face preserved; full projected footprints separated by >=3 mm"
+  ],
+  "actuator_bracket": [
+    [
+      23,
+      95
+    ],
+    "Z",
+    90,
+    "Approved bed face preserved; full projected footprints separated by >=3 mm"
+  ],
+  "plunger": [
+    [
+      25,
+      12
+    ],
+    "Z",
+    90,
+    "Approved bed face preserved; full projected footprints separated by >=3 mm"
+  ],
+  "pulley": [
+    [
+      151,
+      28
+    ],
+    "Z",
+    90,
+    "Approved bed face preserved; full projected footprints separated by >=3 mm"
+  ],
+  "pulley_axle": [
+    [
+      85,
+      10
+    ],
+    "Z",
+    90,
+    "Approved bed face preserved; full projected footprints separated by >=3 mm"
+  ]
+}

@@ -52,6 +52,11 @@ def require_admin_write(request: Request):
         fail(403, "admin_header_required", "Admin mutation header required")
 
 
+class UploadQuota(BaseModel):
+    quota_bytes: int = Field(ge=1, le=107374182400, strict=True)
+    quota_uploads: int = Field(ge=1, le=10000, strict=True)
+
+
 class InviteCreate(BaseModel):
     label: str = Field(min_length=1, max_length=80)
     expires_in_hours: int = Field(default=24, ge=1, le=168)
@@ -76,8 +81,12 @@ class DevelopmentEnrollment(BaseModel):
     key: str = Field(min_length=1, max_length=256)
 
 
+def development_keys_enabled():
+    return os.environ.get("TMT_DEVELOPMENT_KEYS", "false").lower() == "true"
+
+
 def require_development_keys():
-    if os.environ.get("TMT_DEVELOPMENT_KEYS", "false").lower() != "true":
+    if not development_keys_enabled():
         fail(404, "not_found", "Not found")
 
 
@@ -207,6 +216,44 @@ def revoke_installation(installation_id: UUID):
         fail(404, "installation_not_found", "Installation not found")
 
 
+@router.post("/admin/installations/{installation_id}/quota", status_code=204,
+             dependencies=[Depends(require_admin_write)])
+def update_installation_quota(installation_id: UUID, quota: UploadQuota):
+    from app.episode_transfer import reserved
+
+    with database() as connection:
+        installation = connection.execute(
+            """SELECT used_bytes, used_uploads, development_key_id FROM installations
+               WHERE id=%s AND revoked_at IS NULL FOR UPDATE""",
+            (installation_id,),
+        ).fetchone()
+        if not installation:
+            fail(404, "installation_not_found", "Active installation not found")
+        if installation["development_key_id"] is not None:
+            fail(409, "quota_unlimited", "Development installations have unlimited quota")
+        pending_bytes, pending_count = reserved(connection, installation_id)
+        if (quota.quota_bytes < installation["used_bytes"] + pending_bytes
+                or quota.quota_uploads < installation["used_uploads"] + pending_count):
+            fail(409, "quota_below_usage", "Quota cannot be lower than used and reserved capacity")
+        connection.execute(
+            "UPDATE installations SET quota_bytes=%s, quota_uploads=%s WHERE id=%s",
+            (quota.quota_bytes, quota.quota_uploads, installation_id),
+        )
+
+
+@router.post("/admin/invites/{invite_id}/quota", status_code=204, dependencies=[Depends(require_admin_write)])
+def update_invite_quota(invite_id: UUID, quota: UploadQuota):
+    with database() as connection:
+        invite = connection.execute(
+            """UPDATE invitations SET quota_bytes=%s, quota_uploads=%s
+               WHERE id=%s AND redeemed_at IS NULL AND revoked_at IS NULL AND expires_at > now()
+               RETURNING id""",
+            (quota.quota_bytes, quota.quota_uploads, invite_id),
+        ).fetchone()
+    if not invite:
+        fail(404, "invite_not_found", "Available invitation not found")
+
+
 @router.post("/auth/enroll", status_code=201)
 def enroll(payload: Enrollment, response: Response):
     no_store(response)
@@ -288,7 +335,8 @@ def require_installation(request: Request):
 def me(response: Response, installation=Depends(require_installation)):
     no_store(response)
     return {"installation_id": installation["id"], "media_contract_version": 1, "episode_contract_version": 1, "resumable_episode_contract_version": 1,
-            "development_session": installation["development_key_id"] is not None, **{
+            "development_session": installation["development_key_id"] is not None,
+            "development_video_delete_version": 1 if installation["development_key_id"] is not None and development_keys_enabled() else None, **{
         key: installation[key] for key in
         ("installation_name", "quota_bytes", "quota_uploads", "used_bytes", "used_uploads")}}
 

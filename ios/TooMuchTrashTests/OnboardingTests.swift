@@ -43,7 +43,13 @@ private final class StubAPI: CollectorAPI {
     var uploadCalls = 0
     var episodeUploadCalls = 0
     var episodeSupported = false
+    var resumableEpisodeSupported = false
+    var resumableChunkLimits: [UUID: Int] = [:]
+    var beforeResumableUpload: ((UUID) async throws -> Void)?
     var developmentSession = false
+    var developmentVideoDeleteVersion: Int?
+    var videoDeleteError: ClientError?
+    var deletedVideoIDs: [UUID] = []
     var reachable = false
     var servers: [AvailableServer] = []
     var catalogError: Error?
@@ -73,7 +79,9 @@ private final class StubAPI: CollectorAPI {
         if !meErrors.isEmpty { throw meErrors.removeFirst() }
         return Installation(installationID: confirmedID ?? id, installationName: "Test iPhone",
                             quotaBytes: 1000000, quotaUploads: 10, usedBytes: 0, usedUploads: 0, mediaContractVersion: 1,
-                            episodeContractVersion: episodeSupported ? 1 : nil, developmentSession: developmentSession)
+                            episodeContractVersion: episodeSupported ? 1 : nil,
+                            resumableEpisodeContractVersion: resumableEpisodeSupported ? 1 : nil, developmentSession: developmentSession,
+                            developmentVideoDeleteVersion: developmentVideoDeleteVersion)
     }
     func upload(file: URL, token: String) async throws -> MediaReceipt {
         uploadCalls += 1
@@ -107,6 +115,16 @@ private final class StubAPI: CollectorAPI {
     func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt {
         guard let receipt = acceptedUploads[captureID] else { throw ClientError.missingMedia }
         return receipt
+    }
+    func uploadResumableEpisode(directory: URL, episodeID: UUID, token: String, chunkLimit: Int,
+                                progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt {
+        resumableChunkLimits[episodeID] = chunkLimit
+        try await beforeResumableUpload?(episodeID)
+        return try await uploadEpisode(directory: directory, episodeID: episodeID, token: token, progress: progress)
+    }
+    func deleteVideo(captureID: UUID, token: String) async throws {
+        deletedVideoIDs.append(captureID)
+        if let videoDeleteError { throw videoDeleteError }
     }
     func endSession(refreshToken: String) async throws -> EndSessionReceipt {
         endCalls += 1
@@ -194,6 +212,83 @@ final class OnboardingTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: otherFile.path))
         XCTAssertEqual(CaptureQueue(directory: root).captures.map(\.filename), ["other.mov"])
         XCTAssertEqual(api.episodeUploadCalls, 0)
+    }
+
+    func testDeveloperDeleteRetainsLocalCopyUntilBackendAcknowledges() async throws {
+        let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        api.developmentSession = true
+        api.developmentVideoDeleteVersion = 1
+        try seed(api, vault)
+        let queue = CaptureQueue(directory: root), session = try account(api, vault, queue: queue)
+        await session.bootstrap()
+        XCTAssertTrue(session.supportsBackendVideoDeletion)
+        let file = root.appendingPathComponent("owned.mov")
+        try Data("test".utf8).write(to: file)
+        session.queueCapture(file, owner: try XCTUnwrap(session.captureOwner))
+        let capture = try XCTUnwrap(queue.captures.first)
+        let unsyncedFailure = await session.deleteCaptureHereAndBackend(capture.id)
+        XCTAssertNotNil(unsyncedFailure)
+        XCTAssertTrue(api.deletedVideoIDs.isEmpty)
+        try queue.record(MediaReceipt(id: UUID(), status: "completed", filename: "owned.mov", sizeBytes: 4,
+                                      clientCaptureID: capture.id), for: capture.id)
+
+        api.videoDeleteError = .server
+        let failed = await session.deleteCaptureHereAndBackend(capture.id)
+        XCTAssertNotNil(failed)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
+        XCTAssertNotNil(queue.captures.first?.receipt)
+
+        api.videoDeleteError = nil
+        let succeeded = await session.deleteCaptureHereAndBackend(capture.id)
+        XCTAssertNil(succeeded)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: file.path))
+        XCTAssertTrue(queue.captures.isEmpty)
+        XCTAssertEqual(api.deletedVideoIDs, [capture.id, capture.id])
+    }
+
+    func testTwoEpisodesShareFourChunkSlotsAndAnUploadConflictDoesNotStopTheQueue() async throws {
+        let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        api.episodeSupported = true
+        api.resumableEpisodeSupported = true
+        try seed(api, vault)
+        let queue = CaptureQueue(directory: root), session = try account(api, vault, queue: queue)
+        await session.bootstrap()
+        let owner = try XCTUnwrap(session.captureOwner)
+        let ownerFolder = try queue.recordingDirectory(origin: owner.origin, installationID: owner.installationID)
+        let episodes = (0..<3).map { _ in UUID() }
+        for id in episodes {
+            let folder = ownerFolder.appendingPathComponent("episode-\(id.uuidString.lowercased())", isDirectory: true)
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            for name in ["video.mp4", "imu.jsonl", "poses.jsonl"] {
+                try Data("test".utf8).write(to: folder.appendingPathComponent(name))
+            }
+            try Data("{\"episode_id\":\"\(id.uuidString)\",\"complete\":false}".utf8).write(to: folder.appendingPathComponent("manifest.json"))
+            session.queueEpisode(folder, id: id, owner: owner)
+        }
+
+        let bothStarted = expectation(description: "Two episodes upload concurrently")
+        bothStarted.expectedFulfillmentCount = 2
+        var waiting: [UUID: CheckedContinuation<Void, Never>] = [:]
+        api.beforeResumableUpload = { id in
+            guard id != episodes[2] else { return }
+            await withCheckedContinuation { continuation in
+                waiting[id] = continuation
+                bothStarted.fulfill()
+            }
+            if id == episodes[0] { throw ClientError.idempotencyConflict }
+        }
+        let upload = Task { await session.uploadPending() }
+        await fulfillment(of: [bothStarted], timeout: 5)
+        XCTAssertEqual(Set(session.uploadProgress.keys), Set(episodes.prefix(2)))
+        XCTAssertEqual(api.resumableChunkLimits, [episodes[0]: 2, episodes[1]: 2])
+        for continuation in waiting.values { continuation.resume() }
+        await upload.value
+        XCTAssertEqual(api.resumableChunkLimits[episodes[2]], 4)
+        XCTAssertNotNil(queue.captures.first(where: { $0.id == episodes[0] })?.uploadBlocked)
+        XCTAssertEqual(Set(queue.captures.filter { $0.receipt != nil }.map(\.id)), Set(episodes.dropFirst()))
+        XCTAssertTrue(session.uploadProgress.isEmpty)
     }
 
     func testEpisodeLookupWithMismatchedDigestDoesNotMarkSynced() async throws {
@@ -660,7 +755,7 @@ final class OnboardingTests: XCTestCase {
 
         let cleanup = try XCTUnwrap(session.checkRetention())
         await fulfillment(of: [started], timeout: 5)
-        XCTAssertEqual(session.uploadingID, capture.id)
+        XCTAssertNotNil(session.uploadProgress[capture.id])
         XCTAssertNil(session.checkRetention())
         let deletedDuringUpload = await session.deleteLocalCapture(capture.id)
         XCTAssertFalse(deletedDuringUpload)
@@ -938,5 +1033,29 @@ final class OnboardingTests: XCTestCase {
         await session.continueLogin()
         XCTAssertEqual(session.phase, .authorized)
         XCTAssertNotNil(session.captureOwner)
+    }
+
+    func testAutomaticUploadContinuesToNextRecordingAfterAppBecomesInactive() async throws {
+        let api = StubAPI(), vault = MemoryVault(), directory = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try seed(api, vault)
+        let queue = CaptureQueue(directory: directory)
+        let session = AccountSession(configuration: try configuration(), vault: vault, queue: queue,
+                                     automaticUploads: true, apiFactory: { _ in api })
+        await session.bootstrap()
+        api.beforeUpload = { [weak session, weak api] in
+            if api?.uploadCalls == 1 { session?.suspend() }
+        }
+        for name in ["first.mov", "second.mov"] {
+            let file = directory.appendingPathComponent(name)
+            try Data("video".utf8).write(to: file)
+            session.queueCapture(file, owner: session.captureOwner)
+        }
+        for _ in 0..<200 {
+            if session.pendingCaptures.isEmpty { break }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        XCTAssertEqual(api.uploadCalls, 2)
+        XCTAssertEqual(queue.captures.compactMap(\.receipt).count, 2)
     }
 }

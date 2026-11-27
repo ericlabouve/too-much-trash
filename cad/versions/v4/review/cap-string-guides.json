@@ -1,0 +1,174 @@
+{
+  "baseline": {
+    "total_g": 24.082170486450195,
+    "total_minutes": 162.70517578125,
+    "deposited_g_by_role": {
+      "model": 23.7061
+    },
+    "objects": {
+      "baseline": {
+        "deposited_g_by_role": {
+          "model": 23.7061
+        },
+        "deposited_xy_bounds": [
+          [
+            41.71,
+            44.071
+          ],
+          [
+            138.29,
+            135.93
+          ]
+        ],
+        "support_z_mm": null
+      }
+    },
+    "hashes": {
+      "cuff-fit-input.3mf": "b166eb21a368851d655ad5ae3352ea314f23c1801c2a2db8831b7d854b549944",
+      "cuff-fit.gcode.3mf": "912c669d972ff856f0f3810237047c1bb2b464dcd111d9039bf7cc9dc312ae19",
+      "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+      "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+      "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+    },
+    "effective_settings": {
+      "printer_model": "Bambu Lab A1 mini",
+      "nozzle_diameter": [
+        "0.4"
+      ],
+      "layer_height": "0.12",
+      "initial_layer_print_height": "0.2",
+      "curr_bed_type": "Textured PEI Plate",
+      "support_type": "normal(auto)",
+      "support_style": "snug",
+      "support_on_build_plate_only": "0",
+      "support_threshold_angle": "30",
+      "support_top_z_distance": "0.24",
+      "support_bottom_z_distance": "0.24",
+      "support_object_xy_distance": "0.4",
+      "support_interface_top_layers": "2",
+      "support_interface_bottom_layers": "2",
+      "support_interface_spacing": "0.5",
+      "nozzle_temperature": [
+        "245"
+      ],
+      "nozzle_temperature_initial_layer": [
+        "250"
+      ],
+      "textured_plate_temp": [
+        "70"
+      ],
+      "textured_plate_temp_initial_layer": [
+        "70"
+      ],
+      "print_sequence": "by layer",
+      "brim_type": "no_brim",
+      "raft_layers": "0",
+      "bridge_no_support": "0",
+      "bridge_flow": "1",
+      "bridge_speed": [
+        "50"
+      ],
+      "filament_bridge_speed": [
+        "25"
+      ]
+    }
+  },
+  "guided": {
+    "total_g": 24.0972843170166,
+    "total_minutes": 163.42600911458334,
+    "deposited_g_by_role": {
+      "model": 23.7004
+    },
+    "objects": {
+      "guided": {
+        "deposited_g_by_role": {
+          "model": 23.7004
+        },
+        "deposited_xy_bounds": [
+          [
+            41.71,
+            44.071
+          ],
+          [
+            138.29,
+            135.93
+          ]
+        ],
+        "support_z_mm": null
+      }
+    },
+    "hashes": {
+      "cuff-fit-input.3mf": "feb2672e8b06214ddfc4b424f0b6b78ad77cc6b3b67862f2bcaf3f0b7cd99f2c",
+      "cuff-fit.gcode.3mf": "592728cf46d960e45c267c9c44f26a61ed7663f80416bb8b1f3d8bb35eeef695",
+      "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+      "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+      "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+    },
+    "effective_settings": {
+      "printer_model": "Bambu Lab A1 mini",
+      "nozzle_diameter": [
+        "0.4"
+      ],
+      "layer_height": "0.12",
+      "initial_layer_print_height": "0.2",
+      "curr_bed_type": "Textured PEI Plate",
+      "support_type": "normal(auto)",
+      "support_style": "snug",
+      "support_on_build_plate_only": "0",
+      "support_threshold_angle": "30",
+      "support_top_z_distance": "0.24",
+      "support_bottom_z_distance": "0.24",
+      "support_object_xy_distance": "0.4",
+      "support_interface_top_layers": "2",
+      "support_interface_bottom_layers": "2",
+      "support_interface_spacing": "0.5",
+      "nozzle_temperature": [
+        "245"
+      ],
+      "nozzle_temperature_initial_layer": [
+        "250"
+      ],
+      "textured_plate_temp": [
+        "70"
+      ],
+      "textured_plate_temp_initial_layer": [
+        "70"
+      ],
+      "print_sequence": "by layer",
+      "brim_type": "no_brim",
+      "raft_layers": "0",
+      "bridge_no_support": "0",
+      "bridge_flow": "1",
+      "bridge_speed": [
+        "50"
+      ],
+      "filament_bridge_speed": [
+        "25"
+      ]
+    }
+  },
+  "geometry": {
+    "bounds_mm": [
+      3,
+      2
+    ],
+    "clear_circle_mm": 2,
+    "cord_mm": 1,
+    "bore_ligament_mm": 1.35,
+    "centers_xy_mm": [
+      [
+        -1,
+        -22.25
+      ],
+      [
+        -1,
+        22.25
+      ]
+    ],
+    "direction": "Z through handle-end bosses"
+  },
+  "limits": [
+    "Unprinted: threading, wear, strength and loaded derailment prevention require physical checks.",
+    "Guide position targets displayed bare-phone actuator; other rail positions need routing review."
+  ]
+}

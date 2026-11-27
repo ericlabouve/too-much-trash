@@ -1,3 +1,4 @@
+import Accelerate
 import AVFoundation
 import ARKit
 import Combine
@@ -392,6 +393,37 @@ final class ARFrameCollector: NSObject, ARSessionDelegate {
     func session(_ session: ARSession, didFailWithError error: Error) { onInterruption?("arkit_failed") }
 }
 
+/// The full native frame maps to the encoded content rectangle. From the
+/// upper-left pixel edge, scale by content/source dimensions, then translate.
+struct EncodedFrameGeometry: Codable, Hashable, Sendable {
+    static let width = 960
+    static let height = 720
+    static let coordinates = "top_left_pixel_edges_scale_to_content_then_translate"
+
+    let sourceWidth: Int
+    let sourceHeight: Int
+    let encodedWidth: Int
+    let encodedHeight: Int
+    let contentX: Int
+    let contentY: Int
+    let contentWidth: Int
+    let contentHeight: Int
+
+    init(sourceWidth: Int, sourceHeight: Int, encodedWidth: Int = Self.width, encodedHeight: Int = Self.height) {
+        self.sourceWidth = sourceWidth
+        self.sourceHeight = sourceHeight
+        self.encodedWidth = encodedWidth
+        self.encodedHeight = encodedHeight
+        let scale = min(Double(encodedWidth) / Double(sourceWidth), Double(encodedHeight) / Double(sourceHeight))
+        // Multiples of four keep the centered content origin and both edges
+        // aligned to whole chroma samples in 4:2:0 buffers.
+        contentWidth = max(4, Int((Double(sourceWidth) * scale / 4).rounded()) * 4)
+        contentHeight = max(4, Int((Double(sourceHeight) * scale / 4).rounded()) * 4)
+        contentX = (encodedWidth - contentWidth) / 2
+        contentY = (encodedHeight - contentHeight) / 2
+    }
+}
+
 /// Encodes ARKit frames into independently readable MP4 segments. All methods
 /// must be called on the AR frame queue; callbacks may arrive on another queue.
 final class ARVideoSegmentWriter {
@@ -402,11 +434,13 @@ final class ARVideoSegmentWriter {
         let frameCount: Int
         let error: String?
         var frameTimestamps: [TimeInterval] = []
+        var geometry: EncodedFrameGeometry?
     }
     private struct OpenSegment {
         let writer: AVAssetWriter
         let input: AVAssetWriterInput
         let adaptor: AVAssetWriterInputPixelBufferAdaptor
+        let geometry: EncodedFrameGeometry
         let url: URL
         let first: TimeInterval
         var last: TimeInterval
@@ -415,22 +449,30 @@ final class ARVideoSegmentWriter {
     }
     private let directory: URL
     private let segmentDuration: TimeInterval
+    private let encodedWidth: Int
+    private let encodedHeight: Int
     private var current: OpenSegment?
     var onSegmentOpened: ((URL, TimeInterval) -> Void)?
     var onSegment: ((Segment) -> Void)?
     var onFrameDropped: ((TimeInterval, String) -> Void)?
 
-    init(directory: URL, segmentDuration: TimeInterval = 1) throws {
+    init(directory: URL, segmentDuration: TimeInterval = 1,
+         encodedWidth: Int = EncodedFrameGeometry.width, encodedHeight: Int = EncodedFrameGeometry.height) throws {
         precondition(segmentDuration > 0 && segmentDuration.isFinite)
+        precondition(encodedWidth > 0 && encodedHeight > 0 && encodedWidth % 4 == 0 && encodedHeight % 4 == 0)
         self.directory = directory
         self.segmentDuration = segmentDuration
+        self.encodedWidth = encodedWidth
+        self.encodedHeight = encodedHeight
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     }
 
     func append(_ source: CVPixelBuffer, timestamp: TimeInterval) throws {
         guard timestamp.isFinite else { throw SegmentError.invalidTimestamp }
         if let open = current, timestamp < open.last { onFrameDropped?(timestamp, "out_of_order"); return }
-        if let open = current, timestamp - open.first >= segmentDuration { finishCurrent() }
+        if let open = current, timestamp - open.first >= segmentDuration ||
+            CVPixelBufferGetWidth(source) != open.geometry.sourceWidth ||
+            CVPixelBufferGetHeight(source) != open.geometry.sourceHeight { finishCurrent() }
         if current == nil {
             let segment = try makeSegment(source, timestamp: timestamp)
             current = segment
@@ -444,8 +486,15 @@ final class ARVideoSegmentWriter {
         guard CVPixelBufferPoolCreatePixelBuffer(nil, pool, &copied) == kCVReturnSuccess, let copied else {
             onFrameDropped?(timestamp, "pixel_buffer_allocation"); return
         }
-        try copyPixels(from: source, to: copied)
-        CVBufferPropagateAttachments(source, copied)
+        try scalePixels(from: source, to: copied, geometry: open.geometry)
+        // Propagate color information without copying geometry in native pixels.
+        for key in [kCVImageBufferColorPrimariesKey, kCVImageBufferTransferFunctionKey,
+                    kCVImageBufferYCbCrMatrixKey, kCVImageBufferChromaLocationTopFieldKey,
+                    kCVImageBufferChromaLocationBottomFieldKey] {
+            if let value = CVBufferCopyAttachment(source, key, nil) {
+                CVBufferSetAttachment(copied, key, value, .shouldPropagate)
+            }
+        }
         let pts = CMTime(seconds: timestamp, preferredTimescale: 1_000_000_000)
         guard open.adaptor.append(copied, withPresentationTime: pts) else {
             onFrameDropped?(timestamp, "encoder_rejected_frame")
@@ -466,7 +515,8 @@ final class ARVideoSegmentWriter {
         open.writer.finishWriting {
             let failure = open.writer.status == .completed ? nil : (open.writer.error?.localizedDescription ?? "segment_encoding_failed")
             callback?(Segment(url: open.url, firstTimestamp: open.first, lastTimestamp: open.last,
-                              frameCount: open.frames, error: failure, frameTimestamps: open.frameTimestamps))
+                              frameCount: open.frames, error: failure, frameTimestamps: open.frameTimestamps,
+                              geometry: open.geometry))
         }
     }
 
@@ -479,45 +529,76 @@ final class ARVideoSegmentWriter {
     }
 
     private func makeSegment(_ source: CVPixelBuffer, timestamp: TimeInterval) throws -> OpenSegment {
-        let width = CVPixelBufferGetWidth(source), height = CVPixelBufferGetHeight(source)
+        let geometry = EncodedFrameGeometry(sourceWidth: CVPixelBufferGetWidth(source),
+            sourceHeight: CVPixelBufferGetHeight(source), encodedWidth: encodedWidth, encodedHeight: encodedHeight)
         let url = directory.appendingPathComponent("segment-\(UUID().uuidString).mp4")
         let writer = try AVAssetWriter(outputURL: url, fileType: .mp4)
         let input = AVAssetWriterInput(mediaType: .video, outputSettings: [
-            AVVideoCodecKey: AVVideoCodecType.h264, AVVideoWidthKey: width, AVVideoHeightKey: height
+            AVVideoCodecKey: AVVideoCodecType.h264, AVVideoWidthKey: encodedWidth, AVVideoHeightKey: encodedHeight
         ])
         input.expectsMediaDataInRealTime = true
         guard writer.canAdd(input) else { throw SegmentError.writer }
         writer.add(input)
         let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: [
             kCVPixelBufferPixelFormatTypeKey as String: CVPixelBufferGetPixelFormatType(source),
-            kCVPixelBufferWidthKey as String: width, kCVPixelBufferHeightKey as String: height,
+            kCVPixelBufferWidthKey as String: encodedWidth, kCVPixelBufferHeightKey as String: encodedHeight,
             kCVPixelBufferIOSurfacePropertiesKey as String: [:]
         ])
         guard writer.startWriting() else { throw writer.error ?? SegmentError.writer }
         writer.startSession(atSourceTime: CMTime(seconds: timestamp, preferredTimescale: 1_000_000_000))
-        return OpenSegment(writer: writer, input: input, adaptor: adaptor, url: url, first: timestamp, last: timestamp, frames: 0)
+        return OpenSegment(writer: writer, input: input, adaptor: adaptor, geometry: geometry,
+                           url: url, first: timestamp, last: timestamp, frames: 0)
     }
 
-    private func copyPixels(from source: CVPixelBuffer, to destination: CVPixelBuffer) throws {
-        guard CVPixelBufferGetPixelFormatType(source) == CVPixelBufferGetPixelFormatType(destination),
-              CVPixelBufferGetWidth(source) == CVPixelBufferGetWidth(destination),
-              CVPixelBufferGetHeight(source) == CVPixelBufferGetHeight(destination),
-              CVPixelBufferGetPlaneCount(source) == CVPixelBufferGetPlaneCount(destination) else { throw SegmentError.pixelBuffer }
-        CVPixelBufferLockBaseAddress(source, .readOnly)
-        CVPixelBufferLockBaseAddress(destination, [])
-        defer { CVPixelBufferUnlockBaseAddress(destination, []); CVPixelBufferUnlockBaseAddress(source, .readOnly) }
-        let planes = CVPixelBufferGetPlaneCount(source)
-        for plane in 0..<max(planes, 1) {
-            let sourceBase = planes == 0 ? CVPixelBufferGetBaseAddress(source) : CVPixelBufferGetBaseAddressOfPlane(source, plane)
-            let destinationBase = planes == 0 ? CVPixelBufferGetBaseAddress(destination) : CVPixelBufferGetBaseAddressOfPlane(destination, plane)
-            let sourceStride = planes == 0 ? CVPixelBufferGetBytesPerRow(source) : CVPixelBufferGetBytesPerRowOfPlane(source, plane)
-            let destinationStride = planes == 0 ? CVPixelBufferGetBytesPerRow(destination) : CVPixelBufferGetBytesPerRowOfPlane(destination, plane)
-            let rows = planes == 0 ? CVPixelBufferGetHeight(source) : CVPixelBufferGetHeightOfPlane(source, plane)
-            guard let sourceBase, let destinationBase else { throw SegmentError.pixelBuffer }
-            for row in 0..<rows {
-                destinationBase.advanced(by: row * destinationStride).copyMemory(from: sourceBase.advanced(by: row * sourceStride), byteCount: min(sourceStride, destinationStride))
-            }
+    private func scalePixels(from source: CVPixelBuffer, to destination: CVPixelBuffer,
+                             geometry: EncodedFrameGeometry) throws {
+        let format = CVPixelBufferGetPixelFormatType(source)
+        guard format == CVPixelBufferGetPixelFormatType(destination),
+              CVPixelBufferLockBaseAddress(source, .readOnly) == kCVReturnSuccess else { throw SegmentError.pixelBuffer }
+        defer { CVPixelBufferUnlockBaseAddress(source, .readOnly) }
+        guard CVPixelBufferLockBaseAddress(destination, []) == kCVReturnSuccess else { throw SegmentError.pixelBuffer }
+        defer { CVPixelBufferUnlockBaseAddress(destination, []) }
+        switch format {
+        case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange, kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
+            let black = format == kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange ? 16 : 0
+            try scalePlane(from: source, to: destination, geometry: geometry, plane: 0, bytesPerPixel: 1, black: black)
+            try scalePlane(from: source, to: destination, geometry: geometry, plane: 1, bytesPerPixel: 2, black: 128)
+        case kCVPixelFormatType_32BGRA:
+            try scalePlane(from: source, to: destination, geometry: geometry, plane: nil, bytesPerPixel: 4, black: 0)
+        default:
+            throw SegmentError.pixelBuffer
         }
+    }
+
+    private func scalePlane(from source: CVPixelBuffer, to destination: CVPixelBuffer,
+                            geometry: EncodedFrameGeometry, plane: Int?, bytesPerPixel: Int, black: Int) throws {
+        func buffer(_ pixels: CVPixelBuffer) throws -> vImage_Buffer {
+            let base = plane.map { CVPixelBufferGetBaseAddressOfPlane(pixels, $0) } ?? CVPixelBufferGetBaseAddress(pixels)
+            guard let base else { throw SegmentError.pixelBuffer }
+            let width = plane.map { CVPixelBufferGetWidthOfPlane(pixels, $0) } ?? CVPixelBufferGetWidth(pixels)
+            let height = plane.map { CVPixelBufferGetHeightOfPlane(pixels, $0) } ?? CVPixelBufferGetHeight(pixels)
+            let stride = plane.map { CVPixelBufferGetBytesPerRowOfPlane(pixels, $0) } ?? CVPixelBufferGetBytesPerRow(pixels)
+            return vImage_Buffer(data: base, height: vImagePixelCount(height), width: vImagePixelCount(width), rowBytes: stride)
+        }
+
+        var input = try buffer(source)
+        var output = try buffer(destination)
+        if geometry.contentX != 0 || geometry.contentY != 0 {
+            let divisor = plane == 1 ? 2 : 1
+            memset(output.data, Int32(black), output.rowBytes * Int(output.height))
+            output.data = output.data.advanced(by: (geometry.contentY / divisor) * output.rowBytes +
+                                               (geometry.contentX / divisor) * bytesPerPixel)
+            output.width = vImagePixelCount(geometry.contentWidth / divisor)
+            output.height = vImagePixelCount(geometry.contentHeight / divisor)
+        }
+        let flags = vImage_Flags(kvImageHighQualityResampling)
+        let result: vImage_Error
+        switch bytesPerPixel {
+        case 1: result = vImageScale_Planar8(&input, &output, nil, flags)
+        case 2: result = vImageScale_CbCr8(&input, &output, nil, flags)
+        default: result = vImageScale_ARGB8888(&input, &output, nil, flags)
+        }
+        guard result == kvImageNoError else { throw SegmentError.pixelBuffer }
     }
 
     private enum SegmentError: Error { case invalidTimestamp, pixelBuffer, writer }
@@ -560,6 +641,8 @@ final class EpisodeJournal: @unchecked Sendable {
             let attitudeQuaternionOrder: String
             let cameraTransform: String
             let cameraIntrinsics: String
+            let videoFrameCoordinates: String
+            let videoFrameGeometry: [EncodedFrameGeometry]
             let streams: [String: Coverage]
             let gaps: [Gap]
             let videoSegmentJoins: [EpisodeVideoAssembler.JoinTiming]
@@ -695,7 +778,7 @@ final class EpisodeJournal: @unchecked Sendable {
     /// Finalization requires explicit coverage/clock validation from the
     /// coordinator; a produced file alone does not establish synchronized data.
     func finalize(video: URL, release: TimeInterval?, end: TimeInterval,
-                  validatedCoverageAndClock: Bool) throws {
+                  validatedCoverageAndClock: Bool, videoFrameGeometry: [EncodedFrameGeometry] = []) throws {
         guard end.isFinite, end >= window.pressedAt,
               release.map({ $0.isFinite && $0 >= window.pressedAt && $0 <= end }) ?? true else { throw ClientError.storage }
         guard let imu, let poses else { throw ClientError.storage }
@@ -723,6 +806,8 @@ final class EpisodeJournal: @unchecked Sendable {
                 triggerSource: window.source,
                 accelerationUnits: "g", angularVelocityUnits: "rad/s", attitudeQuaternionOrder: "x,y,z,w",
                 cameraTransform: "camera_to_ar_world_column_major", cameraIntrinsics: "column_major_pixels",
+                videoFrameCoordinates: EncodedFrameGeometry.coordinates,
+                videoFrameGeometry: videoFrameGeometry,
                 streams: coverage, gaps: gaps, videoSegmentJoins: videoSegmentJoins))
         let manifestURL = directory.appendingPathComponent("manifest.json")
         try encoder.encode(manifest).write(to: manifestURL, options: .atomic)
@@ -768,7 +853,12 @@ enum EpisodeVideoAssembler {
         let estimatedFrameInterval: TimeInterval?
         let classification: String
     }
-    struct Result { let url: URL; let gaps: [Gap]; let joins: [JoinTiming] }
+    struct Result {
+        let url: URL
+        let gaps: [Gap]
+        let joins: [JoinTiming]
+        let geometry: [EncodedFrameGeometry]
+    }
 
     /// Distinguish a sub-frame container join from a missing expected source
     /// frame. Retain the exact discrepancy as a diagnostic in either case.
@@ -809,6 +899,7 @@ enum EpisodeVideoAssembler {
         var cursor = start
         var gaps: [Gap] = []
         var joins: [JoinTiming] = []
+        var geometry: [EncodedFrameGeometry] = []
         var previousSegment: ARVideoSegmentWriter.Segment?
         for segment in segments.sorted(by: { $0.firstTimestamp < $1.firstTimestamp }) {
             guard segment.error == nil, segment.frameCount > 0 else { continue }
@@ -832,6 +923,7 @@ enum EpisodeVideoAssembler {
             let sourceStart = CMTimeAdd(trackRange.start, CMTime(seconds: from - actualStart, preferredTimescale: scale))
             let range = CMTimeRange(start: sourceStart, duration: CMTime(seconds: to - from, preferredTimescale: scale))
             try destination.insertTimeRange(range, of: track, at: CMTime(seconds: from - start, preferredTimescale: scale))
+            if let mapping = segment.geometry, !geometry.contains(mapping) { geometry.append(mapping) }
             cursor = to
             previousSegment = segment
         }
@@ -858,7 +950,7 @@ enum EpisodeVideoAssembler {
               intendedDuration.isFinite, exportedDuration + 0.1 >= intendedDuration else {
             throw ExportLimitError.oversizedOrTruncated
         }
-        return Result(url: output, gaps: gaps, joins: joins)
+        return Result(url: output, gaps: gaps, joins: joins, geometry: geometry)
     }
 }
 
@@ -1216,7 +1308,8 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
                             journal.noteVideoSegmentJoins(result.joins)
                             if let reason = window.incompleteReason { journal.noteGap(stream: "capture", time: end, reason: reason) }
                             // Clock and complete-stream coverage must be validated on real hardware.
-                            try journal.finalize(video: result.url, release: window.releasedAt, end: end, validatedCoverageAndClock: false)
+                            try journal.finalize(video: result.url, release: window.releasedAt, end: end,
+                                                 validatedCoverageAndClock: false, videoFrameGeometry: result.geometry)
                             self.onEpisode?(journal.directory, window.id)
                             self.publish("Episode saved.")
                         } catch {

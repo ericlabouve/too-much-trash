@@ -24,6 +24,8 @@ VERSIONS = {
     'v3': {'source': 'versions/v3/source', 'viewer': 'versions/v3/viewer.html',
            'check': 'workspace_check.py', 'report': 'versions/v3/review/workspace-validation.json'},
 }
+VIEWERS = {version: data['viewer'] for version, data in VERSIONS.items()}
+VIEWERS['v4'] = 'versions/v4/viewer.html'
 
 
 def output_path(version: str, operation: str, requested: str | None) -> Path:
@@ -115,10 +117,10 @@ def parser() -> argparse.ArgumentParser:
             q.add_argument('--operation', choices=('build', 'check'), default='build')
         q.add_argument('--output', help='new snapshot directory (default: unique cad/build/<version>/ directory)')
     q = sub.add_parser('build-site', help='build an isolated viewer site')
-    q.add_argument('--versions', nargs='+', choices=[*VERSIONS, 'all'], default=['all'])
+    q.add_argument('--versions', nargs='+', choices=[*VIEWERS, 'all'], default=['all'])
     q.add_argument('--output', help='new directory under cad/build/ (default: unique cad/build/site directory)')
     q = sub.add_parser('serve', help='serve a viewer site on loopback')
-    q.add_argument('version', choices=VERSIONS, nargs='?', default='v3')
+    q.add_argument('version', choices=VIEWERS, nargs='?', default='v3')
     q.add_argument('--port', type=int, default=8765)
     q.add_argument('--site', help='built site directory; omit to serve the legacy CAD tree')
     return p
@@ -141,10 +143,13 @@ def main() -> int:
         for version, data in VERSIONS.items():
             check = f'{data["source"]}/{data["check"]}' if version == 'v1' else f'workspace/check.py {version} (copied into snapshot)'
             print(f'{version}: viewer={data["viewer"]}; build={data["source"]}/build.py; check={check}')
+        for version, viewer in VIEWERS.items():
+            if version not in VERSIONS:
+                print(f'{version}: viewer={viewer}; concept review')
         return 0
     if args.command == 'build-site':
         from workspace.site import build_site
-        versions = list(VERSIONS) if 'all' in args.versions else list(dict.fromkeys(args.versions))
+        versions = list(VIEWERS) if 'all' in args.versions else list(dict.fromkeys(args.versions))
         dest = output_path('site', 'site', args.output)
         if CAD / 'build' not in dest.parents:
             raise ValueError('site output must be a new directory under cad/build/ for artifact restoration')
@@ -154,10 +159,10 @@ def main() -> int:
             raise ValueError('port must be between 0 and 65535')
         from workspace.site import SiteHandler
         root = Path(args.site).expanduser().resolve() if args.site else CAD
-        if not (root / VERSIONS[args.version]['viewer']).is_file():
+        if not (root / VIEWERS[args.version]).is_file():
             raise ValueError(f'missing viewer in {root}; run build-site --versions all and serve --site PATH')
         manifest = root / ('print/manifest.json' if args.version == 'v1' else f'versions/{args.version}/review/manifest.json')
-        if not manifest.is_file():
+        if args.version in VERSIONS and not manifest.is_file():
             raise ValueError(f'missing viewer manifest {manifest}; run build-site --versions all and serve --site PATH')
         if not args.site:
             print('Serving legacy tree; if assets are missing, run build-site --versions all or restore historical artifacts.', flush=True)

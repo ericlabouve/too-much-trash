@@ -1,0 +1,132 @@
+{
+  "summary": "Both concepts: 0 g supports / interface \u00b7 PETG 0.12 mm \u00b7 automatic supports ON",
+  "objects": {
+    "a-bracket": {
+      "deposited_g_by_role": {
+        "model": 5.603
+      },
+      "deposited_xy_bounds": [
+        [
+          20.922,
+          36.61
+        ],
+        [
+          69.078,
+          73.39
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "a-plunger": {
+      "deposited_g_by_role": {
+        "model": 0.981
+      },
+      "deposited_xy_bounds": [
+        [
+          72.21,
+          36.135
+        ],
+        [
+          87.79,
+          73.865
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "a-stop": {
+      "deposited_g_by_role": {
+        "model": 0.0466
+      },
+      "deposited_xy_bounds": [
+        [
+          98.011,
+          53.012
+        ],
+        [
+          101.986,
+          56.989
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "b-bracket": {
+      "deposited_g_by_role": {
+        "model": 5.582
+      },
+      "deposited_xy_bounds": [
+        [
+          20.922,
+          96.61
+        ],
+        [
+          69.078,
+          133.39
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "b-plunger": {
+      "deposited_g_by_role": {
+        "model": 1.0411
+      },
+      "deposited_xy_bounds": [
+        [
+          72.21,
+          96.135
+        ],
+        [
+          87.79,
+          133.865
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "b-stop": {
+      "deposited_g_by_role": {
+        "model": 0.0242
+      },
+      "deposited_xy_bounds": [
+        [
+          107.41,
+          114.31
+        ],
+        [
+          112.59,
+          115.69
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "hashes": {
+    "cuff-fit-input.3mf": "849d79e094041b6d26a2391d912f8f7a98acab3e2e6c67b3d787444176179454",
+    "cuff-fit.gcode.3mf": "212b553c6de14dc290b16b5bf243fac51758fabec6dbeec216abd62d2f673cd7",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "geometry": {
+    "a": {
+      "first_contact_sample_mm": 6.1,
+      "slider_insertion_max_overlap_mm3": 0.0,
+      "stop_installation_max_overlap_mm3": 0.0
+    },
+    "b": {
+      "first_contact_sample_mm": 3.3,
+      "slider_insertion_max_overlap_mm3": 0.0,
+      "stop_installation_max_overlap_mm3": 0.0
+    }
+  },
+  "limitations": [
+    "Offline slice evidence only. Removable-stop retention not physically tested.",
+    "Travel limits do not establish safe phone button stroke."
+  ],
+  "slice_recipe": {
+    "printer": "Bambu A1 mini",
+    "nozzle_mm": 0.4,
+    "layer_mm": 0.12,
+    "filament": "Bambu PETG Translucent",
+    "automatic_supports": true,
+    "bridge_no_support": false
+  }
+}

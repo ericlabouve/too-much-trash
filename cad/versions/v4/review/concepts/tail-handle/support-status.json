@@ -1,0 +1,72 @@
+{
+  "summary": "0 g supports / interface \u00b7 PETG 0.12 mm \u00b7 automatic supports ON",
+  "objects": {
+    "plunger": {
+      "deposited_g_by_role": {
+        "model": 0.9773
+      },
+      "deposited_xy_bounds": [
+        [
+          82.21,
+          70.135
+        ],
+        [
+          97.79,
+          109.865
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "hashes": {
+    "cuff-fit-input.3mf": "39b0946311c9d938b092deeb523be89e35bf323e6fb11c97213efed13adc5015",
+    "cuff-fit.gcode.3mf": "46633064e5698a2c68fb8a0217e77154abeec031dbc72decf39eebc7bb527422",
+    "machine.json": "749a06167b7f533ad79483afcdc814e196d1881101210b5df7072eab7c8484b1",
+    "process.json": "f3020aa3be6890b1f545c4a91df97628b2ef3d7781d82651b39773ea64101753",
+    "filament.json": "8c85ef7a40222224526110dd0fa02e4d2966320a1a642e7b7f29a0e37a42b7fe"
+  },
+  "effective_settings": {
+    "printer_model": "Bambu Lab A1 mini",
+    "nozzle_diameter": [
+      "0.4"
+    ],
+    "layer_height": "0.12",
+    "initial_layer_print_height": "0.2",
+    "curr_bed_type": "Textured PEI Plate",
+    "support_type": "normal(auto)",
+    "support_style": "snug",
+    "support_on_build_plate_only": "0",
+    "support_threshold_angle": "30",
+    "support_top_z_distance": "0.24",
+    "support_bottom_z_distance": "0.24",
+    "support_object_xy_distance": "0.4",
+    "support_interface_top_layers": "2",
+    "support_interface_bottom_layers": "2",
+    "support_interface_spacing": "0.5",
+    "nozzle_temperature": [
+      "245"
+    ],
+    "nozzle_temperature_initial_layer": [
+      "250"
+    ],
+    "textured_plate_temp": [
+      "70"
+    ],
+    "textured_plate_temp_initial_layer": [
+      "70"
+    ],
+    "print_sequence": "by layer",
+    "brim_type": "no_brim",
+    "raft_layers": "0",
+    "bridge_no_support": "0",
+    "bridge_flow": "1",
+    "bridge_speed": [
+      "50"
+    ],
+    "filament_bridge_speed": [
+      "25"
+    ]
+  },
+  "source_geometry": "8 mm tailward handle shift; shaft and foot unchanged",
+  "physical_validation": false
+}

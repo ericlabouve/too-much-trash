@@ -38,9 +38,9 @@ def build(c, version='v3', output=None):
 
 
 @task(auto_shortflags=False)
-def release(c, output=None):
-    """Build and package unsliced V3 material projects."""
-    result = subprocess.run([sys.executable, str(Path(__file__).resolve().parent / 'workspace/release.py'), *_option('--output', output)], check=False)
+def release(c, version='v4', output=None):
+    """Build and package unsliced material projects."""
+    result = subprocess.run([sys.executable, str(Path(__file__).resolve().parent / 'workspace/release.py'), *_option('--version', version), *_option('--output', output)], check=False)
     if result.returncode:
         raise Exit(code=result.returncode)
 

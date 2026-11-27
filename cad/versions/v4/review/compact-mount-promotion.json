@@ -1,0 +1,13 @@
+{
+  "revision": "v4-compact-centered-mount",
+  "approved": true,
+  "mount_height_mm": 16.8,
+  "bore_center_z_mm": 8.4,
+  "rail_hardware_y_shift_mm": 1.4,
+  "key_assembly_samples": 40,
+  "key_surrounding_overlap_max_mm3": 0.0,
+  "viewer_checks": "Eight configurations, 13 designs / 24 pieces; motion visibility regression passed",
+  "support_evidence": "concepts/compact-actuator-mount/support-status.json",
+  "bearing_evidence": "concepts/compact-actuator-mount/bearing-check.json",
+  "physical_validation": false
+}

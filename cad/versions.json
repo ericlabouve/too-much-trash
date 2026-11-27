@@ -1,5 +1,5 @@
 {
-  "default": "v3",
+  "default": "v4",
   "versions": [
     {
       "id": "v1",
@@ -18,6 +18,13 @@
       "label": "Version 3 \u00b7 removable cuffs and sliding plunger",
       "viewer": "versions/v3/viewer.html",
       "note": "TPU T/V axle-key prototype: flexible V tip and retained T stop, unchanged axle slot. Keeper remains until physical snap/retention qualification. Flush jaws and interchangeable cuffs unchanged."
+    },
+    {
+      "id": "v4",
+      "label": "Version 4 \u00b7 lined compact harness",
+      "viewer": "versions/v4/viewer.html",
+      "note": "Approved V4 design baseline \u00b7 flush TPU liners, compact clamp and rails, aligned fixed cuff and integrated string guides. Approved captured actuator with common top-down T/V travel stop; field validation pending.",
+      "build_mode": "preview"
     }
   ]
 }

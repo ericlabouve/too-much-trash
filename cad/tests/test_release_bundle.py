@@ -1,4 +1,4 @@
-"""Independent structural and geometry checks for the unsliced V3 release.
+"""Independent structural and geometry checks for the unsliced release.
 
 Set CAD_RELEASE_BUNDLE to a generated release directory to exercise the real
 bundle; ordinary test runs do not trigger a several-minute CAD rebuild.
@@ -25,7 +25,7 @@ CAD = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(CAD))
 
 NS = {'m': 'http://schemas.microsoft.com/3dmanufacturing/core/2015/02'}
-EXPECTED = {
+EXPECTED_V3 = {
     'PETG': Counter({        'shaft_cap': 1, 'carrier': 1, 'sliding_jaw': 1,
         'actuator_bracket': 1, 'plunger': 1, 'pulley': 1, 'pulley_axle': 1,
     }),
@@ -33,6 +33,12 @@ EXPECTED = {
         'phone_cuff': 3, 'pulley_key': 1, 'collar_screw': 5,
         'thumb_nut': 5, 'clip_string_guide': 1,
     }),
+}
+
+
+EXPECTED = {
+    'PETG': EXPECTED_V3['PETG'],
+    'TPU': Counter(phone_cuff=3, pulley_key=2, collar_screw=5, thumb_nut=5, cap_liner=1, jaw_liner=1),
 }
 
 
@@ -99,7 +105,7 @@ def triangle_fingerprint(vertices, faces):
     return triangles[order]
 
 
-def validate_plate(path, expected):
+def validate_plate(path, expected, clearance=2.0):
     items = read_plate(path)
     assert Counter(name for name, _, _ in items) == expected
     footprints = {}
@@ -111,13 +117,13 @@ def validate_plate(path, expected):
         bounds.append((low, high))
     for i, j in combinations(range(len(items)), 2):
         lo1, hi1 = bounds[i]; lo2, hi2 = bounds[j]
-        if np.any(np.maximum(lo1[:2], lo2[:2]) - np.minimum(hi1[:2], hi2[:2]) >= 2.0 - 1e-5):
+        if np.any(np.maximum(lo1[:2], lo2[:2]) - np.minimum(hi1[:2], hi2[:2]) >= clearance - 1e-5):
             continue
         for k in (i, j):
             if k not in footprints:
                 _, v, f = items[k]
                 footprints[k] = projection(v, f)
-        assert footprints[i].distance(footprints[j]) >= 2.0 - 1e-5, (items[i][0], items[j][0])
+        assert footprints[i].distance(footprints[j]) >= clearance - 1e-5, (items[i][0], items[j][0])
     return items
 
 
@@ -179,7 +185,7 @@ class ReleaseBundleTests(unittest.TestCase):
         from workspace import release
         parts = {name: {'name': name, 'quantity': quantity,
                         'material': 'PETG / PLA' if material == 'PETG' else 'ELEGOO TPU 95A'}
-                 for material, counts in EXPECTED.items()
+                 for material, counts in EXPECTED_V3.items()
                  for name, quantity in counts.items()}
         release.validate_layouts(parts)
         cases = {
@@ -206,6 +212,19 @@ class ReleaseBundleTests(unittest.TestCase):
                             release.package(root / 'build', root / 'output')
                         project.assert_not_called()
                         self.assertFalse((root / 'output').exists())
+
+    def test_v4_layouts_cover_full_bom(self):
+        from workspace import release
+        layouts = []
+        for material in ('petg', 'tpu'):
+            raw = json.loads((CAD / f'workspace/layouts/v4-{material}.json').read_text())
+            layouts.append({key: (*value[0], value[2]) for key, value in raw.items()})
+        parts = {name: {'quantity': count, 'material': material}
+                 for material, counts in EXPECTED.items() for name, count in counts.items()}
+        release.validate_layouts(parts, *layouts)
+        parts['pulley_key']['quantity'] = 1
+        with self.assertRaises(ValueError):
+            release.validate_layouts(parts, *layouts)
 
     def test_packager_uses_quantity_and_layout(self):
         from workspace import release
@@ -247,10 +266,11 @@ class ReleaseBundleTests(unittest.TestCase):
         self.assertEqual({p.name for p in root.iterdir()}, {'PETG.3mf', 'TPU.3mf', 'PETG.png', 'TPU.png', 'README.md', 'manifest.json'})
         manifest = json.loads((root / 'manifest.json').read_text())
         self.assertEqual(manifest['status'], 'unsliced')
+        self.assertEqual(manifest['version'], 'v4')
         build = Path(os.environ['CAD_RELEASE_BUILD']) if os.environ.get('CAD_RELEASE_BUILD') else None
         if build:
             run = json.loads((build / 'workspace-run.json').read_text())
-            self.assertEqual((run['version'], run['operation'], run['status'], run['returncode']), ('v3', 'build', 'completed', 0))
+            self.assertEqual((run['version'], run['operation'], run['status'], run['returncode']), ('v4', 'build', 'completed', 0))
             self.assertEqual(manifest['source_sha256'], run['source_sha256'])
             self.assertEqual(manifest['environment_sha256'], run['environment_sha256'])
             for relative, expected_hash in run['source_sha256'].items():
@@ -268,14 +288,14 @@ class ReleaseBundleTests(unittest.TestCase):
                     self.assertTrue(any(e.get('Extension') == 'model' and e.get('ContentType') == 'application/vnd.ms-package.3dmanufacturing-3dmodel+xml' for e in types))
                     self.assertTrue(any(e.get('Target') == '/3D/3dmodel.model' and e.get('Type') == 'http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel' for e in rels))
                     self.assertEqual(set(archive.namelist()), {'[Content_Types].xml', '_rels/.rels', '3D/3dmodel.model'})
-                items = validate_plate(plate, expected)
+                items = validate_plate(plate, expected, clearance=3.0)
                 project = manifest['projects'][material]
                 self.assertEqual(project['sha256'], hashlib.sha256(plate.read_bytes()).hexdigest())
                 self.assertEqual(project['preview'], f'{material}.png')
                 self.assertEqual(project['preview_sha256'], hashlib.sha256((root / project['preview']).read_bytes()).hexdigest())
                 self.assertEqual(Counter(o['design'] for o in project['objects']), expected)
                 if build:
-                    source = build / 'versions/v3/print'
+                    source = build / 'manufacturing/source'
                     for row in project['objects']:
                         self.assertEqual(row['source_sha256'], hashlib.sha256((source / row['source_file']).read_bytes()).hexdigest())
                     # Reverse placements and compare every triangle with the source STL.

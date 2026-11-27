@@ -1,0 +1,762 @@
+{
+  "decision": "Not promoted: lowered moving key collides with pulley retaining key. Approved raised seat retained.",
+  "removed_seat_height_mm": 2.6,
+  "axial_play_mm": 2.6,
+  "first_sampled_collision_pull_mm": 11.5,
+  "collision_at_12_6_mm3": 0.387414162752083,
+  "collision_part": "pulley_key",
+  "pulley_wheel_overlap_mm3": 0,
+  "geometry": {
+    "positive_stop_checks": {
+      "beyond_pull_mm3": 1.8000000000000251,
+      "upward_escape_mm3": 0.4650000000000018
+    },
+    "key_relaxed_span_mm": 5,
+    "plate_slot_width_mm": 3.4,
+    "nominal_each_side_retention_mm": 0.8,
+    "seat_height_mm": 0,
+    "key_axial_play_mm": 2.6,
+    "revision": "v4-common-key-no-seat",
+    "samples": [
+      {
+        "d": 0.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 0.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 1.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 1.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 2.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 2.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 3.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 3.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 4.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 4.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 5.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 5.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 6.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 6.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 7.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 7.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 8.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 8.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 9.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 9.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 10.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 10.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 11.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.0,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 11.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.007606140363233603,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 12.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.08612056260606078,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 12.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.32064523296879377,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 7.766313571749956e-06,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 12.6,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0,
+        "key_bracket_0": 0.0,
+        "key_context_0": 0.387414162752083,
+        "key_bracket_1.3": 0.0,
+        "key_context_1.3": 0.0005204984874232982,
+        "key_bracket_2.6": 0.0,
+        "key_context_2.6": 0.0
+      },
+      {
+        "d": 13.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 13.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 14.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 14.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 15.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 15.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 16.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 16.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 17.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 17.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 18.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 18.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 19.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 19.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 20.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 20.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 21.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 21.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 22.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 22.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 23.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 23.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 24.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 24.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 25.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 25.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 26.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 26.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 27.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 27.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 28.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 28.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 29.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 29.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 30.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 30.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 31.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 31.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 32.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 32.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 33.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 33.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 34.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 34.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 35.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 35.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 36.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 36.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 37.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 37.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 38.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 38.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 39.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 39.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 40.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 40.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 41.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 41.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 42.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 42.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 43.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 43.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 44.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 44.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 45.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 45.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 46.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 46.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 47.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 47.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 48.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 48.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 49.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 49.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 50.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 50.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 51.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 51.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 52.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 52.5,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      },
+      {
+        "d": 53.0,
+        "plunger_bracket": 0.0,
+        "plunger_context": 0.0
+      }
+    ],
+    "limits": "Rigid insertion without key and operating sweep. TPU insertion deformation and retention need physical checks."
+  },
+  "slice_objects": {
+    "bracket": {
+      "deposited_g_by_role": {
+        "model": 5.1012
+      },
+      "deposited_xy_bounds": [
+        [
+          40.922,
+          61.61
+        ],
+        [
+          89.078,
+          98.39
+        ]
+      ],
+      "support_z_mm": null
+    },
+    "plunger": {
+      "deposited_g_by_role": {
+        "model": 1.1071
+      },
+      "deposited_xy_bounds": [
+        [
+          102.21,
+          60.135
+        ],
+        [
+          117.79,
+          99.865
+        ]
+      ],
+      "support_z_mm": null
+    }
+  },
+  "supports": "Automatic supports ON; bridge suppression OFF; zero support/interface paths.",
+  "print_sent": false
+}

@@ -4,6 +4,7 @@ import io
 import hashlib
 import json
 import os
+import tarfile
 import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -12,7 +13,7 @@ from contextlib import contextmanager
 from threading import Event
 from pathlib import Path
 from unittest.mock import patch
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi.testclient import TestClient
 from alembic import command
@@ -108,6 +109,121 @@ class OnboardingTests(unittest.TestCase):
 
     def bearer(self, credentials):
         return {"Authorization": "Bearer " + credentials["access_token"]}
+
+    def test_admin_can_edit_invite_and_active_collector_quotas(self):
+        invite = self.invite(quota_bytes=1, quota_uploads=1)
+        limits = {"quota_bytes": 64, "quota_uploads": 2}
+        invite_path = f"/api/v1/admin/invites/{invite['id']}/quota"
+        self.assertEqual(self.client.post(invite_path, json=limits).status_code, 403)
+        self.assertEqual(self.client.post(invite_path, headers=self.admin_headers, json=limits).status_code, 204)
+        credentials = self.client.post("/api/v1/auth/enroll", json={"invite_code": invite["invite_code"]}).json()
+        headers = self.bearer(credentials)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["quota_bytes"], 64)
+        self.assertEqual(self.client.post(invite_path, headers=self.admin_headers, json=limits).status_code, 404)
+        installation_path = f"/api/v1/admin/installations/{credentials['installation_id']}/quota"
+        self.assertEqual(self.client.post(installation_path, headers=self.admin_headers, json={"quota_bytes": 128, "quota_uploads": 3}).status_code, 204)
+        self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["quota_uploads"], 3)
+
+    def test_development_video_delete_is_scoped_and_resumable(self):
+        from app.video_deletion import sweep_deletions
+
+        regular, episode = self.enrolled(), uuid4()
+        path = f"/api/v1/media/by-client/{episode}"
+        transfer = f"/api/v1/episodes/{episode}/transfer"
+        manifest = {"schema_version": 1, "episode_id": str(episode), "complete": False,
+                    "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                    "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"}, "sensor_metadata": {}}
+        payloads = {"video": b"video", "imu": b"imu", "poses": b"poses", "manifest": json.dumps(manifest).encode()}
+        descriptors = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()} for name, data in payloads.items()}
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
+            key = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers,
+                                   json={"label": "Deletion test"}).json()["key"]
+            dev, stranger = (self.client.post("/api/v1/admin/development-enroll", json={"key": key}).json() for _ in range(2))
+            headers, other = self.bearer(dev), self.bearer(stranger)
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["development_video_delete_version"], 1)
+            self.assertIsNone(self.client.get("/api/v1/auth/me", headers=self.bearer(regular)).json()["development_video_delete_version"])
+            self.assertEqual(self.client.post(transfer, headers=headers, json={"files": descriptors}).status_code, 200)
+            binary = {**headers, "Content-Type": "application/octet-stream"}
+            for name, data in payloads.items():
+                self.assertEqual(self.client.put(f"{transfer}/{name}/0", headers=binary, content=data).status_code, 200)
+            uploaded = self.client.post(transfer + "/finish", headers=headers)
+            self.assertEqual(uploaded.status_code, 202, uploaded.text)
+            capture = uploaded.json()["id"]
+            self.assertEqual(self.client.delete(path).status_code, 401)
+            self.assertEqual(self.client.delete(path, headers=self.bearer(regular)).status_code, 403)
+            self.assertEqual(self.client.delete(path, headers=other).status_code, 404)
+            with database() as connection:
+                connection.execute("UPDATE captures SET status='processing' WHERE id=%s", (capture,))
+            self.assertEqual(self.client.delete(path, headers=headers).json()["detail"]["code"], "capture_processing")
+            poster = f"processed/{capture}/poster.jpg"
+            self.blob.objects[poster] = b"test poster"
+            with database() as connection:
+                connection.execute("UPDATE captures SET status='completed', processed_key=%s WHERE id=%s", (poster, capture))
+
+            actual_delete = self.blob.delete_object
+
+            def fail_after_first_object(Bucket, Key):
+                if Key == poster:
+                    raise HTTPException(503)
+                return actual_delete(Bucket=Bucket, Key=Key)
+
+            with patch.object(self.blob, "delete_object", side_effect=fail_after_first_object):
+                self.assertEqual(self.client.delete(path, headers=headers).status_code, 503)
+            self.assertEqual(self.client.get(path, headers=headers).status_code, 404)
+            self.assertIn(poster, self.blob.objects)
+            self.assertEqual(self.client.post(transfer, headers=headers, json={"files": descriptors}).json()["detail"]["code"], "capture_deleted")
+            self.assertEqual(self.client.put(transfer + "/video/0", headers=binary, content=payloads["video"]).status_code, 409)
+            self.assertEqual(self.client.post(transfer + "/finish", headers=headers).status_code, 409)
+            sweep_deletions()
+            self.assertEqual(self.client.delete(path, headers=headers).json(), {"client_capture_id": str(episode), "deleted": True})
+            self.assertFalse(self.blob.objects)
+            self.assertEqual(self.keyed_upload(dev, episode).status_code, 409)
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["used_uploads"], 1)
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "false"}):
+            self.assertEqual(self.client.delete(path, headers=headers).status_code, 404)
+
+    def test_usb_import_resumes_phone_transfer_with_unlimited_development_quota(self):
+        from tools.import_usb_episodes import FILES, import_episode
+
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
+            key = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers,
+                                   json={"label": "Wired test"}).json()["key"]
+            credentials = self.client.post("/api/v1/admin/development-enroll", json={"key": key}).json()
+            installation = UUID(credentials["installation_id"])
+            with database() as connection:
+                connection.execute("UPDATE installations SET quota_bytes=1, quota_uploads=1, used_uploads=1 WHERE id=%s", (installation,))
+            episode = uuid4()
+            manifest = {"schema_version": 1, "episode_id": str(episode), "complete": False,
+                        "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                        "files": {name: filename for name, filename in FILES.items() if name != "manifest"},
+                        "sensor_metadata": {}}
+            chunk_size = 4 * 1024 * 1024
+            payloads = {"video": b"v" * chunk_size + b"last", "imu": b"imu", "poses": b"poses",
+                        "manifest": json.dumps(manifest).encode()}
+            descriptors = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+                           for name, data in payloads.items()}
+            path = f"/api/v1/episodes/{episode}/transfer"
+            headers = self.bearer(credentials)
+            phone_headers = {**headers, "X-TMT-Chunk-Size": str(chunk_size)}
+            started = self.client.post(path, headers=phone_headers, json={"files": descriptors})
+            self.assertEqual(started.json()["chunk_size"], chunk_size)
+            first_chunk = self.client.put(path + "/video/0",
+                                          headers={**phone_headers, "Content-Type": "application/octet-stream"},
+                                          content=payloads["video"][:chunk_size])
+            self.assertEqual(first_chunk.status_code, 200, first_chunk.text)
+            bundle = io.BytesIO()
+            with tarfile.open(fileobj=bundle, mode="w") as archive:
+                for name, filename in FILES.items():
+                    data = payloads[name]
+                    entry = tarfile.TarInfo(filename)
+                    entry.size = len(data)
+                    archive.addfile(entry, io.BytesIO(data))
+            for _ in range(2):
+                bundle.seek(0)
+                with patch("sys.stdin", io.TextIOWrapper(io.BytesIO(bundle.getvalue()))):
+                    import_episode(installation, episode)
+            self.assertEqual(self.client.get("/api/v1/auth/me", headers=headers).json()["used_uploads"], 2)
+            self.assertEqual(self.client.get(f"/api/v1/episodes/{episode}/files/video", headers=headers).content, payloads["video"])
 
     def test_development_key_is_scoped_audited_and_revocable(self):
         regular = self.enrolled()
@@ -224,7 +340,9 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 200)
         put = lambda name, index, data: self.client.put(f"{path}/{name}/{index}", headers={**headers, "Content-Type": "application/octet-stream"}, content=data)
         self.assertEqual(put("video", 0, payloads["video"][:1024 * 1024]).status_code, 200)
-        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).json()["chunks"]["video"], [0])
+        resumed = self.client.post(path, headers={**headers, "X-TMT-Chunk-Size": "4194304"}, json={"files": files}).json()
+        self.assertEqual(resumed["chunk_size"], 1024 * 1024)
+        self.assertEqual(resumed["chunks"]["video"], [0])
         self.assertEqual(put("video", 1, payloads["video"][1024 * 1024:]).status_code, 200)
         for name in ("imu", "poses", "manifest"):
             self.assertEqual(put(name, 0, payloads[name]).status_code, 200)
@@ -239,6 +357,69 @@ class OnboardingTests(unittest.TestCase):
         self.assertEqual(resumed.json()["chunks"]["video"], [0])
         self.assertEqual(put("video", 1, payloads["video"][1024 * 1024:]).status_code, 200)
         self.assertEqual(self.client.post(path + "/finish", headers=headers).status_code, 202)
+
+    def test_resumable_chunk_size_is_negotiated_and_frozen(self):
+        size = 4 * 1024 * 1024
+        owner, episode = self.enrolled(quota_bytes=2 * size), uuid4()
+        headers = self.bearer(owner)
+        requested = {**headers, "X-TMT-Chunk-Size": str(size)}
+        manifest = {"schema_version": 1, "episode_id": str(episode), "complete": True,
+                    "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                    "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"}, "sensor_metadata": {}}
+        payloads = {"video": b"v" * size + b"last!", "imu": b"imu", "poses": b"poses", "manifest": json.dumps(manifest).encode()}
+        files = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()} for name, data in payloads.items()}
+        path = f"/api/v1/episodes/{episode}/transfer"
+        started = self.client.post(path, headers=requested, json={"files": files})
+        self.assertEqual(started.status_code, 200, started.text)
+        self.assertEqual(started.json()["chunk_size"], size)
+
+        def put(name, index, data, chunk_headers=requested):
+            return self.client.put(f"{path}/{name}/{index}",
+                                   headers={**chunk_headers, "Content-Type": "application/octet-stream"}, content=data)
+
+        self.assertEqual(put("video", 0, payloads["video"][:size], headers).status_code, 413)
+        self.assertEqual(put("video", 0, payloads["video"][:size]).status_code, 200)
+        resumed = self.client.post(path, headers=headers, json={"files": files}).json()
+        self.assertEqual(resumed["chunk_size"], size)
+        self.assertEqual(resumed["chunks"]["video"], [0])
+        self.assertEqual(put("video", 1, payloads["video"][size:], headers).status_code, 400)
+        self.assertEqual(put("video", 1, payloads["video"][size:]).status_code, 200)
+        for name in ("imu", "poses", "manifest"):
+            self.assertEqual(put(name, 0, payloads[name]).status_code, 200)
+        finished = self.client.post(path + "/finish", headers=headers)
+        self.assertEqual(finished.status_code, 202, finished.text)
+        self.assertEqual(self.client.get(f"/api/v1/episodes/{episode}/files/video", headers=headers).content, payloads["video"])
+
+    @unittest.skipUnless(os.environ.get("TMT_TEST_REAL_S3") == "1", "Requires isolated disposable S3")
+    def test_development_deletion_with_disposable_object_storage(self):
+        self.blob_patch.stop()
+        try:
+            from app.main import storage
+            client = storage()
+            with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
+                key = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers,
+                                       json={"label": "Deletion test"}).json()["key"]
+                dev = self.client.post("/api/v1/admin/development-enroll", json={"key": key}).json()
+                episode = uuid4()
+                manifest = {"schema_version": 1, "episode_id": str(episode), "complete": False,
+                            "timing": {"start": 7, "press": 10, "release": 12, "end": 15},
+                            "files": {"video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"},
+                            "sensor_metadata": {}}
+                files = {"video": ("video.mp4", b"synthetic-video", "video/mp4"),
+                         "imu": ("imu.jsonl", b"imu", "application/x-ndjson"),
+                         "poses": ("poses.jsonl", b"poses", "application/x-ndjson"),
+                         "manifest": ("manifest.json", json.dumps(manifest).encode(), "application/json")}
+                headers = {**self.bearer(dev), "Idempotency-Key": str(episode)}
+                response = self.client.post("/api/v1/episodes", headers=headers, files=files)
+                self.assertEqual(response.status_code, 202, response.text)
+                objects = client.list_objects_v2(Bucket=os.environ["S3_BUCKET"]).get("Contents", [])
+                self.assertEqual(len(objects), 4)
+                path = f"/api/v1/media/by-client/{episode}"
+                self.assertEqual(self.client.delete(path, headers=self.bearer(dev)).status_code, 200)
+                self.assertEqual(client.list_objects_v2(Bucket=os.environ["S3_BUCKET"]).get("Contents", []), [])
+                self.assertEqual(self.keyed_upload(dev, episode).status_code, 409)
+        finally:
+            self.blob_patch.start()
 
     @unittest.skipUnless(os.environ.get("TMT_TEST_REAL_S3") == "1", "Requires isolated disposable S3")
     def test_resumable_round_trip_with_disposable_object_storage(self):
