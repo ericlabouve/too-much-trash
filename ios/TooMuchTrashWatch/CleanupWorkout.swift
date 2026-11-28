@@ -9,10 +9,12 @@ final class CleanupWorkout: NSObject, ObservableObject, HKWorkoutSessionDelegate
     @Published private(set) var busy = false
     @Published private(set) var message = ""
     private let store = HKHealthStore()
+    private(set) var cleanupID: UUID?
+    private(set) var startedAt: Date?
     private var session: HKWorkoutSession?
     private var builder: HKLiveWorkoutBuilder?
 
-    func start(configuration: HKWorkoutConfiguration? = nil) async {
+    func start(configuration: HKWorkoutConfiguration? = nil, cleanupID: UUID? = nil, startedAt: Date? = nil) async {
         guard session == nil, !busy else { return }
         guard HKHealthStore.isHealthDataAvailable() else { message = "Workouts are unavailable on this Watch."; return }
         busy = true
@@ -34,6 +36,8 @@ final class CleanupWorkout: NSObject, ObservableObject, HKWorkoutSessionDelegate
             session = workout
             builder = live
             let start = Date()
+            self.cleanupID = cleanupID ?? UUID()
+            self.startedAt = startedAt ?? start
             workout.startActivity(with: start)
             try await live.beginCollection(at: start)
             active = true

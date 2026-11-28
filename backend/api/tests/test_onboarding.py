@@ -110,6 +110,157 @@ class OnboardingTests(unittest.TestCase):
     def bearer(self, credentials):
         return {"Authorization": "Bearer " + credentials["access_token"]}
 
+    def test_cleanup_metadata_is_owned_revisioned_and_survives_retry(self):
+        owner, other = self.enrolled(), self.enrolled()
+        sid = str(uuid4())
+        doc = {"id": sid, "revision": 1, "name": "Beach cleanup", "description": "Shoreline",
+               "started_at": 100, "started_uptime": 10, "record_route": False, "route": [], "route_notes": []}
+        path = f"/api/v1/cleanup-sessions/{sid}"
+        headers = self.bearer(owner)
+        self.assertEqual(self.client.put(path, headers=headers, json=doc).status_code, 200)
+        self.assertEqual(self.client.put(path, headers=headers, json=doc).status_code, 200)
+        self.assertEqual(self.client.get(path, headers=self.bearer(other)).status_code, 404)
+        self.assertEqual(self.client.get(path).status_code, 401)
+        doc["name"] = "Changed without revision"
+        self.assertEqual(self.client.put(path, headers=headers, json=doc).status_code, 409)
+        doc["revision"] = 2
+        doc["record_route"] = True
+        doc["marked_location"] = {"latitude": 37, "longitude": -122, "accuracy_m": 5, "altitude_m": 0, "timestamp": 101, "uptime": 11}
+        doc["route"] = [doc["marked_location"]]
+        self.assertEqual(self.client.put(path, headers=headers, json=doc).status_code, 200)
+        self.assertEqual(self.client.get(path, headers=headers).json()["route"], doc["route"])
+        doc["revision"] = 3; doc["ended_at"] = 110
+        self.assertEqual(self.client.put(path, headers=headers, json=doc).status_code, 200)
+        doc["revision"] = 4; doc["ended_at"] = None
+        self.assertEqual(self.client.put(path, headers=headers, json=doc).status_code, 409)
+
+    def test_cleanup_rejects_invalid_location_and_session_identity(self):
+        headers = self.bearer(self.enrolled())
+        sid = str(uuid4()); path = f"/api/v1/cleanup-sessions/{sid}"
+        doc = {"id": sid, "revision": 1, "name": "Test", "description": "", "started_at": 100, "started_uptime": 10,
+               "marked_location": {"latitude": 91, "longitude": 0, "accuracy_m": 1, "altitude_m": 0, "timestamp": 100, "uptime": 1}}
+        self.assertEqual(self.client.put(path, headers=headers, json=doc).status_code, 422)
+        doc["marked_location"]["latitude"] = 0; doc["id"] = str(uuid4())
+        self.assertEqual(self.client.put(path, headers=headers, json=doc).status_code, 400)
+
+    def continuous_fixture(self, recording):
+        streams = {n: n + ".jsonl" for n in ["imu", "poses", "references", "predictions", "diagnostics"]}
+        manifest = {"schema": "tmt-continuous-session-v1", "session_id": f"continuous-{recording}", "finalized": True,
+                    "audio": False, "start": 10.0, "end": 14.0, "video_parts": [{"file": "part.mp4"}], "streams": streams}
+        payload = {n: b"" for n in streams.values()}
+        payload["part.mp4"] = b"sample-video-bytes"
+        payload["session.json"] = json.dumps(manifest).encode()
+        files = {n: {"size": len(v), "sha256": hashlib.sha256(v).hexdigest()} for n, v in payload.items()}
+        return payload, files
+
+    def test_continuous_resume_ownership_checksum_and_exactly_once_quota(self):
+        credentials = self.enrolled(quota_bytes=10_000, quota_uploads=2)
+        headers = self.bearer(credentials)
+        recording = uuid4()
+        path = f"/api/v1/continuous/{recording}/transfer"
+        payload, files = self.continuous_fixture(recording)
+        r = self.client.post(path, headers=headers, json={"files": files})
+        self.assertEqual(r.status_code, 200, r.text)
+        self.assertFalse(r.json()["complete"])
+        self.assertEqual(self.client.post(path + "/finish", headers=headers).status_code, 409)
+        # Native retries only missing chunks after interruption/relaunch.
+        for name, data in payload.items():
+            if not data: continue
+            h = {**headers, "Content-Type": "application/octet-stream"}
+            self.assertEqual(self.client.put(path + f"/{name}/0", headers=h, content=data).status_code, 200)
+        resumed = self.client.post(path, headers=headers, json={"files": files}).json()
+        self.assertEqual(resumed["chunks"]["part.mp4"], [0])
+        other = self.enrolled()
+        self.assertEqual(self.client.post(path + "/finish", headers=self.bearer(other)).status_code, 404)
+        corrupt = next(k for k in self.blob.objects if "part.mp4/chunks" in k)
+        original = self.blob.objects[corrupt]
+        self.blob.objects[corrupt] = b"corrupt"
+        self.assertEqual(self.client.post(path + "/finish", headers=headers).status_code, 409)
+        self.blob.objects[corrupt] = original
+        for _ in range(2):
+            final = self.client.post(path + "/finish", headers=headers)
+            self.assertEqual(final.status_code, 202, final.text)
+            self.assertTrue(final.json()["complete"])
+        me = self.client.get("/api/v1/auth/me", headers=headers).json()
+        self.assertEqual(me["used_uploads"], 1)
+        self.assertEqual(me["used_bytes"], sum(len(v) for v in payload.values()))
+        for name, data in payload.items():
+            self.assertEqual(self.blob.objects[f"continuous/{credentials['installation_id']}/{recording}/files/{name}"], data)
+        from app.continuous_transfer import sweep_staging
+        sweep_staging()
+        self.assertFalse(any("/chunks/" in k for k in self.blob.objects))
+        self.assertTrue(self.client.post(path, headers=headers, json={"files": files}).json()["complete"])
+        self.assertEqual(self.client.post(path + "/finish", headers=headers).status_code, 202)
+        files["part.mp4"]["sha256"] = "f" * 64
+        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 409)
+
+    def test_continuous_developer_delete_is_owned_retryable_and_preserves_clips(self):
+        with patch.dict(os.environ, {"TMT_DEVELOPMENT_KEYS": "true"}):
+            def developer():
+                key = self.client.post("/api/v1/admin/development-keys", headers=self.admin_headers, json={"label": "Test"}).json()["key"]
+                return self.client.post("/api/v1/admin/development-enroll", json={"key": key}).json()
+            credentials, other = developer(), developer()
+            headers = self.bearer(credentials)
+            recording = uuid4()
+            path = f"/api/v1/continuous/{recording}/transfer"
+            payload, files = self.continuous_fixture(recording)
+            self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 200)
+            for name, data in payload.items():
+                if data:
+                    self.assertEqual(self.client.put(path+f"/{name}/0", headers={**headers,"Content-Type":"application/octet-stream"}, content=data).status_code,200)
+            self.assertEqual(self.client.post(path+"/finish", headers=headers).status_code,202)
+            delete = f"/api/v1/continuous/{recording}"
+            self.assertEqual(self.client.delete(delete, headers=self.bearer(other)).status_code,404)
+            self.assertEqual(self.client.delete(delete, headers=self.bearer(self.enrolled())).status_code,403)
+            with database() as c:
+                capture = uuid4()
+                c.execute("INSERT INTO captures(id,installation_id,filename,content_type,media_kind,original_key,size_bytes) VALUES(%s,%s,'clip.mp4','video/mp4','video','keep-clip',1)", (capture, credentials["installation_id"]))
+            self.blob.objects["keep-clip"] = b"keep"
+            with patch.object(self.blob, "delete_object", side_effect=RuntimeError("temporary blob outage")):
+                with self.assertRaises(RuntimeError):
+                    self.client.delete(delete, headers=headers)
+            # The committed tombstone blocks resurrection before blob cleanup succeeds.
+            self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code,409)
+            self.assertEqual(self.client.post(path+"/finish", headers=headers).status_code,409)
+            self.assertEqual(self.client.put(path+"/part.mp4/0", headers={**headers,"Content-Type":"application/octet-stream"}, content=payload["part.mp4"]).status_code,409)
+            for _ in range(2):
+                r = self.client.delete(delete, headers=headers)
+                self.assertEqual(r.status_code,200,r.text)
+                self.assertEqual(r.json(), {"recording_id":str(recording),"deleted":True})
+            self.assertFalse(any(f"/{recording}/" in k for k in self.blob.objects))
+            self.assertEqual(self.blob.objects["keep-clip"],b"keep")
+            with database() as c:
+                self.assertIsNotNone(c.execute("SELECT id FROM captures WHERE id=%s",(capture,)).fetchone())
+                self.assertIsNone(c.execute("SELECT pending_keys FROM continuous_deletions WHERE recording_id=%s",(recording,)).fetchone()["pending_keys"])
+
+    def test_continuous_reservation_and_path_rejection(self):
+        credentials = self.enrolled(quota_bytes=10_000, quota_uploads=1)
+        headers = self.bearer(credentials)
+        recording = uuid4()
+        _, files = self.continuous_fixture(recording)
+        path = f"/api/v1/continuous/{recording}/transfer"
+        files["../outside.mp4"] = files.pop("part.mp4")
+        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 400)
+        _, files = self.continuous_fixture(recording)
+        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 200)
+        self.assertEqual(self.client.post(f"/api/v1/continuous/{uuid4()}/transfer", headers=headers, json={"files": files}).status_code, 429)
+
+    def test_continuous_expired_reservation_can_restart_without_losing_committed_recordings(self):
+        from app.continuous_transfer import sweep_staging
+        credentials = self.enrolled(quota_bytes=10_000, quota_uploads=1)
+        headers = self.bearer(credentials)
+        recording = uuid4()
+        payload, files = self.continuous_fixture(recording)
+        path = f"/api/v1/continuous/{recording}/transfer"
+        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 200)
+        h = {**headers, "Content-Type": "application/octet-stream"}
+        self.assertEqual(self.client.put(path + "/part.mp4/0", headers=h, content=payload["part.mp4"]).status_code, 200)
+        with database() as c:
+            c.execute("UPDATE continuous_recordings SET expires_at=now()-interval '1 second'")
+        sweep_staging()
+        self.assertFalse(self.blob.objects)
+        self.assertEqual(self.client.post(path, headers=headers, json={"files": files}).status_code, 200)
+
     def test_admin_can_edit_invite_and_active_collector_quotas(self):
         invite = self.invite(quota_bytes=1, quota_uploads=1)
         limits = {"quota_bytes": 64, "quota_uploads": 2}

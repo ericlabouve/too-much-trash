@@ -9,12 +9,18 @@ targets:
     platform: iOS
     sources:
       - TooMuchTrash
+      - path: AlphaPrivate/runtime
+        optional: true
+        includes: [visual-component.json, baseline-model.json, exact-parent-model.json]
+        buildPhase: resources
     dependencies:
       - target: TooMuchTrashWatch
         embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.toomuchtrash.app
+        SWIFT_OBJC_BRIDGING_HEADER: TooMuchTrash/Alpha-Bridging-Header.h
+        CLANG_CXX_LANGUAGE_STANDARD: c++17
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: Info.plist
         SWIFT_VERSION: 5.9

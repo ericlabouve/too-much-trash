@@ -514,3 +514,65 @@ Apply Alembic revision `006_episode_chunk_size` before serving larger chunks. It
 With `TMT_DEVELOPMENT_KEYS` enabled, `/api/v1/auth/me` advertises `development_video_delete_version: 1` to development installations. `DELETE /api/v1/media/by-client/{client_capture_id}` requires the owning development installation and a committed video. If a worker is processing it, wait for processing to finish and retry. The API returns `{client_capture_id, deleted: true}` after removing the original, any episode sidecars, preview and staging. The phone waits for this receipt before deleting its copy.
 
 Revision `007_dev_video_deletion` persists a deletion record before touching object storage. If cleanup fails, another DELETE or the hourly sweep can finish it. A completed deletion acknowledges retries and rejects stale uploads with `capture_deleted`. Cumulative usage remains in installation accounting. Apply the revision and deploy both the API and worker so a worker with an expired claim cannot publish a preview after deletion.
+
+## Full continuous recordings (contract 1)
+
+Authenticated `/auth/me` advertises `continuous_recording_contract_version: 1`.
+These sessions are separate from bounded, one-pickup `/episodes`; the media worker
+must not interpret an entire session as one squeeze/release pair.
+
+- `POST /api/v1/continuous/{UUID}/transfer`: immutable `files` descriptors keyed by
+  filename, each with `size` and lowercase `sha256`. Returns `complete`,
+  `chunk_size: 4194304` and accepted chunk indexes per file. Empty journals are valid.
+- `PUT .../transfer/{filename}/{index}`: exact binary chunk, bearer authenticated.
+  Same-byte retries are idempotent; conflicting bytes are rejected.
+- `POST .../transfer/finish`: verifies every chunk/file hash and session manifest,
+  then returns `{recording_id,bundle_sha256,size_bytes,complete:true}` (202).
+  Repeated finish returns the same receipt and charges quota once.
+
+`session.json` lists video parts and five separate JSONL streams: IMU, poses,
+manual references, predictions and diagnostics. No audio. Final files are stored
+under `continuous/{installation}/{recording}/files/` in the existing blob store.
+One logical full session consumes one upload; byte usage includes all its files.
+Reservations share regular installation quotas with episode uploads; development
+installations remain unlimited. Revocation and ownership checks apply to every
+request. Completed staging chunks are swept; abandoned staging expires after
+seven days without activity and may be restarted from the phone. Completed final
+objects/receipts remain. Only one new Alembic revision is added for this feature.
+
+## Cleanup-session context
+
+`cleanup_session_contract_version: 1` enables owner-scoped
+`PUT/GET /api/v1/cleanup-sessions/{UUID}`. A document contains a name, description,
+start/end times, optional marked location and opt-in walking-route points with
+accuracy/timestamps. Monotonically increasing revisions prevent stale overwrites;
+same-revision/same-content retries are idempotent. Session start is immutable and
+a stopped session cannot reopen. The record is independent of media upload quotas
+and contains no HealthKit metrics. Request bounds limit metadata size and session
+count. Capture manifests reference `cleanup_session_id`; joins must also match
+installation ownership. Full recordings log changes to cleanup association.
+
+Phone-origin start times use phone callback uptime. Watch-origin times explicitly
+identify the wall-clock mapping estimate; uptime is absent when the start predates
+the current phone boot. Route locations preserve their wall timestamps, approximate
+phone-uptime mapping and accuracy; permission/restart failures are noted. Location
+and route collection default off. Unsynced metadata remains in the private,
+origin/installation-scoped phone store and retries after connectivity returns.
+
+These tables are consolidated into this branch's single unmerged revision 008.
+For a development DB that already applied the earlier 008 during this PR, apply
+its idempotent `CLEANUP_SESSIONS_SQL` addendum after backup; do not downgrade or
+recreate the existing continuous-recording tables. Main/production upgrades from
+007 run the complete 008 normally.
+
+
+Full Session Recording deletion: `DELETE /api/v1/continuous/{recording_id}` requires
+an enabled development login and ownership. `/auth/me` advertises
+`development_continuous_delete_version: 1` only for eligible developer sessions.
+Return `{recording_id, deleted: true}` after object cleanup. Persist an owner-scoped
+tombstone before removing transfer metadata; reject subsequent begin/chunk/finish
+with `409 capture_deleted`. Failed object cleanup is retried by the staging sweeper
+and an idempotent DELETE retry. Ordinary squeeze captures, walk metadata and
+cumulative usage counters are preserved. The `continuous_deletions` table belongs
+to the same unmerged revision 008; an already-upgraded development DB needs its
+idempotent `CONTINUOUS_DELETIONS_SQL` addendum after backup.

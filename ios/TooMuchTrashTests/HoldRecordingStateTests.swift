@@ -156,7 +156,8 @@ final class HoldRecordingStateTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: root) }
         var scheduler = EpisodeWindowScheduler()
         let window = try XCTUnwrap(scheduler.press("volume", at: 10))
-        let journal = try EpisodeJournal(ownerDirectory: root, window: window)
+        let walk = UUID(), full = UUID()
+        let journal = try EpisodeJournal(ownerDirectory: root, window: window, cleanupSessionID: walk, fullSessionRecordingID: full)
         for stream in [MotionSample.Stream.accelerometer, .gyroscope, .attitude] {
             try journal.append(MotionSample(stream: stream, timestamp: 8, values: [1, 2, 3]), commonTime: 8, through: 15)
         }
@@ -168,6 +169,8 @@ final class HoldRecordingStateTests: XCTestCase {
         try journal.finalize(video: video, release: 12, end: 15,
                              validatedCoverageAndClock: false, videoFrameGeometry: [geometry])
         let manifest = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: journal.directory.appendingPathComponent("manifest.json"))) as? [String: Any])
+        XCTAssertEqual(manifest["full_session_recording_id"] as? String, full.uuidString.lowercased())
+        XCTAssertEqual(manifest["cleanup_session_id"] as? String, walk.uuidString.lowercased())
         XCTAssertEqual(manifest["complete"] as? Bool, false)
         XCTAssertEqual(manifest["episode_id"] as? String, window.id.uuidString)
         let metadata = try XCTUnwrap(manifest["sensor_metadata"] as? [String: Any])

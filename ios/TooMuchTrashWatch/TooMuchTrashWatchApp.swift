@@ -8,6 +8,12 @@ final class WatchModel: NSObject, ObservableObject, WCSessionDelegate {
     @Published var reachable = false
     @Published var message = ""
     private let session = WCSession.isSupported() ? WCSession.default : nil
+    private var pendingCleanup = UserDefaults.standard.array(forKey: "watchPendingCleanup") as? [[String: Any]] ?? []
+    private func flushCleanup() {
+        guard let session, session.activationState == .activated else { return }
+        for event in pendingCleanup { session.transferUserInfo(event) }
+        pendingCleanup = []; UserDefaults.standard.removeObject(forKey: "watchPendingCleanup")
+    }
     override init() {
         super.init()
         #if DEBUG
@@ -25,7 +31,7 @@ final class WatchModel: NSObject, ObservableObject, WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         let context = session.receivedApplicationContext
         let connected = session.isReachable
-        Task { @MainActor in self.state = context; self.reachable = connected }
+        Task { @MainActor in self.state = context; self.reachable = connected; self.flushCleanup() }
     }
     nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
         let connected = session.isReachable
@@ -33,6 +39,15 @@ final class WatchModel: NSObject, ObservableObject, WCSessionDelegate {
     }
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         Task { @MainActor in self.state = applicationContext }
+    }
+    func cleanupEvent(active: Bool, id: UUID, at time: Date, started: Date) {
+        guard let session, let owner = (state["owner"] ?? session.receivedApplicationContext["owner"]) as? String else {
+            message = "Open the signed-in iPhone app to link this walk."; return
+        }
+        let event: [String: Any] = ["action": active ? "cleanupStart" : "cleanupStop", "id": id.uuidString, "time": time.timeIntervalSince1970, "started": started.timeIntervalSince1970, "owner": owner]
+        pendingCleanup.append(event); UserDefaults.standard.set(pendingCleanup, forKey: "watchPendingCleanup")
+        flushCleanup() // Durable retry; phone de-duplicates start/stop by session ID.
+        if session.activationState == .activated && session.isReachable { session.sendMessage(event, replyHandler: { _ in }, errorHandler: { _ in }) }
     }
     func send(_ action: String, backend: Bool = false) {
         guard let session, session.isReachable else { message = "iPhone unavailable. Open the app on your iPhone."; return }
@@ -86,6 +101,13 @@ struct Dashboard: View {
         }
         .onChange(of: workout.active) { _, active in
             if active { selectedPage = 0 }
+            if let id = workout.cleanupID { model.cleanupEvent(active: active, id: id, at: active ? (workout.startedAt ?? Date()) : Date(), started: workout.startedAt ?? Date()) }
+        }
+        .onChange(of: phoneCleanupState) { _, _ in
+            guard let raw = model.state["cleanupID"] as? String, let id = UUID(uuidString: raw) else { return }
+            if model.state["cleanupActive"] as? Bool == true, !workout.active {
+                Task { await workout.start(cleanupID: id, startedAt: (model.state["cleanupStarted"] as? Double).map(Date.init(timeIntervalSince1970:))) }
+            } else if model.state["cleanupActive"] as? Bool == false, workout.cleanupID == id, workout.active { workout.end() }
         }
         .confirmationDialog("Stop cleanup walk?", isPresented: $confirmStop, titleVisibility: .visible) {
             Button("Stop cleanup walk", role: .destructive) { workout.end() }
@@ -117,6 +139,8 @@ struct Dashboard: View {
         }
     }
 
+    private var phoneCleanupState: String { "\(model.state["cleanupID"] as? String ?? ""): \(model.state["cleanupActive"] as? Bool ?? false)" }
+
     private var showsSession: Bool {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-watch-preview-session") { return true }
@@ -146,7 +170,8 @@ struct Dashboard: View {
                     try await Task.sleep(for: .seconds(1))
                 }
                 try Task.checkCancellation()
-                await workout.start()
+                let sharedID = model.state["cleanupActive"] as? Bool == true ? (model.state["cleanupID"] as? String).flatMap(UUID.init(uuidString:)) : nil
+                await workout.start(cleanupID: sharedID, startedAt: sharedID == nil ? nil : (model.state["cleanupStarted"] as? Double).map(Date.init(timeIntervalSince1970:)))
             } catch { /* Leaving the screen cancels a pending countdown. */ }
         }
     }

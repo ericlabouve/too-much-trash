@@ -5,25 +5,36 @@ struct AdminActions: View {
     @ObservedObject var account: AccountSession
     @Binding var showConfiguration: Bool
     @Environment(\.openURL) private var openURL
+    @State private var showCameraSettings = false
 
     var body: some View {
         Menu("Admin") {
             Button("Admin login", systemImage: "arrow.up.right.square") {
                 Task { if let url = await account.verifiedAdminURL() { openURL(url) } }
             }.accessibilityIdentifier("adminLogin")
+            Button("Camera view", systemImage: "camera") { showCameraSettings = true }
+                .accessibilityIdentifier("cameraSettings")
             Button("Server addresses", systemImage: "gear") { showConfiguration = true }
                 .accessibilityIdentifier("serverAddresses")
         }.accessibilityIdentifier("adminMenu")
+            .sheet(isPresented: $showCameraSettings) {
+                CameraSettingsView(settings: account.cameraSettings)
+                    .onChange(of: account.adminVisible) { _, visible in if !visible { showCameraSettings = false } }
+            }
     }
 }
 
 struct SessionDashboard: View {
     @ObservedObject var account: AccountSession
     @ObservedObject var queue: CaptureQueue
+    @ObservedObject var camera: EpisodeCameraController
     @Environment(\.dismiss) private var dismiss
     @State private var showConfiguration = false
     @State private var confirmEnd = false
+    @State private var showCleanup = false
     @State private var confirmDelete = false
+    @State private var fullToDelete: FullSessionRecording?
+    @State private var confirmFullDelete = false
     @State private var captureToDelete: QueuedCapture?
     @State private var deleteFromBackend = false
     @State private var showDeleteFailure = false
@@ -37,9 +48,43 @@ struct SessionDashboard: View {
                     Button("Back to camera", systemImage: "camera") { dismiss() }
                         .buttonStyle(.borderedProminent).frame(maxWidth: .infinity)
                         .accessibilityIdentifier("backToCamera")
+                    if camera.fullRecording || camera.fullRecordingChanging {
+                        FullSessionRecordingControl(active: camera.fullRecording, changing: camera.fullRecordingChanging, ready: false,
+                                                    start: {}, stop: { camera.setFullRecording(false) })
+                    }
                     SyncIndicator(account: account, queue: queue)
-                    if account.isEndingSession { ProgressView("Ending session…") }
-                    Text("Session videos").font(.headline)
+                    if !account.fullRecordings.isEmpty {
+                        Text("Full Session Recordings").font(.headline)
+                        ForEach(account.fullRecordingGroups) { group in
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack {
+                                    Text(group.name).font(.subheadline.bold())
+                                    if let date = group.startedAt { Text(date, style: .date).font(.caption).foregroundStyle(.secondary) }
+                                }
+                                ForEach(group.recordings) { full in
+                            NavigationLink {
+                                FullRecordingDetail(account: account, queue: queue, full: full) { capture, backend in
+                                    captureToDelete = capture; deleteFromBackend = backend; confirmDelete = true
+                                }
+                            } label: { FullRecordingRow(full: full, clips: account.squeezeRecordings(in: full).count) }
+                            .buttonStyle(.plain)
+                            .contextMenu {
+                                Button("Delete", systemImage: "trash", role: .destructive) {
+                                    fullToDelete = full; deleteFromBackend = false; confirmFullDelete = true
+                                }.disabled(!account.canDeleteLocalCapture || !full.finalized)
+                                if account.supportsBackendFullRecordingDeletion && full.uploaded {
+                                    Button("Delete here and backend", systemImage: "trash", role: .destructive) {
+                                        fullToDelete = full; deleteFromBackend = true; confirmFullDelete = true
+                                    }.disabled(!account.canDeleteLocalCapture || !full.finalized)
+                                }
+                            }
+                                }
+                            }
+                        }
+                    }
+                    if !account.fullRecordingUploadMessage.isEmpty { Text(account.fullRecordingUploadMessage).font(.callout) }
+                    if account.isEndingSession { ProgressView(account.endingSessionStage) }
+                    Text("Session Squeeze Event Recordings").font(.headline)
                     if account.currentCaptures.isEmpty {
                         ContentUnavailableView("No videos yet", systemImage: "video")
                     } else {
@@ -60,22 +105,34 @@ struct SessionDashboard: View {
                 }.padding(18).disabled(account.isEndingSession)
             }
             .navigationTitle("Dashboard").navigationBarTitleDisplayMode(.inline)
+            .task {
+                while !Task.isCancelled {
+                    account.refreshFullRecordings()
+                    do { try await Task.sleep(for: .seconds(1)) } catch { break }
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack(spacing: 14) {
+                        Menu("Menu") { Button("Cleanup session", systemImage: "leaf") { showCleanup = true } }
+                            .accessibilityIdentifier("generalMenu")
                         if account.adminVisible { AdminActions(account: account, showConfiguration: $showConfiguration) }
                         Button(role: .destructive) { confirmEnd = true } label: {
-                            Text("End Session").foregroundStyle(.red)
+                            Text("Sign out").foregroundStyle(.red)
                         }
                             .tint(.red)
-                            .disabled(account.busy || queue.storageUnavailable || account.installation?.mediaContractVersion != 1)
+                            .disabled(camera.fullRecording || camera.fullRecordingChanging || account.busy || queue.storageUnavailable || account.installation?.mediaContractVersion != 1)
                             .accessibilityIdentifier("endSession")
                     }
                 }
             }
+            .onDisappear {
+                if account.phase != .authorized { camera.deactivate() }
+            }
+            .sheet(isPresented: $showCleanup) { CleanupSessionView(store: account.cleanup) }
             .sheet(isPresented: $showConfiguration) { ServerConfigurationView(account: account) }
             .onChange(of: account.adminVisible) { _, visible in if !visible { showConfiguration = false } }
-            .alert("End session?", isPresented: $confirmEnd) {
+            .alert("Sign out and clear local recordings?", isPresented: $confirmEnd) {
                 Button(account.unsyncedVideoCount == 0 ? "Cancel" : "Keep uploading", role: .cancel) {}
                 Button(account.unsyncedVideoCount == 0 ? "End Session" : "End & Delete", role: .destructive) {
                     Task { if await account.endSession() { dismiss() } }
@@ -101,12 +158,73 @@ struct SessionDashboard: View {
             } message: { _ in
                 if deleteFromBackend { Text("This permanently removes the video from this iPhone and the backend.") }
             }
+            .alert(deleteFromBackend ? "Delete here and backend?" : "Delete video from this iphone",
+                   isPresented: $confirmFullDelete, presenting: fullToDelete) { full in
+                Button("Cancel", role: .cancel) {}
+                Button("Delete", role: .destructive) {
+                    let backend = deleteFromBackend
+                    Task {
+                        if let failure = await account.deleteFullRecording(full.id, fromBackend: backend) {
+                            deleteFailure = failure; showDeleteFailure = true
+                        }
+                    }
+                }
+            } message: { _ in
+                if deleteFromBackend { Text("Permanently delete this Full Session Recording here and on the backend. Squeeze event recordings are kept.") }
+            }
             .alert("Couldn’t delete video", isPresented: $showDeleteFailure) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(deleteFailure)
             }
         }
+    }
+}
+
+struct FullRecordingRow: View {
+    let full: FullSessionRecording
+    let clips: Int
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "video.fill").foregroundStyle(.green)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(full.createdAt, format: .dateTime.month().day().hour().minute()).font(.headline)
+                Text("\(Int(full.duration)) sec · \(clips) squeeze event recordings").font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Image(systemName: full.uploaded ? "checkmark.circle.fill" : "clock")
+                .foregroundStyle(full.uploaded ? .green : .secondary)
+                .accessibilityLabel(full.uploaded ? "Synced" : full.finalized ? "Pending upload" : "Finalizing")
+        }.padding(14).background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private struct FullRecordingDetail: View {
+    @ObservedObject var account: AccountSession
+    @ObservedObject var queue: CaptureQueue
+    let full: FullSessionRecording
+    let onDelete: (QueuedCapture, Bool) -> Void
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                FullRecordingRow(full: full, clips: account.squeezeRecordings(in: full).count)
+                Text("Session Squeeze Event Recordings").font(.headline)
+                if account.squeezeRecordings(in: full).isEmpty {
+                    ContentUnavailableView("No squeeze event recordings", systemImage: "video")
+                } else {
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
+                        ForEach(account.squeezeRecordings(in: full).reversed()) { capture in
+                            SessionVideoTile(capture: capture, file: queue.file(for: capture),
+                                uploading: account.uploadProgress[capture.id] != nil, stopPlayback: account.isEndingSession,
+                                canDelete: account.canDeleteLocalCapture,
+                                showsBackendDelete: account.supportsBackendVideoDeletion && capture.receipt?.clientCaptureID == capture.id) {
+                                    onDelete(capture, $0)
+                                }
+                        }
+                    }
+                }
+            }.padding(18)
+        }.navigationTitle("Full Session Recording").navigationBarTitleDisplayMode(.inline)
     }
 }
 

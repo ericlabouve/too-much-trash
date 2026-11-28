@@ -15,6 +15,7 @@ struct QueuedCapture: Codable, Identifiable, Equatable {
     var uploadBlocked: String?
     var episodeDirectory: String?
     var isIncomplete: Bool?
+    var fullSessionRecordingID: UUID?
 
     func isExpired(at now: Date) -> Bool {
         let start = receipt == nil ? createdAt : uploadConfirmedAt
@@ -153,7 +154,8 @@ final class CaptureQueue: ObservableObject {
         var next = captures
         next.append(QueuedCapture(id: id, filename: "video.mp4", origin: origin.absoluteString,
                                   installationID: installationID, createdAt: Date(), sizeBytes: total,
-                                  episodeDirectory: relative, isIncomplete: !complete))
+                                  episodeDirectory: relative, isIncomplete: !complete,
+                                  fullSessionRecordingID: (manifest["full_session_recording_id"] as? String).flatMap(UUID.init(uuidString:))))
         try persist(next)
     }
 
@@ -173,6 +175,7 @@ final class CaptureQueue: ObservableObject {
         return files.filter { file in
             (file.pathExtension.lowercased() == "mov" && !tracked.contains(file.standardizedFileURL)) ||
                 (file.lastPathComponent.hasPrefix("episode-") && !episodeFolders.contains(file.standardizedFileURL)) ||
+                (file.lastPathComponent.hasPrefix("continuous-") && !FileManager.default.fileExists(atPath: file.appendingPathComponent("uploaded.json").path)) ||
                 (file.lastPathComponent.hasPrefix("rolling-") && (try? FileManager.default.contentsOfDirectory(atPath: file.path).isEmpty) == false)
         }.count
     }

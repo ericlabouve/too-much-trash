@@ -9,13 +9,34 @@ struct AppRootView: View {
 
     var body: some View {
         Group {
-            if account.phase == .authorized {
-                ContentView().environmentObject(account)
+            #if DEBUG
+            if FeaturePreview.requested { FeaturePreview() }
+            else if ProcessInfo.processInfo.arguments.contains("-inspect-session") || ProcessInfo.processInfo.arguments.contains("-jaw-alpha-live-check") || ProcessInfo.processInfo.arguments.contains("-jaw-alpha-conformance") || ProcessInfo.processInfo.arguments.contains("-continuous-sync-check") {
+                Text("Checking camera and model…")
             } else {
-                OnboardingView(account: account)
+                normalContent
             }
+            #else
+            normalContent
+            #endif
         }
         .task {
+            #if DEBUG
+            if FeaturePreview.requested { return }
+            if ProcessInfo.processInfo.arguments.contains("-inspect-session") { PhoneSessionInspection.run(); return }
+            if ProcessInfo.processInfo.arguments.contains("-continuous-sync-check") {
+                await FullRecordingSyncCheck.run(account)
+                return
+            }
+            if ProcessInfo.processInfo.arguments.contains("-jaw-alpha-live-check") {
+                await JawAlphaLiveCheck.run()
+                return
+            }
+            if ProcessInfo.processInfo.arguments.contains("-jaw-alpha-conformance") {
+                await Task.detached { JawAlphaConformance.run() }.value
+                return
+            }
+            #endif
             watchBridge.start(account: account)
             await account.bootstrap()
             while !Task.isCancelled {
@@ -28,6 +49,11 @@ struct AppRootView: View {
             UIApplication.shared.isIdleTimerDisabled = phase == .active
         }
         .onChange(of: scenePhase) { _, phase in
+            #if DEBUG
+            if FeaturePreview.requested { return }
+            if ProcessInfo.processInfo.arguments.contains("-inspect-session") { return }
+            if ProcessInfo.processInfo.arguments.contains("-jaw-alpha-live-check") || ProcessInfo.processInfo.arguments.contains("-jaw-alpha-conformance") || ProcessInfo.processInfo.arguments.contains("-continuous-sync-check") { return }
+            #endif
             if phase == .active {
                 account.resume()
                 Task {
@@ -40,6 +66,11 @@ struct AppRootView: View {
             }
         }
     }
+    @ViewBuilder private var normalContent: some View {
+        if account.phase == .authorized { ContentView().environmentObject(account) }
+        else { OnboardingView(account: account) }
+    }
+
 }
 
 struct OnboardingView: View {
@@ -50,12 +81,12 @@ struct OnboardingView: View {
         NavigationStack {
             Group {
                 if account.busy {
-                    ProgressView(account.isEndingSession ? "Ending session…" : "Checking access…")
+                    ProgressView(account.isEndingSession ? account.endingSessionStage : "Checking access…")
                 } else if account.endCleanupPending {
                     VStack(spacing: 20) {
                         Text("Finish ending session").font(.title2)
                         Text(account.message).multilineTextAlignment(.center)
-                        Button("Retry End Session") { Task { _ = await account.endSession() } }
+                        Button("Retry sign-out") { Task { _ = await account.endSession() } }
                             .buttonStyle(.borderedProminent)
                     }.padding(28)
                 } else if account.hasSavedCredential && account.phase != .needsInvite {

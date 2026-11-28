@@ -40,7 +40,9 @@ def reserved(connection, owner_id, *, excluding=None):
     row = connection.execute("""SELECT COALESCE(sum(total_size),0) AS bytes, count(*) AS count
         FROM episode_transfers WHERE installation_id=%s AND status='active'
         AND (%s::uuid IS NULL OR episode_id<>%s::uuid)""", (owner_id, excluding, excluding)).fetchone()
-    return row["bytes"], row["count"]
+    full = connection.execute("""SELECT COALESCE(sum(total_size),0) AS bytes, count(*) AS count
+        FROM continuous_recordings WHERE installation_id=%s AND NOT complete""", (owner_id,)).fetchone()
+    return row["bytes"] + full["bytes"], row["count"] + full["count"]
 
 
 def check_quota(connection, owner, size, *, excluding=None):
