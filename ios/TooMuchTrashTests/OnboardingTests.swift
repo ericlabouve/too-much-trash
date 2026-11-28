@@ -33,6 +33,7 @@ private final class StubAPI: CollectorAPI {
     var uploadError: Error?
     var beforeUpload: (() async -> Void)?
     var endError: Error?
+    var beforeEnd: (() async -> Void)?
     var endCalls = 0
     var endID: UUID?
     var acceptedUploads: [UUID: MediaReceipt] = [:]
@@ -48,6 +49,8 @@ private final class StubAPI: CollectorAPI {
     var beforeResumableUpload: ((UUID) async throws -> Void)?
     var developmentSession = false
     var developmentVideoDeleteVersion: Int?
+    var developmentContinuousDeleteVersion: Int?
+    var deletedFullIDs: [UUID] = []
     var videoDeleteError: ClientError?
     var deletedVideoIDs: [UUID] = []
     var reachable = false
@@ -80,6 +83,7 @@ private final class StubAPI: CollectorAPI {
         return Installation(installationID: confirmedID ?? id, installationName: "Test iPhone",
                             quotaBytes: 1000000, quotaUploads: 10, usedBytes: 0, usedUploads: 0, mediaContractVersion: 1,
                             episodeContractVersion: episodeSupported ? 1 : nil,
+                            developmentContinuousDeleteVersion: developmentContinuousDeleteVersion,
                             resumableEpisodeContractVersion: resumableEpisodeSupported ? 1 : nil, developmentSession: developmentSession,
                             developmentVideoDeleteVersion: developmentVideoDeleteVersion)
     }
@@ -122,12 +126,17 @@ private final class StubAPI: CollectorAPI {
         try await beforeResumableUpload?(episodeID)
         return try await uploadEpisode(directory: directory, episodeID: episodeID, token: token, progress: progress)
     }
+    func deleteContinuous(recordingID: UUID, token: String) async throws {
+        deletedFullIDs.append(recordingID)
+        if let videoDeleteError { throw videoDeleteError }
+    }
     func deleteVideo(captureID: UUID, token: String) async throws {
         deletedVideoIDs.append(captureID)
         if let videoDeleteError { throw videoDeleteError }
     }
     func endSession(refreshToken: String) async throws -> EndSessionReceipt {
         endCalls += 1
+        await beforeEnd?()
         if let endError { throw endError }
         return EndSessionReceipt(installationID: endID ?? id, revoked: true)
     }
@@ -972,6 +981,32 @@ final class OnboardingTests: XCTestCase {
         XCTAssertFalse(FileManager.default.fileExists(atPath: file.path))
     }
 
+    func testUnresponsiveEndTimesOutAndLateAcknowledgementCannotDeleteFiles() async throws {
+        let api = StubAPI(), vault = MemoryVault()
+        try seed(api, vault)
+        let directory = queueDirectory(), queue = CaptureQueue(directory: directory)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let file = directory.appendingPathComponent("retained.mov")
+        try Data("keep this".utf8).write(to: file)
+        try queue.enqueue(file: file, origin: origin, installationID: api.id)
+        let session = try account(api, vault, queue: queue)
+        await session.bootstrap(); session.endOperationTimeout = 0.25
+        var reply: CheckedContinuation<Void, Never>?
+        api.beforeEnd = { await withCheckedContinuation { reply = $0 } }
+        let ended = await session.endSession()
+        XCTAssertFalse(ended)
+        XCTAssertFalse(session.busy)
+        XCTAssertFalse(session.isEndingSession)
+        XCTAssertTrue(session.endCleanupPending)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
+        XCTAssertNil(vault.values[origin]?.revocationConfirmed)
+        let lateReply = try XCTUnwrap(reply)
+        reply = nil; lateReply.resume()
+        for _ in 0..<5 { await Task.yield() }
+        XCTAssertTrue(FileManager.default.fileExists(atPath: file.path))
+        XCTAssertNotNil(vault.values[origin])
+    }
+
     func testMismatchedEndAcknowledgementCannotDeleteVideos() async throws {
         let api = StubAPI(), vault = MemoryVault()
         try seed(api, vault)
@@ -1057,5 +1092,74 @@ final class OnboardingTests: XCTestCase {
         }
         XCTAssertEqual(api.uploadCalls, 2)
         XCTAssertEqual(queue.captures.compactMap(\.receipt).count, 2)
+    }
+}
+
+
+extension OnboardingTests {
+    func testFullRecordingStartsOrJoinsWalkAndLocalDeleteKeepsClipsAndWalk() async throws {
+        let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        try seed(api, vault)
+        let queue = CaptureQueue(directory: root), session = try account(api, vault, queue: queue)
+        await session.bootstrap()
+        let walk = try session.ensureCleanupWalkForRecording()
+        XCTAssertEqual(try session.ensureCleanupWalkForRecording(), walk)
+        let owner = try XCTUnwrap(session.captureOwner)
+        let folder = try queue.recordingDirectory(origin: owner.origin, installationID: owner.installationID)
+        let full = try ContinuousCapture(owner: folder, start: 10, cleanupSessionID: walk)
+        let source = folder.appendingPathComponent("part.mp4")
+        try Data([1]).write(to: source)
+        try full.segment(.init(url: source, firstTimestamp: 10, lastTimestamp: 14, frameCount: 4, error: nil))
+        session.refreshFullRecordings()
+        let activeDelete = await session.deleteFullRecording(full.id, fromBackend: false)
+        XCTAssertNotNil(activeDelete) // Open journals must never be removed.
+        try full.stop(at: 14, pending: [], reason: "user_stop")
+        XCTAssertTrue(try full.finishIfReady())
+        XCTAssertEqual(session.cleanup.activeID, walk)
+        let second = try ContinuousCapture(owner: folder, start: 20, cleanupSessionID: walk)
+        let clipID = UUID(), clip = folder.appendingPathComponent("episode-\(clipID.uuidString.lowercased())")
+        try FileManager.default.createDirectory(at: clip, withIntermediateDirectories: true)
+        for name in ["video.mp4", "imu.jsonl", "poses.jsonl"] { try Data([1]).write(to: clip.appendingPathComponent(name)) }
+        let manifest: [String: Any] = ["episode_id": clipID.uuidString, "complete": false,
+            "full_session_recording_id": full.id.uuidString, "cleanup_session_id": walk.uuidString, "timing": ["press": 11]]
+        try JSONSerialization.data(withJSONObject: manifest).write(to: clip.appendingPathComponent("manifest.json"))
+        session.queueEpisode(clip, id: clipID, owner: owner)
+        session.refreshFullRecordings()
+        let row = try XCTUnwrap(session.fullRecordings.first { $0.id == full.id })
+        XCTAssertEqual(session.squeezeRecordings(in: row).map(\.id), [clipID])
+        let other = try XCTUnwrap(session.fullRecordings.first { $0.id == second.id })
+        XCTAssertTrue(session.squeezeRecordings(in: other).isEmpty)
+        let failure = await session.deleteFullRecording(full.id, fromBackend: false)
+        XCTAssertNil(failure)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: clip.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: second.directory.path))
+        XCTAssertEqual(queue.captures.map(\.id), [clipID])
+        XCTAssertEqual(session.cleanup.activeID, walk)
+    }
+
+    func testDeveloperFullDeletionWaitsForMatchingReceiptAndBackendAcknowledgement() async throws {
+        let api = StubAPI(), vault = MemoryVault(), root = queueDirectory()
+        defer { try? FileManager.default.removeItem(at: root) }
+        api.developmentSession = true; api.developmentContinuousDeleteVersion = 1
+        try seed(api, vault)
+        let queue = CaptureQueue(directory: root), session = try account(api, vault, queue: queue)
+        await session.bootstrap()
+        let owner = try XCTUnwrap(session.captureOwner)
+        let folder = try queue.recordingDirectory(origin: owner.origin, installationID: owner.installationID)
+        let full = try ContinuousCapture(owner: folder, start: 1)
+        try full.stop(at: 2, pending: [], reason: "test")
+        XCTAssertTrue(try full.finishIfReady())
+        let unacknowledged = await session.deleteFullRecording(full.id, fromBackend: true)
+        XCTAssertNotNil(unacknowledged); XCTAssertTrue(api.deletedFullIDs.isEmpty)
+        let ack = ContinuousReceipt(recording_id: full.id, bundle_sha256: "test", size_bytes: 1, complete: true)
+        try JSONEncoder().encode(ack).write(to: full.directory.appendingPathComponent("uploaded.json"))
+        api.videoDeleteError = .network
+        let failed = await session.deleteFullRecording(full.id, fromBackend: true)
+        XCTAssertNotNil(failed); XCTAssertTrue(FileManager.default.fileExists(atPath: full.directory.path))
+        api.videoDeleteError = nil
+        let succeeded = await session.deleteFullRecording(full.id, fromBackend: true)
+        XCTAssertNil(succeeded); XCTAssertFalse(FileManager.default.fileExists(atPath: full.directory.path))
+        XCTAssertEqual(api.deletedFullIDs, [full.id, full.id])
     }
 }

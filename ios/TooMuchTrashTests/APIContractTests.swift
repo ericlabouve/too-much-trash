@@ -5,6 +5,9 @@ import XCTest
 private final class ScriptedTransport: HTTPTransport {
     struct Reply { let status: Int; let json: String; var type = "application/json"; var url: URL?; var retryAfter: String? }
     var replies: [Reply] = []
+    var dataErrors: [Error] = []
+    var connectionResets = 0
+    func resetConnection() { connectionResets += 1 }
     var requests: [URLRequest] = []
     var stagedUpload: Data?
     var overlapUploads = false
@@ -15,6 +18,7 @@ private final class ScriptedTransport: HTTPTransport {
     private(set) var stagedSizes: [String: Int] = [:]
     func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         requests.append(request)
+        if !dataErrors.isEmpty { throw dataErrors.removeFirst() }
         let reply = replies.removeFirst()
         var headers = ["Content-Type": reply.type]
         if let retryAfter = reply.retryAfter { headers["Retry-After"] = retryAfter }
@@ -43,6 +47,65 @@ private final class ScriptedTransport: HTTPTransport {
 
 @MainActor
 final class APIContractTests: XCTestCase {
+    func testFullRecordingDeleteUsesOwnedRouteAndRejectsWrongAcknowledgement() async throws {
+        let id = UUID(), transport = ScriptedTransport()
+        let live = try api(transport)
+        transport.replies = [.init(status: 200, json: "{\"recording_id\":\"\(UUID())\",\"deleted\":true}")]
+        do { try await live.deleteContinuous(recordingID: id, token: "test-access"); XCTFail("Mismatched ID accepted") }
+        catch { XCTAssertEqual(error as? ClientError, .invalidResponse) }
+        transport.replies = [.init(status: 200, json: "{\"recording_id\":\"\(id)\",\"deleted\":true}")]
+        try await live.deleteContinuous(recordingID: id, token: "test-access")
+        XCTAssertEqual(transport.requests.last?.httpMethod, "DELETE")
+        XCTAssertEqual(transport.requests.last?.url?.path, "/api/v1/continuous/\(id.uuidString)")
+        XCTAssertEqual(transport.requests.last?.value(forHTTPHeaderField: "Authorization"), "Bearer test-access")
+    }
+
+    func testFullDeletionRetriesTransientConnectionWithFreshPoolButNotServerFailure() async throws {
+        let id = UUID(), transport = ScriptedTransport()
+        let client = try api(transport)
+        transport.dataErrors = [URLError(.networkConnectionLost)]
+        transport.replies = [.init(status: 200, json: "{\"recording_id\":\"\(id)\",\"deleted\":true}")]
+        try await client.deleteContinuous(recordingID: id, token: "test-access")
+        XCTAssertEqual(transport.connectionResets, 1)
+        XCTAssertEqual(transport.requests.count, 2)
+        XCTAssertEqual(transport.requests[0], transport.requests[1])
+        transport.replies = [.init(status: 503, json: "{}")]
+        do { try await client.deleteContinuous(recordingID: id, token: "test-access"); XCTFail("Server error accepted") }
+        catch { XCTAssertEqual(error as? ClientError, .server) }
+        XCTAssertEqual(transport.requests.count, 3)
+        XCTAssertEqual(transport.connectionResets, 1)
+    }
+
+    func testContinuousUploadResumesAndHandlesEmptySensorJournals() async throws {
+        let base = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: base) }
+        let part = base.appendingPathComponent("part.mp4")
+        try Data([1, 2, 3]).write(to: part)
+        let journal = try ContinuousCapture(owner: base, start: 1)
+        try journal.segment(.init(url: part, firstTimestamp: 1, lastTimestamp: 2, frameCount: 2, error: nil))
+        try journal.stop(at: 2, pending: [], reason: "test")
+        XCTAssertTrue(try journal.finishIfReady())
+        let id = UUID(uuidString: String(journal.directory.lastPathComponent.dropFirst(11)))!
+        let names = try ContinuousCapture.fileNames(journal.directory)
+        let chunks = Dictionary(uniqueKeysWithValues: names.map { ($0, $0 == "part.mp4" ? [0] : []) })
+        let response = try JSONSerialization.data(withJSONObject: ["complete": false, "chunk_size": 4194304, "chunks": chunks])
+        let (digest, size) = try LiveCollectorAPI.continuousDigest(journal.directory)
+        let receipt = try JSONEncoder().encode(ContinuousReceipt(recording_id: id, bundle_sha256: digest, size_bytes: size, complete: true))
+        let transport = ScriptedTransport()
+        transport.replies = [.init(status: 200, json: String(decoding: response, as: UTF8.self)),
+            .init(status: 200, json: "{\"accepted\":true}"), .init(status: 200, json: "{\"accepted\":true}"),
+            .init(status: 202, json: String(decoding: receipt, as: UTF8.self))]
+        let final = try await api(transport).uploadContinuous(directory: journal.directory, recordingID: id, token: "test-access", progress: { _, _ in })
+        XCTAssertTrue(final.complete)
+        XCTAssertEqual(transport.requests.filter { $0.httpMethod == "PUT" }.count, 2) // diagnostics + manifest; empty streams need no chunk
+        XCTAssertFalse(transport.requests.contains { $0.url!.path.hasSuffix("/part.mp4/0") })
+        transport.replies = [.init(status: 200, json: "{\"complete\":true,\"chunk_size\":4194304,\"chunks\":{}}"),
+                             .init(status: 202, json: String(decoding: receipt, as: UTF8.self))]
+        let again = try await api(transport).uploadContinuous(directory: journal.directory, recordingID: id, token: "test-access", progress: { _, _ in })
+        XCTAssertEqual(again.bundle_sha256, digest)
+    }
+
     func testResumableEpisodeSkipsPreviouslyAcknowledgedChunks() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

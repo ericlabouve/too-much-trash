@@ -103,7 +103,8 @@ final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Send
                   captureIDs.contains(id) else { continue }
             let ordinary = [origin.appendingPathComponent("api/v1/media"), origin.appendingPathComponent("api/v1/episodes")].contains(requestURL)
             let transferPrefix = origin.appendingPathComponent("api/v1/episodes/\(id.uuidString)/transfer").absoluteString + "/"
-            guard ordinary || requestURL.absoluteString.hasPrefix(transferPrefix) else { continue }
+            let continuousPrefix = origin.appendingPathComponent("api/v1/continuous/\(id.uuidString)/transfer").absoluteString + "/"
+            guard ordinary || requestURL.absoluteString.hasPrefix(transferPrefix) || requestURL.absoluteString.hasPrefix(continuousPrefix) else { continue }
             task.cancel()
         }
     }
@@ -113,7 +114,8 @@ final class BackgroundUploads: NSObject, URLSessionDataDelegate, @unchecked Send
         let parts = url.pathComponents
         guard parts.count >= 7, parts[parts.count - 3] == "transfer",
               UUID(uuidString: parts[parts.count - 4]) == UUID(uuidString: key),
-              ["video", "imu", "poses", "manifest"].contains(parts[parts.count - 2]),
+              (["video", "imu", "poses", "manifest"].contains(parts[parts.count - 2]) ||
+                (parts[parts.count - 5] == "continuous" && parts[parts.count - 2].range(of: "^[a-zA-Z0-9_.-]+$", options: .regularExpression) != nil)),
               let index = Int(parts.last ?? ""), index >= 0 else { return nil }
         return Self.chunkFileName(episodeID: key, name: parts[parts.count - 2], index: index,
                                   chunkSize: request.value(forHTTPHeaderField: "X-TMT-Chunk-Size"))

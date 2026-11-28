@@ -648,18 +648,24 @@ final class EpisodeJournal: @unchecked Sendable {
             let videoSegmentJoins: [EpisodeVideoAssembler.JoinTiming]
         }
         let schemaVersion: Int
+        let cleanupSessionID: String?
+        let fullSessionRecordingID: String?
         let episodeID: String
         let complete: Bool
         let timing: Timing
         let files: [String: String]
         let sensorMetadata: Metadata
         enum CodingKeys: String, CodingKey {
+            case fullSessionRecordingID = "full_session_recording_id"
+            case cleanupSessionID = "cleanup_session_id"
             case schemaVersion = "schema_version", episodeID = "episode_id", complete, timing, files, sensorMetadata = "sensor_metadata"
         }
     }
 
     let directory: URL
     let window: EpisodeWindowScheduler.Window
+    private let cleanupSessionID: UUID?
+    private let fullSessionRecordingID: UUID?
     private var imu: FileHandle?
     private var poses: FileHandle?
     private var coverage: [String: Coverage] = [:]
@@ -673,8 +679,10 @@ final class EpisodeJournal: @unchecked Sendable {
     private var lastSyncTime: TimeInterval?
     private let encoder = JSONEncoder()
 
-    init(ownerDirectory: URL, window: EpisodeWindowScheduler.Window) throws {
+    init(ownerDirectory: URL, window: EpisodeWindowScheduler.Window, cleanupSessionID: UUID? = nil, fullSessionRecordingID: UUID? = nil) throws {
         self.window = window
+        self.cleanupSessionID = cleanupSessionID
+        self.fullSessionRecordingID = fullSessionRecordingID
         directory = ownerDirectory.appendingPathComponent("episode-\(window.id.uuidString.lowercased())", isDirectory: true)
         guard !FileManager.default.fileExists(atPath: directory.path) else { throw ClientError.storage }
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: false)
@@ -798,7 +806,7 @@ final class EpisodeJournal: @unchecked Sendable {
         try FileManager.default.moveItem(at: video, to: target)
         try CaptureQueue.protect(target)
         let hasPadding = release.map { window.pressedAt - window.start >= 3 && end - $0 >= 3 } ?? false
-        let manifest = Manifest(schemaVersion: 1, episodeID: window.id.uuidString, complete: validatedCoverageAndClock && gaps.isEmpty && hasPadding,
+        let manifest = Manifest(schemaVersion: 1, cleanupSessionID: cleanupSessionID?.uuidString.lowercased(), fullSessionRecordingID: fullSessionRecordingID?.uuidString.lowercased(), episodeID: window.id.uuidString, complete: validatedCoverageAndClock && gaps.isEmpty && hasPadding,
             timing: .init(start: window.start, press: window.pressedAt, release: release, end: end),
             files: ["video": "video.mp4", "imu": "imu.jsonl", "poses": "poses.jsonl"],
             sensorMetadata: .init(commonClock: "system_uptime_seconds", nativeClockAlignment: validatedCoverageAndClock ? "validated" : "unverified",
@@ -967,6 +975,15 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
     let camera = ARFrameCollector()
     private let motion = MotionSampleCollector()
     private let state = DispatchQueue(label: "org.toomuchtrash.episode-state")
+    private let alpha = JawAlphaRunner()
+    private var alphaEnabled = true
+    private var cleanupSessionID: UUID?
+    private var shadowLog: FileHandle?
+    private var continuous: ContinuousCapture?
+    private var finishingContinuous: [ContinuousCapture] = []
+    var onAlpha: (([String: Any]) -> Void)?
+    var onContinuousStatus: ((Bool, String) -> Void)?
+
     private let ownerDirectory: URL
     private let scratchDirectory: URL
     private let writer: ARVideoSegmentWriter
@@ -1006,6 +1023,20 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
         scratchDirectory = ownerDirectory.appendingPathComponent("rolling-\(UUID().uuidString.lowercased())", isDirectory: true)
         writer = try ARVideoSegmentWriter(directory: scratchDirectory)
         try CaptureQueue.protect(scratchDirectory)
+        alpha.onResult = { [weak self] result in
+            self?.state.async { [weak self] in
+                guard let self else { return }
+                self.onAlpha?(result)
+                do {
+                    let data = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys]) + Data([10])
+                    try self.shadowLog?.write(contentsOf: data)
+                } catch { self.publish("Could not save alpha diagnostics.") }
+                for journal in self.allContinuous {
+                    do { try journal.event(result, stream: "predictions") }
+                    catch { self.onContinuousStatus?(self.continuous != nil, "Could not save prediction log; partial recording retained.") }
+                }
+            }
+        }
         camera.onFrame = { [weak self] pixels, pose in
             guard let self else { return }
             self.lifecycleLock.lock()
@@ -1021,13 +1052,23 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
                     self.publish("Video encoding failed. Partial data is retained.")
                 }
             }
-            self.state.async { self.accept(pose) }
+            self.state.async {
+                self.accept(pose)
+                let samples = self.accelerometer.samples.map(\.value) + self.gyroscope.samples.map(\.value)
+                if self.alphaEnabled { self.alpha.offer(pixels, pose: pose, samples: samples) }
+            }
         }
         writer.onSegmentOpened = { [weak self] url, time in self?.state.async { [weak self] in self?.openSegments[url] = time } }
         writer.onFrameDropped = { [weak self] time, reason in self?.state.async { [weak self] in self?.recordGap(stream: "video", time: time, reason: reason) } }
         writer.onSegment = { [weak self] segment in self?.state.async { [weak self] in
             guard let self else { return }
             self.openSegments.removeValue(forKey: segment.url)
+            for journal in self.allContinuous {
+                do { try journal.segment(segment) }
+                catch { self.onContinuousStatus?(self.continuous != nil, "Could not preserve a video part; source retained."); self.preserveRollingFiles = true }
+            }
+            self.finishContinuous()
+
             self.segments.append(segment)
             if self.sizeOverflowIntervals.contains(where: { segment.lastTimestamp >= $0.start && segment.firstTimestamp <= $0.end }) {
                 self.protectedSizeOverflowSegments.insert(segment.url)
@@ -1057,6 +1098,13 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
         lifecycleLock.unlock()
         state.async {
             self.active = true
+            do {
+                try self.shadowLog?.close()
+                let log = self.ownerDirectory.appendingPathComponent("alpha-\(UUID().uuidString.lowercased()).jsonl")
+                FileManager.default.createFile(atPath: log.path, contents: nil)
+                try CaptureQueue.protect(log)
+                self.shadowLog = try FileHandle(forWritingTo: log)
+            } catch { self.publish("Could not open alpha diagnostic log.") }
             self.ready = false
             self.firstFrameUptime = nil
             self.accelerometer = TimedPreRoll(duration: 5)
@@ -1069,6 +1117,7 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
             self.lastGoodVideoTime = nil
             self.publish("Buffering at least three seconds…")
         }
+        state.async { if self.alphaEnabled { self.alpha.reset(reason: "camera_session_start") } }
         motion.start()
         return camera.start()
     }
@@ -1077,7 +1126,7 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
         state.async {
             guard self.active, self.ready, let window = self.scheduler.press(source, at: timestamp) else { return }
             do {
-                let journal = try EpisodeJournal(ownerDirectory: self.ownerDirectory, window: window)
+                let journal = try EpisodeJournal(ownerDirectory: self.ownerDirectory, window: window, cleanupSessionID: self.cleanupSessionID, fullSessionRecordingID: self.continuous?.id)
                 self.journals[window.id] = journal
                 let samples = self.accelerometer.snapshot(from: window.start, through: timestamp).map(\.value) +
                     self.gyroscope.snapshot(from: window.start, through: timestamp).map(\.value) +
@@ -1135,8 +1184,11 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
         lifecycleLock.unlock()
         camera.stop()
         motion.stop()
-        state.async {
+        alpha.stop()
+        let stopTime = ProcessInfo.processInfo.systemUptime
+        camera.onFrameQueue { self.state.async {
             guard self.active else { return }
+            self.stopContinuous(at: stopTime, reason: reason)
             self.active = false
             self.ready = false
             let now = ProcessInfo.processInfo.systemUptime
@@ -1144,7 +1196,8 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
             self.recordGap(stream: "capture", time: now, reason: reason)
             self.publish("Capture interrupted; preserving available data.")
             self.flushSegments(after: 0)
-        }
+            try? self.shadowLog?.synchronize()
+        } }
     }
 
     private func accept(_ sample: MotionSample) {
@@ -1161,6 +1214,10 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
         case .attitude: _ = attitude.append(time: sample.timestamp, value: sample)
         }
         latestMotion[sample.stream.rawValue] = sample
+        for journal in allContinuous {
+            do { try journal.append(sample, stream: "imu", time: sample.timestamp) }
+            catch { onContinuousStatus?(continuous != nil, "Sensor write failed; partial full recording retained.") }
+        }
         for window in scheduler.pending + Array(pendingExports.values) {
             let end = min(window.end ?? .infinity, window.start + EpisodeWindowScheduler.maximumDuration)
             do { try journals[window.id]?.append(sample, commonTime: sample.timestamp, through: end) }
@@ -1186,6 +1243,10 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
             recordGap(stream: "camera_pose", time: pose.callbackUptime, reason: "out_of_order_frame")
         }
         latestPose = pose
+        for journal in allContinuous {
+            do { try journal.append(pose, stream: "poses", time: pose.timestamp) }
+            catch { onContinuousStatus?(continuous != nil, "Pose write failed; partial full recording retained.") }
+        }
         for window in scheduler.pending + Array(pendingExports.values) {
             let end = min(window.end ?? .infinity, window.start + EpisodeWindowScheduler.maximumDuration)
             do { try journals[window.id]?.append(pose, commonTime: pose.timestamp, through: end) }
@@ -1196,6 +1257,73 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
             }
         }
         refreshReadiness()
+    }
+
+    func configureAlpha(enabled: Bool) {
+        state.async {
+            guard self.alphaEnabled != enabled else { return }
+            self.alphaEnabled = enabled
+            if enabled && self.active { self.alpha.reset(reason: "model_enabled") }
+            else { self.alpha.stop() }
+        }
+    }
+    func setCleanupSession(_ id: UUID?) {
+        state.async {
+            guard self.cleanupSessionID != id else { return }
+            self.cleanupSessionID = id
+            for journal in self.allContinuous {
+                try? journal.event(["kind": "cleanup_session_change", "time": ProcessInfo.processInfo.systemUptime, "cleanup_session_id": id?.uuidString.lowercased() as Any? ?? NSNull()], stream: "diagnostics")
+            }
+        }
+    }
+    private var allContinuous: [ContinuousCapture] { (continuous.map { [$0] } ?? []) + finishingContinuous }
+    func setFullRecording(_ enabled: Bool) {
+        state.async {
+            if enabled {
+                guard self.active, self.continuous == nil else {
+                    self.onContinuousStatus?(self.continuous != nil, "Camera is not ready to start another Full Session Recording.")
+                    return
+                }
+                do {
+                    self.continuous = try ContinuousCapture(owner: self.ownerDirectory, start: ProcessInfo.processInfo.systemUptime, cleanupSessionID: self.cleanupSessionID, modelEnabled: self.alphaEnabled)
+                    self.onContinuousStatus?(true, "Full recording active")
+                } catch { self.onContinuousStatus?(false, "Could not start full recording: \(error.localizedDescription)") }
+            } else {
+                let end = ProcessInfo.processInfo.systemUptime
+                self.camera.onFrameQueue {
+                    self.writer.finishCurrent()
+                    self.state.async { self.stopContinuous(at: end, reason: "user_stop") }
+                }
+            }
+        }
+    }
+    func reference(source: String, phase: String, time: Double) {
+        state.async {
+            for journal in self.allContinuous {
+                do { try journal.event(["source": source, "phase": phase, "callback_uptime": time, "kind": phase == "press" ? "squeeze_reference" : phase == "release" ? "release_reference" : "cancel_reference"], stream: "references") }
+                catch { self.onContinuousStatus?(self.continuous != nil, "Reference event write failed; partial data retained.") }
+            }
+        }
+    }
+    private func stopContinuous(at time: Double, reason: String) {
+        guard let journal = continuous else { return }
+        do {
+            try journal.stop(at: time, pending: Set(openSegments.keys), reason: reason)
+            finishingContinuous.append(journal); continuous = nil
+            onContinuousStatus?(false, "Finalizing full recording…")
+            finishContinuous()
+        } catch { onContinuousStatus?(true, "Could not finalize full recording; files retained.") }
+    }
+    private func finishContinuous() {
+        finishingContinuous.removeAll { journal in
+            do {
+                if try journal.finishIfReady() {
+                    onContinuousStatus?(continuous != nil, "Full recording saved; queued for sync.")
+                    return true
+                }
+            } catch { onContinuousStatus?(continuous != nil, "Full recording finalization failed; files retained.") }
+            return false
+        }
     }
 
     private func refreshReadiness() {
@@ -1341,6 +1469,11 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
 
     private func recordGap(stream: String, time: TimeInterval, reason: String) {
         guard time.isFinite else { return }
+        for journal in allContinuous {
+            do { try journal.event(["kind": "gap", "stream": stream, "time": time, "reason": reason], stream: "diagnostics") }
+            catch { onContinuousStatus?(continuous != nil, "Could not save gap diagnostic; files retained.") }
+        }
+        guard time.isFinite else { return }
         recentGaps.append(EpisodeJournal.Gap(stream: stream, timestamp: time, reason: reason))
         let cutoff = (recentGaps.map(\.timestamp).max() ?? time) - 5
         recentGaps.removeAll { $0.timestamp < cutoff }
@@ -1408,6 +1541,22 @@ final class EpisodeCaptureEngine: @unchecked Sendable {
 
 @MainActor
 final class EpisodeCameraController: ObservableObject {
+    @Published private(set) var fullRecording = false
+    @Published private(set) var fullRecordingMessage = ""
+    @Published private(set) var fullRecordingStartedAt: Date?
+    @Published private(set) var alphaEvent = ""
+    private var alphaFlash: Task<Void, Never>?
+    @Published private(set) var fullRecordingChanging = false
+    func setFullRecording(_ enabled: Bool) {
+        guard !fullRecordingChanging, engine != nil else { return }
+        fullRecordingChanging = true
+        engine?.setFullRecording(enabled)
+    }
+    func applyCameraConfiguration(_ value: CameraViewConfiguration) {
+        engine?.configureAlpha(enabled: value.runsModel)
+        if !value.runsModel { alphaFlash?.cancel(); alphaEvent = "" }
+    }
+    func setCleanupSession(_ id: UUID?) { engine?.setCleanupSession(id) }
     @Published private(set) var session: ARSession?
     @Published private(set) var isReady = false
     @Published private(set) var permissionDenied = false
@@ -1425,6 +1574,24 @@ final class EpisodeCameraController: ObservableObject {
     func configure(directory: URL) throws {
         guard engine == nil else { return }
         let engine = try EpisodeCaptureEngine(ownerDirectory: directory)
+        engine.onContinuousStatus = { [weak self] active, message in
+            Task { @MainActor in
+                if active && self?.fullRecording != true { self?.fullRecordingStartedAt = Date() }
+                if !active { self?.fullRecordingStartedAt = nil }
+                self?.fullRecordingChanging = false
+                self?.fullRecording = active; self?.fullRecordingMessage = message
+            }
+        }
+        engine.onAlpha = { [weak self] result in
+            guard let event = result["event"] as? Int, event != 0 else { return }
+            Task { @MainActor [weak self] in
+                self?.alphaEvent = event == 1 ? "SQUEEZE" : "RELEASE"
+                self?.alphaFlash?.cancel()
+                self?.alphaFlash = Task { @MainActor [weak self] in
+                    do { try await Task.sleep(for: .milliseconds(650)); self?.alphaEvent = "" } catch {}
+                }
+            }
+        }
         engine.onStatus = { [weak self] update in
             Task { @MainActor [weak self] in
                 self?.isReady = update.ready
@@ -1465,6 +1632,10 @@ final class EpisodeCameraController: ObservableObject {
         session = engine.camera.session
     }
 
+    #if DEBUG && targetEnvironment(simulator)
+    func debugSetFullRecordingForPreview() { fullRecording = true }
+    #endif
+
     func activate() async {
         #if targetEnvironment(simulator)
         status = "No camera available. Use an iPhone to record."
@@ -1491,6 +1662,7 @@ final class EpisodeCameraController: ObservableObject {
     }
 
     func press(_ source: String) {
+        engine?.reference(source: source, phase: "press", time: ProcessInfo.processInfo.systemUptime)
         guard isReady, !heldSources.contains(source) else { return }
         let time = ProcessInfo.processInfo.systemUptime
         heldSources.insert(source)
@@ -1501,6 +1673,7 @@ final class EpisodeCameraController: ObservableObject {
     }
 
     func release(_ source: String) {
+        engine?.reference(source: source, phase: "release", time: ProcessInfo.processInfo.systemUptime)
         guard heldSources.remove(source) != nil else { return }
         heldStartTimes.removeValue(forKey: source)
         engine?.release(source, at: ProcessInfo.processInfo.systemUptime)
@@ -1508,6 +1681,7 @@ final class EpisodeCameraController: ObservableObject {
     }
 
     func cancel(_ source: String) {
+        engine?.reference(source: source, phase: "cancel", time: ProcessInfo.processInfo.systemUptime)
         guard heldSources.remove(source) != nil else { return }
         heldStartTimes.removeValue(forKey: source)
         engine?.cancel(source, at: ProcessInfo.processInfo.systemUptime, reason: "capture_event_cancelled")

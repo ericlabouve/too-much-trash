@@ -275,3 +275,6 @@ __marimo__/
 !/cad/versions/v3/review/concepts/uniform-rail-sleeve-b/b-bracket.step
 !/cad/versions/v3/print/jobs/2026-10-26-ramped-fixed-hook-source/*.stl
 !/cad/versions/v3/print/jobs/2026-10-26-ramped-fixed-hook-source/*.step
+
+# Private, pinned jaw alpha model assets (stage with ios/scripts/stage_jaw_alpha.py).
+/ios/AlphaPrivate/

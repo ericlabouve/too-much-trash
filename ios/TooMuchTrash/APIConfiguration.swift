@@ -177,6 +177,9 @@ struct Installation: Codable, Equatable {
     let usedUploads: Int
     var mediaContractVersion: Int?
     var episodeContractVersion: Int?
+    var cleanupSessionContractVersion: Int?
+    var continuousRecordingContractVersion: Int?
+    var developmentContinuousDeleteVersion: Int?
     var resumableEpisodeContractVersion: Int?
     var developmentSession: Bool?
     var developmentVideoDeleteVersion: Int?
@@ -186,6 +189,9 @@ struct Installation: Codable, Equatable {
         case usedBytes = "used_bytes", usedUploads = "used_uploads"
         case mediaContractVersion = "media_contract_version"
         case episodeContractVersion = "episode_contract_version"
+        case cleanupSessionContractVersion = "cleanup_session_contract_version"
+        case continuousRecordingContractVersion = "continuous_recording_contract_version"
+        case developmentContinuousDeleteVersion = "development_continuous_delete_version"
         case resumableEpisodeContractVersion = "resumable_episode_contract_version"
         case developmentSession = "development_session"
         case developmentVideoDeleteVersion = "development_video_delete_version"

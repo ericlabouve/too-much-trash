@@ -2,6 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Mark the cleanup location and optionally record your walking route for dataset context.</string>
+    <key>UIBackgroundModes</key><array><string>location</string></array>
     <key>NSMotionUsageDescription</key>
     <string>Record device motion alongside pickup video for research.</string>
     <key>NSAppTransportSecurity</key>

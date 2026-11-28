@@ -32,6 +32,12 @@ invite codes, or unverified claims. Updating memory does not grant new authority
 
 ## Architecture and current decisions
 
+- 2026-11-27: Cleanup session name/description, optional geotag and opt-in route use owner-scoped revisioned PUT/GET `/api/v1/cleanup-sessions/{UUID}` and contract version 1. Stable IDs appear in media manifests; joins also require installation ownership. Same-revision retries must match, start is immutable, stopped walks cannot reopen. HealthKit metrics are not uploaded. Consolidate the cleanup metadata table into unmerged migration 008; the previously applied local development 008 receives only its idempotent additive table SQL after backup, never destructive downgrade. Fresh main/production databases run full 008 normally.
+
+
+- 2026-11-27: Full continuous recordings have a separate resumable `/api/v1/continuous` contract and additive Alembic revision `008_continuous_recordings`. Finalized multi-part video/raw streams and independent reference/prediction logs are immutable, ownership checked and SHA-256 verified before acknowledgement. They are not queued into the one-pickup episode worker. Regular quotas include shared pending reservations; dev sessions remain unlimited. Staging expires after seven inactive days; committed originals/receipts persist. See `backend/onboarding.md`.
+
+
 - Development installations track usage without storage or upload count quotas. The admin portal can edit quotas for unused regular invites and active regular installations. Changes to active quotas account for reserved uploads.
 - Developer video deletion requires development mode and the owning installation. Keep its durable deletion record for cleanup retries and to block stale uploads. Deploy the API and claim-checked worker together when enabling this feature.
 
@@ -421,3 +427,5 @@ invite codes, or unverified claims. Updating memory does not grant new authority
   Simulator checks do not qualify real camera capture or volume-button events.
 - Read `backend/onboarding.md` for the auth contract and verification details;
   `backend/README.md` for setup and `backend/compose.yaml` for deployed services.
+
+- 2026-11-27: Full Session Recording developer deletion uses authenticated owner-scoped DELETE /api/v1/continuous/{id}, separately advertised development_continuous_delete_version:1. Commit continuous_deletions tombstone before cleaning deterministic final/staging object keys, reject upload resurrection, and retry failed cleanup through the sweeper. Preserve squeeze captures, cleanup metadata and cumulative usage. Added table is consolidated into the single unmerged revision008; backed up eric-dev before applying its idempotent CONTINUOUS_DELETIONS_SQL addendum to the already-upgraded DB. Disposable endpoint and migration tests passed; eric-dev API updated, production untouched.

@@ -22,11 +22,15 @@ from app.db import database
 from app.enrollment_limit import require_enrollment_permit
 from app.onboarding import fail, require_installation, router as onboarding_router
 from app.episode_transfer import check_quota, router as episode_transfer_router, sweep_expired
+from app.cleanup_sessions import router as cleanup_router
+from app.continuous_transfer import router as continuous_router, sweep_staging
 from app.video_deletion import reject_deleted_video, router as video_deletion_router, sweep_deletions
 
 app = FastAPI(title="Too Much Trash API", version="0.2.0")
 app.include_router(admin_router)
 app.include_router(onboarding_router)
+app.include_router(continuous_router)
+app.include_router(cleanup_router)
 app.include_router(episode_transfer_router)
 app.include_router(video_deletion_router)
 BUCKET = os.environ["S3_BUCKET"]
@@ -49,6 +53,7 @@ async def start_transfer_sweeper():
             try:
                 await run_in_threadpool(sweep_expired)
                 await run_in_threadpool(sweep_deletions)
+                await run_in_threadpool(sweep_staging)
             except Exception:
                 logging.getLogger(__name__).exception("Resumable transfer cleanup failed; it will be retried")
             await asyncio.sleep(3600)

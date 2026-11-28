@@ -136,3 +136,144 @@ Validation status (2026-11-11): signed iPhone and Watch builds succeeded; the Wa
 The Watch opens on a dedicated green circular leaf button labeled “Press to start cleanup walk.” Pressing runs a three-second 3–2–1 countdown before requesting workout startup; successful startup opens the dashboard. Leaving the screen or backgrounding cancels a pending countdown. The Actions page lists Sync now, Undo last, then Stop cleanup walk; stopping requires confirmation and returns to the leaf screen. Starting requires permission to save workouts in Health; ending finishes the workout and saves it locally in Health. These are explicit user actions, independent of recording individual clips. The user should end the walk when cleanup is finished; closing the iPhone app does not end it automatically. Workout records are not included in our backend uploads.
 
 The Watch declares HealthKit and `workout-processing` to support its dashboard during an actual walking workout. This requires newly provisioned HealthKit-enabled device signing profiles for the Watch target. On 2026-11-13, the signed device build passed with HealthKit enabled using the existing free Personal Team. The updated companion and Watch apps were installed in place through the verified USB relay. The Watch display name is TooMuchTrash and its icon reuses the dashboard’s smiling leaf. Physical workout permissions, start/end behavior, saving, and wrist-wake persistence remain unverified.
+
+## R59 alpha and full recordings
+
+The camera runs the pinned `jaw-r59-independent-motion-alpha1` detector in shadow
+mode at 15 Hz. Final events briefly flash SQUEEZE or RELEASE. Manual volume-button
+recording remains authoritative and unchanged; UI overlays never enter video.
+Raw accelerometer (including gravity) and gyro samples retain native axes/rates.
+The hardware-statistics overlay is intentionally removed from the camera UI.
+
+The native C++ wrappers compile the audited sources in `ml/experiments/jaw-trigger/alpha/runtime`.
+Weights stay private. Before building an alpha-enabled app, run:
+
+```sh
+python3 ios/scripts/stage_jaw_alpha.py /absolute/private/alpha-package
+xcodegen generate --spec ios/project.yml
+```
+
+The staging script verifies the package against the tracked selection and copies
+only its three model JSONs into ignored `ios/AlphaPrivate/runtime/`. A checkout
+without these assets still builds; the detector reports unavailable and manual
+capture/full recording remain usable. Never bundle conformance clips or test data.
+
+**Start Full Session Recording** explicitly starts continuous capture and creates a
+cleanup walk only if none is active. Opening the camera never starts it. Confirming
+**Stop Full Session Recording** finalizes only that recording; the cleanup walk
+remains active, and another full recording can join it. Cancel keeps recording.
+Dashboard remains accessible during full recording and includes a confirmed Stop
+control. Opening it keeps foreground video/sensor capture running; iOS background
+or interruption still ends camera capture automatically. Volume holds continue to make ordinary pre/hold/post-roll episodes
+without stopping the full session. Full sessions preserve consecutive 960×720 MP4
+parts (no audio), IMU, poses/intrinsics, manual reference callbacks, independent
+model predictions, diagnostics and `session.json`. Native monotonic timestamps
+map parts and streams; file boundaries do not reset the model. There is no total
+30-second/80-MB episode cutoff for full sessions. Backgrounding/interruption ends
+the camera session, preserving available data; recording cannot continue in iOS
+background camera suspension.
+
+Finished full recordings upload automatically over a separate resumable contract.
+A matching recording ID, bundle SHA-256, byte count and completion receipt are
+required before recording a local upload acknowledgement. Background chunk tasks
+use the existing disk-backed URLSession. Pending parts survive restart; interrupted
+manifests are explicitly flagged as recovered, with possible missing unclosed tails.
+Confirmed copies expire after 24h; pending finalized sessions get a final resumable
+attempt at 72h before clearing. Active recordings and OS-owned transfers are
+protected. Unsupported servers retain the full recording pending a backend update.
+
+Physical iPhone checks on 2026-11-27 matched all six private conformance fixtures
+(705 frames, identical events, maximum score error 1.4e-17). A short live check
+produced complete 960×720/no-audio video and raw streams, with inference p95 about
+5.8 ms and sensor age about 10 ms. Direct NV12-luma conversion preserves full view
+and native landscape orientation; it differs from the recorded-media PyAV resize
+by about 1.7/255 mean pixel error in the checked scene. This is preprocessing and
+implementation evidence, **not** measured field event accuracy or long-run thermal
+validation. The 61 reserved test clips remain untouched.
+
+## Camera configuration and cleanup context
+
+Dashboard **Admin → Camera view** contains persistent local controls for frozen
+model predictions and the Full recording button. The model picker shows the
+frozen name, date and predicted events; R59 is currently the only shipped model.
+Disabling predictions stops the detector. Disabling the Full recording button
+hides the control without removing an active recording's Stop action. The page
+is reserved for additional camera options. Admin reachability gates this page;
+settings persist when the network is disconnected.
+
+Dashboard **Menu → Cleanup session** is available to ordinary and development
+sessions. Start/stop a cleanup walk, name it, describe the event, mark its location,
+and configure walking-route recording. Watch and phone share stable session IDs;
+Watch start/stop commands are queued durably and de-duplicated, including a stop
+that arrives before its start. Phone start/stop also publishes the walk state to
+the Watch. HealthKit metrics remain on the Watch/in Health. Starting camera capture
+still requires the phone camera screen to be foregrounded.
+
+New phone walks open a form with Mark current location and Record walking route
+preselected; either can be disabled before Start. Permission is requested when
+starting with either selected, or later using Mark current location/enabling route. When-in-use permission plus explicit active-route background
+updates supports walking with the phone screen off; force-quit/relaunch can leave
+gaps. On relaunch, open Cleanup session to resume a previously enabled route.
+Accuracy, timestamps and interruption notes accompany the stored points. Metadata
+is durably saved per collector/installation, revision-synced to the backend, and
+linked from pickup/full-recording manifests for later dataset labeling. Unsaved
+text must be committed with Save details. Stopping a walk stops route collection.
+
+The account action is labeled **Sign out**, distinct from **Stop cleanup walk**.
+Sign-out bounds its waits for upload cancellation, server acknowledgement and
+background-task enumeration. A timeout preserves local data and its recovery
+journal and offers Retry sign-out. Late network replies cannot resume deletion.
+Cleanup details and route preferences are visible before the first walk starts;
+the starting location is requested when the walk begins.
+
+### Full Session Recording dashboard
+
+Dashboard lists **Full Session Recordings** as rows, with duration, upload status
+and related clip count. Open a row to see its **Session Squeeze Event Recordings**.
+New squeeze manifests store `full_session_recording_id` at trigger press, separately
+from `cleanup_session_id`. Historical manifests are never rewritten; old associations
+use matching walk IDs and press timestamps within the recording interval.
+
+Long-press a full recording for local Delete. Synced developer recordings also
+support **Delete here and backend** when the server advertises support. Keep local
+files until the authenticated backend acknowledges the exact recording ID. Protect
+active/finalizing journals, uploads and OS-owned transfers. Both deletion choices
+preserve sibling squeeze clips and cleanup-walk metadata. Normal 24h/72h retention
+still applies; after a full recording expires locally, its clips remain in the
+separate squeeze-recordings list until their own retention deadline.
+
+
+Starting a Full Session Recording without an active walk opens the cleanup form.
+Cancel starts neither a walk nor a recording. Start walk & full recording saves the
+name/description/location choices, dismisses the form, then starts capture when the
+camera is ready. An existing walk is reused directly; stopping full capture leaves
+it active. Full recordings are grouped under their walk, newest first.
+
+The compact cleanup form shows a cloud in the upper left: pulsing while metadata
+is pending/syncing, red after a failed sync and blue after acknowledgement. Draft
+walks show a neutral cloud. The description initially takes one line, expanding to
+three; there is no inline Details synced label. A route point is one timestamped GPS
+sample; an empty active route now says Waiting for the first GPS location.
+
+Tombstone-backed DELETE requests retry once after transient network failure using
+a fresh foreground connection pool, retaining the same identity and credentials.
+Other requests (especially invite enrollment) do not gain this retry. Failed deletion
+preserves the local recording and reports a network code separately from server or
+response errors. Debug inspection can check health GET and deletion-route OPTIONS
+without modifying recordings; never use a user's real recording as a test delete.
+
+
+Marked locations display a cached city/area name from Apple reverse geocoding
+(MapKit on iOS26+, Core Location fallback on supported earlier versions). Country-only/state-only results and failed or offline lookups use the GPS
+coordinates as the display fallback. A readable label must include a city or
+neighborhood; old unverified cached labels are ignored and can be looked up again.
+Lookup is bounded, throttled and performed for marked points, never for each route
+sample. Labels are an owner-scoped local display cache in cleanup-place-names.json;
+the original coordinates, accuracy and timestamps remain the backend research data.
+Late results cannot rename another owner or a newly marked point.
+
+New Watch-started walks also request initial location marking and route collection.
+The paired phone needs granted location access and foreground activation to begin
+or resume its When In Use location service. Stopping full recording leaves the walk
+and its route active; stopping the walk ends route capture. Phone forms keep the
+location options preselected while preserving existing walks' saved choices.

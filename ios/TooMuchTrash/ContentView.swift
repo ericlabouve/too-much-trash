@@ -1,11 +1,16 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var camera = EpisodeCameraController()
+    @StateObject private var camera: EpisodeCameraController
+    init(camera: EpisodeCameraController? = nil) { _camera = StateObject(wrappedValue: camera ?? EpisodeCameraController()) }
     @EnvironmentObject private var account: AccountSession
     @Environment(\.scenePhase) private var scenePhase
     @State private var screenButtonHeld = false
     @State private var showDashboard = false
+    @State private var showCleanupStart = false
+    @State private var pendingFullStart = false
+    @State private var fullRecordingError: String?
+    @State private var cameraConfiguration = CameraViewConfiguration()
 
     var body: some View {
         GeometryReader { geometry in
@@ -13,14 +18,6 @@ struct ContentView: View {
         ZStack {
             Color.black.ignoresSafeArea()
             EpisodeCameraPreview(camera: camera).ignoresSafeArea()
-            if account.showDeveloperSensorOverlay {
-                VStack {
-                    HStack { DeveloperSensorOverlay(camera: camera, compact: landscape); Spacer() }
-                    Spacer()
-                }
-                .padding(.top, landscape ? 78 : 82).padding(.leading, 16)
-                .allowsHitTesting(false)
-            }
             if !camera.isReady {
                 VStack(spacing: 14) {
                     Image(systemName: "camera").font(.system(size: 36))
@@ -55,10 +52,24 @@ struct ContentView: View {
                     Spacer()
                     Button { showDashboard = true } label: { Image(systemName: "square.grid.2x2") }
                         .accessibilityLabel("Dashboard").accessibilityIdentifier("openDashboard")
-                        .disabled(camera.recordingStartedAt != nil || camera.pendingEpisodes > 0)
+                        .disabled(camera.recordingStartedAt != nil || camera.pendingEpisodes > 0 || camera.fullRecordingChanging)
+                        .accessibilityHint("Full Session Recording continues while the dashboard is open.")
                 }
                 .padding(16)
                 .background(.black.opacity(0.55), in: Capsule())
+                if cameraConfiguration.fullRecordingButtonEnabled || camera.fullRecording {
+                HStack {
+                    FullSessionRecordingControl(active: camera.fullRecording, changing: camera.fullRecordingChanging, ready: camera.isReady) {
+                        if account.cleanup.activeID == nil { showCleanupStart = true }
+                        else { beginFullRecording() }
+                    } stop: { camera.setFullRecording(false) }
+                }
+                }
+                if cameraConfiguration.runsModel && !camera.alphaEvent.isEmpty {
+                    Text(camera.alphaEvent).font(.title.bold()).padding(10)
+                        .background(.green.opacity(0.8), in: Capsule())
+                        .accessibilityIdentifier("jawAlphaEvent")
+                }
                 Spacer()
                 VStack(spacing: 16) {
                     if let start = camera.recordingStartedAt {
@@ -102,64 +113,84 @@ struct ContentView: View {
         }
         }
         .foregroundStyle(.white)
+        .accessibilityHidden(showDashboard)
         .task { [account] in
             let owner = account.captureOwner
             camera.onEpisodeSaved = { [weak account] folder, id in account?.queueEpisode(folder, id: id, owner: owner) }
             guard let owner, let directory = try? account.queue.recordingDirectory(origin: owner.origin, installationID: owner.installationID) else { return }
+            account.prepareFullRecordings()
             do { try camera.configure(directory: directory) }
             catch { return }
+            camera.applyCameraConfiguration(account.cameraSettings.configuration)
+            camera.setCleanupSession(account.cleanup.activeID)
+            account.cleanup.resumeRouteIfRequested()
             await camera.activate()
         }
-        .fullScreenCover(isPresented: $showDashboard) { SessionDashboard(account: account, queue: account.queue) }
+        .onReceive(account.cameraSettings.$configuration) { value in
+            cameraConfiguration = value
+            camera.applyCameraConfiguration(value)
+        }
+        .onReceive(account.cleanup.$records) { _ in camera.setCleanupSession(account.cleanup.activeID) }
+        .modifier(FullRecordingStartFlow(store: account.cleanup, presented: $showCleanupStart) { beginFullRecording() })
+        .fullScreenCover(isPresented: $showDashboard) { SessionDashboard(account: account, queue: account.queue, camera: camera) }
         .onChange(of: showDashboard) { _, shown in
-            if shown { screenButtonHeld = false; camera.deactivate() }
+            if shown {
+                pendingFullStart = false; screenButtonHeld = false
+                if !camera.fullRecording { camera.deactivate() }
+            }
             else { Task { await camera.activate() } }
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active && !showDashboard {
+            if phase == .active && (!showDashboard || camera.fullRecording) {
                 Task { await camera.activate() }
             } else {
                 screenButtonHeld = false
                 camera.deactivate()
             }
         }
-        .onDisappear { camera.deactivate() }
-    }
-}
-
-private struct DeveloperSensorOverlay: View {
-    @ObservedObject var camera: EpisodeCameraController
-    var compact = false
-    private func values(_ stream: String) -> String {
-        guard let sample = camera.latestMotion[stream] else { return "—" }
-        return sample.values.map { String(format: "%.2f", $0) }.joined(separator: ", ")
-    }
-    var body: some View {
-        let pose = camera.latestPose
-        let matrix = pose?.cameraToWorldColumns ?? []
-        let position = matrix.count == 16 ? [matrix[12], matrix[13], matrix[14]].map { String(format: "%.2f", $0) }.joined(separator: ", ") : "—"
-        let rotation = pose?.cameraOrientationQuaternion.map { String(format: "%.2f", $0) }.joined(separator: ", ") ?? "—"
-        VStack(alignment: .leading, spacing: compact ? 1 : 3) {
-            Text("DEV SENSORS").fontWeight(.bold)
-            Text("Accel g: \(values("accelerometer"))")
-            Text("Gyro rad/s: \(values("gyroscope"))")
-            Text("Attitude xyzw: \(values("attitude"))")
-            Text("Position m: \(position)")
-            Text("Camera xyzw: \(rotation)")
-            Text("Frame time: \(pose.map { String(format: "%.3f", $0.timestamp) } ?? "—")")
-            Text("IMU time: \(camera.latestMotion["accelerometer"].map { String(format: "%.3f", $0.timestamp) } ?? "—")")
-            Text("Frame/callback Δ: \(pose.map { String(format: "%.3f s", $0.callbackUptime - $0.timestamp) } ?? "—")")
-            Text("Tracking: \(pose?.tracking ?? "—") \(pose?.trackingReason ?? "")")
-            Text("\(camera.status) · \(camera.pendingEpisodes) pending")
+        .onChange(of: camera.isReady) { _, ready in
+            if ready, pendingFullStart { pendingFullStart = false; beginFullRecording() }
         }
-        .font(.system(size: compact ? 9 : 10, design: .monospaced))
-        .padding(compact ? 6 : 8)
-        .background(.black.opacity(0.72), in: RoundedRectangle(cornerRadius: 8))
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("developerSensorOverlay")
+        .alert("Couldn’t start recording", isPresented: Binding(get: { fullRecordingError != nil }, set: { if !$0 { fullRecordingError = nil } })) {
+            Button("OK", role: .cancel) { fullRecordingError = nil }
+        } message: { Text(fullRecordingError ?? "") }
+        .onDisappear {
+            pendingFullStart = false
+            if !showDashboard || account.phase != .authorized { camera.deactivate() }
+        }
     }
+    private func beginFullRecording() {
+        guard let id = account.cleanup.activeID else { fullRecordingError = "Start a cleanup walk first."; return }
+        guard camera.isReady else {
+            pendingFullStart = true
+            Task { await camera.activate() }
+            return
+        }
+        pendingFullStart = false
+        camera.setCleanupSession(id)
+        camera.setFullRecording(true)
+    }
+
 }
 
-#Preview {
-    ContentView().environmentObject(AccountSession(configuration: nil))
+
+struct FullSessionRecordingControl: View {
+    let active: Bool
+    let changing: Bool
+    let ready: Bool
+    let start: () -> Void
+    let stop: () -> Void
+    @State private var confirmStop = false
+    var body: some View {
+        Button(active ? "Stop Full Session Recording" : "Start Full Session Recording") {
+            if active { confirmStop = true } else { start() }
+        }
+        .accessibilityIdentifier("fullSessionRecording")
+        .buttonStyle(.bordered).tint(active ? .red : .green)
+        .disabled(changing || (!ready && !active))
+        .alert("Stop Full Session Recording?", isPresented: $confirmStop) {
+            Button("Keep recording", role: .cancel) {}
+            Button("Stop recording", role: .destructive) { stop() }
+        } message: { Text("Your cleanup walk will stay active.") }
+    }
 }

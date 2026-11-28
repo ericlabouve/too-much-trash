@@ -3,6 +3,7 @@ import CryptoKit
 
 @MainActor
 protocol HTTPTransport {
+    func resetConnection()
     func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse)
     func upload(for request: URLRequest, from file: URL) async throws -> (Data, HTTPURLResponse)
     func upload(for request: URLRequest, from file: URL,
@@ -10,6 +11,7 @@ protocol HTTPTransport {
 }
 
 extension HTTPTransport {
+    func resetConnection() {}
     func upload(for request: URLRequest, from file: URL,
                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> (Data, HTTPURLResponse) {
         try await upload(for: request, from: file)
@@ -28,14 +30,18 @@ final class RefuseRedirects: NSObject, URLSessionTaskDelegate, @unchecked Sendab
 
 @MainActor
 final class SecureHTTPTransport: HTTPTransport {
-    private let session: URLSession
-    init() {
+    private var session = makeSession()
+    private static func makeSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.httpCookieStorage = nil
         configuration.urlCache = nil
         configuration.timeoutIntervalForRequest = 30
         configuration.timeoutIntervalForResource = 300
-        session = URLSession(configuration: configuration, delegate: RefuseRedirects(), delegateQueue: nil)
+        return URLSession(configuration: configuration, delegate: RefuseRedirects(), delegateQueue: nil)
+    }
+    func resetConnection() {
+        session.finishTasksAndInvalidate()
+        session = Self.makeSession()
     }
 
     func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
@@ -63,6 +69,9 @@ final class SecureHTTPTransport: HTTPTransport {
 
 @MainActor
 protocol CollectorAPI {
+    func saveCleanup(_ record: CleanupSessionRecord, token: String) async throws -> CleanupSessionReceipt
+    func uploadContinuous(directory: URL, recordingID: UUID, token: String,
+                          progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> ContinuousReceipt
     func enroll(invite: String, name: String?) async throws -> Enrollment
     func refresh(token: String) async throws -> AccessToken
     func me(token: String) async throws -> Installation
@@ -71,6 +80,7 @@ protocol CollectorAPI {
                 progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt
     func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt
     func deleteVideo(captureID: UUID, token: String) async throws
+    func deleteContinuous(recordingID: UUID, token: String) async throws
     func endSession(refreshToken: String) async throws -> EndSessionReceipt
     func media(id: UUID, token: String) async throws -> MediaReceipt
     func adminReachable() async -> Bool
@@ -82,7 +92,20 @@ protocol CollectorAPI {
                        progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt
 }
 
+struct CleanupSessionReceipt: Decodable { let session_id: UUID; let revision: Int; let saved: Bool }
+
+struct ContinuousReceipt: Codable {
+    let recording_id: UUID
+    let bundle_sha256: String
+    let size_bytes: Int64
+    let complete: Bool
+}
+
 extension CollectorAPI {
+    func saveCleanup(_ record: CleanupSessionRecord, token: String) async throws -> CleanupSessionReceipt { throw ClientError.configuration }
+    func uploadContinuous(directory: URL, recordingID: UUID, token: String,
+                          progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> ContinuousReceipt { throw ClientError.configuration }
+
     func developmentEnroll(key: String) async throws -> Enrollment { throw ClientError.configuration }
     func uploadEpisode(directory: URL, episodeID: UUID, token: String,
                        progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> MediaReceipt { throw ClientError.configuration }
@@ -100,6 +123,7 @@ extension CollectorAPI {
     }
     func uploaded(captureID: UUID, token: String) async throws -> MediaReceipt { throw ClientError.missingMedia }
     func deleteVideo(captureID: UUID, token: String) async throws { throw ClientError.developmentRequired }
+    func deleteContinuous(recordingID: UUID, token: String) async throws { throw ClientError.developmentRequired }
     func endSession(refreshToken: String) async throws -> EndSessionReceipt { throw ClientError.configuration }
 }
 
@@ -115,6 +139,18 @@ final class LiveCollectorAPI: CollectorAPI {
     init(configuration: APIConfiguration, transport: HTTPTransport? = nil) {
         self.configuration = configuration
         self.transport = transport ?? SecureHTTPTransport()
+    }
+
+    func saveCleanup(_ record: CleanupSessionRecord, token: String) async throws -> CleanupSessionReceipt {
+        var request = URLRequest(url: configuration.endpoint("api/v1/cleanup-sessions/\(record.id.uuidString.lowercased())"))
+        request.httpMethod = "PUT"
+        var document = try JSONSerialization.jsonObject(with: JSONEncoder().encode(record)) as! [String: Any]
+        document.removeValue(forKey: "acknowledged_revision")
+        request.httpBody = try JSONSerialization.data(withJSONObject: document)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        let (data, response) = try await transport.data(for: request)
+        return try decode(data, response, expected: 200)
     }
 
     func enroll(invite: String, name: String?) async throws -> Enrollment {
@@ -158,10 +194,36 @@ final class LiveCollectorAPI: CollectorAPI {
         request.httpMethod = "DELETE"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        let (data, response) = try await transport.data(for: request)
+        let (data, response) = try await deletionRequest(request)
         guard response.url == request.url else { throw ClientError.invalidResponse }
         let result: Deletion = try decode(data, response, expected: 200)
         guard result.deleted, result.client_capture_id == captureID else { throw ClientError.invalidResponse }
+    }
+
+    func deleteContinuous(recordingID: UUID, token: String) async throws {
+        struct Deletion: Decodable { let recording_id: UUID; let deleted: Bool }
+        var request = URLRequest(url: configuration.endpoint("api/v1/continuous/\(recordingID.uuidString)"))
+        request.httpMethod = "DELETE"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        let (data, response) = try await deletionRequest(request)
+        guard response.url == request.url else { throw ClientError.invalidResponse }
+        let result: Deletion = try decode(data, response, expected: 200)
+        guard result.deleted, result.recording_id == recordingID else { throw ClientError.invalidResponse }
+    }
+
+    private func deletionRequest(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        var request = request
+        request.timeoutInterval = 15
+        do { return try await transport.data(for: request) }
+        catch let error as URLError where [.timedOut, .networkConnectionLost, .cannotFindHost, .dnsLookupFailed, .cannotConnectToHost, .notConnectedToInternet].contains(error.code) {
+            // DELETE is tombstone-backed and safe after an uncertain response.
+            // A fresh connection pool also avoids reusing a tunnel from before a VPN change.
+            try Task.checkCancellation()
+            transport.resetConnection()
+            try await Task.sleep(for: .milliseconds(500))
+            return try await transport.data(for: request)
+        }
     }
 
     func endSession(refreshToken: String) async throws -> EndSessionReceipt {
@@ -367,6 +429,98 @@ final class LiveCollectorAPI: CollectorAPI {
         return try decode(data, response, expected: 202)
     }
 
+    func uploadContinuous(directory: URL, recordingID episodeID: UUID, token: String,
+                                progress: @escaping @MainActor @Sendable (Int64, Int64) -> Void) async throws -> ContinuousReceipt {
+        let descriptors = try await Task.detached(priority: .utility) { try Self.describeContinuous(directory) }.value
+        let total = descriptors.values.reduce(Int64(0)) { $0 + $1.size }
+        guard total > 0, total <= 64 * 1024 * 1024 * 1024 else { throw ClientError.uploadTooLarge }
+        let path = "api/v1/continuous/\(episodeID.uuidString)/transfer"
+        var begin = URLRequest(url: configuration.endpoint(path))
+        begin.httpMethod = "POST"
+        begin.httpBody = try JSONEncoder().encode(ResumableBegin(files: descriptors))
+        begin.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        begin.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        begin.setValue(String(BackgroundUploads.largerChunkSize), forHTTPHeaderField: "X-TMT-Chunk-Size")
+        let (beginData, beginResponse) = try await transport.data(for: begin)
+        guard beginResponse.url == begin.url else { throw ClientError.invalidResponse }
+        let state: ResumableState = try decode(beginData, beginResponse, expected: 200)
+        if state.complete {
+            var request = URLRequest(url: configuration.endpoint("\(path)/finish"))
+            request.httpMethod = "POST"
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            let (data, response) = try await transport.data(for: request)
+            return try decode(data, response, expected: 202)
+        }
+        let largeChunks = state.chunk_size == BackgroundUploads.largerChunkSize
+        guard (state.chunk_size == 1024 * 1024 || largeChunks),
+              Set(state.chunks.keys) == Set(descriptors.keys) else { throw ClientError.invalidResponse }
+        let chunkSize = Int64(state.chunk_size)
+        let staging = BackgroundUploads.stagingDirectory
+        try FileManager.default.createDirectory(at: staging, withIntermediateDirectories: true)
+        try CaptureQueue.protect(staging)
+        try await BackgroundUploads.shared.cleanOrphanedChunks(captureID: episodeID)
+        var sent: Int64 = 0
+        var missing: [(name: String, source: URL, index: Int, size: Int64)] = []
+        for name in descriptors.keys.sorted() {
+            let filename = name
+            guard let descriptor = descriptors[name], let uploaded = state.chunks[name] else { throw ClientError.invalidResponse }
+            let count = Int((descriptor.size + chunkSize - 1) / chunkSize)
+            let accepted = Set(uploaded)
+            guard accepted.count == uploaded.count, accepted.allSatisfy({ $0 >= 0 && $0 < count }) else { throw ClientError.invalidResponse }
+            let source = directory.appendingPathComponent(filename)
+            for index in 0..<count {
+                let size = min(chunkSize, descriptor.size - Int64(index) * chunkSize)
+                if accepted.contains(index) { sent += size }
+                else { missing.append((name, source, index, size)) }
+            }
+        }
+        progress(sent, total)
+        let tracker = ChunkProgress(sent: sent)
+        defer { tracker.open = false }
+        let parallelism = largeChunks ? BackgroundUploads.maximumConcurrentChunks : 1
+        let chunkHeader = largeChunks ? String(chunkSize) : nil
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for (position, chunk) in missing.enumerated() {
+                if position >= parallelism { _ = try await group.next() }
+                try Task.checkCancellation()
+                group.addTask { @MainActor in
+                    let bodyURL = staging.appendingPathComponent(BackgroundUploads.chunkFileName(
+                        episodeID: episodeID.uuidString, name: chunk.name, index: chunk.index, chunkSize: chunkHeader))
+                    defer { try? FileManager.default.removeItem(at: bodyURL) }
+                    try await Task.detached(priority: .utility) {
+                        try Self.stageChunk(source: chunk.source, target: bodyURL,
+                                            offset: UInt64(Int64(chunk.index) * chunkSize), size: Int(chunk.size))
+                    }.value
+                    try Task.checkCancellation()
+                    var request = URLRequest(url: self.configuration.endpoint("\(path)/\(chunk.name)/\(chunk.index)"))
+                    request.httpMethod = "PUT"
+                    request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+                    request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                    request.setValue(episodeID.uuidString, forHTTPHeaderField: "Idempotency-Key")
+                    request.setValue(chunkHeader, forHTTPHeaderField: "X-TMT-Chunk-Size")
+                    let (data, response) = try await self.transport.upload(for: request, from: bodyURL) { current, _ in
+                        guard tracker.open else { return }
+                        tracker.update(index: position, bytes: min(chunk.size, current))
+                        progress(tracker.sent, total)
+                    }
+                    guard response.url == request.url else { throw ClientError.invalidResponse }
+                    let receipt: ResumableAccepted = try self.decode(data, response, expected: 200)
+                    guard receipt.accepted else { throw ClientError.invalidResponse }
+                    tracker.update(index: position, bytes: chunk.size)
+                    progress(tracker.sent, total)
+                }
+            }
+            for try await _ in group {}
+        }
+        tracker.open = false
+        var finish = URLRequest(url: configuration.endpoint("\(path)/finish"))
+        finish.httpMethod = "POST"
+        finish.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        let (data, response) = try await transport.data(for: finish)
+        guard response.url == finish.url else { throw ClientError.invalidResponse }
+        return try decode(data, response, expected: 202)
+    }
+
     private nonisolated static func describeEpisode(_ directory: URL) throws -> [String: ResumableFile] {
         var result: [String: ResumableFile] = [:]
         for (name, filename) in episodeFileNames {
@@ -383,6 +537,36 @@ final class LiveCollectorAPI: CollectorAPI {
             result[name] = ResumableFile(size: size, sha256: digest.finalize().map { String(format: "%02x", $0) }.joined())
         }
         return result
+    }
+
+    private nonisolated static func describeContinuous(_ directory: URL) throws -> [String: ResumableFile] {
+        let names = try ContinuousCapture.fileNames(directory)
+        var result: [String: ResumableFile] = [:]
+        for name in names {
+            let file = try FileHandle(forReadingFrom: directory.appendingPathComponent(name))
+            defer { try? file.close() }
+            var digest = SHA256(), size: Int64 = 0
+            while let data = try file.read(upToCount: 1024 * 1024), !data.isEmpty {
+                digest.update(data: data); size += Int64(data.count)
+            }
+            result[name] = ResumableFile(size: size, sha256: digest.finalize().map { String(format: "%02x", $0) }.joined())
+        }
+        return result
+    }
+
+    nonisolated static func continuousDigest(_ directory: URL) throws -> (String, Int64) {
+        let descriptors = try describeContinuous(directory)
+        var digest = SHA256(), size: Int64 = 0
+        for name in descriptors.keys.sorted() {
+            let f = descriptors[name]!
+            digest.update(data: Data((name + "\0" + String(f.size) + "\0").utf8))
+            let bytes = stride(from: 0, to: f.sha256.count, by: 2).map { index -> UInt8 in
+                let start = f.sha256.index(f.sha256.startIndex, offsetBy: index)
+                return UInt8(f.sha256[start..<f.sha256.index(start, offsetBy: 2)], radix: 16)!
+            }
+            digest.update(data: Data(bytes)); size += f.size
+        }
+        return (digest.finalize().map { String(format: "%02x", $0) }.joined(), size)
     }
 
     private nonisolated static func stageChunk(source: URL, target: URL, offset: UInt64, size: Int) throws {
